@@ -2,6 +2,7 @@ package org.quickjava.core;
 
 import org.quickjava.core.annotation.QuickBoot;
 import org.quickjava.core.exception.MapNotFoundException;
+import org.quickjava.core.utils.QUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,7 +18,7 @@ public class Env {
             throws Exception
     {
         // 根目录
-        set("ROOT_PATH", System.getProperty("user.dir"));
+        set("rootPath", QUtils.getRootPath());
         // 项目包
         QuickBoot quickBoot = applicationClass.newInstance().getClass().getAnnotation(QuickBoot.class);
         set("basePackages", quickBoot.value());

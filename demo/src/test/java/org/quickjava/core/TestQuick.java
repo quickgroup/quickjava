@@ -3,6 +3,8 @@ package org.quickjava.core;
 import org.junit.Test;
 import org.quickjava.core.bean.Module;
 import org.quickjava.core.config.BaseConfig;
+import org.quickjava.core.utils.QFileUtils;
+import org.quickjava.core.utils.QUtils;
 
 import java.io.File;
 import java.net.URL;
@@ -20,6 +22,7 @@ public class TestQuick {
     public void test1()
     {
         try {
+            String rootPath = QUtils.getRootPath();
             String appPackages = "org.demo.www.application";
             String packagePath = appPackages.replace(".", "/");
 
@@ -36,7 +39,7 @@ public class TestQuick {
             Map<String, Module> moduleList = new HashMap<String, Module>();
             BaseConfig baseConfig;
 
-            while (enumeration.hasMoreElements()) {
+            if (enumeration.hasMoreElements()) {
                 URL item = enumeration.nextElement();
 
                 if (item.getProtocol().equals("file")) {
@@ -44,6 +47,7 @@ public class TestQuick {
                     File appFile = new File(item.getFile());
                     File[] moduleFiles = appFile.listFiles();
                     for (File file : moduleFiles) {
+                        System.out.println("file=" + file);
 
                         if (file.isDirectory()) {
                             /**
@@ -53,12 +57,14 @@ public class TestQuick {
                             moduleList.put(module.getName(), module);
 
                         } else if (file.isFile()){
-
-                            if (file.getName().contains(".yml") || file.getName().contains(".yaml")) {
+                            String fileName = file.getName();
+                            System.out.println("fileName=" + fileName);
+                            if (fileName.contains(".yml") || fileName.contains(".yaml")) {
                                 /**
                                  * YAML 配置文件
                                  */
-                                if (file.getName().equals("config.xml")) {
+                                System.out.println("fileName=" + fileName);
+                                if (fileName.equals("config.yml")) {
                                     baseConfig = BaseConfig.Factory.loadFormYml("");
                                 }
 
@@ -70,6 +76,15 @@ public class TestQuick {
                             }
                         }
                     }
+
+                    // 加载配置文件
+                    URL configYmlUrl = loader.getResource("config.yml");
+                    String configYmlContent = QFileUtils.getFileContents(configYmlUrl.getPath());
+                    URL routeYmlUrl = loader.getResource("route.yml");
+                    System.out.println("configYmlUrl=" + configYmlUrl);
+                    System.out.println("configYmlContent=" + configYmlContent);
+
+                    baseConfig = BaseConfig.Factory.loadFormYml("");
 
                 } else if (item.getProtocol().equals("jar")) {
                     // jar包
