@@ -10,7 +10,7 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>QuickJava</name>
-    <description>QuickJava Boot</description>
+    <description>QuickJava MVC Framework</description>
 
     <!-- 配置 -->
     <properties>
