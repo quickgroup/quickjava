@@ -1,31 +1,91 @@
 package org.quickjava.core.http;
 
 import org.quickjava.common.QUtils;
+import org.quickjava.core.bean.Action;
+import org.quickjava.core.bean.Dict;
+import org.quickjava.core.bean.Module;
+import org.quickjava.core.controller.Controller;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 每个请求进来对应一个
  */
 public class Request {
 
+    /**
+     * @langCn url中的域名
+     */
+    private String domin = null;
+
+    /**
+     * @langCn header头中的host，常规情况下和{@see #domin}一致，某些特殊场景会不同
+     */
     private String host = null;
 
-    private Integer port = 80;
+    /**
+     * @langCn 请求端口号
+     */
+    private Integer port = null;
 
-    private HashMap<String, String> headers = new HashMap<String, String>();
-
+    /**
+     * @langCn 请求类型，大写
+     */
     private String method = null;
 
+    /**
+     * eq pathinfo
+     * @langCn 域名后面的路径
+     */
     private String path = null;
 
-    private String query = null;
+    /**
+     * @langCn 对应模块
+     */
+    private Module module = null;
 
+    /**
+     * @langCn 对应控制器
+     */
+    private Controller controller = null;
+
+    /**
+     * @langCn 对应控制器的方法
+     */
+    private Action action = null;
+
+    /**
+     * @langCn 请求header头
+     */
+    private Dict headers = null;
+
+    /**
+     * @langCn 请求数据类型
+     */
+    private Http.ContentType contentType = null;
+
+    /**
+     * @langCn url-query请求数据
+     */
+    private Dict queryData = null;
+
+    /**
+     * @langCn Post请求数据
+     */
+    private Dict postData = null;
+
+    /**
+     * @langCn 原始HttpServletRequest
+     */
     private HttpServletRequest httpServletRequest = null;
 
+    /**
+     * @langCn 原始HttpServletResponse
+     */
     private HttpServletResponse httpServletResponse = null;
 
     public Request(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
@@ -34,67 +94,39 @@ public class Request {
         this.initHeader(httpServletRequest);
     }
 
+    @SuppressWarnings({"unchecked"})
     private void initHeader(HttpServletRequest httpServletRequest)
     {
         this.host = httpServletRequest.getRemoteHost();
         this.path = httpServletRequest.getPathInfo();
-        this.method = httpServletRequest.getMethod();
+        this.method = httpServletRequest.getMethod().toUpperCase();
+        // 初始化请求数据
+        Map<String, String[]> data = httpServletRequest.getParameterMap();
+        this.postData = new Dict( (Map) data );
     }
 
     public String getHost() {
         return host;
     }
 
-    public void setHost(String host) {
-        this.host = host;
-    }
-
     public Integer getPort() {
         return port;
-    }
-
-    public void setPort(Integer port) {
-        this.port = port;
     }
 
     public String getMethod() {
         return method;
     }
 
-    public void setMethod(String method) {
-        this.method = method;
-    }
-
     public String getPath() {
         return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
-    }
-
-    public String getQuery() {
-        return query;
-    }
-
-    public void setQuery(String query) {
-        this.query = query;
     }
 
     public HttpServletRequest getHttpServletRequest() {
         return httpServletRequest;
     }
 
-    public void setHttpServletRequest(HttpServletRequest httpServletRequest) {
-        this.httpServletRequest = httpServletRequest;
-    }
-
     public HttpServletResponse getHttpServletResponse() {
         return httpServletResponse;
-    }
-
-    public void setHttpServletResponse(HttpServletResponse httpServletResponse) {
-        this.httpServletResponse = httpServletResponse;
     }
 
     public Boolean isPost() {
@@ -107,58 +139,6 @@ public class Request {
 
     public Boolean isXMLHttpRequest() {
         return ("XMLHttpRequest".equals(getHeader("x-requested-with"))) ? true : false;
-    }
-
-    /**
-     * 获取[GET]数据
-     * @param name
-     * @return
-     */
-    public String get(String name)
-    {
-        return null;
-    }
-
-    /**
-     * 获取[POST]的字符串数据，比如UrlEncode、Form-Data
-     * 非字符串数据将报错 {@throw}，获取文件建议使用{@file(String name)}
-     * @param name
-     * @return
-     */
-    public String post(String name)
-    {
-        return null;
-    }
-
-    /**
-     * 获取Form-Data中的文件
-     * @param name
-     * @return
-     */
-    public File file(String name)
-    {
-        return null;
-    }
-
-    /**
-     * 类型类
-     */
-    public class HeaderType {
-        public static final String Accept = "Accept";
-        public static final String Accept_Charset = "Accept-Charset";
-        public static final String Accept_Encoding = "Accept-Encoding";
-        public static final String Accept_Language = "Accept-Language";
-        public static final String Host = "Host";
-        public static final String User_Agent = "User-Agent";
-        public static final String Age = "Age";
-        public static final String Server = "Server";
-        public static final String Accept_Ranges = "Accept-Ranges";
-        public static final String Allow = "Allow";
-        public static final String Location = "Location";
-        public static final String Content_Language = "Content-Language";
-        public static final String Content_Length = "Content-Length";
-        public static final String Content_Type = "Content-Type";
-        public static final String Cookies = "Cookies";
     }
 
     /**
@@ -179,4 +159,50 @@ public class Request {
         String result = httpServletRequest.getHeader(name);
         return QUtils.stringIsEmpty(result) ? defaultValue : result;
     }
+
+    /**
+     * 获取[Query]数据
+     * @param name
+     * @return
+     */
+    public Dict getQueryData(String name)
+    {
+        return this.queryData;
+    }
+
+    public String getQuery(String name)
+    {
+        return this.queryData.getString(name);
+    }
+
+    /**
+     * 获取[POST]的字符串数据，比如UrlEncode、Form-Data
+     * 非字符串数据将报错 {@throw}，获取文件建议使用{@file(String name)}
+     * @param name
+     * @return
+     */
+    public Dict getPostData(String name)
+    {
+        return this.postData;
+    }
+
+    public String getPost(String name)
+    {
+        return this.postData.getString(name);
+    }
+
+    /**
+     * 获取Form-Data中的文件
+     * @param name
+     * @return
+     */
+    public File file(String name)
+    {
+        return null;
+    }
+
+    /**
+     * Session
+     */
+    private Dict session = null;
 }

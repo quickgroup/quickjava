@@ -1,6 +1,7 @@
 package org.quickjava.core.config;
 
 import lombok.Data;
+import org.quickjava.core.bean.Dict;
 import org.quickjava.core.utils.MapUtils;
 import org.yaml.snakeyaml.Yaml;
 
@@ -46,6 +47,12 @@ public class AppConfig {
         {
             Yaml yaml = new Yaml();
             Map<String, Object> result = yaml.load(content);
+
+            Dict dict = new Dict(result);
+            System.out.println("dict:" + dict);
+            System.out.println("dict:" + dict.get("app").getBoolean("debug"));
+
+            if (true) return null;
 
             AppConfig appConfig = null;
             for (Map.Entry<String, Object> entry : result.entrySet()) {

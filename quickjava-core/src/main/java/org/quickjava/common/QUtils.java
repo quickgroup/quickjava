@@ -11,7 +11,7 @@ public class QUtils {
 
     /**
      * Gets the current work environment path
-     * LANG-CN::获取当前工作环境路径
+     * @langCn 获取当前工作环境路径
      * @return String
      */
     public static String getRootPath()
@@ -21,7 +21,7 @@ public class QUtils {
 
     /**
      * Gets a millisecond timestamp
-     * LANG-CN::获取毫秒级时间戳
+     * @langCn 获取毫秒级时间戳
      * @return Long
      */
     public static Long getTimestamp() {
@@ -30,7 +30,7 @@ public class QUtils {
 
     /**
      * Gets the second timestamp
-     * LANG-CN::获取秒时间戳
+     * @langCn 获取秒时间戳
      * @return Long
      */
     public static Long getSecondTimestamp()
@@ -39,7 +39,7 @@ public class QUtils {
     }
 
     /**
-     * LANG-CN::判断字符串为null 或 空
+     * @langCn 判断字符串为null 或 空
      * @param s
      * @return
      */
@@ -48,7 +48,7 @@ public class QUtils {
     }
 
     /**
-     * LANG-CN::获取指定范围内的随机整数
+     * @langCn 获取指定范围内的随机整数
      * @param min
      * @param max
      * @return

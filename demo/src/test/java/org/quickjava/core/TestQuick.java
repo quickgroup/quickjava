@@ -108,4 +108,18 @@ public class TestQuick {
 
         System.out.println("num=" + num);
     }
+
+    @Test
+    public void test3()
+    {
+        try {
+            URL configYmlUrl = Thread.currentThread().getContextClassLoader().getResource("config.yml");
+            String configYmlContent = QFileUtils.getFileContents(configYmlUrl.getPath());
+            AppConfig.Factory.loadFormYml(configYmlContent);
+
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
+
+    }
 }
