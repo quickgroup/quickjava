@@ -1,7 +1,7 @@
 package org.quickjava.core;
 
 import org.quickjava.core.controller.Controller;
-import org.quickjava.core.exception.QuickCoreException;
+import org.quickjava.core.exception.QuickException;
 import org.quickjava.core.http.Request;
 
 import javax.servlet.http.HttpServletRequest;
@@ -56,7 +56,7 @@ public class Dispatch {
             pw.write("<h1>Hello, " + name + "!</h1>");
             pw.write("path: " + request.getPath());
             pw.flush();
-        } catch (QuickCoreException exc) {
+        } catch (QuickException exc) {
             exc.printStackTrace();
         } catch (Exception exc) {
             exc.printStackTrace();

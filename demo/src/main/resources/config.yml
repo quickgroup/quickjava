@@ -1,13 +1,53 @@
 # Application
 app:
-  debug=true
-  name=Demo
-  domin=www.demo.com
-  version=1.0
+  debug: true
+  domin: "www.demo.com"
+  version: 1.0
+  lang: zh-cn
+
+# 模块
+dodule:
+  controllerDir: controller   # 控制器包名
+  modelDir: model   # 模型包名
+  viewDir: view     # 视图包名
+  default:
+    dodule: index       # 默认模块
+    controller: index   # 默认控制器
+    method: index       # 默认方法
+  close: # 禁止访问的模块
+    ["common"]
+
+# 视图
+view:
+  type: default
+
+# session
+session:
+  id: ''    # session 上该应用的ID
+  name: 'QSESSION'  # session 名
+  format: md5   # session生成方式
+  expire: 7    # 有效时间，天
+  httponly: true
+
+# 异常
+exception:
+  handle: default # 处理方式，default=默认框架处理
+  defaultMessage: 页面暂时无法访问
+
+# 日志
+log:
+  handle: default
+  path: ''
+  fileName: "%y-%m-%d.log"
+  level: debug
+  server:
+    host: localhost
+    username: quick
+    password: 123456
 
 # Database
 database:
-  url=jdbc:mysql://127.0.0.1:3306/?useUnicode=true&characterEncoding=utf-8
-  database=quickjava
-  username=quickjava
-  password=quickjava
+  url: jdbc:mysql://127.0.0.1:3306/?useUnicode=true&characterEncoding=utf-8
+  database: quickjava
+  username: quickjava
+  password: quickjava

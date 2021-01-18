@@ -13,7 +13,6 @@ public class QFileUtils {
     public static String getFileContents(String name)
             throws Exception
     {
-
         FileInputStream fileInputStream = null;
         try {
             fileInputStream = new FileInputStream(name);

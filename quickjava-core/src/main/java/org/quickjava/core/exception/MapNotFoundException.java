@@ -5,9 +5,9 @@ package org.quickjava.core.exception;
  * @date 2021/1/17 20:26
  * @ProjectName quickjava
  */
-public class MapNotFoundException extends QuickCoreException {
+public class MapNotFoundException extends QuickException {
 
     public MapNotFoundException(String msg) {
-        super(msg);
+        super(QuickExceptionCode.ERROR.setMsg(msg));
     }
 }

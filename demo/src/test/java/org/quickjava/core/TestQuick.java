@@ -2,9 +2,9 @@ package org.quickjava.core;
 
 import org.junit.Test;
 import org.quickjava.core.bean.Module;
-import org.quickjava.core.config.BaseConfig;
+import org.quickjava.core.config.AppConfig;
 import org.quickjava.core.utils.QFileUtils;
-import org.quickjava.core.utils.QUtils;
+import org.quickjava.common.QUtils;
 
 import java.io.File;
 import java.net.URL;
@@ -37,7 +37,7 @@ public class TestQuick {
 
             // 控制器列表
             Map<String, Module> moduleList = new HashMap<String, Module>();
-            BaseConfig baseConfig;
+            AppConfig baseConfig;
 
             if (enumeration.hasMoreElements()) {
                 URL item = enumeration.nextElement();
@@ -65,7 +65,7 @@ public class TestQuick {
                                  */
                                 System.out.println("fileName=" + fileName);
                                 if (fileName.equals("config.yml")) {
-                                    baseConfig = BaseConfig.Factory.loadFormYml("");
+                                    baseConfig = AppConfig.Factory.loadFormYml("");
                                 }
 
                             } else if (file.getName().contains(".xml")) {
@@ -80,11 +80,9 @@ public class TestQuick {
                     // 加载配置文件
                     URL configYmlUrl = loader.getResource("config.yml");
                     String configYmlContent = QFileUtils.getFileContents(configYmlUrl.getPath());
-                    URL routeYmlUrl = loader.getResource("route.yml");
-                    System.out.println("configYmlUrl=" + configYmlUrl);
-                    System.out.println("configYmlContent=" + configYmlContent);
+                    baseConfig = AppConfig.Factory.loadFormYml(configYmlContent);
 
-                    baseConfig = BaseConfig.Factory.loadFormYml("");
+                    System.out.println("baseConfig=" + baseConfig);
 
                 } else if (item.getProtocol().equals("jar")) {
                     // jar包
@@ -99,5 +97,15 @@ public class TestQuick {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    @Test
+    public void test2()
+    {
+        int min = -10;
+        int max = 3;
+        int num = (int) Math.floor(Math.random() * (max - min) + min);
+
+        System.out.println("num=" + num);
     }
 }

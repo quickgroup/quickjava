@@ -1,10 +1,16 @@
 package org.quickjava.core.config;
 
+import lombok.Data;
+import org.quickjava.core.utils.MapUtils;
+
+import java.util.Map;
+
 /**
  * @author Qlo1062-(QloPC-Msi)
  * @date 2021/1/17 21:07
  * @ProjectName quickjava
  */
+@Data
 public class DatabaseConfig {
 
     private Type type = Type.MYSQL;
@@ -19,5 +25,16 @@ public class DatabaseConfig {
 
     public enum Type {
         MYSQL,
+    }
+
+    @Override
+    public String toString() {
+        return "DatabaseConfig{" +
+                "type=" + type +
+                ", url='" + url + '\'' +
+                ", database='" + database + '\'' +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                '}';
     }
 }

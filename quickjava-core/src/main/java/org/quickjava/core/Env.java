@@ -2,7 +2,7 @@ package org.quickjava.core;
 
 import org.quickjava.core.annotation.QuickBoot;
 import org.quickjava.core.exception.MapNotFoundException;
-import org.quickjava.core.utils.QUtils;
+import org.quickjava.common.QUtils;
 
 import java.util.HashMap;
 import java.util.Map;

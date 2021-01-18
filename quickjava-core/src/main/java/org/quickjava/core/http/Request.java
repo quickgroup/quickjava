@@ -1,5 +1,7 @@
 package org.quickjava.core.http;
 
+import org.quickjava.common.QUtils;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
@@ -29,15 +31,14 @@ public class Request {
     public Request(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         this.httpServletRequest = httpServletRequest;
         this.httpServletResponse = httpServletResponse;
-        this.init(httpServletRequest, httpServletResponse);
+        this.initHeader(httpServletRequest);
     }
 
-    private void init(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
+    private void initHeader(HttpServletRequest httpServletRequest)
     {
         this.host = httpServletRequest.getRemoteHost();
         this.path = httpServletRequest.getPathInfo();
         this.method = httpServletRequest.getMethod();
-        // headers
     }
 
     public String getHost() {
@@ -96,6 +97,18 @@ public class Request {
         this.httpServletResponse = httpServletResponse;
     }
 
+    public Boolean isPost() {
+        return method.equals("POST") ? true : false;
+    }
+
+    public Boolean isAjax() {
+        return isXMLHttpRequest();
+    }
+
+    public Boolean isXMLHttpRequest() {
+        return ("XMLHttpRequest".equals(getHeader("x-requested-with"))) ? true : false;
+    }
+
     /**
      * 获取[GET]数据
      * @param name
@@ -125,5 +138,45 @@ public class Request {
     public File file(String name)
     {
         return null;
+    }
+
+    /**
+     * 类型类
+     */
+    public class HeaderType {
+        public static final String Accept = "Accept";
+        public static final String Accept_Charset = "Accept-Charset";
+        public static final String Accept_Encoding = "Accept-Encoding";
+        public static final String Accept_Language = "Accept-Language";
+        public static final String Host = "Host";
+        public static final String User_Agent = "User-Agent";
+        public static final String Age = "Age";
+        public static final String Server = "Server";
+        public static final String Accept_Ranges = "Accept-Ranges";
+        public static final String Allow = "Allow";
+        public static final String Location = "Location";
+        public static final String Content_Language = "Content-Language";
+        public static final String Content_Length = "Content-Length";
+        public static final String Content_Type = "Content-Type";
+        public static final String Cookies = "Cookies";
+    }
+
+    /**
+     * 获取header
+     * @param name
+     * @return
+     */
+    public String getHeader(String name) {
+        return httpServletRequest.getHeader(name);
+    }
+
+    /**
+     * 获取header
+     * @param name
+     * @return
+     */
+    public String getHeaderOrDefault(String name, String defaultValue) {
+        String result = httpServletRequest.getHeader(name);
+        return QUtils.stringIsEmpty(result) ? defaultValue : result;
     }
 }

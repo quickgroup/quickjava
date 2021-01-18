@@ -1,6 +1,8 @@
 package org.quickjava.core;
 
-public class Helper {
+import org.quickjava.common.QUtils;
+
+public class Helper extends QUtils {
 
 
 }
