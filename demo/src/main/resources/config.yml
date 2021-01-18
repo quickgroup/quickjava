@@ -3,7 +3,8 @@ app:
   debug: true
   domin: "www.demo.com"
   version: 1.0
-  lang: zh-cn
+  lang: zh-CN     # 默认语言
+  charset: UTF-8  # 全局默认字符集
 
 # 模块
 dodule:
