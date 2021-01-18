@@ -11,7 +11,7 @@
 
     <modules>
         <module>demo</module>
-        <module>core</module>
+        <module>quickjava-core</module>
     </modules>
 
 </project>

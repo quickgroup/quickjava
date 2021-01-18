@@ -1,5 +1,6 @@
 package org.quickjava.core.config;
 
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
