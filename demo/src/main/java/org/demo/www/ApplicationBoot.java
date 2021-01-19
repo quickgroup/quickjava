@@ -1,7 +1,7 @@
 package org.demo.www;
 
-import org.quickjava.QuickJavaBoot;
-import org.quickjava.core.annotation.QuickBoot;
+import org.quickjava.framework.QuickJavaBoot;
+import org.quickjava.framework.annotation.QuickBoot;
 
 @QuickBoot("org.demo.www.application")
 public class ApplicationBoot {

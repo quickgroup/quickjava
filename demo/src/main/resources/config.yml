@@ -16,9 +16,9 @@ module:
     model: model   # 模型包名
     view: view     # 视图包名
   default:
-    dodule: index       # 默认模块
+    module: index       # 默认模块
     controller: index   # 默认控制器
-    method: index       # 默认方法
+    action: index       # 默认方法
   close: # 禁止访问的模块
     ["common"]
 
