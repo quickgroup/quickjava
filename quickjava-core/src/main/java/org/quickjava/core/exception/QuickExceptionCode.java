@@ -2,19 +2,20 @@ package org.quickjava.core.exception;
 
 public enum  QuickExceptionCode {
 
-    ERROR(0, "默认"),
-    SUCCESS(1, "成功"),
-    COMPLETE(200, "成功"),
+    ERROR(0, 500,"失败"),
+    SUCCESS(1, 200,"成功"),
+    RESPONSE(2, 200,"成功"),
     ;
-
-    private Integer type = 0;
 
     private Integer code = 0;
 
+    private Integer status = 200;   // http状态码
+
     private String msg = null;
 
-    QuickExceptionCode(Integer code, String msg) {
+    QuickExceptionCode(Integer code,Integer status, String msg) {
         this.code = code;
+        this.status = status;
         this.msg = msg;
     }
 
@@ -35,18 +36,18 @@ public enum  QuickExceptionCode {
         return this;
     }
 
-    public Integer getType() {
-        return type;
+    public Integer getStatus() {
+        return status;
     }
 
-    public void setType(Integer type) {
-        this.type = type;
+    public QuickExceptionCode setStatus(Integer status) {
+        this.status = status;
+        return this;
     }
 
     @Override
     public String toString() {
         return "QuickExceptionCode{" +
-                "type=" + type +
                 ", code=" + code +
                 ", msg='" + msg + '\'' +
                 '}';

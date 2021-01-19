@@ -6,9 +6,13 @@ public class App {
 
     private static App app = new App();
 
+    public static String name = "QuickJava";
+
     private String basePackages = null;
 
     private boolean isDebug = false;
+
+    public static ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
     /**
      * 运行方法
@@ -30,6 +34,7 @@ public class App {
             app.run(args);
 
         } catch (Exception exc) {
+            System.out.println(exc.getMessage());
             exc.printStackTrace();
         }
     }

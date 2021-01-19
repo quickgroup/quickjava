@@ -1,15 +1,15 @@
 package org.quickjava.core.http;
 
 import org.quickjava.common.QUtils;
-import org.quickjava.core.bean.Action;
+import org.quickjava.core.App;
+import org.quickjava.core.controller.Action;
 import org.quickjava.core.bean.Dict;
-import org.quickjava.core.bean.Module;
+import org.quickjava.core.controller.Module;
 import org.quickjava.core.controller.Controller;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -39,14 +39,9 @@ public class Request {
 
     /**
      * eq pathinfo
-     * @langCn 域名后面的路径
+     * @langCn 域名后面的路径，pathinfo格式{@code "/index/index/index"}
      */
     private String path = null;
-
-    /**
-     * @langCn 对应模块
-     */
-    private Module module = null;
 
     /**
      * @langCn 对应控制器
@@ -91,13 +86,26 @@ public class Request {
     public Request(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         this.httpServletRequest = httpServletRequest;
         this.httpServletResponse = httpServletResponse;
-        this.initHeader(httpServletRequest);
+        this.initServlet();
+        this.initHeader();
+    }
+
+    /**
+     * @langCn 对Servlet进行必要配置：编码、语言
+     */
+    private void initServlet()
+    {
+        httpServletResponse.setCharacterEncoding("UTF-8");
+        httpServletResponse.setHeader(Http.HeaderKey.Content_Type,"text/html; charset=UTF-8");
+        httpServletResponse.setHeader(Http.HeaderKey.Server, App.name);
+        httpServletResponse.setHeader(":"+Http.HeaderKey.Server, App.name);
     }
 
     @SuppressWarnings({"unchecked"})
-    private void initHeader(HttpServletRequest httpServletRequest)
+    private void initHeader()
     {
         this.host = httpServletRequest.getRemoteHost();
+        this.port = httpServletRequest.getRemotePort();
         this.path = httpServletRequest.getPathInfo();
         this.method = httpServletRequest.getMethod().toUpperCase();
         // 初始化请求数据

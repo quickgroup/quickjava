@@ -1,12 +1,34 @@
 package org.quickjava.core.http;
 
-import org.quickjava.core.bean.Dict;
+import javax.servlet.http.HttpServletResponse;
 
+/**
+ * @author QloPC-zs
+ * @date 2021/01/19
+ */
 public class Response {
 
-    private Dict session = null;
-
-    private Dict cookies = null;
-
     private Http.ContentType contentType = null;
+
+    private HttpServletResponse httpServletResponse;
+
+    public Response(HttpServletResponse httpServletResponse) {
+        this.httpServletResponse = httpServletResponse;
+    }
+
+    public Http.ContentType getContentType() {
+        return contentType;
+    }
+
+    public void setContentType(Http.ContentType contentType) {
+        this.contentType = contentType;
+    }
+
+    public HttpServletResponse getHttpServletResponse() {
+        return httpServletResponse;
+    }
+
+    public void setHttpServletResponse(HttpServletResponse httpServletResponse) {
+        this.httpServletResponse = httpServletResponse;
+    }
 }

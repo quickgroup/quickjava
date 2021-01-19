@@ -10,13 +10,27 @@ import java.util.Date;
 public class QUtils {
 
     /**
-     * Gets the current work environment path
-     * @langCn 获取当前工作环境路径
+     * Gets the current environment path
+     * @langCn 获取环境路径
      * @return String
      */
     public static String getRootPath()
     {
         return System.getProperty("user.dir");
+    }
+
+    /**
+     * Gets the current classes environment path
+     * @langCn 获取当前classes路径
+     * @return String
+     */
+    public static String getClassesPath()
+    {
+        String path = Thread.currentThread().getContextClassLoader().getResource("").getPath();
+        if (path.indexOf("WEB-INF") != -1) {
+            return path.substring(1, path.indexOf("WEB-INF"));
+        }
+        return path.substring(1, path.length() - 1);
     }
 
     /**

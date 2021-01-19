@@ -28,9 +28,7 @@ public class AppConfig {
 
     public String lang;
 
-    private DatabaseConfig database = null;
-
-    private RouteConfig route = null;
+    public static Dict config = null;
 
     public enum Type {
         YAML,
@@ -38,39 +36,15 @@ public class AppConfig {
 
     public static class Factory {
 
-        public static AppConfig loadFormYml(String yml) throws Exception {
+        public static Dict loadFormYml(String yml) throws Exception {
             return loadFormYaml(yml);
         }
 
-        public static AppConfig loadFormYaml(String content)
-            throws Exception
+        public static Dict loadFormYaml(String content)
         {
             Yaml yaml = new Yaml();
             Map<String, Object> result = yaml.load(content);
-
-            Dict dict = new Dict(result);
-            System.out.println("dict:" + dict);
-            System.out.println("dict:" + dict.get("app").getBoolean("debug"));
-
-            if (true) return null;
-
-            AppConfig appConfig = null;
-            for (Map.Entry<String, Object> entry : result.entrySet()) {
-                String idx_1_key = entry.getKey();
-                Map<String, Object> appData = (Map<String, Object>) entry.getValue();
-                if (idx_1_key.equals("app")) {
-                    appConfig = (AppConfig) MapUtils.map2Bean(AppConfig.class, appData);
-
-                } else if (idx_1_key.equals("database")) {
-                    appConfig.database = (DatabaseConfig) MapUtils.map2Bean(DatabaseConfig.class, appData);
-
-                } else if (idx_1_key.equals("route")) {
-                    appConfig.route = (RouteConfig) MapUtils.map2Bean(RouteConfig.class, appData);
-
-                }
-            }
-
-            return appConfig;
+            return config = new Dict(result);
         }
     }
 
@@ -81,8 +55,7 @@ public class AppConfig {
                 ", debug=" + debug +
                 ", domin='" + domin + '\'' +
                 ", version='" + version + '\'' +
-                ", database=" + database +
-                ", route=" + route +
+                ", config=" + config +
                 '}';
     }
 }

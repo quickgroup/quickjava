@@ -1,16 +1,16 @@
 package org.quickjava.core;
 
 import org.junit.Test;
-import org.quickjava.core.bean.Module;
+import org.quickjava.core.controller.Module;
 import org.quickjava.core.config.AppConfig;
 import org.quickjava.core.utils.QFileUtils;
 import org.quickjava.common.QUtils;
 
 import java.io.File;
 import java.net.URL;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author QloPC-Msi
@@ -37,7 +37,6 @@ public class TestQuick {
 
             // 控制器列表
             Map<String, Module> moduleList = new HashMap<String, Module>();
-            AppConfig baseConfig;
 
             if (enumeration.hasMoreElements()) {
                 URL item = enumeration.nextElement();
@@ -56,33 +55,15 @@ public class TestQuick {
                             Module module = new Module(file.getName(), file.getAbsolutePath());
                             moduleList.put(module.getName(), module);
 
-                        } else if (file.isFile()){
-                            String fileName = file.getName();
-                            System.out.println("fileName=" + fileName);
-                            if (fileName.contains(".yml") || fileName.contains(".yaml")) {
-                                /**
-                                 * YAML 配置文件
-                                 */
-                                System.out.println("fileName=" + fileName);
-                                if (fileName.equals("config.yml")) {
-                                    baseConfig = AppConfig.Factory.loadFormYml("");
-                                }
-
-                            } else if (file.getName().contains(".xml")) {
-                                /**
-                                 * XML配置文件
-                                 */
-
-                            }
                         }
                     }
 
                     // 加载配置文件
                     URL configYmlUrl = loader.getResource("config.yml");
                     String configYmlContent = QFileUtils.getFileContents(configYmlUrl.getPath());
-                    baseConfig = AppConfig.Factory.loadFormYml(configYmlContent);
+                    AppConfig.Factory.loadFormYml(configYmlContent);
 
-                    System.out.println("baseConfig=" + baseConfig);
+                    System.out.println("config=" + AppConfig.config);
 
                 } else if (item.getProtocol().equals("jar")) {
                     // jar包
@@ -120,6 +101,51 @@ public class TestQuick {
         } catch (Exception exc) {
             exc.printStackTrace();
         }
+    }
 
+    @Test
+    public void test4()
+    {
+//        String path = "/asd/qwe/zxc?1231231=asd/asdd";
+        String path = "/asd/qwe/czx/ccc/123";
+        // 拆分query参数
+        String[] pathInfoArr = path.split("\\?");
+        String pathDir = pathInfoArr[0];
+        String pathQuery = (pathInfoArr.length >= 2) ? pathInfoArr[1] : "";
+
+        // 路径映射路由
+
+        // 路径解化成控制器
+        String[] pathArray = pathDir.split("/");
+        System.out.println("pathArray:" + Arrays.toString(pathArray));
+        List<String> pathFullArray = new ArrayList<String>();
+        if (pathArray.length < 4) {
+            System.out.println("pathArray.length=" + pathArray.length);
+            if (pathArray.length <= 1) {
+                pathFullArray.add("");
+                pathFullArray.add("index");
+                pathFullArray.add("index");
+                pathFullArray.add("index");
+            } else if (pathArray.length == 2) {
+                pathFullArray.add(pathArray[0]);
+                pathFullArray.add(pathArray[1]);
+                pathFullArray.add("index");
+                pathFullArray.add("index");
+            } else if (pathArray.length == 3) {
+                pathFullArray.add(pathArray[0]);
+                pathFullArray.add(pathArray[1]);
+                pathFullArray.add(pathArray[2]);
+                pathFullArray.add("index");
+            }
+            pathArray = pathFullArray.toArray(new String[pathFullArray.size()]);
+        }
+
+        // 转字符串
+        String pathNew = String.join("/", pathArray);
+
+        System.out.println("pathFullArray: " + Arrays.toString(pathArray));
+        System.out.println("pathNew: " + pathNew);
+
+        // 参数解化
     }
 }

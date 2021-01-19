@@ -31,27 +31,19 @@ public class Http {
     /**
      * @langCn 常见ContentType
      */
-    public enum  ContentType {
-        FORM("application/x-www-form-urlencoded"),
-        FORM_DATA("multipart/form-data"),
-        JSON("application/json"),
-        XML("text/xml"),
-        BINARY("application/octet-stream"),
-        OTHER(null),
-        ;
+    public class  ContentType {
+        public static final String FORM = "application/x-www-form-urlencoded";
+        public static final String FORM_DATA = "multipart/form-data";
+        public static final String JSON = "application/json";
+        public static final String XML = "text/xml";
+        public static final String HTML = "text/html";
+        public static final String BINARY = "application/octet-stream";
+    }
 
-        private String type;
-
-        ContentType(String type) {
-            this.type = type;
-        }
-
-        public String getType() {
-            return type;
-        }
-
-        public void setType(String type) {
-            this.type = type;
-        }
+    /**
+     * HTTP状态码
+     */
+    public class Status {
+        public static final int SUCCESS = 200;
     }
 }

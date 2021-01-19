@@ -1,6 +1,11 @@
 package org.quickjava.core.exception;
 
+import org.quickjava.core.http.Request;
+import org.quickjava.core.http.Response;
 import org.quickjava.core.response.QuickResponse;
+
+import javax.servlet.http.HttpServletResponse;
+import java.io.OutputStream;
 
 /**
  * @author Qlo1062-QloPC-zs
@@ -8,15 +13,38 @@ import org.quickjava.core.response.QuickResponse;
  */
 public class ResponseException extends QuickException {
 
-    private QuickResponse quickResponse = null;
+    private QuickResponse quickResponse;
 
-    public static ResponseException newInstance() {
-        QuickExceptionCode code = QuickExceptionCode.SUCCESS;
-        code.setType(1);
-        return new ResponseException(code);
+    public ResponseException(QuickResponse quickResponse) {
+        super(QuickExceptionCode.RESPONSE);
+        this.quickResponse = quickResponse;
     }
 
-    public ResponseException(QuickExceptionCode code) {
+    public ResponseException(QuickExceptionCode code, QuickResponse quickResponse) {
         super(code);
+        this.quickResponse = quickResponse;
+    }
+
+    public QuickResponse getQuickResponse() {
+        return quickResponse;
+    }
+
+    public void setQuickResponse(QuickResponse quickResponse) {
+        this.quickResponse = quickResponse;
+    }
+
+    /**
+     * @langCn 异常响应处理
+     */
+    public static void onHandler(ResponseException exc, Request request, Response response)
+    throws Exception
+    {
+        String outputBody = exc.getQuickResponse().output(response);
+        if (outputBody == null)
+            return;
+        HttpServletResponse httpServletResponse = response.getHttpServletResponse();
+        OutputStream outputStream = httpServletResponse.getOutputStream();
+        outputStream.write(outputBody.getBytes());
+        outputStream.close();
     }
 }

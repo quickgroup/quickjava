@@ -1,8 +1,12 @@
 package org.quickjava.core;
 
-import org.quickjava.core.controller.Controller;
+import org.quickjava.core.exception.ActionNotFoundException;
 import org.quickjava.core.exception.QuickException;
+import org.quickjava.core.exception.QuickExceptionHandler;
+import org.quickjava.core.exception.ResponseException;
 import org.quickjava.core.http.Request;
+import org.quickjava.core.http.Response;
+import org.quickjava.core.response.QuickResponse;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -39,56 +43,24 @@ public class Dispatch {
     public void exec(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
             throws IOException
     {
+        Request request = new Request(httpServletRequest, httpServletResponse);
+        Response response = new Response(httpServletResponse);
         try {
+            try {
+                Route.MapAction mapAction = Route.get().findMappingAction(request);
 
-            Request request = new Request(httpServletRequest, httpServletResponse);
+                Object result = mapAction.invoke(request, response);
 
-            DispatchMethod dispatchMethod = findMappingMethod(request);
+                if (result instanceof String) {
+                    throw new ResponseException(new QuickResponse((String) result));
+                }
 
-            methodInvok(dispatchMethod);
-
-            httpServletResponse.setContentType("text/html");
-            String name = httpServletRequest.getParameter("name");
-            if (name == null) {
-                name = "world";
+            } catch (ResponseException exc) {
+                ResponseException.onHandler(exc, request, response);
             }
-            PrintWriter pw = httpServletResponse.getWriter();
-            pw.write("<h1>Hello, " + name + "!</h1>");
-            pw.write("path: " + request.getPath());
-            pw.flush();
-        } catch (QuickException exc) {
-            exc.printStackTrace();
         } catch (Exception exc) {
-            exc.printStackTrace();
+            QuickExceptionHandler.onHandler(exc, request, response);
         }
-    }
-
-    /**
-     * 找到控制器方法
-     * @param request
-     */
-    private DispatchMethod findMappingMethod(Request request)
-    {
-        DispatchMethod dispatchMethod = new DispatchMethod();
-//        dispatchMethod.controller = new Index();    // request 赋值
-        return dispatchMethod;
-    }
-
-    private void methodInvok(DispatchMethod dispatchMethod)
-    {
-
-    }
-
-    /**
-     * 对应操作方法
-     */
-    public class DispatchMethod {
-
-        public Request request;
-
-        public Controller controller;
-
-        public java.lang.reflect.Method targetMethod;
     }
 
     private void test(HttpServletRequest servletRequest, HttpServletResponse servletResponse)

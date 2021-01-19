@@ -6,11 +6,15 @@ app:
   lang: zh-CN     # 默认语言
   charset: UTF-8  # 全局默认字符集
 
+url:
+  caseSensitive: false  # 默认忽略大小写
+
 # 模块
-dodule:
-  controllerDir: controller   # 控制器包名
-  modelDir: model   # 模型包名
-  viewDir: view     # 视图包名
+module:
+  dirname:
+    controller: controller   # 控制器包名
+    model: model   # 模型包名
+    view: view     # 视图包名
   default:
     dodule: index       # 默认模块
     controller: index   # 默认控制器

@@ -19,6 +19,9 @@ public class Dict {
         this.data = data;
         // 嵌套MAP
         for (Map.Entry<String, Object> entry : data.entrySet()) {
+            if (entry.getValue() == null) {
+                continue;
+            }
             if (Map.class.isAssignableFrom(entry.getValue().getClass())) {
                 entry.setValue(new Dict((Map<String, Object>) entry.getValue()));
             }
