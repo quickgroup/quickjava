@@ -1,5 +1,6 @@
 package org.quickjava.framework;
 
+import org.quickjava.common.QLog;
 import org.quickjava.common.QUtils;
 import org.quickjava.framework.bean.Dict;
 import org.quickjava.framework.config.AppConfig;
@@ -40,6 +41,7 @@ public class Route {
     public static void init(String[] args)
             throws Exception
     {
+        QLog.info("Route Init");
         get().scanPackages();
     }
 
@@ -54,10 +56,10 @@ public class Route {
         throws Exception
     {
         String classesPath = QUtils.getClassesPath();
-        System.out.println("classesPath => " + classesPath);
+        QLog.info("classesPath => " + classesPath);
         String basePackages = Env.getString("basePackages");
         String packagePath = basePackages.replace(".", "/");
-        System.out.println("basePackages => " + basePackages + ", packagePath => " + packagePath);
+        QLog.info("basePackages => " + basePackages + ", packagePath => " + packagePath);
 
         Enumeration<URL> enumeration = App.classLoader.getResources(packagePath);
         if (enumeration == null) {
@@ -69,7 +71,7 @@ public class Route {
         String configYmlContent = QFileUtils.getFileContents(configYmlUrl.getPath());
         AppConfig.Factory.loadFormYml(configYmlContent);
         Dict config = AppConfig.config;
-//        System.out.println("AppConfig.config=" + AppConfig.config);
+//        QLog.info("AppConfig.config=" + AppConfig.config);
 
         // 控制器列表
         Map<String, Controller> controllerList = new HashMap<>();
@@ -117,7 +119,7 @@ public class Route {
             /**
              * 扫描完成
              */
-            System.out.println("actionList: " + actionList);
+            QLog.info("actionList: " + actionList);
         }
     }
 
@@ -160,22 +162,22 @@ public class Route {
     public MapAction findMappingAction(Request request)
     {
         String path = request.getPath();
-        System.out.println("path:" + path);
+        QLog.info("path:" + path);
         MapAction mapAction = null;
 
         // TODO::匹配路由
         if (routeList.containsKey(path)) {
-            System.out.println("路由匹配：" + routeList.containsKey(path));
+            QLog.debug("路由匹配：" + routeList.containsKey(path));
         }
 
         // TODO::PathInfo 匹配
         String pathNew = pathAutoComple(path);
         pathNew = pathNew.toLowerCase();    // 忽略路径大小写
         if (actionList.containsKey(pathNew)) {
-            System.out.println("Path 匹配：" + actionList.containsKey(pathNew));
+            QLog.debug("Path 匹配：" + actionList.containsKey(pathNew));
             mapAction = new MapAction(actionList.get(pathNew));
         } else {
-            throw new ActionNotFoundException("方法不存在, path=" + path);
+            throw new ActionNotFoundException("方法不存在 " + path);
         }
 
         return mapAction;

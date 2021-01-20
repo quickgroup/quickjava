@@ -50,10 +50,6 @@ public class MapUtils {
         else if (className.equals(Double.class.getTypeName())) {
             return Double.valueOf(value.toString());
         }
-        else if (className.equals(Map.class.getTypeName())) {
-            System.out.println("value:" + value);
-            //return objectClazz.cast(value);
-        }
 
         return null;
     }

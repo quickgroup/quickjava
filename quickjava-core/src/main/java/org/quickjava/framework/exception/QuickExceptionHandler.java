@@ -1,5 +1,6 @@
 package org.quickjava.framework.exception;
 
+import org.quickjava.common.QLog;
 import org.quickjava.framework.http.Http;
 import org.quickjava.framework.http.Request;
 import org.quickjava.framework.http.Response;
@@ -24,6 +25,7 @@ public class QuickExceptionHandler {
             // @langCn 控制台打印异常
             if (exc instanceof ActionNotFoundException) {
             } else {
+                QLog.error(exc);
                 exc.printStackTrace();
             }
 
@@ -38,9 +40,10 @@ public class QuickExceptionHandler {
 
             PrintWriter printWriter = httpServletResponse.getWriter();
             StringBuffer output = new StringBuffer();
+            output.append("<title>系统异常</title>");
             output.append("<h2>Exception: " + exc.getClass().getTypeName() + "</h2>");
             output.append("<h3>Message: " + exc.getMessage() + "</h3>");
-            output.append("<h4>StackTrace:</h4><pre>" + String.join("\n", stackTraceArrToStringArr(exc.getStackTrace())) + "</pre><br>");
+            output.append("<h4>StackTrace:</h4><pre style=\"background: #eee;overflow: scroll;\">" + String.join("\n", stackTraceArrToStringArr(exc.getStackTrace())) + "</pre><br>");
             printWriter.write(output.toString());
             printWriter.flush();
 

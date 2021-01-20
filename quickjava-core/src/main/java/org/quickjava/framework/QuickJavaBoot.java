@@ -8,10 +8,20 @@ import org.quickjava.framework.App;
 public class QuickJavaBoot {
 
     /**
-     * 启动入口
-     * @param args
+     * @langCn 版本号
      */
-    public static void run(Class clazz, String[] args)
+    public static final String version = "1.0-SNAPSHOT";
+
+    /**
+     * @langCn 版本号值
+     */
+    public static final Integer versionCode = 1010000;
+
+    /**
+     * @langCn 启动入口
+     * @param args arguments
+     */
+    public static void start(Class clazz, String[] args)
     {
         App.startup(clazz, args);
     }

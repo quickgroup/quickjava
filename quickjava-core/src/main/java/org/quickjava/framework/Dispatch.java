@@ -1,5 +1,6 @@
 package org.quickjava.framework;
 
+import org.quickjava.common.QLog;
 import org.quickjava.common.QUtils;
 import org.quickjava.framework.exception.QuickExceptionHandler;
 import org.quickjava.framework.exception.ResponseException;
@@ -50,17 +51,18 @@ public class Dispatch {
 
                 Object result = mapAction.invoke(request, response);
 
+                if (result == null) return;
+
                 if (QuickResponse.class.isAssignableFrom(result.getClass())) {
                     throw new ResponseException( (QuickResponse) result);
                 }
-
                 throw new ResponseException(new QuickResponse(result.toString()));
 
             } catch (ResponseException exc) {
                 ResponseException.onHandler(exc, request, response);
             } finally {
                 Long time = QUtils.getTimestamp() - request.getStartTime();
-                System.out.println("startTime: " + time + "ms");
+                QLog.info("startTime: " + time + "ms");
             }
 
         } catch (Exception exc) {

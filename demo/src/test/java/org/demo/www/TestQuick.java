@@ -1,6 +1,8 @@
 package org.demo.www;
 
+import org.demo.www.index.model.UserModel;
 import org.junit.Test;
+import org.quickjava.common.QLog;
 import org.quickjava.framework.controller.Module;
 import org.quickjava.framework.config.AppConfig;
 import org.quickjava.framework.http.Pathinfo;
@@ -154,5 +156,12 @@ public class TestQuick {
         String path = "http://www.www.com/asd/qwe/zxc?1231231=asd/asdd&word=123";
         Pathinfo pathinfo = Pathinfo.parseFromUrl(path);
         System.out.println("pathinfo: " + pathinfo);
+    }
+
+    @Test
+    public void test6()
+    {
+        UserModel userModel = UserModel.get().where("id", "=", "1").find();
+        QLog.info(userModel.name, userModel);
     }
 }

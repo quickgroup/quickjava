@@ -1,14 +1,14 @@
 package org.demo.www;
 
 import org.quickjava.framework.QuickJavaBoot;
-import org.quickjava.framework.annotation.QuickBoot;
+import org.quickjava.framework.annotation.ApplicationQuickBoot;
 
-@QuickBoot("org.demo.www.application")
+@ApplicationQuickBoot
 public class ApplicationBoot {
 
     public static void main(String[] args)
     {
-        QuickJavaBoot.run(ApplicationBoot.class, args);
+        QuickJavaBoot.start(ApplicationBoot.class, args);
     }
 
 }

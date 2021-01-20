@@ -1,5 +1,6 @@
 package org.quickjava.common;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -53,6 +54,20 @@ public class QUtils {
     }
 
     /**
+     * @langCn 获取格式化时间
+     * @return
+     */
+    public static String getDateTime(String format, Date date)
+    {
+        return new SimpleDateFormat(format).format(date);
+    }
+
+    public static String getDateTime()
+    {
+        return getDateTime("YYYY-MM-dd HH:mm:ss.SS", new Date());
+    }
+
+    /**
      * @langCn 判断字符串为null 或 空
      * @param s
      * @return
@@ -70,5 +85,20 @@ public class QUtils {
     public static Integer randInt(int min, int max)
     {
         return (int) Math.floor(Math.random() * (max - min) + min);
+    }
+
+    /**
+     * @langCn 获取调用者类名+方法名+行数
+     * @return
+     */
+    public static String getCallClassMethod()
+    {
+        StackTraceElement trace = new Exception().getStackTrace()[3];   // 3
+        return trace.getClassName() + "." + trace.getMethodName() + ":" + trace.getLineNumber();
+    }
+
+    public static void exit()
+    {
+        System.exit(0);
     }
 }

@@ -1,6 +1,7 @@
 package org.quickjava.framework;
 
-import org.quickjava.framework.annotation.QuickBoot;
+import org.quickjava.common.QLog;
+import org.quickjava.framework.annotation.ApplicationQuickBoot;
 import org.quickjava.framework.exception.MapNotFoundException;
 import org.quickjava.common.QUtils;
 
@@ -17,11 +18,13 @@ public class Env {
     public static void init(Class applicationClass)
             throws Exception
     {
+        QLog.info("Env Init");
         // 根目录
         set("rootPath", QUtils.getRootPath());
         // 项目包
-        QuickBoot quickBoot = applicationClass.newInstance().getClass().getAnnotation(QuickBoot.class);
-        set("basePackages", quickBoot.value());
+        ApplicationQuickBoot quickBoot = applicationClass.newInstance().getClass().getAnnotation(ApplicationQuickBoot.class);
+        String basePackages = "".equals(quickBoot.value()) ? applicationClass.getPackage().getName() : quickBoot.value();
+        set("basePackages", basePackages);
     }
 
     /**

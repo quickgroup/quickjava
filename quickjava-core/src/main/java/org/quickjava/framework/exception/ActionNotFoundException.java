@@ -8,6 +8,6 @@ package org.quickjava.framework.exception;
 public class ActionNotFoundException extends QuickException {
 
     public ActionNotFoundException(String msg) {
-        super(QuickExceptionCode.ERROR.setMsg(msg));
+        super(QuickExceptionCode.ERROR.setStatus(404).setMsg(msg));
     }
 }

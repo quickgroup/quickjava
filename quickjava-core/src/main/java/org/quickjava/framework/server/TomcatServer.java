@@ -6,6 +6,7 @@ import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.webresources.DirResourceSet;
 import org.apache.catalina.webresources.StandardRoot;
+import org.quickjava.common.QLog;
 import org.quickjava.common.QUtils;
 
 import javax.servlet.ServletException;
@@ -21,23 +22,24 @@ public class TomcatServer {
         tomcat.setPort(8080);
 
         String classesPath = QUtils.getClassesPath();
-        System.out.println("classesPath:" + classesPath);
-        // 设置 Context
+        String webInfClasses = "/WEB-INF/classes";
+
+        // new Context
         StandardContext ctx = (StandardContext) tomcat
                 .addWebapp("", new File(classesPath).getAbsolutePath());
 
-        // 配置 Context 资源路径
+        // Configure the resource path
         // Declare an alternative location for your "WEB-INF/classes" dir
         // Servlet 3.0 annotation will work
         WebResourceRoot resources = new StandardRoot(ctx);
-        resources.addPreResources(new DirResourceSet(resources, "/WEB-INF/classes",
-                classesPath, "/"));
+        resources.addPreResources(new DirResourceSet(resources, webInfClasses, classesPath, "/"));
         ctx.setResources(resources);
 
-        // 配置 Servlet
+        // Configure Servlet
         tomcat.addServlet("", "tomcatServlet", new TomcatServlet());
         ctx.addServletMappingDecoded("/*", "tomcatServlet");
 
+        // start tomcat
         tomcat.start();
         tomcat.getServer().await();
     }
