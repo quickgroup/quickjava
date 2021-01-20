@@ -18,13 +18,14 @@ public class Env {
     public static void init(Class applicationClass)
             throws Exception
     {
-        QLog.info("Env Init");
         // 根目录
         set("rootPath", QUtils.getRootPath());
         // 项目包
         ApplicationQuickBoot quickBoot = applicationClass.newInstance().getClass().getAnnotation(ApplicationQuickBoot.class);
         String basePackages = "".equals(quickBoot.value()) ? applicationClass.getPackage().getName() : quickBoot.value();
         set("basePackages", basePackages);
+
+        QLog.info("Env init complete");
     }
 
     /**

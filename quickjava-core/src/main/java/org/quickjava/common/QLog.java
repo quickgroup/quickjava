@@ -16,7 +16,7 @@ public class QLog {
         String logstr = String.format("%s\t%s [%s]\t%s",
                 QUtils.getDateTime(),
                 Console.Color.output( level, level),
-                QUtils.getCallClassMethod(),
+                QUtils.getSimpleCallClassMethod(),
                 (params.length == 1 ? params[0].toString() : Arrays.toString(params)) );
         System.out.println(logstr);
         // 写入到文件

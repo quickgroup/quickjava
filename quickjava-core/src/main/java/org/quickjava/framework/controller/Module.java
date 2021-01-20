@@ -3,6 +3,9 @@ package org.quickjava.framework.controller;
 import org.quickjava.framework.bean.Dict;
 import org.quickjava.framework.config.AppConfig;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * @author Qlo1062-(QloPC-Msi)
  * @date 2021/1/17 20:56
@@ -10,13 +13,21 @@ import org.quickjava.framework.config.AppConfig;
  */
 public class Module {
 
-    private String name;
+    public String name;
 
-    private String packages;
+    public String packages;
 
-    public Module(String name, String packages) {
+    public String dirpath;
+
+    public String path;
+
+    public Map<String, Controller> controllerList = new LinkedHashMap<>();
+
+    public Module(String name, String packages, String dirpath) {
         this.name = name;
         this.packages = packages;
+        this.dirpath = dirpath;
+        this.path = "/" + name;
     }
 
     public String getName() {
@@ -56,6 +67,9 @@ public class Module {
         return "Module{" +
                 "name='" + name + '\'' +
                 ", packages='" + packages + '\'' +
+                ", dirpath='" + dirpath + '\'' +
+                ", path='" + path + '\'' +
+                ", controllerList=" + controllerList +
                 '}';
     }
 }

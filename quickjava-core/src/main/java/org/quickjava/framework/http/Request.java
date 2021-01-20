@@ -1,104 +1,113 @@
 package org.quickjava.framework.http;
 
+import org.quickjava.common.QLog;
 import org.quickjava.common.QUtils;
 import org.quickjava.framework.App;
 import org.quickjava.framework.config.AppConfig;
 import org.quickjava.framework.controller.Action;
 import org.quickjava.framework.bean.Dict;
 import org.quickjava.framework.controller.Controller;
+import org.quickjava.framework.controller.Module;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
-import java.util.Map;
 
 /**
  * 每个请求进来对应一个
  */
 public class Request {
 
-    protected String url;
+    public String url;
 
     /**
      * @langCn url中的域名
      */
-    protected String domin = null;
+    public String domin = null;
 
     /**
      * @langCn header头中的host，常规情况下和{@see #domin}一致，某些特殊场景会不同
      */
-    protected String host = null;
+    public String host = null;
 
     /**
      * @langCn 请求端口号
      */
-    protected Integer port = null;
+    public Integer port = null;
 
     /**
      * @langCn 请求类型，大写
      */
-    protected String method = null;
+    public String method = null;
 
     /**
      * eq pathinfo
      * @langCn 域名后面的路径，pathinfo格式{@code "/index/index/index"}
      */
-    protected String path;
+    public String path;
 
     /**
      * @langCn Pathinfo
      */
-    protected Pathinfo pathinfo;
+    public Pathinfo pathinfo;
 
     /**
      * @langCn 客户端IP
      */
-    protected String ip;
+    public String ip;
 
     /**
      * @langCn 开始时间
      */
-    protected Long startTime;
+    public Long startTime;
+
+    /**
+     * @langCn 对应模块
+     */
+    public Module module;
+    public String moduleName;
 
     /**
      * @langCn 对应控制器
      */
-    protected Controller controller = null;
+    public Controller controller;
+    public String controllerName;
 
     /**
      * @langCn 对应控制器的方法
      */
-    protected Action action = null;
+    public Action action;
+    public String actionName;
 
     /**
      * @langCn 请求header头
      */
-    protected Dict headers = null;
+    public Dict headers = null;
 
     /**
      * @langCn 请求数据类型
      */
-    protected Http.ContentType contentType = null;
+    public Http.ContentType contentType = null;
 
     /**
      * @langCn url-query请求数据
      */
-    protected Dict queryData = null;
+    public Dict queryData = null;
 
     /**
      * @langCn Post请求数据
      */
-    protected Dict postData = null;
+    public Dict postData = null;
 
     /**
      * @langCn 原始HttpServletRequest
      */
-    protected HttpServletRequest httpServletRequest = null;
+    public HttpServletRequest httpServletRequest = null;
 
     /**
      * @langCn 原始HttpServletResponse
      */
-    protected HttpServletResponse httpServletResponse = null;
+    public HttpServletResponse httpServletResponse = null;
 
     public Request(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         this.startTime = QUtils.getTimestamp();
@@ -112,7 +121,7 @@ public class Request {
     /**
      * @langCn 对Servlet进行必要配置：编码、语言
      */
-    protected void initServlet()
+    public void initServlet()
     {
         httpServletResponse.setCharacterEncoding("UTF-8");
         httpServletResponse.setHeader(Http.HeaderKey.Content_Type,"text/html; charset=UTF-8");
@@ -121,69 +130,39 @@ public class Request {
     }
 
     @SuppressWarnings({"unchecked"})
-    protected void initHeader()
+    public void initHeader()
     {
         this.url = httpServletRequest.getRequestURL().toString();
-        if (httpServletRequest.getQueryString() != null)    // 补全url
-            this.url += "?" + httpServletRequest.getQueryString();
         this.port = httpServletRequest.getLocalPort();
         this.path = httpServletRequest.getPathInfo();
         this.method = httpServletRequest.getMethod().toUpperCase();
         this.ip = httpServletRequest.getRemoteAddr();
+
+        // 补全url
+        if (httpServletRequest.getQueryString() != null) {
+            this.url += "?" + httpServletRequest.getQueryString();
+            this.path += "?" + httpServletRequest.getQueryString();
+        }
 
         // pathinfo
         this.pathinfo = Pathinfo.parseFromUrl(this.url);
         this.domin = this.pathinfo.hostname;
 
         // 解析默认模块/控制器/方法
-        Dict config = AppConfig.config.get("module").get("default");
-        this.pathinfo.parseAction(config.getString("module"), config.getString("controller"), config.getString("action"));
+        Dict defaultConfig = AppConfig.config.get("module").get("default");
+        this.pathinfo.parseControllerAction(
+                defaultConfig.getString("module"),
+                defaultConfig.getString("controller"),
+                defaultConfig.getString("action"));
+        this.moduleName = this.pathinfo.module;
+        this.controllerName = this.pathinfo.controller;
+        this.actionName = this.pathinfo.action;
     }
 
-    protected void initData()
+    public void initData()
     {
         this.postData = new Dict(httpServletRequest.getParameterMap());
         this.queryData = new Dict(this.pathinfo.queryData);
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public String getDomin() {
-        return domin;
-    }
-
-    public void setDomin(String domin) {
-        this.domin = domin;
-    }
-
-    public String getHost() {
-        return host;
-    }
-
-    public Integer getPort() {
-        return port;
-    }
-
-    public String getMethod() {
-        return method;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public Pathinfo getPathinfo() {
-        return pathinfo;
-    }
-
-    public void setPathinfo(Pathinfo pathinfo) {
-        this.pathinfo = pathinfo;
     }
 
     public HttpServletRequest getHttpServletRequest() {
@@ -192,26 +171,6 @@ public class Request {
 
     public HttpServletResponse getHttpServletResponse() {
         return httpServletResponse;
-    }
-
-    public Long getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(Long startTime) {
-        this.startTime = startTime;
-    }
-
-    /**
-     * @langCn 获取客户端(用户)IP
-     * @return IP
-     */
-    public String getIp() {
-        return ip;
-    }
-
-    public void setIp(String ip) {
-        this.ip = ip;
     }
 
     public Boolean isPost() {
@@ -284,5 +243,5 @@ public class Request {
     /**
      * Session
      */
-    protected Dict session = null;
+    public Dict session = null;
 }

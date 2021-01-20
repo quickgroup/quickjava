@@ -6,7 +6,7 @@ import org.quickjava.common.QLog;
 import org.quickjava.framework.controller.Module;
 import org.quickjava.framework.config.AppConfig;
 import org.quickjava.framework.http.Pathinfo;
-import org.quickjava.framework.utils.QFileUtils;
+import org.quickjava.common.utils.QFileUtils;
 import org.quickjava.common.QUtils;
 
 import java.io.File;
@@ -53,7 +53,7 @@ public class TestQuick {
                             /**
                              * 目录统统视为模块
                              */
-                            Module module = new Module(file.getName(), file.getAbsolutePath());
+                            Module module = new Module(file.getName(), file.getAbsolutePath(), file.getAbsolutePath());
                             moduleList.put(module.getName(), module);
 
                         }
@@ -163,5 +163,12 @@ public class TestQuick {
     {
         UserModel userModel = UserModel.get().where("id", "=", "1").find();
         QLog.info(userModel.name, userModel);
+    }
+
+    @Test
+    public void test7()
+    {
+        System.out.println(QUtils.isClassMode());
+        System.out.println(QUtils.isJarMode());
     }
 }

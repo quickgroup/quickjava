@@ -1,4 +1,4 @@
-package org.quickjava.framework.utils;
+package org.quickjava.common.utils;
 
 import java.io.*;
 
@@ -12,9 +12,15 @@ public class QFileUtils {
     public static String getFileContents(String name)
             throws Exception
     {
+        return getFileContents(new File(name));
+    }
+
+    public static String getFileContents(File file)
+            throws Exception
+    {
         FileInputStream fileInputStream = null;
         try {
-            fileInputStream = new FileInputStream(name);
+            fileInputStream = new FileInputStream(file);
             StringBuffer stringBuffer = new StringBuffer();
             int num = 0;
             byte[] buf = new byte[512];

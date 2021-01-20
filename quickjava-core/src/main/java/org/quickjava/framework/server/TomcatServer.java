@@ -39,8 +39,15 @@ public class TomcatServer {
         tomcat.addServlet("", "tomcatServlet", new TomcatServlet());
         ctx.addServletMappingDecoded("/*", "tomcatServlet");
 
+        //
+        java.util.logging.Logger.getLogger("org.apache").setLevel(java.util.logging.Level.WARNING);
+
         // start tomcat
+        QLog.info("start tomcat");
         tomcat.start();
+
+        // start success
+        QLog.info("start tomcat complete");
         tomcat.getServer().await();
     }
 

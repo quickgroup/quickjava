@@ -61,7 +61,7 @@ public class Dispatch {
             } catch (ResponseException exc) {
                 ResponseException.onHandler(exc, request, response);
             } finally {
-                Long time = QUtils.getTimestamp() - request.getStartTime();
+                Long time = QUtils.getTimestamp() - request.startTime;
                 QLog.info("startTime: " + time + "ms");
             }
 

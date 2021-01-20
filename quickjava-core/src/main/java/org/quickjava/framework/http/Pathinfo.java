@@ -65,7 +65,6 @@ public class Pathinfo {
     public static Map<String, String> parseQuery(String query)
     {
         Map<String, String> data = new HashMap<>();
-        System.out.println("query: " + query);
         if (query != null && !"".equals(query)) {
             for (String str : query.split("&")) {
                 int idx = str.indexOf("=");
@@ -82,7 +81,7 @@ public class Pathinfo {
      * @param controller 默认控制器
      * @param action 默认方法
      */
-    public void parseAction(String module, String controller, String action)
+    public void parseControllerAction(String module, String controller, String action)
     {
         String[] paths = path.split("/");
         if (paths.length <= 1) {

@@ -8,9 +8,10 @@ import org.quickjava.framework.controller.Action;
 import org.quickjava.framework.controller.Controller;
 import org.quickjava.framework.controller.Module;
 import org.quickjava.framework.exception.ActionNotFoundException;
+import org.quickjava.framework.http.Pathinfo;
 import org.quickjava.framework.http.Request;
 import org.quickjava.framework.http.Response;
-import org.quickjava.framework.utils.QFileUtils;
+import org.quickjava.common.utils.QFileUtils;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -28,10 +29,6 @@ public class Route {
 
     private static Map<String, Module> moduleList = new LinkedHashMap<>();
 
-    private static Map<String, Controller> controllerList = new LinkedHashMap<>();
-
-    private static Map<String, Action> actionList = new LinkedHashMap<>();
-
     private static Map<String, Action> routeList = new LinkedHashMap<>();
 
     public static Route get() {
@@ -41,8 +38,8 @@ public class Route {
     public static void init(String[] args)
             throws Exception
     {
-        QLog.info("Route Init");
         get().scanPackages();
+        QLog.info("Route init complete");
     }
 
     /**
@@ -73,9 +70,9 @@ public class Route {
         Dict config = AppConfig.config;
 //        QLog.info("AppConfig.config=" + AppConfig.config);
 
-        // 控制器列表
-        Map<String, Controller> controllerList = new HashMap<>();
+        boolean caseSensitive = false;
 
+        // 解析
         if (enumeration.hasMoreElements()) {
             URL item = enumeration.nextElement();
 
@@ -87,23 +84,23 @@ public class Route {
                 // 模块列表
                 for (File moduleFile : moduleFiles) {
                     if (moduleFile.isDirectory()) {
-                        Module module = new Module(moduleFile.getName(), packageReplace(moduleFile.getAbsolutePath(), classesPath));
-                        moduleList.put(module.getPath(), module);
+                        Module module = new Module(moduleFile.getName(), packageReplace(moduleFile.getAbsolutePath(), classesPath), moduleFile.getAbsolutePath());
+                        String modulePath = caseSensitive ? module.path : module.path.toLowerCase();
+                        moduleList.put(modulePath, module);
                         // 模块-控制器列表
                         File controllerDir = new File(moduleFile.getAbsolutePath() + "/" +
                                 config.get("module").get("dirname").getString("controller"));
                         if (controllerDir.exists()) {
                             for (File controllerFile : controllerDir.listFiles()) {
-                                String name = controllerFile.getName();
                                 String controllerPackages = packageReplace(controllerFile.getAbsolutePath(), classesPath );
-                                Controller controller = (Controller) App.classLoader.loadClass(controllerPackages).newInstance();
+                                Controller controller = (Controller) App
+                                        .classLoader.loadClass(controllerPackages).newInstance();
                                 controller.setModule(module);
-                                controller.setName(name);
-                                controller.setPackages(controllerPackages);
-                                controllerList.put(controller.getPath(), controller);
-                                // 寻找方法
-                                Map<String, Action> actionMap = controllerLoadAction(App.classLoader, controller);
-                                Route.actionList.putAll(actionMap);
+                                controller.setViewPath(moduleFile.getAbsolutePath());
+                                String controllerPath = caseSensitive ? controller.path : controller.path.toLowerCase();
+                                module.controllerList.put(controllerPath, controller);
+                                // 加载控制器里的方法
+                                controllerLoadAction(controller);
                             }
                         }
                     }
@@ -119,7 +116,7 @@ public class Route {
             /**
              * 扫描完成
              */
-            QLog.info("actionList: " + actionList);
+            QLog.info("actionList: " + moduleList);
         }
     }
 
@@ -133,25 +130,16 @@ public class Route {
     /**
      * @langCn 加载控制器所有方法
      */
-    public Map<String, Action> controllerLoadAction(ClassLoader loader, Controller controller)
-        throws Exception
+    public void controllerLoadAction(Controller controller)
     {
-        String classesPath = QUtils.getClassesPath();
-        String controllerPath = controller.getPackages().replaceAll("\\\\", "/");
-        String classPackageName = controllerPath.replace(classesPath + "/", "");
-        classPackageName = classPackageName.replaceAll("/", ".").replace(".class", "");
-
-        // 加载类
-        Class clazz = loader.loadClass(classPackageName);
-        Method[] methods = clazz.getDeclaredMethods(); // 获取public方法
         Map<String, Action> actionMap = new LinkedHashMap<>();
-        for (Method method : methods) {
+        for (Method method : controller.getClass().getDeclaredMethods()) {
             if (Modifier.isPublic(method.getModifiers())) {
                 Action action = new Action(controller, method);
-                actionMap.put(action.getPath().toLowerCase(), action);
+                actionMap.put(action.path.toLowerCase(), action);
             }
         }
-        return actionMap;
+        controller.actionList.putAll(actionMap);
     }
 
 
@@ -161,62 +149,39 @@ public class Route {
      */
     public MapAction findMappingAction(Request request)
     {
-        String path = request.getPath();
-        QLog.info("path:" + path);
-        MapAction mapAction = null;
+        String path = request.path;
+        MapAction mapAction;
 
-        // TODO::匹配路由
+        // TODO::路由模式
         if (routeList.containsKey(path)) {
-            QLog.debug("路由匹配：" + routeList.containsKey(path));
+            QLog.debug("路由模式, " + path);
         }
 
-        // TODO::PathInfo 匹配
-        String pathNew = pathAutoComple(path);
-        pathNew = pathNew.toLowerCase();    // 忽略路径大小写
-        if (actionList.containsKey(pathNew)) {
-            QLog.debug("Path 匹配：" + actionList.containsKey(pathNew));
-            mapAction = new MapAction(actionList.get(pathNew));
+        // TODO::REST模式
+        QLog.debug("REST模式, " + path);
+        Pathinfo pathinfo = request.pathinfo;
+        String actionPath = "/" + pathinfo.module;
+        if (moduleList.containsKey(actionPath)) {
+            Module module = moduleList.get(actionPath);
+            if (module.controllerList.containsKey((actionPath += "/" + pathinfo.controller))) {
+                Controller controller = module.controllerList.get(actionPath);
+                if (controller.actionList.containsKey((actionPath += "/" + pathinfo.action))) {
+                    mapAction = new MapAction(controller.actionList.get(actionPath));
+                } else {
+                    throw new ActionNotFoundException("方法不存在 " + actionPath);
+                }
+            } else {
+                throw new ActionNotFoundException("控制器不存在 " + actionPath);
+            }
         } else {
-            throw new ActionNotFoundException("方法不存在 " + path);
+            throw new ActionNotFoundException("模块不存在 " + actionPath);
         }
 
         return mapAction;
     }
 
-    private String pathAutoComple(String pathDir)
-    {
-        String[] pathArray = pathDir.split("/");
-        List<String> pathFullArray = new ArrayList<String>();
-        if (pathArray.length < 4) {
-            if (pathArray.length <= 1) {
-                pathFullArray.add("");
-                pathFullArray.add("index");
-                pathFullArray.add("index");
-                pathFullArray.add("index");
-            } else if (pathArray.length == 2) {
-                pathFullArray.add(pathArray[0]);
-                pathFullArray.add(pathArray[1]);
-                pathFullArray.add("index");
-                pathFullArray.add("index");
-            } else if (pathArray.length == 3) {
-                pathFullArray.add(pathArray[0]);
-                pathFullArray.add(pathArray[1]);
-                pathFullArray.add(pathArray[2]);
-                pathFullArray.add("index");
-            }
-            pathArray = pathFullArray.toArray(new String[pathFullArray.size()]);
-        }
-
-        if (pathArray.length > 4) {
-            pathArray = Arrays.copyOfRange(pathArray, 0, 4);
-        }
-
-        return String.join("/", pathArray);
-    }
-
-
     /**
-     * 对应操作方法
+     * @langCn 对应操作方法
      */
     public class MapAction {
 
@@ -226,11 +191,21 @@ public class Route {
             this.action = action;
         }
 
-        public Object invoke(Request request, Response response) throws Exception {
-            Controller controller = action.getController().getClass().newInstance();
-            controller.setRequest(request);
-            controller.setResponse(response);
-            return action.getMethod().invoke(controller);
+        /**
+         * @langCn 调用目标方法
+         * @param request
+         * @param response
+         * @return
+         * @throws Exception
+         */
+        public Object invoke(Request request, Response response)
+                throws Exception
+        {
+            Controller controller = action.controller.getClass().newInstance();
+            controller._initRequest(request, response);
+            controller.action = action;
+            controller._initialize();
+            return action.method.invoke(controller);
         }
     }
 }

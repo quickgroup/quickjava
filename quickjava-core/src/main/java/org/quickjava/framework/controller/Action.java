@@ -12,62 +12,27 @@ import java.lang.reflect.Method;
 @Data
 public class Action {
 
-    private Controller controller;
+    public Controller controller;
 
-    private Class controllerClass;
+    public String name;
 
-    private String name;
+    public Method method;
 
-    private Method method;
+    public String path;
 
     public Action(Controller controller, Method method) {
         this.controller = controller;
         this.method = method;
         this.name = method.getName();
-    }
-
-    public String getPath() {
-        return controller.getPath() + "/" + method.getName();
+        this.path = controller.path + "/" + method.getName();
     }
 
     @Override
     public String toString() {
         return "Action{" +
-                "controller=" + controller +
                 ", name='" + name + '\'' +
                 ", method=" + method +
+                ", path='" + path + '\'' +
                 '}';
-    }
-
-    public Controller getController() {
-        return controller;
-    }
-
-    public void setController(Controller controller) {
-        this.controller = controller;
-    }
-
-    public Class getControllerClass() {
-        return controllerClass;
-    }
-
-    public void setControllerClass(Class controllerClass) {
-        this.controllerClass = controllerClass;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Method getMethod() {
-        return method;
-    }
-
-    public void setMethod(Method method) {
-        this.method = method;
     }
 }

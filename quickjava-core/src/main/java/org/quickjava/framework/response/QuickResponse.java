@@ -29,7 +29,8 @@ public class QuickResponse {
      * @param response
      * @return
      */
-    public String output(Response response) {
+    public String output(Response response)
+    {
         return data.toString();
     }
 }

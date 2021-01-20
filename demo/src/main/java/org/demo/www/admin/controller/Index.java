@@ -7,25 +7,9 @@ public class Index extends Controller {
     public Object index()
     {
         StringBuffer output = new StringBuffer();
-        output.append("Hello, world!");
+        output.append("module: " + this.request.moduleName );
         output.append("<br>");
-        output.append(this.request.getUrl());
-        output.append("<br>");
-        output.append(this.request.getMethod());
-        output.append("<br>");
-        output.append("domin: " + this.request.getDomin());
-        output.append("<br>");
-        output.append(this.request.getPort());
-        output.append("<br>");
-        output.append(this.request.getPath());
-        output.append("<br>");
-        output.append(this.request.getIp());
-        output.append("<br>");
-        output.append(this.request.getPathinfo().module);
-        output.append("<br>");
-        output.append(this.request.getPathinfo().controller);
-        output.append("<br>");
-        output.append(this.request.getPathinfo().action);
+        output.append("class: " + this.name );
         output.append("<br>");
         return output;
     }

@@ -1,5 +1,6 @@
 package org.quickjava.common;
 
+import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -97,8 +98,44 @@ public class QUtils {
         return trace.getClassName() + "." + trace.getMethodName() + ":" + trace.getLineNumber();
     }
 
+    /**
+     * @langCn 获取调用者类名+方法名+行数
+     * @return
+     */
+    public static String getSimpleCallClassMethod()
+    {
+        StackTraceElement trace = new Exception().getStackTrace()[3];   // 3
+        String className = trace.getClassName();
+        className = className.substring(className.lastIndexOf(".") + 1, className.length());
+        return className + "." + trace.getMethodName() + ":" + trace.getLineNumber();
+    }
+
     public static void exit()
     {
         System.exit(0);
+    }
+
+    /**
+     * 获取运行模式
+     * @return
+     */
+    public static String getRunMode()
+    {
+        try {
+            String path = QUtils.class.getResource("QUtils.class").toString();
+            URI uri = new URI(path);
+            return uri.getScheme();
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
+        return "";
+    }
+
+    public static Boolean isClassMode() {
+        return "file".equals(getRunMode()) ? true : false;
+    }
+
+    public static Boolean isJarMode() {
+        return "jar".equals(getRunMode()) ? true : false;
     }
 }
