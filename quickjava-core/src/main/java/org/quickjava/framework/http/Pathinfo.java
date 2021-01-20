@@ -65,12 +65,12 @@ public class Pathinfo {
     public static Map<String, String> parseQuery(String query)
     {
         Map<String, String> data = new HashMap<>();
+        System.out.println("query: " + query);
         if (query != null && !"".equals(query)) {
             for (String str : query.split("&")) {
                 int idx = str.indexOf("=");
-                if (idx == -1)
-                    continue;
-                data.put(str.substring(0, idx), str.substring(idx));
+                if (idx == -1) continue;
+                data.put(str.substring(0, idx), str.substring(idx + 1));
             }
         }
         return data;

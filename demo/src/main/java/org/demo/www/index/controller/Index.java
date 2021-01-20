@@ -7,7 +7,19 @@ public class Index extends Controller {
     public Object index()
     {
         StringBuffer output = new StringBuffer();
+        output.append("<h2>This QuickJava.</h2>");
+        output.append("<br>");
+        output.append(this.request.query());
+        output.append("<br>");
+        return output;
+    }
+
+    public Object test()
+    {
+        StringBuffer output = new StringBuffer();
         output.append("Hello, world!");
+        output.append("<br>");
+        output.append("<h2>This QuickJava.</h2>");
         output.append("<br>");
         output.append(this.request.getUrl());
         output.append("<br>");

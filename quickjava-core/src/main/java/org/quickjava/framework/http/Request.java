@@ -124,12 +124,17 @@ public class Request {
     protected void initHeader()
     {
         this.url = httpServletRequest.getRequestURL().toString();
-        this.pathinfo = Pathinfo.parseFromUrl(this.url);
+        if (httpServletRequest.getQueryString() != null)    // 补全url
+            this.url += "?" + httpServletRequest.getQueryString();
         this.port = httpServletRequest.getLocalPort();
         this.path = httpServletRequest.getPathInfo();
         this.method = httpServletRequest.getMethod().toUpperCase();
-        this.domin = this.pathinfo.hostname;
         this.ip = httpServletRequest.getRemoteAddr();
+
+        // pathinfo
+        this.pathinfo = Pathinfo.parseFromUrl(this.url);
+        this.domin = this.pathinfo.hostname;
+
         // 解析默认模块/控制器/方法
         Dict config = AppConfig.config.get("module").get("default");
         this.pathinfo.parseAction(config.getString("module"), config.getString("controller"), config.getString("action"));
@@ -242,31 +247,26 @@ public class Request {
 
     /**
      * 获取[Query]数据
-     * @param name
-     * @return
      */
-    public Dict getQueryData(String name)
-    {
+    public Dict query() {
         return this.queryData;
     }
 
-    public String getQuery(String name)
+    public String query(String name)
     {
         return this.queryData.getString(name);
     }
 
     /**
-     * 获取[POST]的字符串数据，比如UrlEncode、Form-Data
+     * 获取[POST]数据，比如UrlEncode、Form-Data
      * 非字符串数据将报错 {@throw}，获取文件建议使用{@file(String name)}
-     * @param name
-     * @return
      */
-    public Dict getPostData(String name)
+    public Dict post()
     {
         return this.postData;
     }
 
-    public String getPost(String name)
+    public String post(String name)
     {
         return this.postData.getString(name);
     }
