@@ -19,14 +19,16 @@ public class Console {
         public static int nordic_blue = 36; // 青蓝色
         public static int white = 37;
 
-        public static String output(String str, int color) {
+        public static String output(String str, int color)
+        {
             return "\033[1;" + color + "m" + str + "\033[0m";
         }
 
         public static String output(String str, String level)
         {
             Integer color = levelColor.containsKey(level) ? levelColor.get(level) : black;
-            return (color == null) ? level : "\033[1;" + color + "m" + str + "\033[0m";
+            String result = (color == null) ? level : "\033[1;" + color + "m" + str + "\033[0m";
+            return result;
         }
 
         private static Map<String, Integer> levelColor = new HashMap<>();
@@ -38,5 +40,14 @@ public class Console {
             levelColor.put("ERROR", Console.Color.red);
             levelColor.put("FATAL", Console.Color.violet_red);
         }
+    }
+
+    /**
+     * 判断看着他支持ANSI
+     * @return
+     */
+    public static Boolean isANSI() {
+        System.out.println(System.getenv().get("TERM"));
+        return (System.console() != null && System.getenv().get("TERM") != null);
     }
 }

@@ -70,6 +70,10 @@ public class Dict {
         return (String) data.get(key);
     }
 
+    public String getStringOrDef(String key, String value) {
+        return (data.get(key) != null) ? (String) data.get(key) : value;
+    }
+
     public Boolean getBoolean(String key) {
         checkValueType(data.get(key), Boolean.class);
         return (Boolean) data.get(key);

@@ -1,6 +1,6 @@
-package org.demo.www.index.controller;
+package org.demo.www.application.index.controller;
 
-import org.demo.www.index.model.UserModel;
+import org.demo.www.application.index.model.UserModel;
 import org.quickjava.framework.controller.Controller;
 
 public class User extends Controller {
@@ -9,4 +9,6 @@ public class User extends Controller {
     {
         UserModel.get().where("id", "=", "1").find();
     }
+
+
 }

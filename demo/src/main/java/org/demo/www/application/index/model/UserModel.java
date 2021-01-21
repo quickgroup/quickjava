@@ -1,4 +1,4 @@
-package org.demo.www.admin.model;
+package org.demo.www.application.index.model;
 
 import org.quickjava.framework.database.Model;
 

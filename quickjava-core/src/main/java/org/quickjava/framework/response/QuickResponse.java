@@ -1,6 +1,12 @@
 package org.quickjava.framework.response;
 
+import org.quickjava.common.QLog;
+import org.quickjava.framework.http.Http;
+import org.quickjava.framework.http.Request;
 import org.quickjava.framework.http.Response;
+
+import javax.servlet.http.HttpServletResponse;
+import java.io.OutputStream;
 
 /**
  * @author Qlo1062-QloPC-zs
@@ -29,8 +35,36 @@ public class QuickResponse {
      * @param response
      * @return
      */
-    public String output(Response response)
+    public String output(Request request, Response response)
     {
         return data.toString();
+    }
+
+    /**
+     * 输出数据转化
+     * @param bytes
+     * @param response
+     */
+    public static void outputWrite(byte[] bytes, Request request, Response response)
+    {
+        try {
+            HttpServletResponse httpServletResponse = response.getHttpServletResponse();
+
+            // 状态设置
+            httpServletResponse.setStatus(response.getStatus());
+            httpServletResponse.setHeader(Http.HeaderKey.Content_Type, response.getContentType());
+
+            // 输出内容
+            OutputStream outputStream = httpServletResponse.getOutputStream();
+            outputStream.write(bytes);
+            outputStream.close();
+
+        } catch (Exception exc) {
+            // 致命异常
+            exc.printStackTrace();
+            QLog.fatal(exc);
+        }
+
+        QLog.info(request.path + " " + response.getStatus());
     }
 }

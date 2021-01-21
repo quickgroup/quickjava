@@ -8,7 +8,9 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class Response {
 
-    private Http.ContentType contentType = null;
+    private Integer status = 200;
+
+    private String contentType = null;
 
     private HttpServletResponse httpServletResponse;
 
@@ -16,11 +18,11 @@ public class Response {
         this.httpServletResponse = httpServletResponse;
     }
 
-    public Http.ContentType getContentType() {
+    public String getContentType() {
         return contentType;
     }
 
-    public void setContentType(Http.ContentType contentType) {
+    public void setContentType(String contentType) {
         this.contentType = contentType;
     }
 
@@ -30,5 +32,13 @@ public class Response {
 
     public void setHttpServletResponse(HttpServletResponse httpServletResponse) {
         this.httpServletResponse = httpServletResponse;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 }

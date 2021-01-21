@@ -9,6 +9,7 @@ import org.quickjava.framework.bean.Dict;
 import org.quickjava.framework.controller.Controller;
 import org.quickjava.framework.controller.Module;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
@@ -45,6 +46,11 @@ public class Request {
      * @langCn 域名后面的路径，pathinfo格式{@code "/index/index/index"}
      */
     public String path;
+
+    /**
+     * @langCn http协议
+     */
+    public String protocol;
 
     /**
      * @langCn Pathinfo
@@ -102,6 +108,11 @@ public class Request {
     /**
      * @langCn 原始HttpServletRequest
      */
+    public ServletContext servletContext = null;
+
+    /**
+     * @langCn 原始HttpServletRequest
+     */
     public HttpServletRequest httpServletRequest = null;
 
     /**
@@ -111,6 +122,7 @@ public class Request {
 
     public Request(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         this.startTime = QUtils.getTimestamp();
+        this.servletContext = httpServletRequest.getServletContext();
         this.httpServletRequest = httpServletRequest;
         this.httpServletResponse = httpServletResponse;
         this.initServlet();
@@ -137,6 +149,7 @@ public class Request {
         this.path = httpServletRequest.getPathInfo();
         this.method = httpServletRequest.getMethod().toUpperCase();
         this.ip = httpServletRequest.getRemoteAddr();
+        this.protocol = httpServletRequest.getProtocol();
 
         // 补全url
         if (httpServletRequest.getQueryString() != null) {

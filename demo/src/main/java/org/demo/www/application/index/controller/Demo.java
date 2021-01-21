@@ -1,4 +1,4 @@
-package org.demo.www.index.controller;
+package org.demo.www.application.index.controller;
 
 import org.quickjava.framework.controller.Controller;
 

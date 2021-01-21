@@ -1,14 +1,15 @@
 package org.quickjava.framework.controller;
 
 import org.quickjava.common.QLog;
+import org.quickjava.common.utils.QFileUtils;
 import org.quickjava.framework.bean.Dict;
 import org.quickjava.framework.exception.ResponseException;
 import org.quickjava.framework.http.Request;
 import org.quickjava.framework.http.Response;
 import org.quickjava.framework.response.JsonResponse;
 import org.quickjava.framework.response.ViewResponse;
-import org.quickjava.framework.view.View;
 
+import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -22,7 +23,7 @@ public class Controller {
 
     public String path;
 
-    public String viewPath;
+    public Map<String, Object> viewData = new LinkedHashMap<>();
 
     public String packages;
 
@@ -39,6 +40,8 @@ public class Controller {
 
     public void _initialize()
     {
+        this.module = request.module;
+        this.action = request.action;
     }
 
     public void _initRequest(Request request, Response response)
@@ -50,14 +53,6 @@ public class Controller {
     public void setModule(Module module) {
         this.module = module;
         this.path = module.getPath() + "/" + name;
-    }
-
-    public void setViewPath(String viewPath) {
-        this.viewPath = viewPath;
-    }
-
-    public String getViewPath() {
-        return this.viewPath;
     }
 
     /**
@@ -81,10 +76,19 @@ public class Controller {
 
     public Object view(String targetPath)
     {
-        String viewPath = this.viewPath + "/" + targetPath + ".html";
-        System.out.println("viewPath: " + viewPath);
-        ViewResponse viewResponse = new ViewResponse(new View(viewPath));
-        return new ViewResponse(new View(""));
+        String viewPath = this.module.viewPath + "/" + targetPath + ".html";
+        ViewResponse viewResponse = new ViewResponse(new File(viewPath), viewData);
+        throw new ResponseException(viewResponse);
+    }
+
+    /**
+     * @langCn 向view中添加变量数据
+     * @param name
+     * @param object
+     */
+    public void assign(String name, Object object)
+    {
+        viewData.put(name, object);
     }
 
     @Override
@@ -93,7 +97,6 @@ public class Controller {
                 ", name='" + name + '\'' +
                 ", action=" + action +
                 ", path='" + path + '\'' +
-                ", viewPath='" + viewPath + '\'' +
                 ", packages='" + packages + '\'' +
                 ", request=" + request +
                 ", response=" + response +

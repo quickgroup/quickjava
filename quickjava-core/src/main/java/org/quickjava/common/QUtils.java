@@ -65,7 +65,7 @@ public class QUtils {
 
     public static String getDateTime()
     {
-        return getDateTime("YYYY-MM-dd HH:mm:ss.SS", new Date());
+        return getDateTime("YYYY-MM-dd HH:mm:ss.SSS", new Date());
     }
 
     /**
@@ -137,5 +137,28 @@ public class QUtils {
 
     public static Boolean isJarMode() {
         return "jar".equals(getRunMode()) ? true : false;
+    }
+
+    /**
+     * @langCn 堆栈数组转string数组
+     * @param stackTraceElements
+     * @return
+     */
+    public static String[] stackTraceArrToStringArr(StackTraceElement[] stackTraceElements)
+    {
+        String[] strings = new String[stackTraceElements.length];
+        for (int fi = 0; fi < stackTraceElements.length; fi++) {
+            strings[fi] = stackTraceElements[fi].toString();
+        }
+        return strings;
+    }
+
+    public static String stackTraceArrToString(StackTraceElement[] stackTraceElements)
+    {
+        String[] strings = new String[stackTraceElements.length];
+        for (int fi = 0; fi < stackTraceElements.length; fi++) {
+            strings[fi] = stackTraceElements[fi].toString();
+        }
+        return String.join("\n", strings);
     }
 }

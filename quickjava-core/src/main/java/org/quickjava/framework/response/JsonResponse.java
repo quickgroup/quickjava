@@ -1,6 +1,7 @@
 package org.quickjava.framework.response;
 
 import org.quickjava.framework.bean.Dict;
+import org.quickjava.framework.http.Request;
 import org.quickjava.framework.http.Response;
 
 import java.util.Map;
@@ -12,7 +13,7 @@ import java.util.Map;
 public class JsonResponse extends QuickResponse {
 
     @Override
-    public String output(Response response) {
+    public String output(Request request, Response response) {
         return null;
     }
 

@@ -8,6 +8,7 @@ import org.apache.catalina.webresources.DirResourceSet;
 import org.apache.catalina.webresources.StandardRoot;
 import org.quickjava.common.QLog;
 import org.quickjava.common.QUtils;
+import org.quickjava.framework.App;
 
 import javax.servlet.ServletException;
 import java.io.File;
@@ -27,6 +28,7 @@ public class TomcatServer {
         // new Context
         StandardContext ctx = (StandardContext) tomcat
                 .addWebapp("", new File(classesPath).getAbsolutePath());
+        ctx.setSessionCookieName("QSESSION");
 
         // Configure the resource path
         // Declare an alternative location for your "WEB-INF/classes" dir
@@ -39,15 +41,15 @@ public class TomcatServer {
         tomcat.addServlet("", "tomcatServlet", new TomcatServlet());
         ctx.addServletMappingDecoded("/*", "tomcatServlet");
 
-        //
+        // tomcat log level
         java.util.logging.Logger.getLogger("org.apache").setLevel(java.util.logging.Level.WARNING);
 
         // start tomcat
-        QLog.info("start tomcat");
         tomcat.start();
+        // App global servletContext
+        App.serverStarting(ctx.getServletContext());
 
         // start success
-        QLog.info("start tomcat complete");
         tomcat.getServer().await();
     }
 

@@ -1,6 +1,6 @@
 package org.demo.www;
 
-import org.demo.www.index.model.UserModel;
+import org.demo.www.application.index.model.UserModel;
 import org.junit.Test;
 import org.quickjava.common.QLog;
 import org.quickjava.framework.controller.Module;

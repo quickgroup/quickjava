@@ -10,13 +10,11 @@ import java.io.*;
 public class QFileUtils {
 
     public static String getFileContents(String name)
-            throws Exception
     {
         return getFileContents(new File(name));
     }
 
     public static String getFileContents(File file)
-            throws Exception
     {
         FileInputStream fileInputStream = null;
         try {
@@ -30,9 +28,9 @@ public class QFileUtils {
 
             return stringBuffer.toString();
 
-        }catch (Throwable tr){
+        } catch (Throwable tr){
             tr.printStackTrace();
-        }finally {
+        } finally {
             if (fileInputStream != null) {
                 try{
                     fileInputStream.close();

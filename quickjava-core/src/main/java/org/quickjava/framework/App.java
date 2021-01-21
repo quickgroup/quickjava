@@ -2,8 +2,15 @@ package org.quickjava.framework;
 
 import org.quickjava.common.Console;
 import org.quickjava.common.QLog;
+import org.quickjava.framework.http.Request;
 import org.quickjava.framework.server.TomcatServer;
 
+import javax.servlet.ServletContext;
+
+/**
+ * @author QloPC-Msi
+ * @date 2021/01/08
+ */
 public class App {
 
     private static App app = new App();
@@ -15,6 +22,8 @@ public class App {
     private boolean isDebug = false;
 
     public static ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+
+    public static ServletContext servletContext = null;
 
     public static App get() {
         return app;
@@ -47,13 +56,23 @@ public class App {
     }
 
     /**
-     * 运行Tomcat
+     * @langCn 运行Tomcat
      * @param args
      */
     private void run(String[] args)
             throws Exception
     {
         TomcatServer.run();
+    }
+
+    /**
+     * @langCn 启动成功
+     */
+    public static void serverStarting(ServletContext servletContext)
+    {
+        App.servletContext = servletContext;
+
+        QLog.info("App start complete");
     }
 
     public static String quickJavaWelcome()
@@ -68,6 +87,26 @@ public class App {
         strs += " :: " + Console.Color.output("QuickJava", "INFO") + " :: " + QuickJavaBoot.version + " ("+ QuickJavaBoot.versionCode +") \n";
         System.out.println(strs);
         return strs;
+    }
+
+    /**
+     * @langCn 线程存值
+     */
+    private static final ThreadLocal<Object> threadLocal = new ThreadLocal<Object>(){
+        @Override
+        protected Object initialValue()
+        {
+            System.out.println("调用get方法时，当前线程共享变量没有设置，调用initialValue获取默认值！");
+            return null;
+        }
+    };
+
+    public static void setCurrentRequest(Request request) {
+        threadLocal.set(request);
+    }
+
+    public static Request getCurrentRequest() {
+        return (Request) threadLocal.get();
     }
 
 }

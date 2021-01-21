@@ -17,9 +17,21 @@ public class Module {
 
     public String packages;
 
+    /**
+     * @langCn 文件路径
+     */
     public String dirpath;
 
+    /**
+     * @langCn 路由路径(网址路径)
+     */
     public String path;
+
+    public String controllerPath;
+
+    public String modelPath;
+
+    public String viewPath;
 
     public Map<String, Controller> controllerList = new LinkedHashMap<>();
 
@@ -28,6 +40,11 @@ public class Module {
         this.packages = packages;
         this.dirpath = dirpath;
         this.path = "/" + name;
+
+        Dict dirnameConfig = AppConfig.config.get("module").get("dirname");
+        this.controllerPath = this.dirpath + "/" + dirnameConfig.getStringOrDef("controller", "controller");
+        this.modelPath = this.dirpath + "/" + dirnameConfig.getStringOrDef("model", "model");
+        this.viewPath = this.dirpath + "/" + dirnameConfig.getStringOrDef("view", "view");
     }
 
     public String getName() {

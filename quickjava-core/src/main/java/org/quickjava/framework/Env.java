@@ -9,7 +9,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 环境变量管理
+ * @langCn 环境变量管理
+ * @author QloPC-Msi
+ * @date 2021/0108
  */
 public class Env {
 
@@ -22,7 +24,7 @@ public class Env {
         set("rootPath", QUtils.getRootPath());
         // 项目包
         ApplicationQuickBoot quickBoot = applicationClass.newInstance().getClass().getAnnotation(ApplicationQuickBoot.class);
-        String basePackages = "".equals(quickBoot.value()) ? applicationClass.getPackage().getName() : quickBoot.value();
+        String basePackages = "".equals(quickBoot.value()) ? applicationClass.getPackage().getName() + ".application" : quickBoot.value();
         set("basePackages", basePackages);
 
         QLog.info("Env init complete");

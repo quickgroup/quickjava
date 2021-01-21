@@ -1,7 +1,6 @@
-package org.demo.www.index.controller;
+package org.demo.www.application.index.controller;
 
 import org.quickjava.framework.controller.Controller;
-import org.quickjava.framework.view.View;
 
 public class Index extends Controller {
 

@@ -1,14 +1,8 @@
 package org.quickjava.framework.exception;
 
-import org.quickjava.common.QLog;
-import org.quickjava.framework.http.Http;
 import org.quickjava.framework.http.Request;
 import org.quickjava.framework.http.Response;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.PrintWriter;
-import java.util.Arrays;
+import org.quickjava.framework.response.QuickResponse;
 
 /**
  * @author QloPC-zs
@@ -16,54 +10,41 @@ import java.util.Arrays;
  */
 public class QuickExceptionHandler {
 
+
     /**
-     * @langCn 异常处理
+     * @langCn 异常响应处理输出
      */
-    public static void onHandler(Throwable exc, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
+    public static void onHandler(Throwable thr, Request request, Response response)
     {
         try {
-            // @langCn 控制台打印异常
-            if (exc instanceof ActionNotFoundException) {
+            String outputBody = null;
+
+            if (thr instanceof ResponseException) {
+                ResponseException responseException = (ResponseException) thr;
+                outputBody = responseException.getQuickResponse().output(request, response);
             } else {
-                QLog.error(exc);
-                exc.printStackTrace();
+                throw thr;
             }
 
-            // @langCn 异常反馈
-            httpServletResponse.setContentType(Http.ContentType.HTML);
-            if (exc instanceof QuickException) {
-                QuickException quickException = (QuickException) exc;
-                httpServletResponse.setStatus(quickException.getCode().getStatus());
-            } else {
-                httpServletResponse.setStatus(500);
-            }
+            if (outputBody == null)
+                return;
+            QuickResponse.outputWrite(outputBody.getBytes(), request, response);
 
-            PrintWriter printWriter = httpServletResponse.getWriter();
-            StringBuffer output = new StringBuffer();
-            output.append("<title>系统异常</title>");
-            output.append("<h2>Exception: " + exc.getClass().getTypeName() + "</h2>");
-            output.append("<h3>Message: " + exc.getMessage() + "</h3>");
-            output.append("<h4>StackTrace:</h4><pre style=\"background: #eee;overflow: scroll;\">" + String.join("\n", stackTraceArrToStringArr(exc.getStackTrace())) + "</pre><br>");
-            printWriter.write(output.toString());
-            printWriter.flush();
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        } catch (Throwable throwable) {
+            onHandlerTerminal(throwable, request, response);
         }
     }
 
     /**
-     * @langCn 堆栈数组转string数组
-     * @param stackTraceElements
-     * @return
+     * @langCn 异常响应处理输出-最终级别
      */
-    private static String[] stackTraceArrToStringArr(StackTraceElement[] stackTraceElements)
+    public static void onHandlerTerminal(Throwable thr, Request request, Response response)
     {
-        String[] strings = new String[stackTraceElements.length];
-        for (int fi = 0; fi < stackTraceElements.length; fi++) {
-            strings[fi] = stackTraceElements[fi].toString();
-        }
-        return strings;
+        thr.printStackTrace();
+
+        QuickException quickException = new QuickException(thr);
+        String outputBody = quickException.output(request, response);
+        QuickResponse.outputWrite(outputBody.getBytes(), request, response);
     }
 
 }

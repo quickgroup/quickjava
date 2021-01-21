@@ -1,4 +1,4 @@
-package org.demo.www.admin.controller;
+package org.demo.www.application.admin.controller;
 
 import org.quickjava.framework.controller.Controller;
 

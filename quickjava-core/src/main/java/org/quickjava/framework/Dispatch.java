@@ -2,6 +2,7 @@ package org.quickjava.framework;
 
 import org.quickjava.common.QLog;
 import org.quickjava.common.QUtils;
+import org.quickjava.framework.exception.QuickException;
 import org.quickjava.framework.exception.QuickExceptionHandler;
 import org.quickjava.framework.exception.ResponseException;
 import org.quickjava.framework.http.Request;
@@ -14,17 +15,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 拦截器/分发器
+ * @langCn 请求入口处理器
+ * @author QloPC-Msi
+ * @date 2021/01/21
  */
 public class Dispatch {
 
-    // singleton
     private static Dispatch dispatch = new Dispatch();
-
-    /**
-     * 用户定义的拦截器
-     */
-    private static List<Object> dispatchList = new ArrayList<Object>();
 
     public static Dispatch get() {
         return dispatch;
@@ -40,33 +37,33 @@ public class Dispatch {
      */
     public void exec(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
     {
-        Request request = null;
-        Response response = null;
+        Request request = new Request(httpServletRequest, httpServletResponse);
+        Response response = new Response(httpServletResponse);
+        App.setCurrentRequest(request);
+
+        QLog.info(request.method + " " + request.path + " " + request.protocol);
+
         try {
-            request = new Request(httpServletRequest, httpServletResponse);
-            response = new Response(httpServletResponse);
+            Route.MapAction mapAction = Route.get().findMappingAction(request);
 
-            try {
-                Route.MapAction mapAction = Route.get().findMappingAction(request);
+            Object result = mapAction.invoke(request, response);
 
-                Object result = mapAction.invoke(request, response);
+            if (result == null) return;
 
-                if (result == null) return;
-
-                if (QuickResponse.class.isAssignableFrom(result.getClass())) {
-                    throw new ResponseException( (QuickResponse) result);
-                }
-                throw new ResponseException(new QuickResponse(result.toString()));
-
-            } catch (ResponseException exc) {
-                ResponseException.onHandler(exc, request, response);
-            } finally {
-                Long time = QUtils.getTimestamp() - request.startTime;
-                QLog.info("startTime: " + time + "ms");
+            if (QuickResponse.class.isAssignableFrom(result.getClass())) {
+                throw new ResponseException( (QuickResponse) result);
             }
+            throw new ResponseException(new QuickResponse(result.toString()));
 
-        } catch (Exception exc) {
-            QuickExceptionHandler.onHandler(exc, httpServletRequest, httpServletResponse);
+        } catch (Throwable throwable) {
+            QuickExceptionHandler.onHandler(throwable, request, response);
+        } finally {
+
+            // Request环境清理
+            App.setCurrentRequest(null);
+
+            Long time = QUtils.getTimestamp() - request.startTime;
+            QLog.info("Handling time: " + time + "ms");
         }
     }
 

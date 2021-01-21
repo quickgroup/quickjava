@@ -25,6 +25,13 @@
     <!-- 依赖包 -->
     <dependencies>
 
+        <!-- https://mvnrepository.com/artifact/org.freemarker/freemarker -->
+        <dependency>
+            <groupId>org.freemarker</groupId>
+            <artifactId>freemarker</artifactId>
+            <version>2.3.30</version>
+        </dependency>
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -110,7 +117,7 @@
 
         </plugins>
 
-        <!-- 配置文件 -->
+        <!-- 资源文件 -->
         <resources>
             <resource>
                 <directory>${basedir}/src/main/java/</directory>
@@ -125,6 +132,7 @@
                 </includes>
             </resource>
         </resources>
+
     </build>
 
 </project>

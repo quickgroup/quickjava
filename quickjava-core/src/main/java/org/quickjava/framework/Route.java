@@ -14,6 +14,7 @@ import org.quickjava.framework.http.Response;
 import org.quickjava.common.utils.QFileUtils;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URL;
@@ -67,9 +68,9 @@ public class Route {
         URL configYmlUrl = App.classLoader.getResource("config.yml");
         String configYmlContent = QFileUtils.getFileContents(configYmlUrl.getPath());
         AppConfig.Factory.loadFormYml(configYmlContent);
-        Dict config = AppConfig.config;
-//        QLog.info("AppConfig.config=" + AppConfig.config);
 
+        // 配置
+        Dict config = AppConfig.config;
         boolean caseSensitive = false;
 
         // 解析
@@ -79,27 +80,28 @@ public class Route {
             // 文件形式
             if (item.getProtocol().equals("file"))
             {
+
+                // TODO::模块列表
                 File appFile = new File(item.getFile());
                 File[] moduleFiles = appFile.listFiles();
-                // 模块列表
                 for (File moduleFile : moduleFiles) {
                     if (moduleFile.isDirectory()) {
                         Module module = new Module(moduleFile.getName(), packageReplace(moduleFile.getAbsolutePath(), classesPath), moduleFile.getAbsolutePath());
                         String modulePath = caseSensitive ? module.path : module.path.toLowerCase();
                         moduleList.put(modulePath, module);
-                        // 模块-控制器列表
-                        File controllerDir = new File(moduleFile.getAbsolutePath() + "/" +
-                                config.get("module").get("dirname").getString("controller"));
+
+                        // TODO::控制器列表
+                        File controllerDir = new File(module.controllerPath);
                         if (controllerDir.exists()) {
                             for (File controllerFile : controllerDir.listFiles()) {
                                 String controllerPackages = packageReplace(controllerFile.getAbsolutePath(), classesPath );
                                 Controller controller = (Controller) App
                                         .classLoader.loadClass(controllerPackages).newInstance();
                                 controller.setModule(module);
-                                controller.setViewPath(moduleFile.getAbsolutePath());
                                 String controllerPath = caseSensitive ? controller.path : controller.path.toLowerCase();
                                 module.controllerList.put(controllerPath, controller);
-                                // 加载控制器里的方法
+
+                                // TODO::控制器方法列表
                                 controllerLoadAction(controller);
                             }
                         }
@@ -144,7 +146,7 @@ public class Route {
 
 
     /**
-     * 找到控制器方法
+     * @langCn 找到控制器方法
      * @param request
      */
     public MapAction findMappingAction(Request request)
@@ -166,7 +168,7 @@ public class Route {
             if (module.controllerList.containsKey((actionPath += "/" + pathinfo.controller))) {
                 Controller controller = module.controllerList.get(actionPath);
                 if (controller.actionList.containsKey((actionPath += "/" + pathinfo.action))) {
-                    mapAction = new MapAction(controller.actionList.get(actionPath));
+                    mapAction = new MapAction(controller.actionList.get(actionPath), request);
                 } else {
                     throw new ActionNotFoundException("方法不存在 " + actionPath);
                 }
@@ -187,8 +189,12 @@ public class Route {
 
         public Action action;
 
-        public MapAction(Action action) {
+        public MapAction(Action action, Request request) {
             this.action = action;
+            // 配置request
+            request.module = action.controller.module;
+            request.controller = action.controller;
+            request.action = action;
         }
 
         /**
@@ -199,13 +205,18 @@ public class Route {
          * @throws Exception
          */
         public Object invoke(Request request, Response response)
-                throws Exception
+                throws Throwable
         {
             Controller controller = action.controller.getClass().newInstance();
             controller._initRequest(request, response);
-            controller.action = action;
             controller._initialize();
-            return action.method.invoke(controller);
+
+            try {
+                return action.method.invoke(controller);
+            } catch (InvocationTargetException exc) {
+                throw exc.getTargetException();
+            }
+
         }
     }
 }

@@ -17,7 +17,7 @@ public class QLog {
                 QUtils.getDateTime(),
                 Console.Color.output( level, level),
                 QUtils.getSimpleCallClassMethod(),
-                (params.length == 1 ? params[0].toString() : Arrays.toString(params)) );
+                ((params.length == 1 && params[0] != null) ? params[0].toString() : Arrays.toString(params)) );
         System.out.println(logstr);
         // 写入到文件
     }

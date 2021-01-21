@@ -1,9 +1,8 @@
 package org.quickjava.framework;
 
-import org.quickjava.framework.App;
-
 /**
- * 启动类
+ * @author QloPC-Msi
+ * @date 2021/0108
  */
 public class QuickJavaBoot {
 
@@ -15,7 +14,7 @@ public class QuickJavaBoot {
     /**
      * @langCn 版本号值
      */
-    public static final Integer versionCode = 1010000;
+    public static final Integer versionCode = 2101001;
 
     /**
      * @langCn 启动入口
