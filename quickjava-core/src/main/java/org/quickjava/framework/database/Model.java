@@ -8,7 +8,7 @@ public class Model<T> {
 
     public String name;
 
-    public static Model get() {
+    public static Model _get() {
         return new Model();
     }
 
@@ -19,11 +19,11 @@ public class Model<T> {
      * @param value
      * @return
      */
-    public T where(String field, String operator, String value) {
+    final public T where(String field, String operator, String value) {
         return (T) this;
     }
 
-    public T find() {
+    final public T find() {
         return (T) this;
     }
 

@@ -61,7 +61,7 @@ public class Dict {
     }
 
     /**
-     * {@see #get(String key)}
+     * {@see #_get(String key)}
      * @param key MAP键
      * @return String
      */
