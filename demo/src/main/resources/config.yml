@@ -1,7 +1,7 @@
 # Application
 app:
-  hostname: localhost
-  port: 80
+  hostname: "0.0.0.0"
+  port: 8080
   debug: true
   version: 1.0
   versionCode: 101000
