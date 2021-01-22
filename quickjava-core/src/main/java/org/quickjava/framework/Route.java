@@ -2,8 +2,6 @@ package org.quickjava.framework;
 
 import org.quickjava.common.QLog;
 import org.quickjava.common.QUtils;
-import org.quickjava.framework.bean.Dict;
-import org.quickjava.framework.config.AppConfig;
 import org.quickjava.framework.controller.Action;
 import org.quickjava.framework.controller.Controller;
 import org.quickjava.framework.controller.Module;
@@ -11,7 +9,6 @@ import org.quickjava.framework.exception.ActionNotFoundException;
 import org.quickjava.framework.http.Pathinfo;
 import org.quickjava.framework.http.Request;
 import org.quickjava.framework.http.Response;
-import org.quickjava.common.utils.QFileUtils;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
@@ -53,33 +50,33 @@ public class Route {
     private void scanPackages()
         throws Exception
     {
-        String classesPath = QUtils.getClassesPath();
-        QLog.info("classesPath => " + classesPath);
         String basePackages = Env.getString("basePackages");
         String packagePath = basePackages.replace(".", "/");
-        QLog.info("basePackages => " + basePackages + ", packagePath => " + packagePath);
+        QLog.debug("basePackages => " + basePackages + ", packagePath => " + packagePath);
 
         Enumeration<URL> enumeration = App.classLoader.getResources(packagePath);
         if (enumeration == null) {
             throw new ClassNotFoundException("package not found, basePackages=" + basePackages);
         }
 
-        // 加载配置文件
-        URL configYmlUrl = App.classLoader.getResource("config.yml");
-        String configYmlContent = QFileUtils.getFileContents(configYmlUrl.getPath());
-        AppConfig.Factory.loadFormYml(configYmlContent);
-
         // 配置
-        Dict config = AppConfig.config;
         boolean caseSensitive = false;
 
-        // 解析
+        /**
+         * @langCn 解析
+         */
         if (enumeration.hasMoreElements()) {
             URL item = enumeration.nextElement();
 
-            // 文件形式
+            /**
+             * @langCn classes文件模式
+             */
             if (item.getProtocol().equals("file"))
             {
+                /**
+                 * @langCn 环境数据
+                 */
+                String classesPath = QUtils.getClassesPath();
 
                 // TODO::模块列表
                 File appFile = new File(item.getFile());
@@ -109,16 +106,18 @@ public class Route {
                 }
 
             }
-            // jar包
+            /**
+             * @langCn jar包
+             */
             else if (item.getProtocol().equals("jar"))
             {
-
+                System.out.println("jar");
             }
 
             /**
-             * 扫描完成
+             * @langCn 扫描完成
              */
-            QLog.info("actionList: " + moduleList);
+            QLog.debug("actionList: " + moduleList);
         }
     }
 
@@ -160,7 +159,7 @@ public class Route {
         }
 
         // TODO::REST模式
-        QLog.debug("REST模式, " + path);
+//        QLog.debug("REST模式, " + path);
         Pathinfo pathinfo = request.pathinfo;
         String actionPath = "/" + pathinfo.module;
         if (moduleList.containsKey(actionPath)) {

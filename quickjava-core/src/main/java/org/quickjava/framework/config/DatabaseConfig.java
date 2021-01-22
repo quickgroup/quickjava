@@ -1,13 +1,10 @@
 package org.quickjava.framework.config;
 
-import lombok.Data;
-
 /**
  * @author Qlo1062-(QloPC-Msi)
  * @date 2021/1/17 21:07
  * @ProjectName quickjava
  */
-@Data
 public class DatabaseConfig {
 
     private Type type = Type.MYSQL;

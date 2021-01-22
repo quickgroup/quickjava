@@ -2,10 +2,14 @@ package org.quickjava.framework;
 
 import org.quickjava.common.Console;
 import org.quickjava.common.QLog;
+import org.quickjava.common.QFileUtils;
+import org.quickjava.framework.bean.Dict;
+import org.quickjava.framework.config.AppConfig;
 import org.quickjava.framework.http.Request;
 import org.quickjava.framework.server.TomcatServer;
 
 import javax.servlet.ServletContext;
+import java.net.URL;
 
 /**
  * @author QloPC-Msi
@@ -17,13 +21,11 @@ public class App {
 
     public static String name = "QuickJava";
 
-    private String basePackages = null;
-
-    private boolean isDebug = false;
-
     public static ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
     public static ServletContext servletContext = null;
+
+    public static Dict config = null;
 
     public static App get() {
         return app;
@@ -36,12 +38,11 @@ public class App {
     public static void startup(Class applicationClass, String[] args)
     {
         try {
-            quickJavaWelcome();
+            app.welcome();
 
             // 初始化环境
             Env.init(applicationClass);
-
-            // 初始化数据库连接
+            app.loadConfig();
 
             // 初始化路由
             Route.init(args);
@@ -71,11 +72,24 @@ public class App {
     public static void serverStarting(ServletContext servletContext)
     {
         App.servletContext = servletContext;
-
         QLog.info("App start complete");
     }
 
-    public static String quickJavaWelcome()
+    /**
+     * @langCn 加载配置文件
+     * @throws Exception
+     */
+    public void loadConfig() throws Exception
+    {
+        String configYmlContent = QFileUtils.getPackageFileContent("", "config.yml");
+        config = AppConfig.Factory.loadFormYml(configYmlContent);
+    }
+
+    /**
+     * @langCn welcome
+     * @return
+     */
+    public String welcome()
     {
         String strs = "\n" +
                 "   ____        _      _        _                  \n" +

@@ -1,7 +1,7 @@
 package org.quickjava.framework.controller;
 
+import org.quickjava.framework.App;
 import org.quickjava.framework.bean.Dict;
-import org.quickjava.framework.config.AppConfig;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -41,10 +41,10 @@ public class Module {
         this.dirpath = dirpath;
         this.path = "/" + name;
 
-        Dict dirnameConfig = AppConfig.config.get("module").get("dirname");
-        this.controllerPath = this.dirpath + "/" + dirnameConfig.getStringOrDef("controller", "controller");
-        this.modelPath = this.dirpath + "/" + dirnameConfig.getStringOrDef("model", "model");
-        this.viewPath = this.dirpath + "/" + dirnameConfig.getStringOrDef("view", "view");
+        Dict dirDict = App.config.get("module").get("dirname");
+        this.controllerPath = this.dirpath + "/" + dirDict.getString("controller", "controller");
+        this.modelPath = this.dirpath + "/" + dirDict.getString("model", "model");
+        this.viewPath = this.dirpath + "/" + dirDict.getString("view", "view");
     }
 
     public String getName() {
@@ -65,18 +65,6 @@ public class Module {
 
     public String getPath() {
         return "/" + this.name;
-    }
-
-    /**
-     * @langCn 初始化模块
-     */
-    public void init()
-    {
-        String packagePath = this.packages;
-        Dict dirDict = AppConfig.config.get("module").get("dir");
-        String controllerPath = packagePath + "/" + dirDict.getString("controller");
-        String modelPath = packagePath + "/" + dirDict.getString("model");
-        String viewPath = packagePath + "/" + dirDict.getString("view");
     }
 
     @Override

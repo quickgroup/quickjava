@@ -62,8 +62,8 @@ public class Dispatch {
             // Request环境清理
             App.setCurrentRequest(null);
 
-            Long time = QUtils.getTimestamp() - request.startTime;
-            QLog.info("Handling time: " + time + "ms");
+            long time = QUtils.getTimestamp() - request.startTime;
+            QLog.debug("Handling time: " + time + "ms");
         }
     }
 

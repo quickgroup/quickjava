@@ -138,7 +138,7 @@ public class Request {
         httpServletResponse.setCharacterEncoding("UTF-8");
         httpServletResponse.setHeader(Http.HeaderKey.Content_Type,"text/html; charset=UTF-8");
         httpServletResponse.setHeader(Http.HeaderKey.Server, App.name);
-        httpServletResponse.setHeader(":"+Http.HeaderKey.Server, App.name);
+        httpServletResponse.setHeader(":" + Http.HeaderKey.Server, App.name);
     }
 
     @SuppressWarnings({"unchecked"})
@@ -162,7 +162,7 @@ public class Request {
         this.domin = this.pathinfo.hostname;
 
         // 解析默认模块/控制器/方法
-        Dict defaultConfig = AppConfig.config.get("module").get("default");
+        Dict defaultConfig = App.config.get("module").get("default");
         this.pathinfo.parseControllerAction(
                 defaultConfig.getString("module"),
                 defaultConfig.getString("controller"),

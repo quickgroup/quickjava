@@ -1,5 +1,6 @@
 package org.quickjava.framework.exception;
 
+import org.quickjava.common.QLog;
 import org.quickjava.framework.http.Request;
 import org.quickjava.framework.http.Response;
 import org.quickjava.framework.response.QuickResponse;
@@ -17,18 +18,23 @@ public class QuickExceptionHandler {
     public static void onHandler(Throwable thr, Request request, Response response)
     {
         try {
-            String outputBody = null;
+            byte[] outputBytes = null;
 
             if (thr instanceof ResponseException) {
                 ResponseException responseException = (ResponseException) thr;
-                outputBody = responseException.getQuickResponse().output(request, response);
+                outputBytes = responseException.getQuickResponse().output(request, response);
+            } else if (thr instanceof ActionNotFoundException) {
+                ActionNotFoundException exception = (ActionNotFoundException) thr;
+                outputBytes = exception.output(request, response);
+                QLog.error(exception.getMessage());
+
             } else {
                 throw thr;
             }
 
-            if (outputBody == null)
+            if (outputBytes == null)
                 return;
-            QuickResponse.outputWrite(outputBody.getBytes(), request, response);
+            QuickResponse.outputWrite(outputBytes, request, response);
 
         } catch (Throwable throwable) {
             onHandlerTerminal(throwable, request, response);
@@ -43,8 +49,8 @@ public class QuickExceptionHandler {
         thr.printStackTrace();
 
         QuickException quickException = new QuickException(thr);
-        String outputBody = quickException.output(request, response);
-        QuickResponse.outputWrite(outputBody.getBytes(), request, response);
+        byte[] outputBytes = quickException.output(request, response);
+        QuickResponse.outputWrite(outputBytes, request, response);
     }
 
 }

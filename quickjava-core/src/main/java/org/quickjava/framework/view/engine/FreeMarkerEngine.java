@@ -30,6 +30,7 @@ public class FreeMarkerEngine extends ViewEngine {
         this.dataModel = data;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public String output()
     {

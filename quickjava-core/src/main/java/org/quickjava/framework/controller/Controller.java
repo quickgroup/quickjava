@@ -1,7 +1,5 @@
 package org.quickjava.framework.controller;
 
-import org.quickjava.common.QLog;
-import org.quickjava.common.utils.QFileUtils;
 import org.quickjava.framework.bean.Dict;
 import org.quickjava.framework.exception.ResponseException;
 import org.quickjava.framework.http.Request;

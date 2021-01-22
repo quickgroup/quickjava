@@ -13,7 +13,7 @@ import java.util.Map;
 public class JsonResponse extends QuickResponse {
 
     @Override
-    public String output(Request request, Response response) {
+    public byte[] output(Request request, Response response) {
         return null;
     }
 

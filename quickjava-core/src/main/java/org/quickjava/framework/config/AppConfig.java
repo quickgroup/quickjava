@@ -1,9 +1,13 @@
 package org.quickjava.framework.config;
 
-import lombok.Data;
+import org.quickjava.common.QLog;
+import org.quickjava.common.QUtils;
+import org.quickjava.common.QFileUtils;
 import org.quickjava.framework.bean.Dict;
 import org.yaml.snakeyaml.Yaml;
 
+import java.io.File;
+import java.net.URL;
 import java.util.Map;
 
 /**
@@ -12,26 +16,15 @@ import java.util.Map;
  * @date 2021/1/17 20:52
  * @ProjectName quickjava
  */
-@Data
 public class AppConfig {
-
-    private Type type = Type.YAML;
 
     public Boolean isJar = false;   // 是否打包模式
 
-    public Boolean debug;
+    public Boolean debug = false;
 
-    public String domin;
+    public String version = null;
 
-    public String version;
-
-    public String lang;
-
-    public static Dict config = null;
-
-    public enum Type {
-        YAML,
-    }
+    public String lang = null;
 
     public static class Factory {
 
@@ -42,19 +35,40 @@ public class AppConfig {
         public static Dict loadFormYaml(String content)
         {
             Yaml yaml = new Yaml();
-            Map<String, Object> result = yaml.load(content);
-            return config = new Dict(result);
-        }
-    }
+            // Default config
+            Dict dictDefault = loadDefaultConfig(yaml);
+            // User config
+            Map<String, Object> resultUser = yaml.load(content);
+            Dict dictUser = new Dict(resultUser);
+            // merger
+            dictUser = Dict.putAll(dictDefault, dictUser);
+            QLog.debug("dictUser: " + dictUser);
 
-    @Override
-    public String toString() {
-        return "AppConfig{" +
-                "type=" + type +
-                ", debug=" + debug +
-                ", domin='" + domin + '\'' +
-                ", version='" + version + '\'' +
-                ", config=" + config +
-                '}';
+            return dictUser;
+        }
+
+        private static Dict loadDefaultConfig(Yaml yaml)
+        {
+            String configContent;
+            String filename = "default.yml";
+
+            if (QUtils.isClassMode()) {
+                /**
+                 * @langCn 多模块、开发模式下，框架资源文件需要特殊读取
+                 */
+                String packageName = AppConfig.class.getPackage().getName();
+                packageName = "/" + packageName.replaceAll("\\.", "/");
+                String filePath = QUtils.getRootPath() + "/quickjava-core/target/classes" + packageName + "/" + filename;
+                configContent = QFileUtils.getFileContents(filePath);
+
+            } else {
+                configContent = QFileUtils.getPackageFileContent(
+                        AppConfig.class.getPackage().getName(), filename);
+            }
+
+            Map<String, Object> resultDefault = yaml.load(configContent);
+
+            return new Dict(resultDefault);
+        }
     }
 }

@@ -35,9 +35,9 @@ public class QuickResponse {
      * @param response
      * @return
      */
-    public String output(Request request, Response response)
+    public byte[] output(Request request, Response response)
     {
-        return data.toString();
+        return data.toString().getBytes();
     }
 
     /**
@@ -65,6 +65,20 @@ public class QuickResponse {
             QLog.fatal(exc);
         }
 
-        QLog.info(request.path + " " + response.getStatus());
+        QLog.debug(request.path + " " + response.getStatus());
+    }
+
+    /**
+     * @langCn 统一字符转码
+     * @return
+     */
+    public static byte[] stringToBytes(String string)
+    {
+        try {
+            return string.getBytes("UTF-8");
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
+        return null;
     }
 }

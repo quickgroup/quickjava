@@ -1,7 +1,5 @@
 package org.quickjava.framework.config;
 
-import lombok.Data;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -10,7 +8,6 @@ import java.util.Map;
  * @date 2021/1/17 20:52
  * @ProjectName quickjava
  */
-@Data
 public class RouteConfig {
 
     private String type = "default";

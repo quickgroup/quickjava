@@ -1,7 +1,5 @@
 package org.quickjava.framework.controller;
 
-import lombok.Data;
-
 import java.lang.reflect.Method;
 
 /**
@@ -9,7 +7,6 @@ import java.lang.reflect.Method;
  * @date 2021/1/18 23:31
  * @projectName quickjava
  */
-@Data
 public class Action {
 
     public Controller controller;

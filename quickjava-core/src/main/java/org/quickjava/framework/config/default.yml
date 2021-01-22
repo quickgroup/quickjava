@@ -1,7 +1,7 @@
 # Application
 app:
   hostname: localhost
-  port: 80
+  port: 8080
   debug: true
   version: 1.0
   versionCode: 101000
@@ -49,9 +49,9 @@ log:
   level: DEBUG
   server:
     [{
-       host: localhost,
-       password: 123456,
-     },
+        host: localhost,
+        password: 123456,
+      },
     ]
 
 # Database

@@ -124,8 +124,7 @@ public class QUtils {
     {
         try {
             String path = QUtils.class.getResource("QUtils.class").toString();
-            URI uri = new URI(path);
-            return uri.getScheme();
+            return new URI(path).getScheme();
         } catch (Exception exc) {
             exc.printStackTrace();
         }

@@ -3,10 +3,11 @@ package org.demo.www;
 import org.demo.www.application.index.model.UserModel;
 import org.junit.Test;
 import org.quickjava.common.QLog;
+import org.quickjava.framework.App;
 import org.quickjava.framework.controller.Module;
 import org.quickjava.framework.config.AppConfig;
 import org.quickjava.framework.http.Pathinfo;
-import org.quickjava.common.utils.QFileUtils;
+import org.quickjava.common.QFileUtils;
 import org.quickjava.common.QUtils;
 
 import java.io.File;
@@ -22,63 +23,6 @@ public class TestQuick {
     @Test
     public void test1()
     {
-        try {
-            String rootPath = QUtils.getRootPath();
-            String appPackages = "org.demo.www.application";
-            String packagePath = appPackages.replace(".", "/");
-
-            System.out.println("appPackages => " + appPackages + ", packagePath => " + packagePath);
-
-            ClassLoader loader = Thread.currentThread().getContextClassLoader();
-
-            Enumeration<URL> enumeration = loader.getResources(packagePath);
-            if (enumeration == null) {
-                throw new ClassNotFoundException(appPackages + " package not found");
-            }
-
-            // 控制器列表
-            Map<String, Module> moduleList = new HashMap<String, Module>();
-
-            if (enumeration.hasMoreElements()) {
-                URL item = enumeration.nextElement();
-
-                if (item.getProtocol().equals("file")) {
-                    // 文件形式
-                    File appFile = new File(item.getFile());
-                    File[] moduleFiles = appFile.listFiles();
-                    for (File file : moduleFiles) {
-                        System.out.println("file=" + file);
-
-                        if (file.isDirectory()) {
-                            /**
-                             * 目录统统视为模块
-                             */
-                            Module module = new Module(file.getName(), file.getAbsolutePath(), file.getAbsolutePath());
-                            moduleList.put(module.getName(), module);
-
-                        }
-                    }
-
-                    // 加载配置文件
-                    URL configYmlUrl = loader.getResource("config.yml");
-                    String configYmlContent = QFileUtils.getFileContents(configYmlUrl.getPath());
-                    AppConfig.Factory.loadFormYml(configYmlContent);
-
-                    System.out.println("config=" + AppConfig.config);
-
-                } else if (item.getProtocol().equals("jar")) {
-                    // jar包
-
-                }
-
-                // 打印
-                System.out.println("moduleList=" + moduleList.toString());
-            }
-
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
     }
 
     @Test
@@ -94,14 +38,15 @@ public class TestQuick {
     @Test
     public void test3()
     {
-        try {
-            URL configYmlUrl = Thread.currentThread().getContextClassLoader().getResource("config.yml");
-            String configYmlContent = QFileUtils.getFileContents(configYmlUrl.getPath());
-            AppConfig.Factory.loadFormYml(configYmlContent);
+//        try {
+//            String configYmlContent = QFileUtils.getPackageFileContent("", "config.yml");
+//            AppConfig.Factory.loadFormYml(configYmlContent);
+//
+//        } catch (Exception exc) {
+//            exc.printStackTrace();
+//        }
 
-        } catch (Exception exc) {
-            exc.printStackTrace();
-        }
+        System.out.println(java.nio.charset.Charset.defaultCharset().toString());
     }
 
     @Test
@@ -170,5 +115,34 @@ public class TestQuick {
     {
         System.out.println(QUtils.isClassMode());
         System.out.println(QUtils.isJarMode());
+    }
+
+    @Test
+    public void test8()
+    {
+        URL url = TestClass.class.getClassLoader().getResource("default.yml");
+        URL url2 = TestClass.class.getClassLoader().getResource("default.yml");
+        System.out.println("url: " + url);
+        System.out.println("url2: " + url2);
+
+        TestQuick.getPackageResource("");
+    }
+
+    public static String getPackageResource(String packageName)
+    {
+        String rootPath = QUtils.getClassesPath();
+        System.out.println("rootPath: " + rootPath);
+        if (QUtils.isClassMode()) {
+            System.out.println("isClassMode");
+        }
+        else if (QUtils.isJarMode()) {
+            System.out.println("isJarMode");
+        }
+        return null;
+    }
+
+    public static String getPackageResource(Package packageItem)
+    {
+        return null;
     }
 }

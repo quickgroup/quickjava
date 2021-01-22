@@ -1,8 +1,10 @@
 package org.quickjava.framework.exception;
 
 import org.quickjava.common.QUtils;
+import org.quickjava.framework.App;
 import org.quickjava.framework.http.Request;
 import org.quickjava.framework.http.Response;
+import org.quickjava.framework.response.QuickResponse;
 
 public class QuickException extends RuntimeException {
 
@@ -39,20 +41,23 @@ public class QuickException extends RuntimeException {
      * @param response
      * @return
      */
-    public String output(Request request, Response response)
+    public byte[] output(Request request, Response response)
     {
         Throwable throwable = (targetThrowable == null) ? this : targetThrowable;
-        System.out.println("targetThrowable: " + targetThrowable);
 
-        StringBuffer output = new StringBuffer();
-        output.append("<title>系统异常</title>");
-        output.append("<h2>Exception: " + throwable.getClass().getTypeName() + "</h2>");
-        output.append("<h3>Message: " + throwable.getMessage() + "</h3>");
-        output.append("<h4>StackTrace:</h4><pre style=\"background: #eee;overflow: scroll;\">" + QUtils.stackTraceArrToString(throwable.getStackTrace()) + "</pre><br>");
+        StringBuffer stringBuffer = new StringBuffer();
+        stringBuffer.append("<title>系统异常</title>");
+        stringBuffer.append("<body>");
+        stringBuffer.append("<h2>Exception: " + throwable.getClass().getTypeName() + "</h2>");
+        stringBuffer.append("<h3>Message: " + throwable.getMessage() + "</h3>");
+        stringBuffer.append("<h4>StackTrace:</h4><pre style=\"background: #eee;overflow: scroll;\">" + QUtils.stackTraceArrToString(throwable.getStackTrace()) + "</pre><br>");
+        stringBuffer.append("</body>");
 
         // 设置返回头
         response.setStatus(this.getCode().getStatus());
 
-        return output.toString();
+        return QuickResponse.stringToBytes(stringBuffer.toString());
     }
+
+
 }
