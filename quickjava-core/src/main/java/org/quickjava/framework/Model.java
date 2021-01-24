@@ -1,4 +1,4 @@
-package org.quickjava.framework.database;
+package org.quickjava.framework;
 
 /**
  * @author Qlo1062-(QloPC-zs)
@@ -19,11 +19,11 @@ public class Model<T> {
      * @param value
      * @return
      */
-    final public T where(String field, String operator, String value) {
+    public T where(String field, String operator, String value) {
         return (T) this;
     }
 
-    final public T find() {
+    public T find() {
         return (T) this;
     }
 

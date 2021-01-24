@@ -22,10 +22,6 @@ public class TomcatServer {
     public static void run()
             throws LifecycleException, ServletException
     {
-        // IPV4
-        Properties properties = System.getProperties();
-        properties.setProperty("java.net.preferIPv4Stack", "true");
-
         Tomcat tomcat = new Tomcat();
         /**
          * @langCn configure tomcat hostname and port

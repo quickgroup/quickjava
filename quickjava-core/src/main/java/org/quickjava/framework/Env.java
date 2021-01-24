@@ -7,6 +7,7 @@ import org.quickjava.common.QUtils;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * @langCn 环境变量管理
@@ -27,7 +28,16 @@ public class Env {
         String basePackages = "".equals(quickBoot.value()) ? applicationClass.getPackage().getName() + ".application" : quickBoot.value();
         set("basePackages", basePackages);
 
+        Env.systemEnvInit();
+
         QLog.info("Env init complete");
+    }
+
+    public static void systemEnvInit()
+    {
+        // IPV4
+        Properties properties = System.getProperties();
+        properties.setProperty("java.net.preferIPv4Stack", "true");
     }
 
     /**
