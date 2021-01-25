@@ -1,5 +1,6 @@
 package org.quickjava.framework.controller;
 
+import org.quickjava.common.QUtils;
 import org.quickjava.framework.App;
 import org.quickjava.framework.bean.Dict;
 

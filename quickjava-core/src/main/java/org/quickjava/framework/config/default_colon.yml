@@ -10,8 +10,6 @@ app:
 
 url:
   caseSensitive: false  # 默认忽略大小写
-  static:     # 静态资源文件夹
-    ["static"]
 
 # module
 module:
@@ -51,9 +49,9 @@ log:
   level: DEBUG
   server:
     [{
-       host: localhost,
-       password: 123456,
-     },
+        host: localhost,
+        password: 123456,
+      },
     ]
 
 # Database

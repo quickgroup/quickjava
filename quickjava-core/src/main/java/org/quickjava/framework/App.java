@@ -83,6 +83,7 @@ public class App {
     {
         String configYmlContent = QFileUtils.getPackageFileContent("", "config.yml");
         config = AppConfig.Factory.loadFormYml(configYmlContent);
+        QLog.info("Config load complete.");
     }
 
     /**

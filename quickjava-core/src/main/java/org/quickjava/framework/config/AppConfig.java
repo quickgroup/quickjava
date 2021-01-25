@@ -37,11 +37,14 @@ public class AppConfig {
             Yaml yaml = new Yaml();
             // Default config
             Dict dictDefault = loadDefaultConfig(yaml);
+//            QLog.debug("dictDefault: " + dictDefault);
             // User config
             Map<String, Object> resultUser = yaml.load(content);
             Dict dictUser = new Dict(resultUser);
+//            QLog.debug("dictUser: " + dictUser);
             // merger
             dictUser = Dict.putAll(dictDefault, dictUser);
+
             QLog.debug("dictUser: " + dictUser);
 
             return dictUser;
@@ -54,7 +57,7 @@ public class AppConfig {
 
             if (QUtils.isClassMode()) {
                 /**
-                 * @langCn 多模块、开发模式下，框架资源文件需要特殊读取
+                 * @langCn 多模块开发模式下，框架资源文件需要特殊读取
                  */
                 String packageName = AppConfig.class.getPackage().getName();
                 packageName = "/" + packageName.replaceAll("\\.", "/");

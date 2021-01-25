@@ -30,7 +30,7 @@ public class Env {
 
         Env.systemEnvInit();
 
-        QLog.info("Env init complete");
+        QLog.info("Env init complete.");
     }
 
     public static void systemEnvInit()
