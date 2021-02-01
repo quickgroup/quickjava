@@ -34,15 +34,13 @@ org.demo.www  包目录
 
 * 社区支持：[`ask.quickjava.org`](http://ask.quickjava.org)
 
-* Github：
+* Github：(https://github.com/quickgroup/quickjava)
 
 * Gitee：
 
 ## 特别鸣谢
 ## 支持我们
-![img](resource/img/001.jpg)
-
-![img](resource/img/002.jpg)
+![img](resource/img/001.jpg) | ![img](resource/img/002.jpg)
 
 ## 版权申明
 
