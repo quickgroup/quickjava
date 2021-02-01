@@ -35,14 +35,15 @@ public class Module {
 
     public Map<String, Controller> controllerList = new LinkedHashMap<>();
 
-    public Module(String name, String packages, String dirpath) {
+    public Module(String name, String packages, String dirpath)
+    {
         this.name = name;
         this.packages = packages;
         this.dirpath = dirpath;
         this.path = "/" + name;
 
         Dict dirDict = App.config.get("module").get("dirname");
-        this.controllerPath = this.dirpath + "/" + dirDict.getString("module", "module");
+        this.controllerPath = this.dirpath + "/" + dirDict.getString("controller", "controller");
         this.modelPath = this.dirpath + "/" + dirDict.getString("model", "model");
         this.viewPath = this.dirpath + "/" + dirDict.getString("view", "view");
     }

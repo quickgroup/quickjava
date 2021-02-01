@@ -8,15 +8,15 @@ QuickJava是一个开源免费的，快速、简单的轻量级Java MVC开发框
 
 ## 快速入门
 ### 目录结构
-project  工程目录
-├─application             应用目录
-│  ├─index               模块目录(可自定义)
-│  │  ├─controller      控制器目录
-│  │  ├─model           模型目录
-│  │  ├─view            视图目录
-│  │  ├─lang            语言包目录
-│  │  ├─service         业务类目录
-│  ├- ApplicationBoot.java  应用程序入口
+org.demo.www  包目录\
+├─application             应用目录\
+│  ├─index               模块目录(可自定义)\
+│  │  ├─controller      控制器目录\
+│  │  ├─model           模型目录\
+│  │  ├─view            视图目录\
+│  │  ├─lang            语言包目录\
+│  │  ├─service         业务类目录\
+│  ├─ ApplicationBoot.java  应用程序入口
 
 ### 基本概念
 * 控制器：接收前台发送的请求，复制任务调度；
