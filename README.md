@@ -30,9 +30,9 @@ org.demo.www  包目录
 
 ## 反馈
 
-* 意见邮箱：[`issue@quickjava.org`](mailto:issue@quickjava.org)
+* 反馈邮箱：[`issue@quickjava.org`](mailto:issue@quickjava.org)
 
-* 社区支持：[`ask.quickjava.org`](http://ask.quickjava.org)
+* 社区论坛：[`ask.quickjava.org`](http://ask.quickjava.org)
 
 * Github：(https://github.com/quickgroup/quickjava)
 
@@ -40,8 +40,8 @@ org.demo.www  包目录
 
 ## 支持我们
 <p align="center">
-  <img src="resource/img/001.jpg" width="49%" alt="screenshot" />
-  <img src="resource/img/002.jpg" width="49%" alt="screenshot" />
+  <img src="resource/img/001.jpg" width="49%" alt="001.jpg" />
+  <img src="resource/img/002.jpg" width="49%" alt="002.jpg" />
 </p>
 
 ## 版权申明
