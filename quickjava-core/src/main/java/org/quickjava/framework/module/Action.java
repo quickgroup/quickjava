@@ -1,4 +1,4 @@
-package org.quickjava.framework.controller;
+package org.quickjava.framework.module;
 
 import java.lang.reflect.Method;
 

@@ -1,6 +1,6 @@
 package org.demo.www.application.index.controller;
 
-import org.quickjava.framework.controller.Controller;
+import org.quickjava.framework.module.Controller;
 
 public class Demo extends Controller {
 

@@ -1,13 +1,11 @@
 package org.quickjava.framework.http;
 
-import org.quickjava.common.QLog;
 import org.quickjava.common.QUtils;
 import org.quickjava.framework.App;
-import org.quickjava.framework.config.AppConfig;
-import org.quickjava.framework.controller.Action;
+import org.quickjava.framework.module.Action;
 import org.quickjava.framework.bean.Dict;
-import org.quickjava.framework.controller.Controller;
-import org.quickjava.framework.controller.Module;
+import org.quickjava.framework.module.Controller;
+import org.quickjava.framework.module.Module;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -165,7 +163,7 @@ public class Request {
         Dict defaultConfig = App.config.get("module").get("default");
         this.pathinfo.parseControllerAction(
                 defaultConfig.getString("module"),
-                defaultConfig.getString("controller"),
+                defaultConfig.getString("module"),
                 defaultConfig.getString("action"));
         this.moduleName = this.pathinfo.module;
         this.controllerName = this.pathinfo.controller;
@@ -220,10 +218,6 @@ public class Request {
     /**
      * 获取[Query]数据
      */
-    public Dict query() {
-        return this.queryData;
-    }
-
     public String query(String name)
     {
         return this.queryData.getString(name);
@@ -233,11 +227,6 @@ public class Request {
      * 获取[POST]数据，比如UrlEncode、Form-Data
      * 非字符串数据将报错 {@throw}，获取文件建议使用{@file(String name)}
      */
-    public Dict post()
-    {
-        return this.postData;
-    }
-
     public String post(String name)
     {
         return this.postData.getString(name);
@@ -257,4 +246,93 @@ public class Request {
      * Session
      */
     public Dict session = null;
+
+
+    public String getUrl() {
+        return url;
+    }
+
+    public String getDomin() {
+        return domin;
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public Integer getPort() {
+        return port;
+    }
+
+    public String getMethod() {
+        return method;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public String getProtocol() {
+        return protocol;
+    }
+
+    public Pathinfo getPathinfo() {
+        return pathinfo;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public Long getStartTime() {
+        return startTime;
+    }
+
+    public Module getModule() {
+        return module;
+    }
+
+    public String getModuleName() {
+        return moduleName;
+    }
+
+    public Controller getController() {
+        return controller;
+    }
+
+    public String getControllerName() {
+        return controllerName;
+    }
+
+    public Action getAction() {
+        return action;
+    }
+
+    public String getActionName() {
+        return actionName;
+    }
+
+    public Dict getHeaders() {
+        return headers;
+    }
+
+    public Http.ContentType getContentType() {
+        return contentType;
+    }
+
+    public Dict getQueryData() {
+        return queryData;
+    }
+
+    public Dict getPostData() {
+        return postData;
+    }
+
+    public ServletContext getServletContext() {
+        return servletContext;
+    }
+
+    public Dict getSession() {
+        return session;
+    }
 }

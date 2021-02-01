@@ -76,7 +76,7 @@ public class Pathinfo {
     }
 
     /**
-     * @langCn 将path解析/module/controller/action
+     * @langCn 将path解析/module/module/action
      * @param module 默认模块
      * @param controller 默认控制器
      * @param action 默认方法
@@ -145,7 +145,7 @@ public class Pathinfo {
                 ", query='" + query + '\'' +
                 ", queryData=" + queryData +
                 ", module='" + module + '\'' +
-                ", controller='" + controller + '\'' +
+                ", module='" + controller + '\'' +
                 ", action='" + action + '\'' +
                 '}';
     }

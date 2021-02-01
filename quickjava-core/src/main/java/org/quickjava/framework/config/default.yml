@@ -19,7 +19,7 @@ module:
     controller: index   # 默认控制器
     action: index       # 默认方法
   dirname:    # 目录名称，相对模块的路径
-    controller: controller   # 控制器包名
+    controller: module   # 控制器包名
     model: model   # 模型包名
     view: view     # 视图包名
     lang: lang     # 语言包名

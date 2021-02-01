@@ -29,7 +29,7 @@ public class Dispatch {
 
     public static void init()
     {
-
+        QLog.info(Lang.to("Dispatch init complete."));
     }
 
     /**
@@ -37,8 +37,11 @@ public class Dispatch {
      */
     public void exec(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
     {
+        long startNanoTime = System.nanoTime();
+
         Request request = new Request(httpServletRequest, httpServletResponse);
         Response response = new Response(httpServletResponse);
+
         App.setCurrentRequest(request);
 
         QLog.info(request.method + " " + request.path + " " + request.protocol);
@@ -59,12 +62,19 @@ public class Dispatch {
             QuickExceptionHandler.onHandler(throwable, request, response);
         } finally {
 
-            // Request环境清理
-            App.setCurrentRequest(null);
+            Dispatch.get().clearCurrentRequest(request, response);
 
-            long time = QUtils.getTimestamp() - request.startTime;
-            QLog.debug("Handling time: " + time + "ms");
+            double time = ((double)(System.nanoTime() - startNanoTime)) / 1000000L;
+            QLog.debug(Lang.to("Handling time:") + time + "ms");
         }
+    }
+
+    /**
+     * 清理本链接环境
+     */
+    private void clearCurrentRequest(Request request, Response response)
+    {
+        App.setCurrentRequest(null);
     }
 
 }

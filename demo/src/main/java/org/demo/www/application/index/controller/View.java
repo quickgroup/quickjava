@@ -1,18 +1,16 @@
 package org.demo.www.application.index.controller;
 
-import org.quickjava.framework.controller.Controller;
+import org.quickjava.framework.module.Controller;
 
 public class View extends Controller {
 
     public void index()
     {
-        this.assign("msg", "来自View.class信息");
-        this.assign("path", "你的访问路径是：" + request.path);
-        this.assign("module", request.moduleName);
-        this.assign("controller", request.controllerName);
-        this.assign("action", request.actionName);
-        this.assign("request", request);
-        this.view();
+        assign("msg", "来自View控制器的信息");
+        assign("path", "你的访问路径是：" + request.path);
+        assign("a", request.queryData.getString("a", ""));
+        System.out.println("dict: " + request.queryData);
+        view();
     }
 
 }

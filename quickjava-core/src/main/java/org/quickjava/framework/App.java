@@ -40,11 +40,14 @@ public class App {
         try {
             app.welcome();
 
-            // 初始化环境
+            // 加载环境参数、配置
             Env.init(applicationClass);
             app.loadConfig();
 
-            // 初始化路由
+            // 功能，使用配置初始化
+            Lang.init(config.get("app").getString("lang"));
+
+            // 路由
             Route.init(args);
 
             // 运行服务器
@@ -72,7 +75,7 @@ public class App {
     public static void serverStarting(ServletContext servletContext)
     {
         App.servletContext = servletContext;
-        QLog.info("App start complete");
+        QLog.info(Lang.to("App start complete"));
     }
 
     /**
@@ -83,7 +86,7 @@ public class App {
     {
         String configYmlContent = QFileUtils.getPackageFileContent("", "config.yml");
         config = AppConfig.Factory.loadFormYml(configYmlContent);
-        QLog.info("Config load complete.");
+        QLog.info(Lang.to("Config load complete."));
     }
 
     /**
@@ -111,7 +114,7 @@ public class App {
         @Override
         protected Object initialValue()
         {
-            System.out.println("调用get方法时，当前线程共享变量没有设置，调用initialValue获取默认值！");
+            System.out.println("initialValue 设置默认值！");
             return null;
         }
     };

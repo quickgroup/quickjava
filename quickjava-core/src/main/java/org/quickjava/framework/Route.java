@@ -2,9 +2,9 @@ package org.quickjava.framework;
 
 import org.quickjava.common.QLog;
 import org.quickjava.common.QUtils;
-import org.quickjava.framework.controller.Action;
-import org.quickjava.framework.controller.Controller;
-import org.quickjava.framework.controller.Module;
+import org.quickjava.framework.module.Action;
+import org.quickjava.framework.module.Controller;
+import org.quickjava.framework.module.Module;
 import org.quickjava.framework.exception.ActionNotFoundException;
 import org.quickjava.framework.http.Pathinfo;
 import org.quickjava.framework.http.Request;
@@ -43,8 +43,8 @@ public class Route {
     /**
      * 扫描包下面的控制器-方法(public)
      * 格式：
-     *      application/{module}/controller/{controller}
-     *      /{module}/{controller}/{method}
+     *      application/{module}/module/{module}
+     *      /{module}/{module}/{method}
      */
     @SuppressWarnings({"unchecked"})
     private void scanPackages()
@@ -91,15 +91,17 @@ public class Route {
                         File controllerDir = new File(module.controllerPath);
                         if (controllerDir.exists()) {
                             for (File controllerFile : controllerDir.listFiles()) {
-                                String controllerPackages = packageReplace(controllerFile.getAbsolutePath(), classesPath );
-                                Controller controller = (Controller) App
-                                        .classLoader.loadClass(controllerPackages).newInstance();
-                                controller.setModule(module);
-                                String controllerPath = caseSensitive ? controller.path : controller.path.toLowerCase();
-                                module.controllerList.put(controllerPath, controller);
 
-                                // TODO::控制器方法列表
-                                controllerLoadAction(controller);
+                                if (controllerFile.isFile()) {
+                                    String controllerPackages = packageReplace(controllerFile.getAbsolutePath(), classesPath );
+                                    Controller controller = (Controller) App
+                                            .classLoader.loadClass(controllerPackages).newInstance();
+                                    controller.setModule(module);
+                                    String controllerPath = caseSensitive ? controller.path : controller.path.toLowerCase();
+                                    module.controllerList.put(controllerPath, controller);
+                                    // TODO::控制器方法列表
+                                    controllerLoadAction(controller);
+                                }
                             }
                         }
                     }
@@ -151,15 +153,15 @@ public class Route {
     public MapAction findMappingAction(Request request)
     {
         String path = request.path;
-        MapAction mapAction;
+        MapAction mapAction = null;
 
         // TODO::路由模式
         if (routeList.containsKey(path)) {
             QLog.debug("路由模式, " + path);
+            return mapAction;
         }
 
         // TODO::REST模式
-//        QLog.debug("REST模式, " + path);
         Pathinfo pathinfo = request.pathinfo;
         String actionPath = "/" + pathinfo.module;
         if (moduleList.containsKey(actionPath)) {

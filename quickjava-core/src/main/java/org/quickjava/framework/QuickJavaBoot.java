@@ -9,12 +9,12 @@ public class QuickJavaBoot {
     /**
      * @langCn 版本号
      */
-    public static final String version = "1.0-SNAPSHOT";
+    public static final String version = "1.1-SNAPSHOT";
 
     /**
      * @langCn 版本号值
      */
-    public static final Integer versionCode = 2101001;
+    public static final Integer versionCode = 2101002;
 
     /**
      * @langCn 启动入口

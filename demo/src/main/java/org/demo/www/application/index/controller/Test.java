@@ -1,6 +1,6 @@
 package org.demo.www.application.index.controller;
 
-import org.quickjava.framework.controller.Controller;
+import org.quickjava.framework.module.Controller;
 
 public class Test extends Controller {
 
@@ -14,7 +14,7 @@ public class Test extends Controller {
         StringBuffer output = new StringBuffer();
         output.append("<h2>QuickJava page.</h2>");
         output.append("<br>");
-        output.append(this.request.query());
+        output.append(this.request.queryData);
         output.append("<br>");
         return output;
     }

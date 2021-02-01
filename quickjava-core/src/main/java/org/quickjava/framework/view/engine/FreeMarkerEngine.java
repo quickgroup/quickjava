@@ -6,7 +6,6 @@ import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import org.quickjava.common.QLog;
-import org.quickjava.common.QUtils;
 import org.quickjava.framework.exception.QuickException;
 
 import java.io.IOException;
@@ -19,7 +18,7 @@ import java.util.Map;
  * @date 2021/1/21 17:30
  * @projectName quickjava
  */
-public class FreeMarkerEngine extends ViewEngine {
+public class FreeMarkerEngine extends ViewBaseEngine {
 
     public String name = "FreeMarkerEngine";
 

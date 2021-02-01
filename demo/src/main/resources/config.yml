@@ -1,7 +1,7 @@
 # Application
 app:
   hostname: "0.0.0.0"
-  port: 8080
+  port: 8200
   debug: true
   version: 1.0
   versionCode: 101000
@@ -20,7 +20,7 @@ module:
     controller: index   # 默认控制器
     action: index       # 默认方法
   dirname:    # 目录名称，相对模块的路径
-    controller: controller   # 控制器包名
+    controller: module   # 控制器包名
     model: model   # 模型包名
     view: view     # 视图包名
     lang: lang     # 语言包名
@@ -30,15 +30,18 @@ module:
 
 # view
 view:
+  cache: true
   engine: default # 模板引擎
 
 # session
 session:
-  name: QSESSION  # session 名
-  format: md5       # session ID 值生成方式
-  expire: 7         # 有效时间，天
-  httponly: true
+  type: memory      # 保存方式，支持：file、memory
+  name: QSESSION    # session 名
+  format: md5       # session ID 生成方式
+  expire: 604800    # 有效时间，秒，默认7天
+  httponly: true    # 绑定http协议
 
+# Exception
 exception:
   handle: default   # 处理方式，default=默认框架处理
   defaultMessage: 页面暂时无法访问
@@ -46,15 +49,9 @@ exception:
 log:
   name: demo
   handle: default
-  path: "log"   # 日志保存目录，程序相对路径
+  path: "log"   # 日志目录，工作目录相对路径
   fileName: "%y-%m-%d.log"
   level: DEBUG
-  server:
-    [{
-       host: localhost,
-       password: 123456,
-     },
-    ]
 
 # Database
 database:

@@ -7,7 +7,7 @@ import java.util.Map;
  * @date 2021/1/21 17:30
  * @projectName quickjava
  */
-public class QuickEngine extends ViewEngine {
+public class QuickEngine extends ViewBaseEngine {
 
     public String name = "QuickEngine";
 

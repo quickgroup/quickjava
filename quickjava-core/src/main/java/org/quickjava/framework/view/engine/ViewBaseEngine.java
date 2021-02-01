@@ -7,9 +7,9 @@ import java.util.Map;
  * @date 2021/1/21 17:33
  * @projectName quickjava
  */
-public abstract class ViewEngine {
+public abstract class ViewBaseEngine {
 
-    public String name = "ViewEngine";
+    public String name = "ViewBaseEngine";
 
     protected String view = null;
 

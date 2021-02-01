@@ -1,4 +1,4 @@
-package org.quickjava.framework.controller;
+package org.quickjava.framework.module;
 
 import org.quickjava.framework.bean.Dict;
 import org.quickjava.framework.exception.ResponseException;
@@ -74,6 +74,8 @@ public class Controller {
 
     public Object view(String targetPath)
     {
+        viewData.put("Request", request);
+
         String viewPath = this.module.viewPath + "/" + targetPath + ".html";
         ViewResponse viewResponse = new ViewResponse(new File(viewPath), viewData);
         throw new ResponseException(viewResponse);

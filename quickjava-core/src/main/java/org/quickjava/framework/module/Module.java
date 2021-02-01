@@ -1,6 +1,5 @@
-package org.quickjava.framework.controller;
+package org.quickjava.framework.module;
 
-import org.quickjava.common.QUtils;
 import org.quickjava.framework.App;
 import org.quickjava.framework.bean.Dict;
 
@@ -43,7 +42,7 @@ public class Module {
         this.path = "/" + name;
 
         Dict dirDict = App.config.get("module").get("dirname");
-        this.controllerPath = this.dirpath + "/" + dirDict.getString("controller", "controller");
+        this.controllerPath = this.dirpath + "/" + dirDict.getString("module", "module");
         this.modelPath = this.dirpath + "/" + dirDict.getString("model", "model");
         this.viewPath = this.dirpath + "/" + dirDict.getString("view", "view");
     }

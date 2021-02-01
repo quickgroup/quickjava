@@ -66,7 +66,6 @@ public class Dict {
      * @return String
      */
     public String getString(String key) {
-        checkValueType(data.get(key), String.class);
         return (String) data.get(key);
     }
 

@@ -7,7 +7,7 @@ import org.quickjava.framework.exception.QuickException;
 import org.quickjava.framework.http.Request;
 import org.quickjava.framework.http.Response;
 import org.quickjava.framework.view.engine.FreeMarkerEngine;
-import org.quickjava.framework.view.engine.ViewEngine;
+import org.quickjava.framework.view.engine.ViewBaseEngine;
 
 import java.io.File;
 import java.util.LinkedHashMap;
@@ -23,7 +23,7 @@ public class ViewResponse extends QuickResponse {
 
     public String template = null;
 
-    public ViewEngine engine = null;
+    public ViewBaseEngine engine = null;
 
     public ViewResponse() {
         this.engine = new FreeMarkerEngine();

@@ -15,7 +15,7 @@ url.static: ["static"]  # 静态资源文件夹
 module.default.module: index       # 默认模块
 module.default.controller: index   # 默认控制器
 module.default.action: index       # 默认方法
-module.dirname.controller: controller   # 控制器包名
+module.dirname.controller: module   # 控制器包名
 module.dirname.model: model   # 模型包名
 module.dirname.view: view     # 视图包名
 module.dirname.lang: lang     # 语言包名

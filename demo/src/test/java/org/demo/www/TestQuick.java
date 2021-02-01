@@ -3,14 +3,9 @@ package org.demo.www;
 import org.demo.www.application.index.model.UserModel;
 import org.junit.Test;
 import org.quickjava.common.QLog;
-import org.quickjava.framework.App;
-import org.quickjava.framework.controller.Module;
-import org.quickjava.framework.config.AppConfig;
 import org.quickjava.framework.http.Pathinfo;
-import org.quickjava.common.QFileUtils;
 import org.quickjava.common.QUtils;
 
-import java.io.File;
 import java.net.URL;
 import java.util.*;
 
