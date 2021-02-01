@@ -38,9 +38,11 @@ org.demo.www  包目录
 
 * Gitee：
 
-## 特别鸣谢
 ## 支持我们
-![img](resource/img/001.jpg) | ![img](resource/img/002.jpg)
+<p align="center">
+  <img src="resource/img/001.jpg" width="49%" alt="screenshot" />
+  <img src="resource/img/002.jpg" width="49%" alt="screenshot" />
+</p>
 
 ## 版权申明
 
