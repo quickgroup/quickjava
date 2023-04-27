@@ -1,0 +1,47 @@
+# Application
+app.hostname: "0.0.0.0"
+app.port: 8080
+app.debug: true
+app.version: 1.0
+app.versionCode: 101000
+app.lang: zh-CN     # 默认语言
+app.charset: UTF-8  # 全局默认字符集
+
+# URL
+url.caseSensitive: false  # 默认忽略大小写
+url.static: ["static"]  # 静态资源文件夹
+
+# module
+module.default.module: index       # 默认模块
+module.default.controller: index   # 默认控制器
+module.default.action: index       # 默认方法
+module.dirname.controller: module   # 控制器包名
+module.dirname.model: model   # 模型包名
+module.dirname.view: view     # 视图包名
+module.dirname.lang: lang     # 语言包名
+module.dirname.validator: validator  # 验证器包名
+module.forb: ["common"]  # 禁止访问的模块
+
+# render
+view.engine: default # 模板引擎
+
+# session
+session.name: QSESSION  # session 名
+session.format: md5       # session ID 值生成方式
+session.expire: 7         # 有效时间，天
+session.httponly: true
+
+exception.handle: default   # 处理方式，default=默认框架处理
+exception.defaultMessage: 页面暂时无法访问
+
+log.name: demo
+log.handle: default
+log.path: "log"   # 日志保存目录，程序相对路径
+log.fileName: "%y-%m-%d.log"
+log.level: DEBUG
+
+# Database
+database.url: jdbc:mysql://127.0.0.1:3306/?useUnicode=true&characterEncoding=utf-8
+database.database: quickjava
+database.username: quickjava
+database.password: quickjava

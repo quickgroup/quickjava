@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>QuickJava</title>
+</head>
+<body>
+
+<div>
+    msg: ${msg}
+</div>
+
+<div>
+    path: ${path}
+</div>
+
+<p>Request.moduleName: ${Request.moduleName}</p>
+<p>Request.controllerName: ${Request.controllerName}</p>
+<p>Request.actionName: ${Request.actionName}</p>
+
+<h3>Form 表单</h3>
+<p>a: ${a}</p>
+
+<a onclick="openWindow()">弹窗</a>
+
+</body>
+
+<script>
+    function openWindow() {
+
+        showModalDialog('https://www.jb51.net','脚本之家','dialogWidth:400px;dialogHeight:300px;dialogLeft:200px;dialogTop:150px;center:yes;help:yes;resizable:yes;status:yes')
+
+    }
+</script>
+
+</html>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+                      http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+         version="3.1"
+         metadata-complete="true">
+
+    <display-name>QuickJava</display-name>
+    <description>
+        Welcome to QuickJava
+    </description>
+
+    <servlet-mapping>
+        <servlet-name>quickjava</servlet-name>
+        <url-pattern>/*</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>quickjava</servlet-name>
+        <servlet-class>org.quickjava.framework.server.QuickServlet</servlet-class>
+    </servlet>
+
+</web-app>
