@@ -2,10 +2,9 @@ package org.quickjava.framework.orm.utils;
 
 import net.sf.cglib.proxy.Enhancer;
 import org.quickjava.framework.orm.Model;
-import org.quickjava.framework.orm.contain.ModelField;
+import org.quickjava.framework.orm.contain.ModelMeta;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -25,47 +24,14 @@ import java.util.Map;
  */
 public class ModelUtil extends SqlUtil {
 
-    public static final Map<Class<?>, Map<String, ModelField>> __fieldCache = new LinkedHashMap<>();
-    // 这个map只缓存是关联属性的方法
-    public static final Map<Class<?>, Map<String, ModelField>> __methodCache = new LinkedHashMap<>();
+    public static final Map<Class<?>, ModelMeta> modelCache = new LinkedHashMap<>();
 
-    public static void putFieldMap(Class<?> clazz, Map<String, ModelField> fieldMap) {
-        ModelUtil.__fieldCache.put(clazz, fieldMap);
+    public static ModelMeta getMeta(Class<?> clazz) {
+        return modelCache.get(clazz);
     }
 
-    public static Map<String, ModelField> findFieldMap(Class<?> clazz) {
-        return ModelUtil.__fieldCache.get(clazz);
-    }
-
-    public static ModelField findField(Class<?> clazz, String name) {
-        Map<String, ModelField> fieldMap = findFieldMap(clazz);
-        return fieldMap == null ? null : fieldMap.get(name);
-    }
-
-    public static boolean existFieldMap(Class<?> clazz) {
-        return ModelUtil.__fieldCache.containsKey(clazz);
-    }
-
-    public static void putMethodMap(Class<?> clazz, Map<String, ModelField> methodMap) {
-        ModelUtil.__methodCache.put(clazz, methodMap);
-    }
-
-    public static Map<String, ModelField> findMethodMap(Class<?> clazz) {
-        return ModelUtil.__methodCache.get(clazz);
-    }
-
-    public static ModelField findMethod(Class<?> clazz, Method method) {
-        return findMethod(clazz, method.getName());
-    }
-
-    public static ModelField findMethod(Class<?> clazz, String name) {
-        Map<String, ModelField> ret = findMethodMap(clazz);
-        return ret == null ? null : ret.get(name);
-    }
-
-    public static boolean existMethod(Class<?> clazz, String name) {
-        Map<String, ModelField> ret = findMethodMap(clazz);
-        return ret != null && ret.get(name) != null;
+    public static void setMeta(Class<?> clazz, ModelMeta meta) {
+        modelCache.put(clazz, meta);
     }
 
     public static boolean isProxyModel(Class<?> clazz) {
@@ -86,6 +52,13 @@ public class ModelUtil extends SqlUtil {
 
     public static Class<?> getModelClass(Class<?> clazz) {
         return Enhancer.isEnhanced(clazz) ? clazz.getSuperclass() : clazz;
+    }
+
+    public static Class<?> getModelClass(Object obj) {
+        if (obj instanceof Class) {
+            return getModelClass((Class<?>) obj);
+        }
+        return getModelClass(obj.getClass());
     }
 
     public static void setFieldValue(Object o, String field, Object value) {
@@ -119,4 +92,53 @@ public class ModelUtil extends SqlUtil {
             e.printStackTrace();
         }
     }
+    // 直接拷贝属性
+    public static void copyProperties(Object src, Object dst)
+    {
+        try {
+            Class<?> srcClass = getModelClass(src);
+            Class<?> dstClass = getModelClass(dst);
+            if (Map.class.isAssignableFrom(dstClass)) {
+                throw new RuntimeException("暂不支持 dst 为Map的拷贝");
+            }
+            // map=>实体
+            if (Map.class.isAssignableFrom(srcClass)) {
+                Map<String, Object> data = (Map<String, Object>) src;
+                for (Field field : dstClass.getDeclaredFields()) {
+                    if (data.containsKey(field.getName())) {
+                        field.setAccessible(true);
+                        field.set(dst, data.get(field.getName()));
+                        continue;
+                    }
+                    String fieldName = ModelUtil.fieldName(field.getName());
+                    if (data.containsKey(fieldName)) {
+                        field.setAccessible(true);
+                        field.set(dst, data.get(fieldName));
+                        continue;
+                    }
+                    fieldName = ModelUtil.fieldLineName(field.getName());
+                    if (data.containsKey(fieldName)) {
+                        field.setAccessible(true);
+                        field.set(dst, data.get(fieldName));
+                        continue;
+                    }
+                }
+                return;
+            }
+            // 实体=>实体
+            Map<String, Object> srcMap = new LinkedHashMap<>();
+            for (Field field : srcClass.getDeclaredFields()) {
+                field.setAccessible(true);
+                srcMap.put(field.getName(), field.get(src));
+            }
+            for (Field field : dstClass.getDeclaredFields()) {
+                if (srcMap.containsKey(field.getName())) {
+                    field.setAccessible(true);
+                    field.set(dst, srcMap.get(field.getName()));
+                }
+            }
+        } catch (IllegalAccessException ignored) {
+        }
+    }
+
 }

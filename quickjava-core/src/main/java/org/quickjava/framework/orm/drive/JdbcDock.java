@@ -82,7 +82,7 @@ public class JdbcDock {
         ResultSetMetaData metaData = resultSet.getMetaData();
         List<String> fieldNameArr = new LinkedList<>();
         for (int i = 1; i <= metaData.getColumnCount(); i++) {
-            fieldNameArr.add(metaData.getColumnName(i));
+            fieldNameArr.add(metaData.getColumnLabel(i));
         }
         return fieldNameArr;
     }

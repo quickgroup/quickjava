@@ -32,8 +32,17 @@ public class Test {
         System.out.println("row2=" + row2);
     }
 
-    public void test() {
-        testQuery();
+    public void testModel() {
+        // 预载入查询
+        Article article3 = new Article().with("user").where("id", 1).find();
+        System.out.println("article3=" + article3);
+//        System.out.println("article3.user=" + article3.getUser());
+//        System.out.println("article3.users=" + article3.getUsers());
+    }
+
+    public void test()
+    {
+        testModel();
 
         // 查询用户
 //        User user1 = userModel.where().find();

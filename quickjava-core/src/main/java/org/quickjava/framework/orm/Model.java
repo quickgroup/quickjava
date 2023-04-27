@@ -12,6 +12,7 @@ import org.quickjava.framework.orm.enums.RelationType;
 import org.quickjava.framework.orm.utils.Helper;
 import org.quickjava.framework.orm.utils.ModelUtil;
 import org.quickjava.framework.orm.utils.QuerySetHelper;
+import org.quickjava.framework.orm.utils.SqlUtil;
 
 import java.io.Serializable;
 import java.lang.reflect.*;
@@ -32,32 +33,36 @@ import java.util.stream.Collectors;
  * +-------------------------------------------------------------------
  * License: Apache Licence 2.0
  * +-------------------------------------------------------------------
- *
- * 支持特性
- * - Map转对象
- * - 一对一
- * - 一对多
- * TODO::目前想实现数据懒加载，可用动态代理
  */
+/**
+ * 模型
+ * */
 public class Model extends Helper {
 
-    // 模型对应表名
-    private String __table;
+    /**
+     * 模型元信息
+     * */
+    private ModelMeta __meta;
 
     /**
-     * 存放标准的数据
-     * - 驼峰字段：数据
+     * 关联的父模型对象
+     * */
+    private Model __parent;
+
+    /**
+     * 预载入属性
+     * */
+    private List<String> __withs;
+
+    /**
+     * 数据
      * */
     private DataMap __data = new DataMap();
 
-    // 关联父模型对象
-    private Model __parent;
-
-    // 关联关系
-    private Map<String, Relation> __relations = new LinkedHashMap<>();
-
-    // 关联关系
-    private List<String> __withs;
+    /**
+     * 修改的字段
+     * */
+    private List<String> __modifiedFields;
 
     public Model() {
         initModel(this, getClass());
@@ -112,14 +117,14 @@ public class Model extends Helper {
     }
 
     /**
-     * 字段名称补全
+     * 补全字段名称
      * - 预载入补全表名
      * */
     private String whereFieldName(String field) {
         field = ModelUtil.fieldLineName(field);
         if (__withs != null) {
             if (!field.contains(".")) {
-                field = __table + "." + field;
+                field = __meta.table() + "." + field;
             }
         }
         return field;
@@ -128,18 +133,21 @@ public class Model extends Helper {
     /**
      * 判断当前类是素模型（不是代理模型
      * - 不是：在 insert、update 时需要收集字段数据
+     * - 收集字段数据
      * */
-    // 加载单纯的数据对象
     private void loadingVegetarianModel()
     {
         if (ModelUtil.isVegetarianModel(this)) {
             // 收集字段数据
-            ModelUtil.findFieldMap(getMClass()).forEach((name, field) -> {
+            __meta.getFieldMap().forEach((name, field) -> {
                 data(field.getName(), ModelUtil.getFieldValue(this, field.getField()));
             });
         }
     }
 
+    /**
+     * 新增
+     * */
     public Model insert()
     {
         Long pkVal = query().insert(this.sqlData());
@@ -147,11 +155,17 @@ public class Model extends Helper {
         return ModelUtil.isProxyModel(this) ? this : newProxyModel(getMClass(), data());
     }
 
+    /**
+     * 使用对象新增
+     * */
     public Model insert(DataMap data) {
         data(data);
         return insert();
     }
 
+    /**
+     * 更新
+     * */
     public Model update()
     {
         query().update(this.sqlData());
@@ -182,6 +196,10 @@ public class Model extends Helper {
         return data(pk());
     }
 
+    /**
+     * 保存数据
+     * - 自动判断主键是否为null，为null执行新增，否则进行更新
+     * */
     public Model save() {
         String pk = pk();
         Object pkVal = data(pk);
@@ -194,6 +212,9 @@ public class Model extends Helper {
         return this;
     }
 
+    /**
+     * 排序
+     * */
     public Model order(String field, String asc) {
         query().order(ModelUtil.fieldName(field), asc);
         return this;
@@ -225,6 +246,9 @@ public class Model extends Helper {
         return this;
     }
 
+    /**
+     * 分页
+     * */
     public Model page(Integer page) {
         query().page(page);
         return this;
@@ -240,16 +264,14 @@ public class Model extends Helper {
      * 查询一条
      * */
     public <D extends Model> D find() {
-        // 预载入字段声明
-        queryBeforeWith();
+        // 查询前处理：预载入
+        queryBefore();
         // 数据装填
         Map<String, Object> data = query().find();
         if (ModelUtil.isEmpty(data)) {
             return null;
         }
-        // 预载入数据组装
-
-        return newProxyModel(getClass(), data);
+        return resultTranshipment(getClass(), data);
     }
 
     public <D extends Model> D find(Serializable id) {
@@ -269,22 +291,36 @@ public class Model extends Helper {
      * 查询前处理预载入
      * - 一对一的字段声明
      * */
-    private void queryBeforeWith() {
+    private void queryBefore() {
+        if (__withs == null || __withs.size() == 0) {
+            return;
+        }
+
         List<String> fields = new LinkedList<>();
         // 本表字段声明
-        Map<String, ModelField> fieldMap = getModelFieldAll();
-        fieldMap.forEach((name, field) -> {
-            if (field.getWay() != null) {
+        __meta.getFieldMap().forEach((name, field) -> {
+            if (field.getWay() != null || Model.class.isAssignableFrom(field.getClazz())) {
                 return;
             }
             name = ModelUtil.fieldLineName(name);
-            fields.add(__table + "." + name + " AS " + __table + "__" + name);
+            fields.add(__meta.table() + "." + name + " AS " + __meta.table() + "__" + name);
         });
+
         // 关联表字段声明
-        getWithModels().forEach((name, modelClass) -> {
-            name = ModelUtil.fieldLineName(name);
-            String tableName = getModelTableName(modelClass);
-            fields.add(tableName + "." + name + " AS " + tableName + "__" + name);
+        getWithRelation().forEach((relationName, relation) -> {
+            // 字段
+            ModelMeta meta = ModelUtil.getMeta(relation.getClazz());
+            meta.getFieldMap().forEach((name, field) -> {
+                if (field.getWay() != null || Model.class.isAssignableFrom(field.getClazz())) {
+                    return;
+                }
+                name = ModelUtil.fieldLineName(name);
+                fields.add(meta.table() + "." + name + " AS " + meta.table() + "__" + name);
+            });
+            // join
+            query().join(meta.table(), String.format("%s.%s = %s.%s",
+                    meta.table(), ModelUtil.fieldLineName(relation.getForeignKey()),
+                    __meta.table(), ModelUtil.fieldLineName(relation.getLocalKey())));
         });
         // 查询器
         query().field(fields);
@@ -295,26 +331,48 @@ public class Model extends Helper {
      * - 组装一对一数据
      * - 一对多的关联在主数据返回后再统一查询组装
      * */
-    private void queryAfterWith() {
+    private <D extends Model> D resultTranshipment(Class<?> clazz, Map<String, Object> data) {
+        // 装载关联属性
+        System.out.println("data=" + data);
+        Map<String, Relation> relationMap = getWithRelation();
+        if (relationMap.size() > 0) {
+            // 主表数据加载
+            D model = newProxyModel(clazz);
+            resultTranshipmentWith(model, data);
+            // 关联表数据
+            getWithRelation().forEach((relationName, relation) -> {
+                Model relationModel = newProxyModel(relation.getClazz());
+                resultTranshipmentWith(relationModel, data);
+                SqlUtil.setFieldValue(model, relationName, relationModel);
+            });
+            return model;
+        }
+        return newProxyModel(getClass(), data);
+    }
 
+    private void resultTranshipmentWith(Model model, Map<String, Object> set) {
+        model.__meta.getFieldMap().forEach((name, field) -> {
+            if (field.getWay() != null || Model.class.isAssignableFrom(field.getClazz())) {
+                return;
+            }
+            String dataName = model.__meta.table() + "__" + ModelUtil.fieldLineName(name);
+            model.data(name, set.get(dataName));
+        });
     }
 
     /**
      * 获取预载入的属性名对应模型类
      * */
-    private Map<String, Class<Model>> getWithModels() {
-        Map<String, Class<Model>> modelMap = new LinkedHashMap<>();
+    private Map<String, Relation> getWithRelation() {
+        Map<String, Relation> relationMap = new LinkedHashMap<>();
         if (__withs != null) {
-            Map<String, ModelField> methodMap = getModelMethodAll();
-            Map<String, ModelField> fieldMap = getModelFieldAll();
             __withs.forEach(name -> {
-                ModelField field = fieldMap.get(name);
-                if (field != null && Model.class.isAssignableFrom(field.getClazz()) && methodMap.containsKey(field.getName())) {
-                    modelMap.put(name, (Class<Model>) field.getClazz());
+                if (__meta.getRelationMap().containsKey(name)) {
+                    relationMap.put(name, __meta.getRelationMap().get(name));
                 }
             });
         }
-        return modelMap;
+        return relationMap;
     }
 
     //---------- TODO::分页方法 ----------//
@@ -366,7 +424,7 @@ public class Model extends Helper {
      * */
     public Model data(String name, Object val) {
         name = ModelUtil.fieldName(name);
-        ModelField field = ModelUtil.findField(getMClass(), name);
+        ModelField field = __meta.getFieldMap().get(name);
         if (field != null && field.getWay() == null) {
             __data.put(name, val);      // 只保存本类字段数据，关联数据不缓存
         }
@@ -383,8 +441,8 @@ public class Model extends Helper {
     }
 
     public static Map<String, Object> dataFieldConvLine(Map<String, Object> data, Class<?> clazz) {
+        Map<String, ModelField> fieldMap = ModelUtil.getMeta(clazz).getFieldMap();
         Map<String, Object> ret = new LinkedHashMap<>();
-        Map<String, ModelField> fieldMap = ModelUtil.findFieldMap(clazz);
         data.forEach((k, v) -> {
             if (fieldMap.containsKey(ModelUtil.fieldName(k))) {
                 ret.put(ModelUtil.fieldLineName(k), v);
@@ -484,7 +542,7 @@ public class Model extends Helper {
              * 3. 如果是就对返回数据处理
              * */
             Class<?> clazz = getModelClass(o.getClass());
-            if (ModelUtil.existMethod(clazz, method.getName())) {       // 存在关联属性的方法
+            if (ModelUtil.getMeta(clazz).getRelationMap().containsKey(method.getName())) {       // 存在关联属性的方法
                 return LoadingRelationGetter(clazz, o, method, objects);
             }
             return methodProxy.invokeSuper(o, objects); // 执行方法后返回数据
@@ -501,34 +559,35 @@ public class Model extends Helper {
      * */
     public <D> D relation(String fieldName, Class<?> clazz, RelationType type, String localKey, String foreignKey) {
         // 缓存关联关系
-        if (!__relations.containsKey(fieldName)) {
-            __relations.put(fieldName, new Relation(clazz, type, localKey, foreignKey));
+        if (!__meta.getRelationMap().containsKey(fieldName)) {
+            __meta.getRelationMap().put(fieldName, new Relation(clazz, type, localKey, foreignKey));
         }
         // 返回查询模型
         return newModel(clazz, this);
     }
 
     public <D extends Model> D relation(Class<?> clazz, RelationType type, String localKey, String foreignKey) {
-        String fieldName = Thread.currentThread().getStackTrace()[0].getMethodName();
+        String fieldName = Thread.currentThread().getStackTrace()[1].getMethodName();
         return relation(fieldName, clazz, type, localKey, foreignKey);
     }
 
     public <D extends Model> D relation(String clazzName, RelationType type, String localKey, String foreignKey) {
         try {
-            String fieldName = Thread.currentThread().getStackTrace()[0].getMethodName();
-            return relation(fieldName, getClass().getClassLoader().loadClass(clazzName), type, localKey, foreignKey);
+            Class<?> clazz = getClass().getClassLoader().loadClass(clazzName);
+            String fieldName = Thread.currentThread().getStackTrace()[2].getMethodName();
+            return relation(fieldName, clazz, type, localKey, foreignKey);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     public <D extends Model> D hasOne(Class<?> clazz, String localKey, String foreignKey) {
-        String fieldName = Thread.currentThread().getStackTrace()[0].getMethodName();
+        String fieldName = Thread.currentThread().getStackTrace()[2].getMethodName();
         return relation(fieldName, clazz, RelationType.OneToOne, localKey, foreignKey);
     }
 
     public <D extends Model> D hasMany(Class<?> clazz, String localKey, String foreignKey) {
-        String fieldName = Thread.currentThread().getStackTrace()[0].getMethodName();
+        String fieldName = Thread.currentThread().getStackTrace()[2].getMethodName();
         return relation(fieldName, clazz, RelationType.OneToMany, localKey, foreignKey);
     }
 
@@ -577,65 +636,59 @@ public class Model extends Helper {
         if (Enhancer.isEnhanced(clazz)) {
             clazz = clazz.getSuperclass();
         }
-        // 表名
-        model.__table = getModelTableName(clazz);
-        // 缓存模型字段
-        if (!ModelUtil.existFieldMap(clazz))
-        {
-            // 提前标记，不然嵌套模型会无限递归初始化
-            ModelUtil.putFieldMap(clazz, new LinkedHashMap<>());
-            // 全部方法
-            Map<String, Method> methodMap = new LinkedHashMap<>();
-            for (Method method : clazz.getDeclaredMethods()) {
-                methodMap.put(method.getName(), method);
+
+        // 已加载模型元组信息
+        if (ModelUtil.getMeta(clazz) != null) {
+            model.__meta = ModelUtil.getMeta(clazz);
+            return;
+        }
+
+        // 初始化模型信息
+        ModelMeta meta = model.__meta = new ModelMeta();
+        meta.setTable(getModelTableName(clazz));
+        meta.setClazz(clazz);
+        meta.setFieldMap(new LinkedHashMap<>());
+        ModelUtil.setMeta(clazz, meta);
+
+        // 全部方法
+        Map<String, Method> methodMap = new LinkedHashMap<>();
+        for (Method method : clazz.getDeclaredMethods()) {
+            methodMap.put(method.getName(), method);
+        }
+        // 全部属性
+        for (Field field : clazz.getDeclaredFields()) {
+            // 排除静态字段
+            if (Modifier.isStatic(field.getModifiers())) {
+                continue;
             }
-            // 全部属性
-            Map<String, ModelField> fieldMap = ModelUtil.findFieldMap(clazz);
-            for (Field field : clazz.getDeclaredFields()) {
-                // 排除静态字段
-                if (Modifier.isStatic(field.getModifiers())) {
+            ModelField fieldInfo = new ModelField(field);
+            String fieldName = fieldInfo.getName();
+            //
+            org.quickjava.framework.orm.annotation.ModelField modelField = field.getAnnotation(org.quickjava.framework.orm.annotation.ModelField.class);
+            if (modelField != null) {
+                if (!modelField.exist()) {
                     continue;
                 }
-                ModelField fieldInfo = new ModelField(field);
-                String fieldName = fieldInfo.getName();
-                // 排除注解字段
-                org.quickjava.framework.orm.annotation.ModelField modelField = field.getAnnotation(org.quickjava.framework.orm.annotation.ModelField.class);
-                if (modelField != null) {
-                    if (!modelField.exist()) {
-                        continue;
-                    }
-                    if (!"".equals(modelField.name())) {
-                        fieldInfo.setName(modelField.name());
-                    }
-                    fieldInfo.setFill(modelField.fill());
-                    fieldInfo.setSoftDelete(modelField.softDelete());
+                if (!"".equals(modelField.name())) {
+                    fieldInfo.setName(modelField.name());
                 }
-                fieldInfo.setWay(findRelationAno(field));
-                // 有关联方法
-                if (methodMap.containsKey(fieldName)) {
-                    try {
-                        methodMap.get(fieldName).invoke(model);
-                    } catch (IllegalAccessException | InvocationTargetException e) {
-                        throw new RuntimeException(e);
-                    }
-                    fieldInfo.setWay(model.__relations.get(fieldName));
-                }
-
-                fieldMap.put(field.getName(), fieldInfo);
+                fieldInfo.setFill(modelField.fill());
+                fieldInfo.setSoftDelete(modelField.softDelete());
             }
-            ModelUtil.putFieldMap(clazz, fieldMap);
-            // 缓存关联方法
-            Map<String, ModelField> methodCache = new LinkedHashMap<>();
-            fieldMap.forEach((name, relation) -> {
-                if (relation.getWay() == null) {
-                    return;
+            fieldInfo.setWay(findRelationAno(field));
+
+            // 有关联方法
+            if (methodMap.containsKey(fieldName)) {
+                try {
+                    Method method = methodMap.get(fieldName);
+                    method.invoke(model);
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    throw new RuntimeException(e);
                 }
-                if (methodMap.containsKey(name)) {
-                    relation.setMethod(methodMap.get(name));
-                    methodCache.put(name, relation);
-                }
-            });
-            ModelUtil.putMethodMap(clazz, methodCache);
+                fieldInfo.setWay(meta.getRelationMap().get(fieldName));
+            }
+
+            meta.getFieldMap().put(field.getName(), fieldInfo);
         }
     }
 
@@ -676,7 +729,7 @@ public class Model extends Helper {
     {
         try {
             // 加载
-            ModelField modelField = ModelUtil.findMethod(clazz, method);
+            ModelField modelField = ModelUtil.getMeta(clazz).getFieldMap().get(method.getName());
             Field field = modelField.getField();
             if (Model.class.isAssignableFrom(o.getClass())) {
                 Model curr = (Model) o;
@@ -685,6 +738,7 @@ public class Model extends Helper {
                 if (curr.data().containsKey(fieldName)) {
                     return curr.data().get(fieldName);
                 }
+
                 // 存在递归和toString调用
                 StackTraceElement[] stackTraceArr = Thread.currentThread().getStackTrace();
                 for (int i = 0; i < stackTraceArr.length; i++) {
@@ -696,6 +750,7 @@ public class Model extends Helper {
 //                        return curr.data().get(fieldName);
 //                    }
                 }
+
                 // 懒加载二
                 if (modelField.getWay() != null && Relation.class.isAssignableFrom(modelField.getWay().getClass())) {
                     Relation relation = (Relation) modelField.getWay();
@@ -806,18 +861,7 @@ public class Model extends Helper {
     }
 
     public static Class<?> getModelClass(Object obj) {
-        if (obj instanceof Class) {
-            return getModelClass((Class<?>) obj);
-        }
-        return getModelClass(obj.getClass());
-    }
-
-    public Map<String, ModelField> getModelFieldAll() {
-        return ModelUtil.findFieldMap(getMClass());
-    }
-
-    public Map<String, ModelField> getModelMethodAll() {
-        return ModelUtil.findMethodMap(getMClass());
+        return ModelUtil.getModelClass(obj);
     }
 
     @Override

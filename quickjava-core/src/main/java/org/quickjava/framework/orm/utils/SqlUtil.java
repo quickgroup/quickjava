@@ -195,7 +195,7 @@ public class SqlUtil {
     // 数据字段转驼峰
     public static Map<String, Object> dataFieldConv(Map<String, Object> data, Class<?> clazz) {
         Map<String, Object> ret = new LinkedHashMap<>();
-        Map<String, ModelField> fieldMap = ModelUtil.findFieldMap(clazz);
+        Map<String, ModelField> fieldMap = ModelUtil.getMeta(clazz).getFieldMap();
         data.forEach((k, v) -> {
             if (fieldMap.containsKey(SqlUtil.fieldName(k))) {
                 ret.put(SqlUtil.fieldName(k), v);

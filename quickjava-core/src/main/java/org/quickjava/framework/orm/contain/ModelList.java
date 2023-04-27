@@ -1,7 +1,6 @@
-package org.quickjava.framework.orm.set;
+package org.quickjava.framework.orm.contain;
 
 import org.quickjava.framework.orm.Model;
-import org.quickjava.framework.orm.contain.DataMap;
 
 import java.util.LinkedList;
 
