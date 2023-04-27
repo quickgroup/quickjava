@@ -37,10 +37,16 @@ public class Article extends Model {
     // 一对一关联
     private User user;
 
+    private User user2;
+
     // 一对多关联
     private List<User> users;
 
     public User user() {
+        return hasOne(User.class, "userId", "id");
+    }
+
+    public User user2() {
         return hasOne(User.class, "userId", "id");
     }
 
