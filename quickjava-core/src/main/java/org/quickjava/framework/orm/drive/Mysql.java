@@ -104,6 +104,11 @@ public class Mysql implements Drive {
         sqlList.add(query.__Table().toString());
 
         // TODO::JOIN
+        if (query.__JoinList().size() > 0) {
+            query.__JoinList().forEach(arr -> {
+                sqlList.add(String.format("%s JOIN %s ON %s", arr[2], arr[0], arr[1]));
+            });
+        }
 
         // UPDATE
         if (action == Action.UPDATE) {

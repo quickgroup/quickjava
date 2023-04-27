@@ -1,5 +1,9 @@
 package org.quickjava.framework.orm.example;
 
+import org.quickjava.framework.orm.QuerySet;
+
+import java.util.Map;
+
 /*
  * Copyright (c) 2020~2023 http://www.quickjava.org All rights reserved.
  * +-------------------------------------------------------------------
@@ -16,7 +20,21 @@ package org.quickjava.framework.orm.example;
  */
 public class Test {
 
+    public void testQuery() {
+        Map row = QuerySet.table("article").where("id", 1).find();
+        System.out.println("row=" + row);
+
+        // join
+        Map row2 = QuerySet.table("article")
+                .join("user", "user.id = article.user_id")
+                .where("article.id", 1)
+                .find();
+        System.out.println("row2=" + row2);
+    }
+
     public void test() {
+        testQuery();
+
         // 查询用户
 //        User user1 = userModel.where().find();
 
@@ -31,10 +49,10 @@ public class Test {
 //        System.out.println("article2.users=" + article2.users().select());
 
 //        // 预载入查询
-        Article article3 = new Article().with("user").where("id", 1).find();
-        System.out.println("article3=" + article3);
-        System.out.println("article3.user=" + article3.getUser());
-        System.out.println("article3.users=" + article3.getUsers());
+//        Article article3 = new Article().with("user").where("id", 1).find();
+//        System.out.println("article3=" + article3);
+//        System.out.println("article3.user=" + article3.getUser());
+//        System.out.println("article3.users=" + article3.getUsers());
     }
 
 }

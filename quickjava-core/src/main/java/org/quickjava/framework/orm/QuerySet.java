@@ -42,6 +42,7 @@ public class QuerySet {
     private final List<String> orderByList = new LinkedList<>();
 
     private final Map<String, Object> data = new LinkedHashMap<>();
+
     private final List<Map<String, Object>> dataList = new LinkedList<>();
 
     private String groupBy = null;
@@ -49,6 +50,8 @@ public class QuerySet {
     private Integer limitIndex = 0;
 
     private Integer limitSize = 20;
+
+    private final List<String[]> joinList = new LinkedList<>();
 
     public QuerySet() {}
 
@@ -107,16 +110,13 @@ public class QuerySet {
         return this.whereOr(field, "=", value);
     }
 
-    public QuerySet join(String joinTable) {
-        return join(joinTable, "", "LEFT");
+    public QuerySet join(String table, String condition) {
+        return join(table, condition, "INNER");
     }
 
-    public QuerySet join(String joinTable, String str12) {
-        return join(joinTable, str12, "LEFT");
-    }
-
-    public QuerySet join(String joinTable, String str12, String str3)
+    public QuerySet join(String table, String condition, String type)
     {
+        joinList.add(new String[]{table, condition, type});
         return this;
     }
 
@@ -278,8 +278,14 @@ public class QuerySet {
         return result.intValue();
     }
 
-    // 获取表全部字段
-    public List<TableColumn> getColumns()
+    /**
+     * 获取表全部字段
+     * */
+    public List<TableColumn> getColumns() {
+        return getColumns(table);
+    }
+
+    public List<TableColumn> getColumns(String table)
     {
         List<TableColumn> ret = SqlUtil.getTableColumns(table);
         if (ret != null) {
@@ -499,5 +505,9 @@ public class QuerySet {
 
     public List<Map<String, Object>> __DataList() {
         return dataList;
+    }
+
+    public List<String[]> __JoinList() {
+        return joinList;
     }
 }
