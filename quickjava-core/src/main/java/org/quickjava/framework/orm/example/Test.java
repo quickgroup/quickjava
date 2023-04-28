@@ -46,16 +46,16 @@ public class Test {
         System.out.println("article3.getTags=" + article3.getTags());
 
         // 预载入查询
-        List<Article> article4 = new Article()
-                .with("user,comments,tags")
-                .select();
-        System.out.println("article4=" + article4);
-
-        // 预载入分页
-        Pagination<Article> pagination = new Article()
-                .with("user,comments,tags")
-                .pagination();
-        System.out.println("pagination=" + pagination);
+//        List<Article> article4 = new Article()
+//                .with("user,comments,tags")
+//                .select();
+//        System.out.println("article4=" + article4);
+//
+//        // 预载入分页
+//        Pagination<Article> pagination = new Article()
+//                .with("user,comments,tags")
+//                .pagination();
+//        System.out.println("pagination=" + pagination);
     }
 
     public void test()

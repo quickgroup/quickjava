@@ -392,14 +392,12 @@ public class Model extends Helper {
                 models.forEach(model -> conditionMap.get(fieldName).add(SqlUtil.getFieldValue(model, relation.localKey())));
             });
             // 查询
-            System.out.println("conditionMap=" + conditionMap);
             relationMap.forEach((fieldName, relation) -> {
                 if (conditionMap.get(fieldName).size() == 0) {
                     return;
                 }
                 Model queryModel = newModel(relation.getClazz());
                 List<Model> rows = queryModel.where(relation.foreignKey(), "IN", conditionMap.get(fieldName)).select();
-                System.out.println("rows=" + rows);
                 // 数据装填
                 models.forEach(model -> {
                     Object modelKeyVal = SqlUtil.getFieldValue(model, relation.localKey());

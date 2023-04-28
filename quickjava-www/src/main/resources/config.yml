@@ -68,6 +68,12 @@ log:
   level: DEBUG
 
 # Database
+database2:
+  url: jdbc:mysql://127.0.0.1:3306/www_lcdp_com?useSSL=false
+  driver: com.mysql.jdbc.Driver
+  username: root
+  password: 123456
+
 database:
   url: jdbc:mysql://192.168.10.53:53306/www_lcdp_com?useSSL=false
   driver: com.mysql.jdbc.Driver
