@@ -34,10 +34,14 @@ public class Test {
 
     public void testModel() {
         // 预载入查询
-        Article article3 = new Article().with("user,user2").where("id", 1).find();
+        Article article3 = new Article()
+                .with("user,comments")
+                .where("id", 1)
+                .find();
         System.out.println("article3=" + article3);
 //        System.out.println("article3.user=" + article3.getUser());
 //        System.out.println("article3.users=" + article3.getUsers());
+        System.out.println("article3.getComments=" + article3.getComments());
     }
 
     public void test()

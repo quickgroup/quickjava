@@ -1,5 +1,6 @@
 package org.quickjava.framework.orm;
 
+import cn.hutool.core.util.ArrayUtil;
 import com.baomidou.mybatisplus.annotation.TableName;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
@@ -264,14 +265,21 @@ public class Model extends Helper {
      * 查询一条
      * */
     public <D extends Model> D find() {
-        // 查询前处理：预载入
+        // 查询前：预载入字段准备
         queryBefore();
         // 数据装填
         Map<String, Object> data = query().find();
         if (ModelUtil.isEmpty(data)) {
             return null;
         }
-        return resultTranshipment(getClass(), data);
+        // 装载
+        D model = resultTranshipmentOne(getClass(), data);
+        // 查询后：一对多数据加载
+        List<Model> models = new LinkedList<>();
+        models.add(model);
+        queryAfter(models);
+
+        return model;
     }
 
     public <D extends Model> D find(Serializable id) {
@@ -296,8 +304,8 @@ public class Model extends Helper {
             return;
         }
 
-        List<String> fields = new LinkedList<>();
         // 本表字段声明
+        List<String> fields = new LinkedList<>();
         __meta.getFieldMap().forEach((name, field) -> {
             if (field.getWay() != null || Model.class.isAssignableFrom(field.getClazz())) {
                 return;
@@ -307,8 +315,7 @@ public class Model extends Helper {
         });
 
         // 关联表字段声明
-        getWithRelation().forEach((relationName, relation) -> {
-            // 字段
+        getWithRelation(new RelationType[]{RelationType.OneToOne}).forEach((relationName, relation) -> {
             ModelMeta meta = ModelUtil.getMeta(relation.getClazz());
             meta.getFieldMap().forEach((name, field) -> {
                 if (field.getWay() != null || Model.class.isAssignableFrom(field.getClazz())) {
@@ -319,8 +326,8 @@ public class Model extends Helper {
             });
             // join
             query().join(meta.table() + " " + relationName,
-                    String.format("%s.%s = %s.%s", relationName, ModelUtil.fieldLineName(relation.getForeignKey()),
-                    __meta.table(), ModelUtil.fieldLineName(relation.getLocalKey())), "LEFT");
+                    String.format("%s.%s = %s.%s", relationName, ModelUtil.fieldLineName(relation.foreignKey()),
+                    __meta.table(), ModelUtil.fieldLineName(relation.localKey())), "LEFT");
         });
         // 查询器
         query().field(fields);
@@ -331,16 +338,15 @@ public class Model extends Helper {
      * - 组装一对一数据
      * - 一对多的关联在主数据返回后再统一查询组装
      * */
-    private <D extends Model> D resultTranshipment(Class<?> clazz, Map<String, Object> data) {
+    private <D extends Model> D resultTranshipmentOne(Class<?> clazz, Map<String, Object> data) {
         // 装载关联属性
-        System.out.println("data=" + data);
-        Map<String, Relation> relationMap = getWithRelation();
+        Map<String, Relation> relationMap = getWithRelation(new RelationType[]{RelationType.OneToOne});
         if (relationMap.size() > 0) {
             // 主表数据
             D model = newProxyModel(clazz);
             resultTranshipmentWith(model, data);
             // 关联表数据
-            getWithRelation().forEach((relationName, relation) -> {
+            relationMap.forEach((relationName, relation) -> {
                 Model relationModel = newProxyModel(relation.getClazz());
                 resultTranshipmentWith(relationModel, data);
                 SqlUtil.setFieldValue(model, relationName, relationModel);
@@ -361,13 +367,47 @@ public class Model extends Helper {
     }
 
     /**
+     * 查询后模型处理
+     * */
+    private void queryAfter(List<Model> models) {
+        // 数据关联条件：关联属性名=关联id
+        Map<String, List<Object>> conditionMap = new LinkedHashMap<>();
+        // 一对多数据条件准备
+        Map<String, Relation> relationMap = getWithRelation(new RelationType[]{RelationType.OneToMany});
+        relationMap.forEach((fieldName, relation) -> {
+            if (!conditionMap.containsKey(fieldName)) {
+                conditionMap.put(fieldName, new LinkedList<>());
+            }
+            models.forEach(model -> conditionMap.get(fieldName).add(SqlUtil.getFieldValue(model, relation.localKey())));
+        });
+        // 查询
+        System.out.println("conditionMap=" + conditionMap);
+        relationMap.forEach((fieldName, relation) -> {
+            if (conditionMap.get(fieldName).size() == 0) {
+                return;
+            }
+            Model queryModel = newModel(relation.getClazz());
+            List<Model> rows = queryModel.where(relation.foreignKey(), "IN", conditionMap.get(fieldName)).select();
+            System.out.println("rows=" + rows);
+            // 数据装填
+            models.forEach(model -> {
+                Object modelKeyVal = SqlUtil.getFieldValue(model, relation.localKey());
+                List<Model> set = rows.stream().filter(row -> modelKeyVal.equals(SqlUtil.getFieldValue(row, relation.foreignKey())))
+                        .collect(Collectors.toList());
+                SqlUtil.setFieldValue(model, fieldName, set);
+            });
+        });
+    }
+
+    /**
      * 获取预载入的属性名对应模型类
      * */
-    private Map<String, Relation> getWithRelation() {
+    private Map<String, Relation> getWithRelation(RelationType[] types) {
         Map<String, Relation> relationMap = new LinkedHashMap<>();
         if (__withs != null) {
             __withs.forEach(name -> {
-                if (__meta.getRelationMap().containsKey(name)) {
+                Relation relation = __meta.getRelationMap().get(name);
+                if (relation != null && ArrayUtil.contains(types, relation.getType())) {
                     relationMap.put(name, __meta.getRelationMap().get(name));
                 }
             });
@@ -757,8 +797,8 @@ public class Model extends Helper {
                     if (relation.getType() == RelationType.OneToOne) {
                         Model relationModel = newModel(fieldType, curr);
                         // 设置全部关联属性为空，避免多重查询
-                        Object localValue = ModelUtil.getFieldValue(curr.getMClass(), curr, relation.getLocalKey());
-                        Object fieldValue = relationModel.where(relation.getForeignKey(), localValue).find();  // 查询结果
+                        Object localValue = ModelUtil.getFieldValue(curr.getMClass(), curr, relation.localKey());
+                        Object fieldValue = relationModel.where(relation.foreignKey(), localValue).find();  // 查询结果
                         curr.data(fieldName, fieldValue);
                         return fieldValue;
                     } else if (relation.getType() == RelationType.OneToMany) {
@@ -766,8 +806,8 @@ public class Model extends Helper {
                             ParameterizedType pt = (ParameterizedType) field.getGenericType();
                             Class<?> genericClazz = (Class<?>) pt.getActualTypeArguments()[0];
                             Model relationModel = newModel(genericClazz, curr);
-                            Object localValue = ModelUtil.getFieldValue(curr.getMClass(), curr, relation.getLocalKey());
-                            Object fieldValue = relationModel.where(relation.getForeignKey(), localValue).select();  // 查询结果
+                            Object localValue = ModelUtil.getFieldValue(curr.getMClass(), curr, relation.localKey());
+                            Object fieldValue = relationModel.where(relation.foreignKey(), localValue).select();  // 查询结果
                             curr.data(fieldName, fieldValue);
                             return fieldValue;
                         }

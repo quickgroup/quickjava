@@ -48,7 +48,7 @@ public class Relation {
         this.type = type;
     }
 
-    public String getLocalKey() {
+    public String localKey() {
         return localKey;
     }
 
@@ -56,7 +56,7 @@ public class Relation {
         this.localKey = localKey;
     }
 
-    public String getForeignKey() {
+    public String foreignKey() {
         return foreignKey;
     }
 

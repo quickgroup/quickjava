@@ -42,6 +42,9 @@ public class Article extends Model {
     // 一对多关联
     private List<User> users;
 
+    // 一对多：评论回复表
+    private List<Comment> comments;
+
     public User user() {
         return hasOne(User.class, "userId", "id");
     }
@@ -52,6 +55,10 @@ public class Article extends Model {
 
     public User users() {
         return hasMany(User.class, "userId", "id");
+    }
+
+    public Comment comments() {
+        return hasMany(Comment.class, "id", "articleId");
     }
 
     public Long getId() {
@@ -108,5 +115,29 @@ public class Article extends Model {
 
     public void setUsers(List<User> users) {
         this.users = users;
+    }
+
+    public Long getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Long categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public User getUser2() {
+        return user2;
+    }
+
+    public void setUser2(User user2) {
+        this.user2 = user2;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
     }
 }

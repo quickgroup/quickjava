@@ -5,6 +5,10 @@
 
 package org.quickjava.framework.orm.contain;
 
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import org.quickjava.framework.orm.utils.SqlUtil;
 
@@ -91,6 +95,8 @@ public abstract class WhereBase {
             result = Float.toString((Float) value);
         } else if (value instanceof Double) {
             result = Double.toString((Double) value);
+        } else if (value instanceof Iterable) {
+            result = CollectionUtil.join(((Iterable<?>) value), ",");
         } else {
             result = String.format("\"%s\"", SqlUtil.escapeSql(String.valueOf(value)));
         }
