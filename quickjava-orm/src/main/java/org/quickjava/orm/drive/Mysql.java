@@ -1,8 +1,7 @@
 package org.quickjava.orm.drive;
 
 import cn.hutool.core.util.ReflectUtil;
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.extra.spring.SpringUtil;
+import com.baomidou.mybatisplus.autoconfigure.MybatisPlusAutoConfiguration;
 import org.quickjava.orm.QuerySet;
 import org.quickjava.orm.contain.Action;
 import org.quickjava.orm.contain.Value;
@@ -10,6 +9,7 @@ import org.quickjava.orm.contain.WhereBase;
 import org.quickjava.orm.utils.QueryException;
 import org.quickjava.orm.utils.QuickConnection;
 import org.quickjava.orm.utils.SqlUtil;
+import org.springframework.context.ApplicationContext;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
@@ -43,7 +43,8 @@ public class Mysql implements Drive {
             if (__quickConnection.get() == null) {
                 // FIXME::获取Spring数据库连接
                 try {
-                    DataSource dataSource = SpringUtil.getBean("dataSource");
+                    ApplicationContext ac = SpringAutoConfiguration.getApplicationContext();
+                    DataSource dataSource = (DataSource) ac.getBean("dataSource");
                     __quickConnection.set(new QuickConnection(dataSource.getConnection()));
                 } catch (Exception e) {
                     try {
@@ -103,7 +104,7 @@ public class Mysql implements Drive {
 
         // action is SELECT
         if (action == Action.SELECT) {
-            sqlList.add(StrUtil.join(",", query.__FieldList()));
+            sqlList.add(SqlUtil.strJoin(",", query.__FieldList()));
             sqlList.add("FROM");
         }
 
@@ -155,12 +156,12 @@ public class Mysql implements Drive {
         // WHERE
         if (query.__WhereList().size() > 0) {
             sqlList.add("WHERE");
-            sqlList.add(WhereBase.taskOutFirstLogic(StrUtil.join(" ", query.__WhereList())));
+            sqlList.add(WhereBase.taskOutFirstLogic(SqlUtil.strJoin(" ", query.__WhereList())));
         }
 
         // ORDER BY
         if (query.__Orders().size() > 0) {
-            sqlList.add(String.format("ORDER BY %s", StrUtil.join(",", query.__Orders())));
+            sqlList.add(String.format("ORDER BY %s", SqlUtil.strJoin(",", query.__Orders())));
         }
 
         // Limit
@@ -168,7 +169,7 @@ public class Mysql implements Drive {
             sqlList.add(String.format("LIMIT %d,%d", query.__Limit(), query.__LimitSize()));
         }
 
-        sql = StrUtil.join(" ", sqlList);
+        sql = SqlUtil.strJoin(" ", sqlList);
         return sql;
     }
 

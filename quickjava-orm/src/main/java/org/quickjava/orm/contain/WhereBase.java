@@ -6,10 +6,6 @@
 package org.quickjava.orm.contain;
 
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.collection.ListUtil;
-import cn.hutool.core.convert.Convert;
-import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.StrUtil;
 import org.quickjava.orm.utils.SqlUtil;
 
 import java.util.LinkedHashMap;
@@ -111,7 +107,7 @@ public abstract class WhereBase {
     public String toString() {
         // 嵌套查询
         if (children != null) {
-            return taskOutFirstLogic(StrUtil.join(" ", children));
+            return taskOutFirstLogic(SqlUtil.strJoin(" ", children));
         }
         // 输出
         if ("RAW".equals(operator)) {

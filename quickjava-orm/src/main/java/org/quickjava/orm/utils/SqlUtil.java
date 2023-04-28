@@ -1,5 +1,6 @@
 package org.quickjava.orm.utils;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
@@ -126,6 +127,13 @@ public class SqlUtil {
      * */
     public static String fieldLineName(String field) {
         return StrUtil.toUnderlineCase(field);
+    }
+
+    /**
+     * List转字符串
+     * */
+    public static <T> String strJoin(CharSequence conjunction, Iterable<T> iterable) {
+        return CollUtil.join(iterable, conjunction);
     }
 
     /**
