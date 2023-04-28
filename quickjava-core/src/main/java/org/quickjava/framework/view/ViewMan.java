@@ -27,7 +27,7 @@ public abstract class ViewMan {
 
     public static void init()
     {
-        String name = Kernel.config.get("view").getString("engine").toLowerCase();
+        String name = Kernel.config().get("view").getString("engine").toLowerCase();
         if ("default".equals(name) || "freemarker".equals(name)) {
         } else {
         }

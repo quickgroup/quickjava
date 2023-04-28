@@ -164,7 +164,7 @@ public class Request {
         this.domin = this.pathinfo.hostname;
 
         // 解析默认模块/控制器/方法
-        Dict defaultConfig = Kernel.config.get("module").get("path");
+        Dict defaultConfig = Kernel.config().get("module").get("path");
         this.pathinfo.parseControllerAction(
                 defaultConfig.getString("module"),
                 defaultConfig.getString("module"),

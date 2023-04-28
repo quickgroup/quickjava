@@ -53,7 +53,8 @@ public class Route {
     private void scanPackages()
         throws Exception
     {
-        ClassLoader classLoader = Kernel.classLoader;
+        ClassLoader classLoader = Kernel.getClassLoader();
+        Dict config = Kernel.config();
         String classPath = Env.getString("classPath");
         String basePackages = Env.getString("basePackages");
         String packagePath = basePackages.replace(".", "/");
@@ -64,9 +65,9 @@ public class Route {
             throw new ClassNotFoundException("package not found, basePackages=" + basePackages);
         }
 
-        boolean caseSensitive = Kernel.config.get("url").getBoolean("caseSensitive", false);
+        boolean caseSensitive = config.get("url").getBoolean("caseSensitive", false);
 
-        Dict dirname = Kernel.config.get("module").get("dirname");
+        Dict dirname = config.get("module").get("dirname");
         String controllerDirName = dirname.getString("controller", "controller");
         QuickLog.debug("classPath=" + classPath);
 

@@ -28,13 +28,13 @@ public class TomcatServer {
         /**
          * @langCn 配置tomcat主机名和端口
          */
-        tomcat.setHostname(Kernel.config.get("app").getString("hostname", "localhost"));
-        tomcat.setPort(Kernel.config.get("app").getInteger("port", 8700));
+        tomcat.setHostname(Kernel.config().get("app").getString("hostname", "localhost"));
+        tomcat.setPort(Kernel.config().get("app").getInteger("port", 8700));
         tomcat.getConnector().setUseIPVHosts(true);
         QuickLog.info("Server Listen: "
-                + Kernel.config.get("app").getString("hostname", "localhost")
+                + Kernel.config().get("app").getString("hostname", "localhost")
                 + ":"
-                + Kernel.config.get("app").getInteger("port", 8700));
+                + Kernel.config().get("app").getInteger("port", 8700));
 
         String classesPath = (QuickUtil.isClassMode()) ? QuickUtil.getClassesPath() : "";
         String webInfClasses = "/WEB-INF/classes";

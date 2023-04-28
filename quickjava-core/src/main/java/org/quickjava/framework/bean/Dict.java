@@ -16,10 +16,11 @@
 
 package org.quickjava.framework.bean;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class Dict {
+public class Dict extends HashMap {
 
     /**
      * 真实存放数据

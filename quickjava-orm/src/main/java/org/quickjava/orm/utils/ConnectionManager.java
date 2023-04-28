@@ -14,35 +14,32 @@
  *
  */
 
-package org.quickjava.framework.database;
+package org.quickjava.orm.utils;
 
-import org.quickjava.common.QuickLog;
-import org.quickjava.framework.Kernel;
-import org.quickjava.framework.Lang;
-import org.quickjava.framework.bean.Dict;
 
-public class DBMan {
+public class ConnectionManager {
 
     private QuickConnection quickConnection = null;
 
     private static class DBManClassInstance{
-        private static final DBMan instance = new DBMan();
+        private static final ConnectionManager instance = new ConnectionManager();
     }
 
-    private DBMan()
+    private ConnectionManager()
     {
-        Dict database = Kernel.config().get("database");
-        quickConnection = new QuickConnection(database.getString("url"), database.getString("username"), database.getString("password"));
-        quickConnection.connectStart();
-
-        QuickLog.info(Lang.to("Database init Complete."));
+//        Dict database = Kernel.config.get("database");
+//        quickConnection = new QuickConnection(
+//                database.getString("url"), database.getString("username"), database.getString("password"));
+//        quickConnection.connectStart();
+//
+//        QuickLog.info(Lang.to("Database init Complete."));
     }
 
     public static void init() {
 
     }
 
-    public static QuickConnection getQuickConnection() {
+    public static QuickConnection getConnection() {
         return DBManClassInstance.instance.quickConnection;
     }
 }

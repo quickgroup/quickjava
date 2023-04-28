@@ -23,7 +23,7 @@ public class Lang {
 
     public static void init()
     {
-        String language = Kernel.config.get("app").getString("lang");
+        String language = Kernel.config().get("app").getString("lang");
         Lang.language = language.toLowerCase();
         // 默认语言包
         tran.put(Md5Utils.encrypt("App start ..."), "应用启动中 ...");

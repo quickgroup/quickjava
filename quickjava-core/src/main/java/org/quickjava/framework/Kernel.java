@@ -28,11 +28,11 @@ public class Kernel {
 
     public static String name = "QuickJava";
 
-    public static ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+    private static ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
     public static ServletContext servletContext = null;
 
-    public static Dict config = null;
+    private static Dict config = null;
 
     public static Kernel get() {
         return kernel;
@@ -113,6 +113,14 @@ public class Kernel {
         String configYmlContent = FileUtils.getPackageFileContent("", "config.yml");
         config = AppConfig.Factory.loadFormYml(configYmlContent);
         QuickLog.debug(Lang.to("Config load Complete."));
+    }
+
+    public static Dict config() {
+        return config;
+    }
+
+    public static ClassLoader getClassLoader() {
+        return classLoader;
     }
 
     /**

@@ -11,6 +11,7 @@
 
     <modules>
         <module>quickjava-core</module>
+        <module>quickjava-orm</module>
         <module>quickjava-www</module>
     </modules>
 
