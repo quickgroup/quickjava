@@ -275,14 +275,14 @@ public class Model extends Helper {
     }
 
     public <D extends Model> D find(Serializable id) {
-        Map<String, Object> data = query().where(query().getColumnPk(), id).find();
-        if (ModelUtil.isEmpty(data)) {
-            return null;
-        }
-        return newProxyModel(getClass(), data);
+        query().where(query().getColumnPk(), id);
+        return find();
     }
 
     public <D extends Model> List<D> select() {
+        // 查询前处理：预载入
+        queryBefore();
+        // 执行查询
         List<Map<String, Object>> dataList = query().select();
         return dataList.stream().map(data -> Model.<D>newProxyModel(getClass(), data)).collect(Collectors.toList());
     }
@@ -315,12 +315,12 @@ public class Model extends Helper {
                     return;
                 }
                 name = ModelUtil.fieldLineName(name);
-                fields.add(meta.table() + "." + name + " AS " + meta.table() + "__" + name);
+                fields.add(relationName + "." + name + " AS " + relationName + "__" + name);
             });
             // join
-            query().join(meta.table(), String.format("%s.%s = %s.%s",
-                    meta.table(), ModelUtil.fieldLineName(relation.getForeignKey()),
-                    __meta.table(), ModelUtil.fieldLineName(relation.getLocalKey())));
+            query().join(meta.table() + " " + relationName,
+                    String.format("%s.%s = %s.%s", relationName, ModelUtil.fieldLineName(relation.getForeignKey()),
+                    __meta.table(), ModelUtil.fieldLineName(relation.getLocalKey())), "LEFT");
         });
         // 查询器
         query().field(fields);
@@ -336,7 +336,7 @@ public class Model extends Helper {
         System.out.println("data=" + data);
         Map<String, Relation> relationMap = getWithRelation();
         if (relationMap.size() > 0) {
-            // 主表数据加载
+            // 主表数据
             D model = newProxyModel(clazz);
             resultTranshipmentWith(model, data);
             // 关联表数据

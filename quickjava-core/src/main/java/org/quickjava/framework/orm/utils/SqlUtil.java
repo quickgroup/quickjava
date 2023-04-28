@@ -1,6 +1,7 @@
 package org.quickjava.framework.orm.utils;
 
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import org.quickjava.framework.orm.contain.ModelField;
 import org.quickjava.framework.orm.contain.TableColumn;
@@ -87,23 +88,7 @@ public class SqlUtil {
     public static void setFieldValue(Object o, Field field, Object value) {
         try {
             field.setAccessible(true);
-            if (value == null) {
-                field.set(o, value);
-            } else if (Long.class.isAssignableFrom(field.getType())) {
-                field.set(o, Long.valueOf(String.valueOf(value)));
-            } else if (String.class.isAssignableFrom(field.getType())) {
-                field.set(o, String.valueOf(value));
-            } else if (Date.class.isAssignableFrom(field.getType())) {
-                if (value instanceof LocalDateTime) {
-                    LocalDateTime dateTime = (LocalDateTime) value;
-                    field.set(o, Date.from(dateTime.atZone(ZoneId.systemDefault()).toInstant()));
-                }
-            } else {
-                field.set(o, value);
-            }
-        } catch (IllegalAccessException e) {
-            System.out.println("设置");
-            e.printStackTrace();
+            ReflectUtil.setFieldValue(o, field, value);
         } catch (Exception e) {
             System.out.println("设置对象字段数据时异常 o=" + o + "\nfield=" + field + ", value=" + value + "\nmsg=" + e.getMessage());
             e.printStackTrace();
