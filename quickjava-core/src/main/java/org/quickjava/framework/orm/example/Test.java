@@ -1,6 +1,7 @@
 package org.quickjava.framework.orm.example;
 
 import org.quickjava.framework.orm.QuerySet;
+import org.quickjava.framework.orm.contain.Pagination;
 
 import java.util.List;
 import java.util.Map;
@@ -49,6 +50,12 @@ public class Test {
                 .with("user,comments,tags")
                 .select();
         System.out.println("article4=" + article4);
+
+        // 预载入分页
+        Pagination<Article> pagination = new Article()
+                .with("user,comments,tags")
+                .pagination();
+        System.out.println("pagination=" + pagination);
     }
 
     public void test()

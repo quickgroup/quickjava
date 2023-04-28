@@ -428,12 +428,16 @@ public class Model extends Helper {
     }
 
     //---------- TODO::分页方法 ----------//
-    public Pagination<?> pagination(Integer page, Integer pageSize) {
-        return query().pagination(getMClass(), page, pageSize);
+    public <D> Pagination<D> pagination(Integer page, Integer pageSize) {
+        Pagination<Map<String, Object>> pagination = query().pagination(page, pageSize);
+        // 数据组装
+        Pagination<Model> pagination1 = new Pagination<>(pagination);
+        pagination1.rows = resultTranshipment(getMClass(), pagination.rows);
+        return (Pagination<D>) pagination1;
     }
 
-    public Pagination<?> pagination() {
-        return query().pagination(getMClass(), 1, 20);
+    public <D> Pagination<D> pagination() {
+        return pagination(1, 20);
     }
 
     // 提取某字段为list

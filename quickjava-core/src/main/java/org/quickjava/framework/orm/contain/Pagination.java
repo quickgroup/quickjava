@@ -1,5 +1,6 @@
 package org.quickjava.framework.orm.contain;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /*
@@ -27,6 +28,14 @@ public class Pagination<T> {
     public long total;
 
     public List<T> rows;
+
+    public Pagination(Pagination<?> pagination) {
+        this.page = pagination.page;
+        this.pageSize = pagination.pageSize;
+        this.pages = pagination.pages;
+        this.total = pagination.total;
+        this.rows = new LinkedList<>();
+    }
 
     public Pagination(long page, long pageSize, long total, List<T> rows) {
         this.page = page;
