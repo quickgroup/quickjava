@@ -65,7 +65,7 @@ public class ModelMeta {
         this.fieldMap = fieldMap;
     }
 
-    public Map<String, Relation> getRelationMap() {
+    public Map<String, Relation> relationMap() {
         return relationMap;
     }
 

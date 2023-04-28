@@ -74,7 +74,7 @@ public class Model extends Helper {
     public synchronized QuerySet query() {
         synchronized (Model.class) {
             if (__querySet == null) {
-                __querySet = QuerySet.table(getModelTableName(getClass()));
+                __querySet = QuerySet.table(parseModelTableName(getClass()));
             }
         }
         return __querySet;
@@ -418,9 +418,9 @@ public class Model extends Helper {
         Map<String, Relation> relationMap = new LinkedHashMap<>();
         if (__withs != null) {
             __withs.forEach(name -> {
-                Relation relation = __meta.getRelationMap().get(name);
+                Relation relation = __meta.relationMap().get(name);
                 if (relation != null && ArrayUtil.contains(types, relation.getType())) {
-                    relationMap.put(name, __meta.getRelationMap().get(name));
+                    relationMap.put(name, __meta.relationMap().get(name));
                 }
             });
         }
@@ -594,7 +594,7 @@ public class Model extends Helper {
              * 3. 如果是就对返回数据处理
              * */
             Class<?> clazz = getModelClass(o.getClass());
-            if (ModelUtil.getMeta(clazz).getRelationMap().containsKey(method.getName())) {       // 存在关联属性的方法
+            if (ModelUtil.getMeta(clazz).relationMap().containsKey(method.getName())) {       // 存在关联属性的方法
                 return LoadingRelationGetter(clazz, o, method, objects);
             }
             return methodProxy.invokeSuper(o, objects); // 执行方法后返回数据
@@ -611,8 +611,8 @@ public class Model extends Helper {
      * */
     public <D> D relation(String fieldName, Class<?> clazz, RelationType type, String localKey, String foreignKey) {
         // 缓存关联关系
-        if (!__meta.getRelationMap().containsKey(fieldName)) {
-            __meta.getRelationMap().put(fieldName, new Relation(clazz, type, localKey, foreignKey));
+        if (!__meta.relationMap().containsKey(fieldName)) {
+            __meta.relationMap().put(fieldName, new Relation(clazz, type, localKey, foreignKey));
         }
         // 返回查询模型
         return newModel(clazz, this);
@@ -656,7 +656,7 @@ public class Model extends Helper {
         try {
             if (isModel(clazz)) {
                 D model = (D) clazz.newInstance();
-                ModelUtil.setFieldValue(model, "__table", getModelTableName(clazz));
+                ModelUtil.setFieldValue(model, "__table", parseModelTableName(clazz));
                 return model;
             }
             throw new RuntimeException("该类不能实例化为模型");
@@ -697,7 +697,7 @@ public class Model extends Helper {
 
         // 初始化模型信息
         ModelMeta meta = model.__meta = new ModelMeta();
-        meta.setTable(getModelTableName(clazz));
+        meta.setTable(parseModelTableName(clazz));
         meta.setClazz(clazz);
         meta.setFieldMap(new LinkedHashMap<>());
         ModelUtil.setMeta(clazz, meta);
@@ -737,7 +737,7 @@ public class Model extends Helper {
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     throw new RuntimeException(e);
                 }
-                fieldInfo.setWay(meta.getRelationMap().get(fieldName));
+                fieldInfo.setWay(meta.relationMap().get(fieldName));
             }
 
             meta.getFieldMap().put(field.getName(), fieldInfo);
@@ -754,7 +754,7 @@ public class Model extends Helper {
         return null;
     }
 
-    public static String getModelTableName(Class<?> clazz)
+    private static String parseModelTableName(Class<?> clazz)
     {
         clazz = getModelClass(clazz);
         String tableName = null;
@@ -855,69 +855,22 @@ public class Model extends Helper {
         }
     }
 
-    // 直接拷贝属性
-    public static void copyProperties(Object src, Object dst)
-    {
-        try {
-            Class<?> srcClass = getModelClass(src);
-            Class<?> dstClass = getModelClass(dst);
-            if (Map.class.isAssignableFrom(dstClass)) {
-                throw new RuntimeException("暂不支持 dst 为Map的拷贝");
-            }
-            // map=>实体
-            if (Map.class.isAssignableFrom(srcClass)) {
-                Map<String, Object> data = (Map<String, Object>) src;
-                for (Field field : dstClass.getDeclaredFields()) {
-                    if (data.containsKey(field.getName())) {
-                        field.setAccessible(true);
-                        field.set(dst, data.get(field.getName()));
-                        continue;
-                    }
-                    String fieldName = ModelUtil.fieldName(field.getName());
-                    if (data.containsKey(fieldName)) {
-                        field.setAccessible(true);
-                        field.set(dst, data.get(fieldName));
-                        continue;
-                    }
-                    fieldName = ModelUtil.fieldLineName(field.getName());
-                    if (data.containsKey(fieldName)) {
-                        field.setAccessible(true);
-                        field.set(dst, data.get(fieldName));
-                        continue;
-                    }
-                }
-                return;
-            }
-            // 实体=>实体
-            Map<String, Object> srcMap = new LinkedHashMap<>();
-            for (Field field : srcClass.getDeclaredFields()) {
-                field.setAccessible(true);
-                srcMap.put(field.getName(), field.get(src));
-            }
-            for (Field field : dstClass.getDeclaredFields()) {
-                if (srcMap.containsKey(field.getName())) {
-                    field.setAccessible(true);
-                    field.set(dst, srcMap.get(field.getName()));
-                }
-            }
-        } catch (IllegalAccessException ignored) {
-        }
-    }
-
-    public Class<?> getMClass() {
+    private Class<?> getMClass() {
         return Enhancer.isEnhanced(getClass()) ? getClass().getSuperclass() : getClass();
     }
 
-    public static Class<?> getModelClass(Class<?> clazz) {
+    private static Class<?> getModelClass(Class<?> clazz) {
         return ModelUtil.getModelClass(clazz);
     }
 
-    public static Class<?> getModelClass(Object obj) {
+    private static Class<?> getModelClass(Object obj) {
         return ModelUtil.getModelClass(obj);
     }
 
     @Override
     public String toString() {
-        return getMClass().getSimpleName() + data().toString();
+        Map<String, Object> dataMap = new LinkedHashMap<>(data());
+        __meta.relationMap().forEach((name, relation) -> dataMap.put(name, SqlUtil.getFieldValue(this, name)));
+        return getMClass().getSimpleName() + dataMap;
     }
 }
