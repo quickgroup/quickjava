@@ -35,13 +35,14 @@ public class Test {
     public void testModel() {
         // 预载入查询
         Article article3 = new Article()
-                .with("user,comments")
+                .with("user,comments,tags")
                 .where("id", 1)
                 .find();
         System.out.println("article3=" + article3);
 //        System.out.println("article3.user=" + article3.getUser());
 //        System.out.println("article3.users=" + article3.getUsers());
         System.out.println("article3.getComments=" + article3.getComments());
+        System.out.println("article3.getTags=" + article3.getTags());
     }
 
     public void test()

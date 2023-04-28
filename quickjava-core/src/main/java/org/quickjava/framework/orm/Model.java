@@ -71,9 +71,11 @@ public class Model extends Helper {
 
     private QuerySet __querySet = null;
 
-    public QuerySet query() {
-        if (__querySet == null) {
-            __querySet = QuerySet.table(getModelTableName(getClass()));
+    public synchronized QuerySet query() {
+        synchronized (Model.class) {
+            if (__querySet == null) {
+                __querySet = QuerySet.table(getModelTableName(getClass()));
+            }
         }
         return __querySet;
     }
