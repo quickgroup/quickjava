@@ -270,18 +270,15 @@ public class Model extends Helper {
         // 查询前：预载入字段准备
         queryBefore();
         // 数据装填
-        Map<String, Object> data = query().find();
-        if (ModelUtil.isEmpty(data)) {
+        List<Map<String, Object>> dataList = query().limit(0, 1).select();
+        if (ModelUtil.isEmpty(dataList)) {
             return null;
         }
         // 装载
-        D model = resultTranshipmentOne(getClass(), data);
+        List<Model> models = resultTranshipment(getClass(), dataList);
         // 查询后：一对多数据加载
-        List<Model> models = new LinkedList<>();
-        models.add(model);
         queryAfter(models);
-
-        return model;
+        return (D) models.get(0);
     }
 
     public <D extends Model> D find(Serializable id) {
@@ -294,7 +291,11 @@ public class Model extends Helper {
         queryBefore();
         // 执行查询
         List<Map<String, Object>> dataList = query().select();
-        return dataList.stream().map(data -> Model.<D>newProxyModel(getClass(), data)).collect(Collectors.toList());
+        // 装载
+        List<Model> models = resultTranshipment(getClass(), dataList);
+        // 查询后
+        queryAfter(models);
+        return (List<D>) models;
     }
 
     /**
@@ -340,22 +341,28 @@ public class Model extends Helper {
      * - 组装一对一数据
      * - 一对多的关联在主数据返回后再统一查询组装
      * */
-    private <D extends Model> D resultTranshipmentOne(Class<?> clazz, Map<String, Object> data) {
-        // 装载关联属性
-        Map<String, Relation> relationMap = getWithRelation(new RelationType[]{RelationType.OneToOne});
-        if (relationMap.size() > 0) {
-            // 主表数据
-            D model = newProxyModel(clazz);
-            resultTranshipmentWith(model, data);
-            // 关联表数据
-            relationMap.forEach((relationName, relation) -> {
-                Model relationModel = newProxyModel(relation.getClazz());
-                resultTranshipmentWith(relationModel, data);
-                SqlUtil.setFieldValue(model, relationName, relationModel);
-            });
-            return model;
-        }
-        return newProxyModel(getClass(), data);
+    private <D extends Model> List<D> resultTranshipment(Class<?> clazz, List<Map<String, Object>> dataList) {
+        // 集合对象
+        List<D> models = new LinkedList<>();
+        dataList.forEach(data -> {
+            // 装载关联属性
+            Map<String, Relation> relationMap = getWithRelation(new RelationType[]{RelationType.OneToOne});
+            if (relationMap.size() > 0) {
+                // 主表数据
+                D model = newProxyModel(clazz);
+                resultTranshipmentWith(model, data);
+                // 关联表数据
+                relationMap.forEach((relationName, relation) -> {
+                    Model relationModel = newProxyModel(relation.getClazz());
+                    resultTranshipmentWith(relationModel, data);
+                    SqlUtil.setFieldValue(model, relationName, relationModel);
+                });
+                models.add(model);
+            } else {
+                models.add(newProxyModel(getClass(), data));
+            }
+        });
+        return models;
     }
 
     private void resultTranshipmentWith(Model model, Map<String, Object> set) {
@@ -372,33 +379,36 @@ public class Model extends Helper {
      * 查询后模型处理
      * */
     private void queryAfter(List<Model> models) {
-        // 数据关联条件：关联属性名=关联id
-        Map<String, List<Object>> conditionMap = new LinkedHashMap<>();
-        // 一对多数据条件准备
-        Map<String, Relation> relationMap = getWithRelation(new RelationType[]{RelationType.OneToMany});
-        relationMap.forEach((fieldName, relation) -> {
-            if (!conditionMap.containsKey(fieldName)) {
-                conditionMap.put(fieldName, new LinkedList<>());
-            }
-            models.forEach(model -> conditionMap.get(fieldName).add(SqlUtil.getFieldValue(model, relation.localKey())));
-        });
-        // 查询
-        System.out.println("conditionMap=" + conditionMap);
-        relationMap.forEach((fieldName, relation) -> {
-            if (conditionMap.get(fieldName).size() == 0) {
-                return;
-            }
-            Model queryModel = newModel(relation.getClazz());
-            List<Model> rows = queryModel.where(relation.foreignKey(), "IN", conditionMap.get(fieldName)).select();
-            System.out.println("rows=" + rows);
-            // 数据装填
-            models.forEach(model -> {
-                Object modelKeyVal = SqlUtil.getFieldValue(model, relation.localKey());
-                List<Model> set = rows.stream().filter(row -> modelKeyVal.equals(SqlUtil.getFieldValue(row, relation.foreignKey())))
-                        .collect(Collectors.toList());
-                SqlUtil.setFieldValue(model, fieldName, set);
+        // 预载入的数据查询后加载
+        if (__withs != null) {
+            // 数据关联条件：关联属性名=关联id
+            Map<String, List<Object>> conditionMap = new LinkedHashMap<>();
+            // 一对多数据条件准备
+            Map<String, Relation> relationMap = getWithRelation(new RelationType[]{RelationType.OneToMany});
+            relationMap.forEach((fieldName, relation) -> {
+                if (!conditionMap.containsKey(fieldName)) {
+                    conditionMap.put(fieldName, new LinkedList<>());
+                }
+                models.forEach(model -> conditionMap.get(fieldName).add(SqlUtil.getFieldValue(model, relation.localKey())));
             });
-        });
+            // 查询
+            System.out.println("conditionMap=" + conditionMap);
+            relationMap.forEach((fieldName, relation) -> {
+                if (conditionMap.get(fieldName).size() == 0) {
+                    return;
+                }
+                Model queryModel = newModel(relation.getClazz());
+                List<Model> rows = queryModel.where(relation.foreignKey(), "IN", conditionMap.get(fieldName)).select();
+                System.out.println("rows=" + rows);
+                // 数据装填
+                models.forEach(model -> {
+                    Object modelKeyVal = SqlUtil.getFieldValue(model, relation.localKey());
+                    List<Model> set = rows.stream().filter(row -> modelKeyVal.equals(SqlUtil.getFieldValue(row, relation.foreignKey())))
+                            .collect(Collectors.toList());
+                    SqlUtil.setFieldValue(model, fieldName, set);
+                });
+            });
+        }
     }
 
     /**

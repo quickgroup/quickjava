@@ -2,6 +2,7 @@ package org.quickjava.framework.orm.example;
 
 import org.quickjava.framework.orm.QuerySet;
 
+import java.util.List;
 import java.util.Map;
 
 /*
@@ -39,10 +40,15 @@ public class Test {
                 .where("id", 1)
                 .find();
         System.out.println("article3=" + article3);
-//        System.out.println("article3.user=" + article3.getUser());
-//        System.out.println("article3.users=" + article3.getUsers());
+        System.out.println("article3.user=" + article3.getUser());
         System.out.println("article3.getComments=" + article3.getComments());
         System.out.println("article3.getTags=" + article3.getTags());
+
+        // 预载入查询
+        List<Article> article4 = new Article()
+                .with("user,comments,tags")
+                .select();
+        System.out.println("article4=" + article4);
     }
 
     public void test()

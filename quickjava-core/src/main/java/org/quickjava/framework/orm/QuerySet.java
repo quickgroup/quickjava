@@ -47,9 +47,9 @@ public class QuerySet {
 
     private String groupBy = null;
 
-    private Integer limitIndex = 0;
+    private Integer limitIndex = null;
 
-    private Integer limitSize = 20;
+    private Integer limitSize = null;
 
     private final List<String[]> joinList = new LinkedList<>();
 
