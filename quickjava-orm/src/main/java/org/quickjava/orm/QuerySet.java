@@ -84,6 +84,9 @@ public class QuerySet {
 
     public QuerySet where(String field, String operator, Object value)
     {
+        if (SqlUtil.isEmpty(field)) {
+            return this;
+        }
         whereList.add(new Where(field, operator, value));
         return this;
     }
@@ -93,7 +96,7 @@ public class QuerySet {
      * */
     public QuerySet where(String sql)
     {
-        whereList.add(new Where(sql, "RAW", null));
+        where(sql, "RAW", null);
         return this;
     }
 
@@ -132,6 +135,9 @@ public class QuerySet {
 
     public QuerySet group(String fields)
     {
+        if (SqlUtil.isEmpty(fields)) {
+            return this;
+        }
         groupBy = fields; //field.split(",");
         return this;
     }
@@ -149,6 +155,9 @@ public class QuerySet {
 
     public QuerySet order(String field)
     {
+        if (SqlUtil.isEmpty(field)) {
+            return this;
+        }
         if (field.contains(",")) {
             return order(Arrays.asList(field.split(",")));
         }
@@ -185,6 +194,9 @@ public class QuerySet {
 
     public QuerySet field(String fields)
     {
+        if (SqlUtil.isEmpty(fields)) {
+            return this;
+        }
         field(fields.split(","));
         return this;
     }
