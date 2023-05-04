@@ -1,6 +1,7 @@
 package org.quickjava.orm;
 
 import cn.hutool.core.util.ArrayUtil;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
@@ -43,38 +44,44 @@ import java.util.stream.Collectors;
 /**
  * 模型
  * */
-public class Model extends Helper {
+public class Model {
 
     /**
      * 模型元信息
      * */
+    @TableField(exist = false)
     private ModelMeta __meta;
 
     /**
      * 关联的父模型对象
      * */
+    @TableField(exist = false)
     private Model __parent;
 
     /**
      * 预载入属性
      * */
+    @TableField(exist = false)
     private List<String> __withs;
 
     /**
      * 数据
      * */
+    @TableField(exist = false)
     private DataMap __data = new DataMap();
 
     /**
      * 修改的字段
      * */
+    @TableField(exist = false)
     private List<String> __modifiedFields;
+
+    @TableField(exist = false)
+    private QuerySet __querySet = null;
 
     public Model() {
         initModel(this, getClass());
     }
-
-    private QuerySet __querySet = null;
 
     public synchronized QuerySet query() {
         synchronized (Model.class) {

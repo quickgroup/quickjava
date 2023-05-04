@@ -2,6 +2,8 @@ package org.quickjava.orm.drive;
 
 import cn.hutool.core.util.ReflectUtil;
 import com.baomidou.mybatisplus.autoconfigure.MybatisPlusAutoConfiguration;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
 import org.quickjava.orm.QuerySet;
 import org.quickjava.orm.contain.Action;
 import org.quickjava.orm.contain.Value;
@@ -10,6 +12,7 @@ import org.quickjava.orm.utils.QueryException;
 import org.quickjava.orm.utils.QuickConnection;
 import org.quickjava.orm.utils.SqlUtil;
 import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.ContextLoader;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
@@ -41,11 +44,12 @@ public class Mysql implements Drive {
     public QuickConnection getConnection() {
         synchronized (Drive.class) {
             if (__quickConnection.get() == null) {
-                // FIXME::获取Spring数据库连接
                 try {
+                    // TODO::获取Spring数据库连接
                     ApplicationContext ac = SpringAutoConfiguration.getApplicationContext();
-                    DataSource dataSource = (DataSource) ac.getBean("dataSource");
-                    __quickConnection.set(new QuickConnection(dataSource.getConnection()));
+                    SqlSessionFactory factory = (SqlSessionFactory) ac.getBean("sqlSessionFactory");
+                    SqlSession session = factory.openSession();
+                    __quickConnection.set(new QuickConnection(session.getConnection()));
                 } catch (Exception e) {
                     try {
                         __quickConnection.set(getConnectionByQuick());

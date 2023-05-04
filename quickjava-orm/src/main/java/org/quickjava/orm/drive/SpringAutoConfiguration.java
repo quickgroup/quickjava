@@ -1,8 +1,14 @@
 package org.quickjava.orm.drive;
 
+import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import javax.sql.DataSource;
 
 /*
  * Copyright (c) 2020~2023 http://www.quickjava.org All rights reserved.
@@ -19,6 +25,7 @@ import org.springframework.context.annotation.Configuration;
  * +-------------------------------------------------------------------
  */
 @Configuration
+@ConditionalOnSingleCandidate(DataSource.class)
 public class SpringAutoConfiguration implements InitializingBean {
 
     private static ApplicationContext applicationContext;
