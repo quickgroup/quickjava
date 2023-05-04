@@ -43,6 +43,11 @@ public abstract class WhereBase {
     }
 
     public String getLogicStr() {
+        // 如果字段带有logic就返回空字符串
+        String fieldClear = this.field.toUpperCase().trim();
+        if (fieldClear.startsWith("AND") || fieldClear.startsWith("OR")) {
+            return "";
+        }
         return logic == 2 ? "OR" : "AND";
     }
 
@@ -69,8 +74,11 @@ public abstract class WhereBase {
         OpMap.put("LIKE", "LIKE");
         OpMap.put("IN", "IN");
         OpMap.put("NOT_IN", "NOT IN");
+        OpMap.put("NOT IN", "NOT IN");
         OpMap.put("IS_NULL", "IS NULL");
+        OpMap.put("IS NULL", "IS NULL");
         OpMap.put("IS_NOT_NULL", "IS NOT NULL");
+        OpMap.put("IS NOT NULL", "IS NOT NULL");
     }
 
     public String getOperator() {

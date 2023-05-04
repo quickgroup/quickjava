@@ -88,6 +88,15 @@ public class QuerySet {
         return this;
     }
 
+    /**
+     * 高级sql语句查询
+     * */
+    public QuerySet where(String sql)
+    {
+        whereList.add(new Where(sql, "RAW", null));
+        return this;
+    }
+
     public QuerySet between(String field, Object val1, Object val2)
     {
         whereList.add(new Where(field, "BETWEEN", new Object[]{val1, val2}));

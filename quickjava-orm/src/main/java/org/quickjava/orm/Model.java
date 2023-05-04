@@ -107,6 +107,14 @@ public class Model {
         return this;
     }
 
+    /**
+     * 高级sql语句查询
+     * */
+    public Model where(String sql) {
+        query().where(sql, "RAW", null);
+        return this;
+    }
+
     public Model eq(String field, Object val) {
         return where(field, val);
     }
