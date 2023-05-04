@@ -115,7 +115,7 @@ public abstract class WhereBase {
     public String toString() {
         // 嵌套查询
         if (children != null) {
-            return taskOutFirstLogic(SqlUtil.strJoin(" ", children));
+            return getLogicStr() + " " + taskOutFirstLogic(SqlUtil.strJoin(" ", children));
         }
         // 输出
         if ("RAW".equals(operator)) {
@@ -126,10 +126,13 @@ public abstract class WhereBase {
         return getLogicStr() + " " + getField() + " " + getOperator() + " " + getValue();
     }
 
+    /**
+     * 去掉查询条件第一个logic
+     * */
     public static String taskOutFirstLogic(String whereSql) {
-        if (whereSql.startsWith("AND ")) {
+        if (whereSql.toUpperCase().startsWith("AND ")) {
             return whereSql.substring(4);
-        } else if (whereSql.startsWith("OR ")) {
+        } else if (whereSql.toUpperCase().startsWith("OR ")) {
             return whereSql.substring(3);
         }
         return whereSql;
