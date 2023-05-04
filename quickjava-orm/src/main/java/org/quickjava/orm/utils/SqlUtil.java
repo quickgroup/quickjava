@@ -116,6 +116,26 @@ public class SqlUtil {
     }
 
     /**
+     * 是全大写字符串
+     * */
+    public static boolean isUpperString(String str) {
+        for (int i = 0; i < str.length(); i++) {
+            char c = str.charAt(i);
+            if (Character.isLowerCase(c)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 反引号包围
+     * */
+    public static String backQuote(String str) {
+        return "`" + str + "`";
+    }
+
+    /**
      * 转为标准实体属性驼峰名称
      * */
     public static String fieldName(String field) {

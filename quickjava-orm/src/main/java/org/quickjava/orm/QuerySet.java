@@ -7,7 +7,6 @@ package org.quickjava.orm;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import org.quickjava.orm.contain.*;
-import org.quickjava.orm.contain.*;
 import org.quickjava.orm.drive.Drive;
 import org.quickjava.orm.drive.Mysql;
 import org.quickjava.orm.utils.DBConfig;
@@ -144,13 +143,13 @@ public class QuerySet {
 
     public QuerySet order(String field, String sort)
     {
-        orderByList.add(String.format("`%s` %s", field, sort.toUpperCase()));
+//        field = SqlUtil.isUpperString(field) ? field : SqlUtil.backQuote(field);
+        orderByList.add(String.format("%s %s", field, sort.toUpperCase()));
         return this;
     }
 
     public QuerySet order(String field, boolean asc) {
-        orderByList.add(String.format("`%s` %s", field, asc ? "ASC" : "DESC"));
-        return this;
+        return order(field, asc ? "ASC" : "DESC");
     }
 
     public QuerySet order(String field)
@@ -313,7 +312,8 @@ public class QuerySet {
         if (ret != null) {
             return ret;
         }
-        String sql = "SHOW FULL COLUMNS FROM `"+table+"`";
+//        table = (SqlUtil.isUpperString(table) ? table : SqlUtil.backQuote(table));
+        String sql = "SHOW FULL COLUMNS FROM " + table;
         List<Map<String, String>> columns = (List<Map<String, String>>) this.executeSql(sql);
         if (SqlUtil.isEmpty(columns)) {
             return new LinkedList<>();
