@@ -57,7 +57,7 @@ public class ModelMeta {
         this.table = table;
     }
 
-    public Map<String, ModelField> getFieldMap() {
+    public Map<String, ModelField> fieldMap() {
         return fieldMap;
     }
 

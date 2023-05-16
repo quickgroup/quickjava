@@ -141,4 +141,31 @@ public class ModelUtil extends SqlUtil {
         }
     }
 
+    /**
+     * Java程序数据转sql兼容数据，如：true => 1、false => 0
+     * */
+    public static Object valueToSqlValue(Object val)
+    {
+        if (val instanceof Boolean) {
+            return Boolean.TRUE.equals(val) ? 1 : 0;
+        }
+        return val;
+    }
+
+    /**
+     * 对象比较
+     * */
+    public static boolean objectEquals(Object obj1, Object obj2)
+    {
+        if (obj1 == null && obj2 == null) {
+            return true;
+        } else if (obj1 != null) {
+            return obj1.equals(obj2);
+        } else if (obj2 != null) {
+            return obj2.equals(obj1);
+        } else {
+            return false;
+        }
+    }
+
 }

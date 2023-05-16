@@ -136,14 +136,14 @@ public class SqlUtil {
     }
 
     /**
-     * 转为标准实体属性驼峰名称
+     * 转为标准实体属性驼峰名称，如：userType，和 {@link SqlUtil#fieldLineName} 相反用法
      * */
     public static String fieldName(String field) {
         return StrUtil.toCamelCase(field);
     }
 
     /**
-     * 转为下划线字段名称
+     * 转为下划线字段名称，如：user_type，和 {@link SqlUtil#fieldName} 相反用法
      * */
     public static String fieldLineName(String field) {
         return StrUtil.toUnderlineCase(field);
@@ -205,7 +205,7 @@ public class SqlUtil {
     // 数据字段转驼峰
     public static Map<String, Object> dataFieldConv(Map<String, Object> data, Class<?> clazz) {
         Map<String, Object> ret = new LinkedHashMap<>();
-        Map<String, ModelField> fieldMap = ModelUtil.getMeta(clazz).getFieldMap();
+        Map<String, ModelField> fieldMap = ModelUtil.getMeta(clazz).fieldMap();
         data.forEach((k, v) -> {
             if (fieldMap.containsKey(SqlUtil.fieldName(k))) {
                 ret.put(SqlUtil.fieldName(k), v);

@@ -10,12 +10,10 @@ import org.quickjava.orm.annotation.ModelName;
 import org.quickjava.orm.annotation.ModelField;
 import org.quickjava.orm.annotation.OneToMany;
 import org.quickjava.orm.annotation.OneToOne;
-import org.quickjava.orm.contain.*;
 import org.quickjava.orm.contain.DataMap;
 import org.quickjava.orm.contain.ModelMeta;
 import org.quickjava.orm.contain.Pagination;
 import org.quickjava.orm.enums.RelationType;
-import org.quickjava.orm.utils.Helper;
 import org.quickjava.orm.utils.ModelUtil;
 import org.quickjava.orm.utils.QuerySetHelper;
 import org.quickjava.orm.utils.SqlUtil;
@@ -74,7 +72,7 @@ public class Model {
      * 修改的字段
      * */
     @TableField(exist = false)
-    private List<String> __modifiedFields;
+    private List<String> __modified;
 
     @TableField(exist = false)
     private QuerySet __querySet = null;
@@ -154,7 +152,7 @@ public class Model {
     }
 
     /**
-     * 判断当前类是素模型（不是代理模型
+     * 如果当前对象素模型（不是代理模型），就加载一次对象上的数据
      * - 不是：在 insert、update 时需要收集字段数据
      * - 收集字段数据
      * */
@@ -162,8 +160,11 @@ public class Model {
     {
         if (ModelUtil.isVegetarianModel(this)) {
             // 收集字段数据
-            __meta.getFieldMap().forEach((name, field) -> {
-                data(field.getName(), ModelUtil.getFieldValue(this, field.getField()));
+            __meta.fieldMap().forEach((name, field) -> {
+                Object val = ModelUtil.getFieldValue(this, field.getField());
+                if (__data.containsKey(name) && !ModelUtil.objectEquals(__data.get(name), val)) {
+                    data(field.getName(), val);
+                }
             });
         }
     }
@@ -329,7 +330,7 @@ public class Model {
 
         // 本表字段声明
         List<String> fields = new LinkedList<>();
-        __meta.getFieldMap().forEach((name, field) -> {
+        __meta.fieldMap().forEach((name, field) -> {
             if (field.getWay() != null || Model.class.isAssignableFrom(field.getClazz())) {
                 return;
             }
@@ -340,7 +341,7 @@ public class Model {
         // 关联表字段声明
         getWithRelation(new RelationType[]{RelationType.OneToOne}).forEach((relationName, relation) -> {
             ModelMeta meta = ModelUtil.getMeta(relation.getClazz());
-            meta.getFieldMap().forEach((name, field) -> {
+            meta.fieldMap().forEach((name, field) -> {
                 if (field.getWay() != null || Model.class.isAssignableFrom(field.getClazz())) {
                     return;
                 }
@@ -386,7 +387,7 @@ public class Model {
     }
 
     private void resultTranshipmentWith(Model model, Map<String, Object> set) {
-        model.__meta.getFieldMap().forEach((name, field) -> {
+        model.__meta.fieldMap().forEach((name, field) -> {
             if (field.getWay() != null || Model.class.isAssignableFrom(field.getClazz())) {
                 return;
             }
@@ -487,22 +488,29 @@ public class Model {
     /**
     * 获取data中的数据
     * */
-    public Object data(String field)
-    {
-        this.loadingVegetarianModel();
-        return __data.get(field);
+    public Object data(String field) {
+        return data().get(field);
     }
 
     /**
      * 通过map装载实体数据
      * */
-    public Model data(String name, Object val) {
+    public Model data(String name, Object val)
+    {
+        // 数据保存
         name = ModelUtil.fieldName(name);
-        org.quickjava.orm.contain.ModelField field = __meta.getFieldMap().get(name);
+        org.quickjava.orm.contain.ModelField field = __meta.fieldMap().get(name);
         if (field != null && field.getWay() == null) {
             __data.put(name, val);      // 只保存本类字段数据，关联数据不缓存
         }
         ModelUtil.setFieldValue(this, name, val);
+
+        // 被修改的字段
+        if (__modified == null) {
+            __modified = new LinkedList<>();
+        }
+        __modified.add(name);
+
         return this;
     }
 
@@ -515,7 +523,7 @@ public class Model {
     }
 
     public static Map<String, Object> dataFieldConvLine(Map<String, Object> data, Class<?> clazz) {
-        Map<String, org.quickjava.orm.contain.ModelField> fieldMap = ModelUtil.getMeta(clazz).getFieldMap();
+        Map<String, org.quickjava.orm.contain.ModelField> fieldMap = ModelUtil.getMeta(clazz).fieldMap();
         Map<String, Object> ret = new LinkedHashMap<>();
         data.forEach((k, v) -> {
             if (fieldMap.containsKey(ModelUtil.fieldName(k))) {
@@ -527,21 +535,21 @@ public class Model {
 
     /**
      * 执行sql的数据
+     * - insert、update的数据
      * */
     public DataMap sqlData()
     {
-        this.loadingVegetarianModel();
-        DataMap data = DataMap.one();
-        this.data().forEach((k, v) -> {
-            if (v instanceof Boolean) {
-                data.put(ModelUtil.fieldLineName(k), Boolean.TRUE.equals(v) ? 1 : 0);
-            } else if (v instanceof Model) {
-                return; // 关联模型数据不能一起写入
+        DataMap data = data();
+        DataMap ret = DataMap.one();
+        __modified.forEach(name -> {
+            Object v = data.get(name);
+            if (v instanceof Model) {
+                // 关联模型数据不能一起写入
             } else {
-                data.put(ModelUtil.fieldLineName(k), v);
+                ret.put(ModelUtil.fieldLineName(name), ModelUtil.valueToSqlValue(v));
             }
         });
-        return data;
+        return ret;
     }
 
     //---------- TODO::静态操作方法 ----------//
@@ -616,8 +624,17 @@ public class Model {
              * 3. 如果是就对返回数据处理
              * */
             Class<?> clazz = getModelClass(o.getClass());
-            if (ModelUtil.getMeta(clazz).relationMap().containsKey(method.getName())) {       // 存在关联属性的方法
+            String methodName = method.getName();
+            ModelMeta meta = ModelUtil.getMeta(clazz);
+            if (meta.relationMap().containsKey(methodName)) {       // 存在关联属性的方法
                 return LoadingRelationGetter(clazz, o, method, objects);
+            }
+            // setter方法
+            if (methodName.startsWith("set")) {
+                String fieldName = ModelUtil.fieldName(methodName.substring(3));
+                if (meta.fieldMap().containsKey(fieldName) && objects.length == 1 && method.getReturnType().equals(Void.TYPE)) {
+                    Setter(clazz, o, method, objects[0], fieldName);
+                }
             }
             return methodProxy.invokeSuper(o, objects); // 执行方法后返回数据
         }
@@ -762,7 +779,7 @@ public class Model {
                 fieldInfo.setWay(meta.relationMap().get(fieldName));
             }
 
-            meta.getFieldMap().put(field.getName(), fieldInfo);
+            meta.fieldMap().put(field.getName(), fieldInfo);
         }
     }
 
@@ -799,11 +816,30 @@ public class Model {
         return ModelUtil.fieldLineName(tableName);
     }
 
-    public static Object LoadingRelationGetter(Class<?> clazz, Object o, Method method, Object ...objects)
+    /**
+     * 模型setter数据处理
+     * - 保存修改的数据
+     * */
+    private static void Setter(Class<?> clazz, Object o, Method method, Object arg, String fieldName)
+    {
+        try {
+            Model model = (Model) o;
+            model.data(fieldName, arg);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 加载属性关联getter
+     * */
+    private static Object LoadingRelationGetter(Class<?> clazz, Object o, Method method, Object ...objects)
     {
         try {
             // 加载
-            org.quickjava.orm.contain.ModelField modelField = ModelUtil.getMeta(clazz).getFieldMap().get(method.getName());
+            org.quickjava.orm.contain.ModelField modelField = ModelUtil.getMeta(clazz).fieldMap().get(method.getName());
             Field field = modelField.getField();
             if (Model.class.isAssignableFrom(o.getClass())) {
                 Model curr = (Model) o;

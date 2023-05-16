@@ -39,13 +39,13 @@ public @interface ModelField {
     ModelFieldFill fill() default ModelFieldFill.NONE;
 
     /**
-     * 字段填充处理方法
+     * 字段填充方法
      * */
 //    Constants.FillMethod fillMethod() default Constants.defaultFillMethod;
 
     /**
      * 软删除字段
-     * - 字段类型必须是datetime，且可为NULL，属性类型是Date，查询时将自动追加条件： Field IS NULL
+     * - 支持类属性是Date，字段类型是datetime，且可为NULL，查询时将自动追加条件，如：`delete_time` IS NULL
      * */
     boolean softDelete() default false;
 }
