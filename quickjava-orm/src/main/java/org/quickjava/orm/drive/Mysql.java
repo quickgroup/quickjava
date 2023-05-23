@@ -1,7 +1,6 @@
 package org.quickjava.orm.drive;
 
 import cn.hutool.core.util.ReflectUtil;
-import com.baomidou.mybatisplus.autoconfigure.MybatisPlusAutoConfiguration;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.quickjava.orm.QuerySet;
@@ -12,9 +11,7 @@ import org.quickjava.orm.utils.QueryException;
 import org.quickjava.orm.utils.QuickConnection;
 import org.quickjava.orm.utils.SqlUtil;
 import org.springframework.context.ApplicationContext;
-import org.springframework.web.context.ContextLoader;
 
-import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
