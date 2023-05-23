@@ -136,7 +136,7 @@ public class SqlUtil {
     }
 
     /**
-     * 转为标准实体属性驼峰名称，如：userType，和 {@link SqlUtil#fieldLineName} 相反用法
+     * 转为驼峰名称，如：userType，和 {@link SqlUtil#fieldLineName} 相反用法
      * */
     public static String fieldName(String field) {
         return StrUtil.toCamelCase(field);

@@ -160,7 +160,7 @@ public class QuerySet {
         if (field.contains(",")) {
             return order(Arrays.asList(field.split(",")));
         }
-        String[] arr = field.split(" ");
+        String[] arr = field.trim().split(" ");
         return arr.length == 2 ? order(arr[0], arr[1]) : order(arr[0], "ASC");
     }
 

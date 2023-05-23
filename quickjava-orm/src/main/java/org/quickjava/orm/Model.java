@@ -101,7 +101,11 @@ public class Model {
     }
 
     public Model where(Map<String, Object> query) {
-        QuerySetHelper.loadQuery(query(), query);
+        // 处理字段名：标准字段名你：驼峰转下划线组成
+        Map<String, Object> queryRet = new LinkedHashMap<>();
+        query.forEach((name, val) -> queryRet.put(ModelUtil.fieldLineName(name), val));
+        // 调用querySet加载条件
+        QuerySetHelper.loadQuery(query(), queryRet);
         return this;
     }
 
@@ -240,21 +244,24 @@ public class Model {
      * 排序
      * */
     public Model order(String field, String asc) {
-        query().order(ModelUtil.fieldName(field), asc);
+        query().order(ModelUtil.fieldLineName(field), asc);
         return this;
     }
 
     public Model order(String field, boolean asc) {
-        order(ModelUtil.fieldName(field), asc ? "ASC" : "DESC");
+        order(ModelUtil.fieldLineName(field), asc ? "ASC" : "DESC");
         return this;
     }
 
     public Model order(String fields)
     {
+        if (SqlUtil.isEmpty(fields)) {
+            return this;
+        }
         if (fields.contains(",")) {
             return order(Arrays.asList(fields.split(",")));
         }
-        String[] arr = fields.split(" ");
+        String[] arr = fields.trim().split(" ");
         return arr.length == 2 ? order(arr[0], arr[1]) : order(arr[0], "ASC");
     }
 
@@ -493,7 +500,7 @@ public class Model {
     }
 
     /**
-     * 通过map装载实体数据
+     * 装载数据
      * */
     public Model data(String name, Object val)
     {
