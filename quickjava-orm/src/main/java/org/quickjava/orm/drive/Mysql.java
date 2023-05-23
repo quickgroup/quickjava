@@ -218,7 +218,10 @@ public class Mysql implements Drive {
 
         } finally {
             long endTime = System.nanoTime();
-            String printSql = sql.length() < 512 ? sql: sql.substring(0, 512);
+            String printSql = sql;
+//            if (action == Action.INSERT) {
+//                printSql = sql.length() < 512 ? sql: sql.substring(0, 512);
+//            }
             String msg = "SQL execution time " + ((double) (endTime - startTime)) / 1000000 + "ms " + printSql;
             System.out.println(msg);
         }

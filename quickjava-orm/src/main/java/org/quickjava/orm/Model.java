@@ -331,7 +331,8 @@ public class Model {
      * - 一对一的字段声明
      * */
     private void queryBefore() {
-        if (__withs == null || __withs.size() == 0) {
+        Map<String, Relation> relationMap = getWithRelation(new RelationType[]{RelationType.OneToOne});
+        if (relationMap == null || relationMap.size() == 0) {
             return;
         }
 
@@ -346,18 +347,18 @@ public class Model {
         });
 
         // 关联表字段声明
-        getWithRelation(new RelationType[]{RelationType.OneToOne}).forEach((relationName, relation) -> {
+        relationMap.forEach((aliasName, relation) -> {
             ModelMeta meta = ModelUtil.getMeta(relation.getClazz());
             meta.fieldMap().forEach((name, field) -> {
                 if (field.getWay() != null || Model.class.isAssignableFrom(field.getClazz())) {
                     return;
                 }
                 name = ModelUtil.fieldLineName(name);
-                fields.add(relationName + "." + name + " AS " + relationName + "__" + name);
+                fields.add(aliasName + "." + name + " AS " + aliasName + "__" + name);
             });
             // join
-            query().join(meta.table() + " " + relationName,
-                    String.format("%s.%s = %s.%s", relationName, ModelUtil.fieldLineName(relation.foreignKey()),
+            query().join(meta.table() + " " + aliasName,
+                    String.format("%s.%s = %s.%s", aliasName, ModelUtil.fieldLineName(relation.foreignKey()),
                     __meta.table(), ModelUtil.fieldLineName(relation.localKey())), "LEFT");
         });
         // 查询器
@@ -373,32 +374,33 @@ public class Model {
         // 集合对象
         List<D> models = new LinkedList<>();
         dataList.forEach(data -> {
+            D model = newProxyModel(clazz);
             // 装载关联属性
             Map<String, Relation> relationMap = getWithRelation(new RelationType[]{RelationType.OneToOne});
             if (relationMap.size() > 0) {
                 // 主表数据
-                D model = newProxyModel(clazz);
-                resultTranshipmentWith(model, data);
+                resultTranshipmentWith(model, data, null);
                 // 关联表数据
                 relationMap.forEach((relationName, relation) -> {
                     Model relationModel = newProxyModel(relation.getClazz());
-                    resultTranshipmentWith(relationModel, data);
+                    resultTranshipmentWith(relationModel, data, relationName);
                     SqlUtil.setFieldValue(model, relationName, relationModel);
                 });
-                models.add(model);
             } else {
-                models.add(newProxyModel(getClass(), data));
+                model.data(data);
             }
+            models.add(model);
         });
         return models;
     }
 
-    private void resultTranshipmentWith(Model model, Map<String, Object> set) {
+    private void resultTranshipmentWith(Model model, Map<String, Object> set, String relationName) {
         model.__meta.fieldMap().forEach((name, field) -> {
             if (field.getWay() != null || Model.class.isAssignableFrom(field.getClazz())) {
                 return;
             }
-            String dataName = model.__meta.table() + "__" + ModelUtil.fieldLineName(name);
+            String aliasName = relationName == null ? model.__meta.table() : relationName;
+            String dataName = aliasName + "__" + ModelUtil.fieldLineName(name);
             model.data(name, set.get(dataName));
         });
     }
@@ -455,6 +457,9 @@ public class Model {
 
     //---------- TODO::分页方法 ----------//
     public <D> Pagination<D> pagination(Integer page, Integer pageSize) {
+        // 查询前处理：预载入
+        queryBefore();
+        // 执行查询
         Pagination<Map<String, Object>> pagination = query().pagination(page, pageSize);
         // 数据组装
         Pagination<Model> pagination1 = new Pagination<>(pagination);
@@ -761,18 +766,18 @@ public class Model {
             }
             org.quickjava.orm.contain.ModelField fieldInfo = new org.quickjava.orm.contain.ModelField(field);
             String fieldName = fieldInfo.getName();
-            //
+            // 兼容mybatis-plus字段说明
+            TableField tableField = field.getAnnotation(TableField.class);
+            // 模型字段说明
             ModelField modelField = field.getAnnotation(ModelField.class);
             if (modelField != null) {
-                if (!modelField.exist()) {
-                    continue;
-                }
                 if (!"".equals(modelField.name())) {
                     fieldInfo.setName(modelField.name());
                 }
                 fieldInfo.setFill(modelField.fill());
                 fieldInfo.setSoftDelete(modelField.softDelete());
             }
+
             fieldInfo.setWay(findRelationAno(field));
 
             // 有关联方法
@@ -784,6 +789,14 @@ public class Model {
                     throw new RuntimeException(e);
                 }
                 fieldInfo.setWay(meta.relationMap().get(fieldName));
+            } else {
+                // 非关联字段且隐藏
+                if (tableField != null && !tableField.exist()) {
+                    continue;
+                }
+                if (modelField != null && !modelField.exist()) {
+                    continue;
+                }
             }
 
             meta.fieldMap().put(field.getName(), fieldInfo);
