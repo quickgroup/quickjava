@@ -25,16 +25,18 @@ public @interface ModelField {
 
     /**
      * 字段名称
+     * @return 字段名称
      * */
     String name() default "";
 
     /**
-     * 字段是否存在
+     * @return 字段是否存在
      * */
     boolean exist() default true;
 
     /**
      * 字段填充处理
+     * @return 数据填充处理
      * */
     ModelFieldFill fill() default ModelFieldFill.NONE;
 
@@ -46,6 +48,7 @@ public @interface ModelField {
     /**
      * 软删除字段
      * - 支持类属性是Date，字段类型是datetime，且可为NULL，查询时将自动追加条件，如：`delete_time` IS NULL
+     * @return 软删除字段
      * */
     boolean softDelete() default false;
 }

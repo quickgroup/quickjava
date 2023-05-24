@@ -25,6 +25,7 @@ public @interface ModelName {
 
     /**
      * 表名
+     * @return 表名
      * */
     String value() default "";
 }

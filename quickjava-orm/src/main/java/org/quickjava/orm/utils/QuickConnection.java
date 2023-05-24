@@ -50,7 +50,7 @@ public class QuickConnection {
 
     /**
      * 连接数据库
-     * @return
+     * @return 数据库连接
      */
     public Connection connectStart()
     {
@@ -69,7 +69,6 @@ public class QuickConnection {
 
     /**
      * 关闭数据库链接
-     * @return
      */
     public void close()
     {

@@ -25,11 +25,13 @@ public @interface ModelId {
 
     /**
      * 字段名称
+     * @return 字段名称
      * */
     String value() default "";
 
     /**
      * 主键类型
+     * @return 主键类型
      * */
     IdType type() default IdType.NONE;
 }

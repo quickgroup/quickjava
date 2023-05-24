@@ -61,6 +61,7 @@ public class Mysql implements Drive {
 
     /**
      * FIXME::从QuickJava读取配置连接数据库
+     * @return 新的数据库连接
      * */
     public QuickConnection getConnectionByQuick() throws ClassNotFoundException {
         Class<?> kernelClazz = getClass().getClassLoader().loadClass("org.quickjava.framework.Kernel");

@@ -68,6 +68,9 @@ public class QuerySetHelper {
 
     /**
      * 查询条件处理
+     * @param table 表名
+     * @param query 查询条件（双下划线格式
+     * @return 查询器
      * */
     public static QuerySet loadQuery(String table, Map<String, Object> query) {
         return loadQuery(Q.table(table), query);

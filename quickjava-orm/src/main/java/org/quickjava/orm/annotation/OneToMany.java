@@ -30,6 +30,7 @@ public @interface OneToMany {
      * 关联模型的字段
      * - 支持属性名称、字段名
      * - 默认取关联模型类名加_id（下划线id）
+     * @return 关联模型的字段
      * */
     String localKey() default "";
 }

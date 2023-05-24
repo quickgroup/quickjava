@@ -128,6 +128,8 @@ public abstract class WhereBase {
 
     /**
      * 去掉查询条件第一个logic
+     * @param whereSql 查询语句
+     * @return 连接符AND、OR
      * */
     public static String taskOutFirstLogic(String whereSql) {
         if (whereSql.toUpperCase().startsWith("AND ")) {

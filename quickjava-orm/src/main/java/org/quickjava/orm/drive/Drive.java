@@ -11,7 +11,7 @@ import org.quickjava.orm.utils.QuickConnection;
 
 /**
  * @author Qlo1062-(QloPC-zs)
- * @date 2021/1/25 15:54
+ * &#064;date  2021/1/25 15:54
  */
 public interface Drive {
 

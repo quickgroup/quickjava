@@ -30,14 +30,20 @@ public class SqlUtil {
 
     /**
      * 获取类上的泛型
-     * */
+     * @param clazz 目标类
+     * @param index 泛型位置
+     * @return 泛型实际类
+     */
     public static Class<?> getGenericsType(Class<?> clazz, int index) {
         return GenericsUtils.getSuperClassGenericsType(clazz, index);
     }
 
     /**
      * 直接读取属性值，不走getter
-     * */
+     * @param o 对象
+     * @param fieldName 属性名
+     * @return 属性值
+     */
     public static Object getFieldValue(Object o, String fieldName) {
         return getFieldValue(o.getClass(), o, fieldName);
     }
@@ -67,7 +73,10 @@ public class SqlUtil {
 
     /**
      * 直接设置属性值，不走setter
-     * */
+     * @param o 对象
+     * @param field 属性名
+     * @param value 属性值
+     */
     public static void setFieldValue(Object o, String field, Object value) {
         setFieldValue(o.getClass(), o, field, value);
     }
@@ -117,7 +126,9 @@ public class SqlUtil {
 
     /**
      * 是全大写字符串
-     * */
+     * @param str 名称
+     * @return 是否全大写
+     */
     public static boolean isUpperString(String str) {
         for (int i = 0; i < str.length(); i++) {
             char c = str.charAt(i);
@@ -130,6 +141,8 @@ public class SqlUtil {
 
     /**
      * 反引号包围
+     * @param str 字段名称
+     * @return 结果
      * */
     public static String backQuote(String str) {
         return "`" + str + "`";
@@ -137,6 +150,8 @@ public class SqlUtil {
 
     /**
      * 转为驼峰名称，如：userType，和 {@link SqlUtil#fieldLineName} 相反用法
+     * @param field 字段名称
+     * @return 结果
      * */
     public static String fieldName(String field) {
         return StrUtil.toCamelCase(field);
@@ -144,21 +159,30 @@ public class SqlUtil {
 
     /**
      * 转为下划线字段名称，如：user_type，和 {@link SqlUtil#fieldName} 相反用法
-     * */
+     * @param field 字段名称
+     * @return 结果
+     */
     public static String fieldLineName(String field) {
         return StrUtil.toUnderlineCase(field);
     }
 
     /**
      * List转字符串
-     * */
+     * @param conjunction 连接字符
+     * @param iterable 可迭代对象
+     * @return 拼接语句
+     * @param <T> 对象
+     */
     public static <T> String strJoin(CharSequence conjunction, Iterable<T> iterable) {
         return CollUtil.join(iterable, conjunction);
     }
 
     /**
      * map的键连接
-     * */
+     * @param str 语句
+     * @param map 字段集
+     * @param callback 处理方法
+     */
     public static void mapKeyJoin(StringBuilder str, Map<String, Object> map, MapJoinCallback callback)
     {
         str.append("(");
@@ -177,12 +201,15 @@ public class SqlUtil {
 
     /**
      * map的键连接
+     * @param str 构造语句
+     * @param data 数据集
+     * @param callback 数据处理方法
      * */
-    public static void mapValueJoin(StringBuilder str, Map<String, Object> map, MapJoinCallback callback)
+    public static void mapValueJoin(StringBuilder str, Map<String, Object> data, MapJoinCallback callback)
     {
         str.append("(");
         int fi = 0;
-        for (Map.Entry<String, Object> entry : map.entrySet()) {
+        for (Map.Entry<String, Object> entry : data.entrySet()) {
             if (fi++ > 0)
                 str.append(",");
             str.append(callback.call(entry));

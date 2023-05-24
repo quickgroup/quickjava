@@ -28,11 +28,13 @@ public @interface OneToOne {
      * 本表关联字段
      * - 支持属性名称、字段名
      * - 默认取关联模型类名加_id（下划线id）
+     * @return 本表字段名称（支持驼峰、下划线名称
      * */
     String localKey() default "";
 
     /*
      * 关联表关联字段
+     * @return 关联表关联字段（支持驼峰、下划线名称
      * */
     String foreignKey() default "";
 }
