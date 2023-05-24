@@ -578,7 +578,9 @@ public class Model {
 
     /**
      * 通过 DataMap 创建对象
-     * */
+     * @param data 数据集
+     * @return 模型对象
+     */
     public Model create(DataMap data) {
         return create((Map<String, Object>) data);
     }
@@ -589,7 +591,9 @@ public class Model {
 
     /**
      * 批量创建
-     * */
+     * @param dataList 数据列表
+     * @return 对象数量
+     */
     public Integer bulkCreate(List<DataMap> dataList)
     {
         List<DataMap> dataList2 = new LinkedList<>();
@@ -697,7 +701,9 @@ public class Model {
 
     /**
      * 预载入方法
-     * */
+     * @param fields 需要预载入的属性名称
+     * @return 模型对象
+     */
     public Model with(String fields) {
         if (ModelUtil.isEmpty(fields)) {
             return this;
@@ -763,7 +769,13 @@ public class Model {
             methodMap.put(method.getName(), method);
         }
         // 全部属性
-        for (Field field : clazz.getDeclaredFields()) {
+        Class<?> getClazz = clazz;
+        List<Field> fieldList = new ArrayList<>();
+        while (getClazz != null){
+            fieldList.addAll(new ArrayList<>(Arrays.asList(getClazz.getDeclaredFields())));
+            getClazz = getClazz.getSuperclass();
+        }
+        for (Field field : fieldList) {
             // 排除静态字段
             if (Modifier.isStatic(field.getModifiers())) {
                 continue;
