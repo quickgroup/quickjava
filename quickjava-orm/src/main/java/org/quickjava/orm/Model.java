@@ -64,7 +64,7 @@ public class Model {
 
     /**
      * 数据
-     * */
+     */
     @TableField(exist = false)
     private DataMap __data = new DataMap();
 
@@ -111,7 +111,9 @@ public class Model {
 
     /**
      * 高级sql语句查询
-     * */
+     * @param sql 原生sql语句
+     * @return 模型对象
+     */
     public Model where(String sql) {
         query().where(sql, "RAW", null);
         return this;
@@ -156,10 +158,11 @@ public class Model {
     }
 
     /**
+     *
      * 如果当前对象素模型（不是代理模型），就加载一次对象上的数据
      * - 不是：在 insert、update 时需要收集字段数据
      * - 收集字段数据
-     * */
+     */
     private void loadingVegetarianModel()
     {
         if (ModelUtil.isVegetarianModel(this)) {
@@ -175,7 +178,8 @@ public class Model {
 
     /**
      * 新增
-     * */
+     * @return 模型对象
+     */
     public Model insert()
     {
         Long pkVal = query().insert(this.sqlData());
@@ -184,8 +188,10 @@ public class Model {
     }
 
     /**
-     * 使用对象新增
-     * */
+     * 使用数据集新增
+     * @param data 数据集
+     * @return 模型对象
+     */
     public Model insert(DataMap data) {
         data(data);
         return insert();
@@ -193,7 +199,8 @@ public class Model {
 
     /**
      * 更新
-     * */
+     * @return 模型对象
+     */
     public Model update()
     {
         query().update(this.sqlData());
@@ -227,7 +234,8 @@ public class Model {
     /**
      * 保存数据
      * - 自动判断主键是否为null，为null执行新增，否则进行更新
-     * */
+     * @return 模型对象
+     */
     public Model save() {
         String pk = pk();
         Object pkVal = data(pk);
@@ -242,7 +250,10 @@ public class Model {
 
     /**
      * 排序
-     * */
+     * @param field 字段
+     * @param asc 排序方式：ASC、DESC
+     * @return 模型对象
+     */
     public Model order(String field, String asc) {
         query().order(ModelUtil.fieldLineName(field), asc);
         return this;
@@ -279,21 +290,32 @@ public class Model {
 
     /**
      * 分页
-     * */
+     * @param page 页数
+     * @return 模型对象
+     */
     public Model page(Integer page) {
         query().page(page);
         return this;
     }
 
+    /**
+     * 分页
+     * @param page 页数
+     * @param size 页大小
+     * @return 模型对象
+     */
     public Model page(Integer page, Integer size) {
         query().page(page, size);
         return this;
     }
 
     //---------- TODO::数据查询方法 ----------//
+
     /**
-     * 查询一条
-     * */
+     * 查询一条数据
+     * @return 模型对象
+     * @param <D> 模型类
+     */
     public <D extends Model> D find() {
         // 查询前：预载入字段准备
         queryBefore();
@@ -442,7 +464,9 @@ public class Model {
 
     /**
      * 获取预载入的属性名对应模型类
-     * */
+     * @param types 关联类型
+     * @return 关联属性集合
+     */
     private Map<String, Relation> getWithRelation(RelationType[] types) {
         Map<String, Relation> relationMap = new LinkedHashMap<>();
         if (__withs != null) {
@@ -492,22 +516,32 @@ public class Model {
     }
 
     //---------- TODO::数据操作方法 ----------//
-    // 实体通过map装载数据
+
+    /**
+     * 实体通过map装载数据
+     * @param data 数据集
+     * @return 模型对象
+     */
     public Model data(Map<String, Object> data) {
         data.forEach(this::data);
         return this;
     }
 
     /**
-    * 获取data中的数据
-    * */
+     * 获取data中的数据
+     * @param field 属性名
+     * @return 属性值
+     */
     public Object data(String field) {
         return data().get(field);
     }
 
     /**
      * 装载数据
-     * */
+     * @param name 属性名
+     * @param val 属性值
+     * @return 模型对象
+     */
     public Model data(String name, Object val)
     {
         // 数据保存
@@ -529,7 +563,8 @@ public class Model {
 
     /**
      * 获取data全部数据
-     * */
+     * @return 模型数据
+     */
     public DataMap data() {
         this.loadingVegetarianModel();
         return __data;
@@ -549,7 +584,8 @@ public class Model {
     /**
      * 执行sql的数据
      * - insert、update的数据
-     * */
+     * @return 数据集
+     */
     public DataMap sqlData()
     {
         DataMap data = data();
@@ -566,9 +602,12 @@ public class Model {
     }
 
     //---------- TODO::静态操作方法 ----------//
+
     /**
      * 通过 Map 创建对象
-     * */
+     * @param data 数据集
+     * @return 模型对象
+     */
     public Model create(Map<String, Object> data)
     {
         Model model = newProxyModel(getMClass(), data);
@@ -763,16 +802,20 @@ public class Model {
         meta.setFieldMap(new LinkedHashMap<>());
         ModelUtil.setMeta(clazz, meta);
 
-        // 全部方法
-        Map<String, Method> methodMap = new LinkedHashMap<>();
-        for (Method method : clazz.getDeclaredMethods()) {
-            methodMap.put(method.getName(), method);
-        }
-        // 全部属性
+        // 全部方法、属性
         Class<?> getClazz = clazz;
         List<Field> fieldList = new ArrayList<>();
+        Map<String, Method> methodMap = new LinkedHashMap<>();
         while (getClazz != null){
+            // 属性
             fieldList.addAll(new ArrayList<>(Arrays.asList(getClazz.getDeclaredFields())));
+            // 方法
+            for (Method method : getClazz.getDeclaredMethods()) {
+                if (!methodMap.containsKey(method.getName())) { // 子类覆写的方法不允许重复添加
+                    methodMap.put(method.getName(), method);
+                }
+            }
+            // 父类
             getClazz = getClazz.getSuperclass();
         }
         for (Field field : fieldList) {
