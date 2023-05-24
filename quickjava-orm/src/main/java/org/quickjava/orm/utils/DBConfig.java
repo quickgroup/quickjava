@@ -2,8 +2,8 @@ package org.quickjava.orm.utils;
 
 /**
  * @author Qlo1062-(QloPC-Msi)
- * @date 2021/1/23 23:19
- * @projectName quickjava
+ * &#064;date  2021/1/23 23:19
+ * &#064;projectName  quickjava
  */
 public class DBConfig {
 

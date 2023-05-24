@@ -17,11 +17,11 @@ import java.util.*;
 
 /**
  * 数据操作类，本类主要进行条件构建、查询、数据返回
- * - select 返回 List<Map<String,Object>>
- * - find 返回 Map<String,Object>
+ * - select 返回 {@code List<Map<String,Object>>}
+ * - find 返回 {@code Map<String,Object>}
  * - QuerySet 是不支持层级模型返回的，只支持简单查询和join查询，数据层级封装由Model自己负责
  * @author Qlo1062-(QloPC-zs)
- * @date 2021/1/19 10:18
+ * &#064;date  2021/1/19 10:18
  */
 public class QuerySet {
 
@@ -61,6 +61,7 @@ public class QuerySet {
 
     /**
      * 连接数据库（返回默认链接
+     * @return 查询器
      * */
     public static QuerySet connect() {
         synchronized (QuerySet.class) {
@@ -92,6 +93,8 @@ public class QuerySet {
 
     /**
      * 高级sql语句查询
+     * @param sql SQL语句
+     * @return 查询取
      * */
     public QuerySet where(String sql)
     {
@@ -301,6 +304,7 @@ public class QuerySet {
 
     /**
      * 获取表全部字段
+     * @return 字段列表
      * */
     public List<TableColumn> getColumns() {
         return getColumns(table);
@@ -461,6 +465,7 @@ public class QuerySet {
 
     /**
      * 回调方法中执行事务
+     * @param callback 事务回调方法
      * */
     public static void transaction(TransactionCallback callback)
     {

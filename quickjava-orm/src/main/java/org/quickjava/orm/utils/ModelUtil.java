@@ -92,7 +92,12 @@ public class ModelUtil extends SqlUtil {
             e.printStackTrace();
         }
     }
-    // 直接拷贝属性
+
+    /**
+     * 直接拷贝属性
+     * @param src 来源对象
+     * @param dst 目标对象
+     */
     public static void copyProperties(Object src, Object dst)
     {
         try {
@@ -142,8 +147,10 @@ public class ModelUtil extends SqlUtil {
     }
 
     /**
-     * Java程序数据转sql兼容数据，如：true => 1、false => 0
-     * */
+     * Java程序数据转sql兼容数据，如：true=1、false=0
+     * @param val 值
+     * @return 转换后的值
+     */
     public static Object valueToSqlValue(Object val)
     {
         if (val instanceof Boolean) {
@@ -154,7 +161,10 @@ public class ModelUtil extends SqlUtil {
 
     /**
      * 对象比较
-     * */
+     * @param obj1 对象1
+     * @param obj2 对象2
+     * @return 比较结果
+     */
     public static boolean objectEquals(Object obj1, Object obj2)
     {
         if (obj1 == null && obj2 == null) {

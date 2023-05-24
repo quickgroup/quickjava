@@ -25,7 +25,7 @@ public class GenericsUtils {
      * @param clazz 类
      * @return 返回第一个类型
      */
-    public static Class getSuperClassGenericsType(Class clazz) {
+    public static Class<?> getSuperClassGenericsType(Class<?> clazz) {
         return getSuperClassGenericsType(clazz, 0);
     }
 
@@ -33,8 +33,9 @@ public class GenericsUtils {
      * 通过反射,获得定义Class时声明的父类的范型参数的类型
      * @param clazz 类
      * @param index 返回某下标的类型
+     * @return 返回泛型实际类型
      */
-    public static Class getSuperClassGenericsType(Class clazz, int index)
+    public static Class<?> getSuperClassGenericsType(Class<?> clazz, int index)
             throws IndexOutOfBoundsException {
         Type genType = clazz.getGenericSuperclass();
         if (!(genType instanceof ParameterizedType)) {
