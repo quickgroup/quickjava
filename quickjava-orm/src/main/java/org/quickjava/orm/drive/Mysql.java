@@ -2,7 +2,6 @@ package org.quickjava.orm.drive;
 
 import cn.hutool.core.util.ReflectUtil;
 import org.apache.ibatis.session.SqlSession;
-import org.apache.ibatis.session.SqlSessionFactory;
 import org.quickjava.orm.QuerySet;
 import org.quickjava.orm.contain.Action;
 import org.quickjava.orm.contain.Value;
@@ -10,8 +9,8 @@ import org.quickjava.orm.contain.WhereBase;
 import org.quickjava.orm.utils.QueryException;
 import org.quickjava.orm.utils.QuickConnection;
 import org.quickjava.orm.utils.SqlUtil;
-import org.springframework.context.ApplicationContext;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,15 +37,16 @@ public class Mysql implements Drive {
     private String sql = null;
 
     @Override
-    public QuickConnection getConnection() {
+    public QuickConnection getConnection()
+    {
         synchronized (Drive.class) {
-            if (__quickConnection.get() == null) {
+            // 为空时、连接不存在时
+            if (__quickConnection.get() == null || __quickConnection.get().connection == null) {
                 try {
-                    // TODO::获取Spring数据库连接
-                    ApplicationContext ac = SpringAutoConfiguration.getApplicationContext();
-                    SqlSessionFactory factory = (SqlSessionFactory) ac.getBean("sqlSessionFactory");
-                    SqlSession session = factory.openSession();
-                    __quickConnection.set(new QuickConnection(session.getConnection()));
+                    // TODO::使用
+                    Connection connection = SpringAutoConfiguration.instance.getDataSource().getConnection();
+
+                    __quickConnection.set(new QuickConnection(connection, 2));
                 } catch (Exception e) {
                     try {
                         __quickConnection.set(getConnectionByQuick());
@@ -73,6 +73,7 @@ public class Mysql implements Drive {
                 ReflectUtil.invoke(database, "getString", "username"),
                 ReflectUtil.invoke(database, "getString", "password")
         );
+        quickConnection.connectionFormType = 1;
         quickConnection.connectStart();
         return quickConnection;
     }
@@ -191,11 +192,12 @@ public class Mysql implements Drive {
     {
         long startTime = System.nanoTime();
         Object number = null;
+        QuickConnection quickConnection = getConnection();
 
         try {
             // 执行操作
             if (action == Action.INSERT) {
-                Map<String, Object> generatedKeys = JdbcDock.insert(getConnection().connection, sql);
+                Map<String, Object> generatedKeys = JdbcDock.insert(quickConnection.connection, sql);
                 if (generatedKeys == null || generatedKeys.isEmpty()) {
                     return null;
                 }
@@ -203,13 +205,13 @@ public class Mysql implements Drive {
                 number = gk instanceof Long ? (Long) gk : Long.valueOf(String.valueOf(gk));
 
             } else if (action == Action.DELETE) {
-                number = JdbcDock.delete(getConnection().connection, sql).longValue();
+                number = JdbcDock.delete(quickConnection.connection, sql).longValue();
 
             } else if (action == Action.UPDATE) {
-                number = JdbcDock.update(getConnection().connection, sql).longValue();
+                number = JdbcDock.update(quickConnection.connection, sql).longValue();
 
             } else if (action == Action.SELECT) {
-                List<Map<String, Object>> rows = JdbcDock.select(getConnection().connection, sql);
+                List<Map<String, Object>> rows = JdbcDock.select(quickConnection.connection, sql);
                 return (T) rows;
             }
             return (T) number;
@@ -226,38 +228,11 @@ public class Mysql implements Drive {
 //            }
             String msg = "SQL execution time " + ((double) (endTime - startTime)) / 1000000 + "ms " + printSql;
             System.out.println(msg);
-        }
-    }
 
-    @Override
-    public void setAutoCommit(boolean autoCommit) {
-        try {
-            getConnection().connection.setAutoCommit(autoCommit);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void startTrans() {
-        setAutoCommit(false);
-    }
-
-    @Override
-    public void commit() {
-        try {
-            getConnection().connection.commit();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void rollback() {
-        try {
-            getConnection().connection.rollback();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+            // 主动关闭连接
+            if (quickConnection.autoCommit) {
+                quickConnection.close();
+            }
         }
     }
 }

@@ -1,9 +1,12 @@
 package org.quickjava.orm.drive;
 
+import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
 
@@ -27,8 +30,14 @@ public class SpringAutoConfiguration implements InitializingBean {
 
     private static ApplicationContext applicationContext;
 
+    public static SpringAutoConfiguration instance;
+
+    @Autowired
+    private DataSource druidDataSource;
+
     public SpringAutoConfiguration(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
+        this.instance = this;
     }
 
     public static ApplicationContext getApplicationContext() {
@@ -38,5 +47,9 @@ public class SpringAutoConfiguration implements InitializingBean {
     @Override
     public void afterPropertiesSet() throws Exception {
 
+    }
+
+    public DataSource getDataSource() {
+        return druidDataSource;
     }
 }

@@ -20,6 +20,10 @@ public class QuickConnection {
 
     public Connection connection = null;
 
+    public Integer connectionFormType = 0;  // 0=自行连接；1=quickjava；2=spring
+
+    public boolean autoCommit = true;
+
     public QuickConnection(Type type, String url, String database, String username, String password, String driver) {
         this.type = type;
         this.url = url;
@@ -44,8 +48,9 @@ public class QuickConnection {
         this.url = url;
     }
 
-    public QuickConnection(Connection connection) {
+    public QuickConnection(Connection connection, Integer connectionFormType) {
         this.connection = connection;
+        this.connectionFormType = connectionFormType;
     }
 
     /**
@@ -85,5 +90,38 @@ public class QuickConnection {
     public enum Type {
         MYSQL,
         ORACLE,
+    }
+
+    public void setAutoCommit(boolean autoCommit) {
+        try {
+            connection.setAutoCommit(autoCommit);
+            this.autoCommit = autoCommit;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void startTrans() {
+        setAutoCommit(false);
+    }
+
+    public void commit() {
+        try {
+            connection.commit();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            close();        // druid连接池：事务完成后返回连接
+        }
+    }
+
+    public void rollback() {
+        try {
+            connection.rollback();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            close();        // druid连接池：事务完成后返回连接
+        }
     }
 }

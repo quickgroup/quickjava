@@ -27,11 +27,19 @@ public interface Drive {
 
     <T> T executeSql(Action action, String sql);
 
-    void setAutoCommit(boolean autoCommit);
+    default void setAutoCommit(boolean autoCommit) {
+        getConnection().setAutoCommit(autoCommit);
+    }
 
-    void startTrans();
+    default void startTrans() {
+        setAutoCommit(false);
+    }
 
-    void commit();
+    default void commit() {
+        getConnection().commit();
+    }
 
-    void rollback();
+    default void rollback() {
+        getConnection().rollback();
+    }
 }
