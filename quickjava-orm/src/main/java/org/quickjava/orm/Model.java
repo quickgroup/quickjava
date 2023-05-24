@@ -699,6 +699,9 @@ public class Model {
      * 预载入方法
      * */
     public Model with(String fields) {
+        if (ModelUtil.isEmpty(fields)) {
+            return this;
+        }
         this.__withs = Arrays.asList(fields.split(","));
         return this;
     }
