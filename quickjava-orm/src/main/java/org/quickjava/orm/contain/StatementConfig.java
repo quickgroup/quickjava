@@ -1,9 +1,4 @@
-package org.quickjava.orm.drive;
-
-import org.quickjava.orm.QuerySet;
-import org.quickjava.orm.contain.Action;
-import org.quickjava.orm.contain.StatementConfig;
-import org.quickjava.orm.utils.QuickConnection;
+package org.quickjava.orm.contain;
 
 /*
  * Copyright (c) 2020~2023 http://www.quickjava.org All rights reserved.
@@ -12,23 +7,30 @@ import org.quickjava.orm.utils.QuickConnection;
  * +-------------------------------------------------------------------
  * Author: Qlo1062
  * +-------------------------------------------------------------------
- * File: Oracle
+ * File: StatementConfig
  * +-------------------------------------------------------------------
- * Date: 2023/3/12 15:27
+ * Date: 2023-5-25 17:52
  * +-------------------------------------------------------------------
  * License: Apache Licence 2.0
  * +-------------------------------------------------------------------
  */
-public class Oracle extends Drive {
+public class StatementConfig {
 
-    private static final StatementConfig statementConfig = new StatementConfig(
-            "", "",
-            "'", "'"
-    );
+    public String fieldBefore = "";
 
-    @Override
-    public StatementConfig getStatementConfig() {
-        return statementConfig;
+    public String fieldAfter = "";
+
+    public String whereValBefore = "";
+
+    public String whereValAfter = "";
+
+    public StatementConfig() {
     }
 
+    public StatementConfig(String fieldBefore, String fieldAfter, String whereValBefore, String whereValAfter) {
+        this.fieldBefore = fieldBefore;
+        this.fieldAfter = fieldAfter;
+        this.whereValBefore = whereValBefore;
+        this.whereValAfter = whereValAfter;
+    }
 }

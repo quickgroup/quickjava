@@ -89,7 +89,7 @@ public abstract class WhereBase {
         this.operator = operator;
     }
 
-    public Object getValue() {
+    public Object getValue(StatementConfig config) {
         Object result;
         if (value == null) {
             result = "NULL";
@@ -102,7 +102,7 @@ public abstract class WhereBase {
         } else if (value instanceof Iterable) {
             result = CollectionUtil.join(((Iterable<?>) value), ",");
         } else {
-            result = String.format("\"%s\"", SqlUtil.escapeSql(String.valueOf(value)));
+            result = String.format("%s%s%s", config.whereValBefore, SqlUtil.escapeSql(String.valueOf(value)), config.whereValAfter);
         }
         return result;
     }
@@ -113,6 +113,10 @@ public abstract class WhereBase {
 
     @Override
     public String toString() {
+        return getLogicStr() + " " + field + " " + operator + " " + value;
+    }
+
+    public String toString(StatementConfig config) {
         // 嵌套查询
         if (children != null) {
             return getLogicStr() + " " + taskOutFirstLogic(SqlUtil.strJoin(" ", children));
@@ -121,9 +125,15 @@ public abstract class WhereBase {
         if ("RAW".equals(operator)) {
             return field;
         } else if ("IN".equals(operator) || "NOT_IN".equals(operator)) {
-            return getLogicStr() + " " + getField() + " " + getOperator() + " (" + getValue() + ")";
+            return getLogicStr() + " " + getField() + " " + getOperator() + " (" + getValue(config) + ")";
         }
-        return getLogicStr() + " " + getField() + " " + getOperator() + " " + getValue();
+        return getLogicStr() + " " + getField() + " " + getOperator() + " " + getValue(config);
+    }
+
+    public static String toSql(List<WhereBase> wheres, StatementConfig config) {
+        List<String> sql = new LinkedList<>();
+        wheres.forEach(where-> sql.add(where.toString(config)));
+        return SqlUtil.strJoin(" ", sql);
     }
 
     /**

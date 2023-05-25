@@ -25,11 +25,7 @@ import java.util.*;
  */
 public class QuerySet {
 
-    private DBConfig dbConfig = null;
-
     private static QuerySet __defaultQuerySet = null;
-
-    private Drive drive = new Mysql();
 
     private String table = null;
 
@@ -223,7 +219,7 @@ public class QuerySet {
 
     public List<Map<String, Object>> select()
     {
-        List<Map<String, Object>> resultSet = drive.executeSql(this);
+        List<Map<String, Object>> resultSet = executeSql();
         return ObjectUtil.isEmpty(resultSet) ? new LinkedList<>() : resultSet;
     }
 
@@ -266,14 +262,14 @@ public class QuerySet {
     {
         action = Action.UPDATE;
         this.data.putAll(data);
-        drive.executeSql(this);
+        executeSql();
         return null;
     }
 
     public Integer update()
     {
         this.action = Action.UPDATE;
-        this.drive.executeSql(this);
+        executeSql();
         return 1;
     }
 
@@ -281,7 +277,7 @@ public class QuerySet {
     {
         this.action = Action.INSERT;
         this.data.putAll(data);
-        return this.drive.executeSql(this);
+        return executeSql();
     }
 
     public Integer insertAll(List<DataMap> dataList)
@@ -289,7 +285,7 @@ public class QuerySet {
         action = Action.INSERT;
         this.dataList.clear();
         this.dataList.addAll(dataList);
-        return drive.executeSql(this);
+        return executeSql();
     }
 
     public Integer delete()
@@ -298,7 +294,7 @@ public class QuerySet {
             throw new QueryException("不允许空条件的删除执行");
         }
         this.action = Action.DELETE;
-        Long result = drive.executeSql(this);
+        Long result = executeSql();
         return result.intValue();
     }
 
@@ -340,12 +336,17 @@ public class QuerySet {
 
     public String fetchSql()
     {
-        return this.drive.pretreatment(this);
+        return ORMContext.getDrive().pretreatment(this);
     }
 
     public Object executeSql(String sql)
     {
-        return drive.executeSql(Action.SELECT, sql);
+        return ORMContext.getDrive().executeSql(Action.SELECT, sql);
+    }
+
+    private <T> T executeSql()
+    {
+        return ORMContext.getDrive().executeSql(this);
     }
 
     //TODO::--------------- 增强方法 ---------------
@@ -393,7 +394,7 @@ public class QuerySet {
 
     public Integer count(String field) {
         fieldList.add(field);
-        List<Map<String, Object>> resultSet = drive.executeSql(this);
+        List<Map<String, Object>> resultSet = executeSql();
         return Math.toIntExact((Long) resultSet.get(0).get(field));
     }
 
@@ -424,7 +425,7 @@ public class QuerySet {
     }
 
     public static void startTrans(QuerySet querySet) {
-        startTrans(querySet.drive);
+        startTrans(ORMContext.getDrive());
     }
 
     public static void startTrans(Drive drive) {
@@ -439,7 +440,7 @@ public class QuerySet {
     }
 
     public static void commit(QuerySet querySet) {
-        commit(querySet.drive);
+        commit(ORMContext.getDrive());
     }
 
     public static void commit(Drive drive) {
@@ -455,7 +456,7 @@ public class QuerySet {
     }
 
     public static void rollback(QuerySet querySet) {
-        rollback(querySet.drive);
+        rollback(ORMContext.getDrive());
     }
 
     public static void rollback(Drive drive) {

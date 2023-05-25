@@ -6,17 +6,17 @@ import java.sql.SQLException;
 
 public class QuickConnection {
 
-    private Type type = Type.MYSQL;
+    public DBType type = DBType.MYSQL;
 
-    private String url = null;		//数据库地址
+    public String url = null;		//数据库地址
 
-    private String database = null;		//数据库
+    public String database = null;		//数据库
 
-    private String username = null;		//数据库用户名
+    public String username = null;		//数据库用户名
 
-    private String password = null;		//数据库密码
+    public String password = null;		//数据库密码
 
-    private String driver = "com.mysql.jdbc.Driver";		//mysql驱动，测试写死
+    public String driver = "com.mysql.jdbc.Driver";		//mysql驱动，测试写死
 
     public Connection connection = null;
 
@@ -24,33 +24,54 @@ public class QuickConnection {
 
     public boolean autoCommit = true;
 
-    public QuickConnection(Type type, String url, String database, String username, String password, String driver) {
+    public QuickConnection(DBType type, String url, String database, String username, String password, String driver) {
         this.type = type;
         this.url = url;
         this.database = database;
         this.username = username;
         this.password = password;
         this.driver = driver;
+        init();
     }
 
     public QuickConnection(String url, String username, String password) {
         this.url = url;
         this.username = username;
         this.password = password;
+        init();
     }
 
     public QuickConnection(String url) {
         if (url.toLowerCase().contains("mysql://")) {
-            this.type = Type.MYSQL;
+            this.type = DBType.MYSQL;
         } else if (url.toLowerCase().contains("oracle://")) {
-            this.type = Type.ORACLE;
+            this.type = DBType.ORACLE;
         }
         this.url = url;
+        init();
     }
 
     public QuickConnection(Connection connection, Integer connectionFormType) {
         this.connection = connection;
         this.connectionFormType = connectionFormType;
+        init();
+    }
+
+    public void init() {
+        try {
+            String driverName = connection.getMetaData().getDriverName().toUpperCase();
+            if (driverName.contains("MYSQL")) {
+                this.type = DBType.MYSQL;
+            } else if (driverName.contains("SQL SERVER")) {
+                this.type = DBType.SQL_SERVER;
+            } else if (driverName.contains("ORACLE")) {
+                this.type = DBType.ORACLE;
+            } else {
+                this.type = DBType.UNKNOWN;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -87,9 +108,11 @@ public class QuickConnection {
         }
     }
 
-    public enum Type {
+    public enum DBType {
         MYSQL,
         ORACLE,
+        SQL_SERVER,
+        UNKNOWN,
     }
 
     public void setAutoCommit(boolean autoCommit) {
