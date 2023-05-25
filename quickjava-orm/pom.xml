@@ -7,7 +7,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.quickjava.core</groupId>
     <artifactId>quickjava-orm</artifactId>
-    <version>1.2.3</version>
+    <version>1.2.4</version>
     <packaging>jar</packaging>
     <name>quickjava-orm</name>
     <description>QuickJava ORM Framework</description>
