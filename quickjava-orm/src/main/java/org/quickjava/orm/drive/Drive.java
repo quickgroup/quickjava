@@ -28,10 +28,15 @@ public abstract class Drive {
 
     private StatementConfig statementConfig = null;
 
+    private static final StatementConfig statementConfigDefault = new StatementConfig(
+            "", "",
+            "'", "'"
+    );
+
     private QuickConnection quickConnection = null;
 
     public StatementConfig getStatementConfig() {
-        return statementConfig;
+        return statementConfig == null ? statementConfigDefault : statementConfig;
     }
 
     public void setStatementConfig(StatementConfig statementConfig) {
