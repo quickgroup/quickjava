@@ -1,7 +1,5 @@
 package org.quickjava.orm.contain;
 
-import org.quickjava.orm.enums.ModelFieldFill;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
@@ -37,7 +35,9 @@ public class ModelField {
 
     private Method method;
 
-    private ModelFieldFill fill = ModelFieldFill.NONE;
+    private String insertFill = "";
+
+    private String updateFill = "";
 
     private boolean softDelete = false;
 
@@ -115,12 +115,20 @@ public class ModelField {
         this.method = method;
     }
 
-    public ModelFieldFill getFill() {
-        return fill;
+    public String getInsertFill() {
+        return insertFill;
     }
 
-    public void setFill(ModelFieldFill fill) {
-        this.fill = fill;
+    public void setInsertFill(String insertFill) {
+        this.insertFill = insertFill;
+    }
+
+    public String getUpdateFill() {
+        return updateFill;
+    }
+
+    public void setUpdateFill(String updateFill) {
+        this.updateFill = updateFill;
     }
 
     public boolean isSoftDelete() {

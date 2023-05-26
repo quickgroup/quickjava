@@ -833,7 +833,8 @@ public class Model {
                 if (!"".equals(modelField.name())) {
                     fieldInfo.setName(modelField.name());
                 }
-                fieldInfo.setFill(modelField.fill());
+                fieldInfo.setInsertFill(modelField.insertFill());
+                fieldInfo.setUpdateFill(modelField.updateFill());
                 fieldInfo.setSoftDelete(modelField.softDelete());
             }
 

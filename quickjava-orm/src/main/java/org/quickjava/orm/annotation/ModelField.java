@@ -1,7 +1,5 @@
 package org.quickjava.orm.annotation;
 
-import org.quickjava.orm.enums.ModelFieldFill;
-
 import java.lang.annotation.*;
 
 /*
@@ -35,15 +33,16 @@ public @interface ModelField {
     boolean exist() default true;
 
     /**
-     * 字段填充处理
-     * @return 数据填充处理
-     * */
-    ModelFieldFill fill() default ModelFieldFill.NONE;
+     * 插入时填充
+     * @return 填充数据
+     */
+    String insertFill() default "";
 
     /**
-     * 字段填充方法
-     * */
-//    Constants.FillMethod fillMethod() default Constants.defaultFillMethod;
+     * 更新时填充
+     * @return 填充数据
+     */
+    String updateFill() default "";
 
     /**
      * 软删除字段
