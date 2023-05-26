@@ -44,39 +44,45 @@ import java.util.stream.Collectors;
 /**
  * 模型
  * */
-@JsonIgnoreProperties({"__meta", "__parent", "__withs", "__data", "__modified", "__querySet"})
+@JsonIgnoreProperties(value = {"__meta", "__parent", "__withs", "__data", "__modified", "__querySet"}, ignoreUnknown = true)
 public class Model {
 
     /**
      * 模型元信息
      * */
+    @JsonIgnore
     @TableField(exist = false)
     private ModelMeta __meta;
 
     /**
      * 关联的父模型对象
      * */
+    @JsonIgnore
     @TableField(exist = false)
     private Model __parent;
 
     /**
      * 预载入属性
      * */
+    @JsonIgnore
     @TableField(exist = false)
     private List<String> __withs;
 
     /**
      * 数据
      */
+    @JsonIgnore
     @TableField(exist = false)
     private DataMap __data = new DataMap();
 
     /**
      * 修改的字段
      * */
+    @JsonIgnore
     @TableField(exist = false)
     private List<String> __modified;
 
+    @JsonIgnore
     @TableField(exist = false)
     private QuerySet __querySet = null;
 
@@ -674,7 +680,8 @@ public class Model {
         return model;
     }
 
-    public static MethodInterceptor modelProxyMethodInterceptor = new MethodInterceptor () {
+    @JsonIgnore
+    private static MethodInterceptor modelProxyMethodInterceptor = new MethodInterceptor () {
         @Override
         public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
             /*
