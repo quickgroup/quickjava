@@ -1,8 +1,12 @@
 package org.quickjava.orm.example;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import org.quickjava.orm.Model;
+import org.quickjava.orm.annotation.ModelField;
 import org.quickjava.orm.annotation.ModelName;
+import org.quickjava.orm.contain.ModelFieldFill;
 
+import java.util.Date;
 import java.util.List;
 
 /*
@@ -47,6 +51,12 @@ public class Article extends Model {
 
     // 一对多：评论回复表
     private List<ArticleTag> tags;
+
+    @ModelField(insertFill = ModelFieldFill.DATETIME)
+    private Date createTime;
+
+    @ModelField(updateFill = ModelFieldFill.METHOD + "app.UserUtil.makeNickname")
+    private Date updateTime;
 
     public User user() {
         return hasOne(User.class, "userId", "id");

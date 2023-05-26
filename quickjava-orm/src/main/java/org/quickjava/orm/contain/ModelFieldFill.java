@@ -1,4 +1,4 @@
-package org.quickjava.orm.annotation;
+package org.quickjava.orm.contain;
 
 /*
  * Copyright (c) 2020~2023 http://www.quickjava.org All rights reserved.
@@ -7,19 +7,19 @@ package org.quickjava.orm.annotation;
  * +-------------------------------------------------------------------
  * Author: Qlo1062
  * +-------------------------------------------------------------------
- * File: Constants
+ * File: ModelFieldFill
  * +-------------------------------------------------------------------
- * Date: 2023-3-14 17:22
+ * Date: 2023-5-26 10:11
  * +-------------------------------------------------------------------
  * License: Apache Licence 2.0
  * +-------------------------------------------------------------------
  */
-public class Constants {
+public class ModelFieldFill {
 
-    public final static FillMethod defaultFillMethod = value -> null;
-
-    public interface FillMethod {
-        Object call(Object value);
-    }
+    public static final String DATETIME = "model:datetime";
+    /**
+     * 指定类方法填充，method:+类名+方法名，完整例子：method:app.UserUtil.makeNickname
+     */
+    public static final String METHOD = "method:";
 
 }

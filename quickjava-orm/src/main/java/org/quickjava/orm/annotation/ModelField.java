@@ -33,13 +33,16 @@ public @interface ModelField {
     boolean exist() default true;
 
     /**
-     * 插入时填充
+     * 插入时填充<br>
+     * - ModelFieldFill.DATETIME=填充当前时间<br>
+     * - ModelFieldFill.METHOD=调用方法填充数据<br>
      * @return 填充数据
      */
     String insertFill() default "";
 
     /**
      * 更新时填充
+     * 与 {@link ModelField#insertFill()}类似
      * @return 填充数据
      */
     String updateFill() default "";
