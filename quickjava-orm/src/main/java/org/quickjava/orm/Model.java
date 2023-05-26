@@ -3,6 +3,8 @@ package org.quickjava.orm;
 import cn.hutool.core.util.ArrayUtil;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
@@ -42,6 +44,7 @@ import java.util.stream.Collectors;
 /**
  * 模型
  * */
+@JsonIgnoreProperties({"__meta", "__parent", "__withs", "__data", "__modified", "__querySet"})
 public class Model {
 
     /**
