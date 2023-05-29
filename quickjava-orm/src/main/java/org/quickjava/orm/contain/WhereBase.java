@@ -7,10 +7,7 @@ package org.quickjava.orm.contain;
 
 import org.quickjava.orm.utils.SqlUtil;
 
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public abstract class WhereBase {
 
@@ -82,7 +79,7 @@ public abstract class WhereBase {
         this.operator = operator;
     }
 
-    public Object getValue(DriveConfigure config) {
+    public Object valueConv(Object value, DriveConfigure config) {
         Object result;
         if (value == null) {
             result = "NULL";
@@ -98,6 +95,10 @@ public abstract class WhereBase {
             result = String.format("%s%s%s", config.whereValL, SqlUtil.escapeSql(String.valueOf(value)), config.whereValR);
         }
         return result;
+    }
+
+    public Object getValue(DriveConfigure config) {
+        return valueConv(value, config);
     }
 
     public void setValue(Object value) {
@@ -120,8 +121,14 @@ public abstract class WhereBase {
         } else if ("IN".equals(operator) || "NOT_IN".equals(operator)) {
             return getLogicStr() + " " + getField() + " " + getOperator() + " (" + getValue(cfg) + ")";
         } else if ("BETWEEN".equals(operator)) {
-            Object[] valArr = (Object[]) value;
-            return getLogicStr() + " " + getField() + " BETWEEN " + cfg.whereValL + valArr[0] + cfg.whereValR + " AND " + cfg.whereValL + valArr[1] + cfg.whereValR;
+            Object[] arr = new Object[]{null, null};
+            if (value.getClass().isArray()) {
+                arr = (Object[]) value;
+            } else if (value instanceof List) {
+                List<?> list = (List<?>) value;
+                arr = new Object[]{list.get(0), list.get(1)};
+            }
+            return getLogicStr() + " " + getField() + " BETWEEN " + valueConv(arr[0], cfg) + " AND " + valueConv(arr[1], cfg);
         }
         return getLogicStr() + " " + getField() + " " + getOperator() + " " + getValue(cfg);
     }

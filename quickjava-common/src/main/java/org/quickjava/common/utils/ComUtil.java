@@ -107,7 +107,7 @@ public abstract class ComUtil {
                         sb.append(Character.toLowerCase(c));
                     }
                 } else {
-                    if (symbol != c && sb.length() > 0 && Character.isUpperCase(sb.charAt(-1)) && Character.isLowerCase(c)) {
+                    if (symbol != c && sb.length() > 0 && Character.isUpperCase(sb.charAt(sb.length()-1)) && Character.isLowerCase(c)) {
                         sb.append(symbol);
                     }
 

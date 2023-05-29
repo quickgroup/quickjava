@@ -20,9 +20,9 @@ public class DriveConfigure {
 
     public String fieldR = "";
 
-    public String whereValL = "";
+    public String whereValL = "\"";
 
-    public String whereValR = "";
+    public String whereValR = "\"";
 
     public DriveConfigure() {
     }

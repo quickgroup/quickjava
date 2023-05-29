@@ -4,6 +4,7 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.sql.Clob;
 import java.util.Arrays;
 
 /*
@@ -98,8 +99,9 @@ public class ReflectUtil {
                 return field;
             }
         }
-        if (parent) {
-            return getField(o, name, true);
+        Class<?> currClazz = o instanceof Class ? (Class<?>) o : o.getClass();
+        if (parent && currClazz.getSuperclass() != null) {
+            return getField(currClazz.getSuperclass(), name, true);
         }
         return null;
     }
@@ -125,12 +127,13 @@ public class ReflectUtil {
                 return;
             }
             // 直接设置属性
-            Field field = getField(clazz, fieldName);
+            Field field = getField(clazz, fieldName, true);
             if (field != null) {
-                field.set(o, value);
-            } else {
-                if (clazz.getSuperclass() != null) {
-                    setFieldValue(clazz.getSuperclass(), o, fieldName, value);
+                field.setAccessible(true);
+                if (String.class.isAssignableFrom(field.getType())) {
+                    field.set(o, valueConv(value));     // clob类型
+                } else {
+                    field.set(o, value);
                 }
             }
 
@@ -141,9 +144,13 @@ public class ReflectUtil {
 
     public static void setFieldValueDirect(Object o, String fieldName, Object value) {
         try {
+            // 处理clob类未string
+            value = valueConv(value);
+            // 类型
             Class<?> clazz = o instanceof Class ? (Class<?>) o : o.getClass();
             Field field = getField(clazz, fieldName);
             if (field != null) {
+                field.setAccessible(true);
                 field.set(o, value);
             } else {
                 if (clazz.getSuperclass() != null) {
@@ -190,6 +197,9 @@ public class ReflectUtil {
         // 参数对象类
         Class<?>[] argsClasses = new Class<?>[args.length];
         for (int i = 0; i < args.length; i++) {
+            if (args[i] == null) {
+                return null;
+            }
             argsClasses[i] = args[i] instanceof Class<?> ? (Class<?>) args[i] : args[i].getClass();
         }
         for (Method method : getMethods(o)) {
@@ -215,6 +225,19 @@ public class ReflectUtil {
             e.printStackTrace();
             throw new RuntimeException(e.getMessage());
         }
+    }
+
+    // 数据转换
+    public static Object valueConv(Object value)
+    {
+        if (value instanceof Clob) {
+            try {
+                Clob clob = (Clob) value;
+                return clob.getSubString(1, (int) clob.length());
+            } catch (Exception ignored) {
+            }
+        }
+        return value;
     }
 
 

@@ -81,9 +81,7 @@ public class SqlUtil extends ORMHelper {
             sb.append(t).append(sequence);
             count++;
         }
-        if (count > 1) {
-            sb.deleteCharAt(sb.length() - sequence.length());
-        }
+        sb.deleteCharAt(sb.length() - sequence.length());
         return sb.toString();
     }
 
