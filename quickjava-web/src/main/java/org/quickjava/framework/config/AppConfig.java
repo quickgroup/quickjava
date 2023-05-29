@@ -59,7 +59,7 @@ public class AppConfig {
                  */
                 String packageName = AppConfig.class.getPackage().getName();
                 packageName = "/" + packageName.replaceAll("\\.", "/");
-                String filePath = QuickUtil.getRootPath() + "/quickjava-core/target/classes" + packageName + "/" + filename;
+                String filePath = QuickUtil.getRootPath() + "/quickjava-web/target/classes" + packageName + "/" + filename;
                 configContent = FileUtils.getFileContents(filePath);
 
             } else {

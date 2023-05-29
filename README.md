@@ -47,7 +47,7 @@ org.demo.www
 
 ### 程序打包
 `
-Maven->QuickJava-core->Lifecycle->install
+Maven->QuickJava-web->Lifecycle->install
 Maven->QuickJava-www->Lifecycle->packing
 运行：java -jar jar包
 `
