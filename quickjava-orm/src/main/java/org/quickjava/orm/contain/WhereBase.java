@@ -95,7 +95,7 @@ public abstract class WhereBase {
         } else if (value instanceof Iterable) {
             result = SqlUtil.collJoin(",", ((Iterable<?>) value));
         } else {
-            result = String.format("%s%s%s", config.whereValBefore, SqlUtil.escapeSql(String.valueOf(value)), config.whereValAfter);
+            result = String.format("%s%s%s", config.whereValL, SqlUtil.escapeSql(String.valueOf(value)), config.whereValR);
         }
         return result;
     }
@@ -109,7 +109,7 @@ public abstract class WhereBase {
         return getLogicStr() + " " + field + " " + operator + " " + value;
     }
 
-    public String toString(DriveConfigure config) {
+    public String toString(DriveConfigure cfg) {
         // 嵌套查询
         if (children != null) {
             return getLogicStr() + " " + taskOutFirstLogic(SqlUtil.collJoin(" ", children));
@@ -118,9 +118,12 @@ public abstract class WhereBase {
         if ("RAW".equals(operator)) {
             return field;
         } else if ("IN".equals(operator) || "NOT_IN".equals(operator)) {
-            return getLogicStr() + " " + getField() + " " + getOperator() + " (" + getValue(config) + ")";
+            return getLogicStr() + " " + getField() + " " + getOperator() + " (" + getValue(cfg) + ")";
+        } else if ("BETWEEN".equals(operator)) {
+            Object[] valArr = (Object[]) value;
+            return getLogicStr() + " " + getField() + " BETWEEN " + cfg.whereValL + valArr[0] + cfg.whereValR + " AND " + cfg.whereValL + valArr[1] + cfg.whereValR;
         }
-        return getLogicStr() + " " + getField() + " " + getOperator() + " " + getValue(config);
+        return getLogicStr() + " " + getField() + " " + getOperator() + " " + getValue(cfg);
     }
 
     public static String toSql(List<WhereBase> wheres, DriveConfigure config) {

@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
+import org.quickjava.common.utils.ReflectUtil;
 import org.quickjava.orm.annotation.ModelName;
 import org.quickjava.orm.annotation.ModelField;
 import org.quickjava.orm.annotation.OneToMany;
@@ -177,7 +178,7 @@ public class Model {
         if (ModelUtil.isVegetarianModel(this)) {
             // 收集字段数据
             __meta.fieldMap().forEach((name, field) -> {
-                Object val = ModelUtil.getFieldValue(this, field.getField());
+                Object val = ReflectUtil.getFieldValue(this, field.getField());
                 if (__data.containsKey(name) && !ModelUtil.objectEquals(__data.get(name), val)) {
                     data(field.getName(), val);
                 }
@@ -415,7 +416,7 @@ public class Model {
                 relationMap.forEach((relationName, relation) -> {
                     Model relationModel = newProxyModel(relation.getClazz());
                     resultTranshipmentWith(relationModel, data, relationName);
-                    SqlUtil.setFieldValue(model, relationName, relationModel);
+                    ReflectUtil.setFieldValue(model, relationName, relationModel);
                 });
             } else {
                 model.data(data);
@@ -451,7 +452,7 @@ public class Model {
                 if (!conditionMap.containsKey(fieldName)) {
                     conditionMap.put(fieldName, new LinkedList<>());
                 }
-                models.forEach(model -> conditionMap.get(fieldName).add(SqlUtil.getFieldValue(model, relation.localKey())));
+                models.forEach(model -> conditionMap.get(fieldName).add(ReflectUtil.getFieldValue(model, relation.localKey())));
             });
             // 查询
             relationMap.forEach((fieldName, relation) -> {
@@ -462,10 +463,10 @@ public class Model {
                 List<Model> rows = queryModel.where(relation.foreignKey(), "IN", conditionMap.get(fieldName)).select();
                 // 数据装填
                 models.forEach(model -> {
-                    Object modelKeyVal = SqlUtil.getFieldValue(model, relation.localKey());
-                    List<Model> set = rows.stream().filter(row -> modelKeyVal.equals(SqlUtil.getFieldValue(row, relation.foreignKey())))
+                    Object modelKeyVal = ReflectUtil.getFieldValue(model, relation.localKey());
+                    List<Model> set = rows.stream().filter(row -> modelKeyVal.equals(ReflectUtil.getFieldValue(row, relation.foreignKey())))
                             .collect(Collectors.toList());
-                    SqlUtil.setFieldValue(model, fieldName, set);
+                    ReflectUtil.setFieldValue(model, fieldName, set);
                 });
             });
         }
@@ -957,7 +958,7 @@ public class Model {
                     if (relation.getType() == RelationType.OneToOne) {
                         Model relationModel = newModel(fieldType, curr);
                         // 设置全部关联属性为空，避免多重查询
-                        Object localValue = ModelUtil.getFieldValue(curr.getMClass(), curr, relation.localKey());
+                        Object localValue = ReflectUtil.getFieldValue(curr.getMClass(), curr, relation.localKey());
                         Object fieldValue = relationModel.where(relation.foreignKey(), localValue).find();  // 查询结果
                         curr.data(fieldName, fieldValue);
                         return fieldValue;
@@ -966,7 +967,7 @@ public class Model {
                             ParameterizedType pt = (ParameterizedType) field.getGenericType();
                             Class<?> genericClazz = (Class<?>) pt.getActualTypeArguments()[0];
                             Model relationModel = newModel(genericClazz, curr);
-                            Object localValue = ModelUtil.getFieldValue(curr.getMClass(), curr, relation.localKey());
+                            Object localValue = ReflectUtil.getFieldValue(curr.getMClass(), curr, relation.localKey());
                             Object fieldValue = relationModel.where(relation.foreignKey(), localValue).select();  // 查询结果
                             curr.data(fieldName, fieldValue);
                             return fieldValue;
@@ -978,7 +979,7 @@ public class Model {
                     OneToOne one = (OneToOne) modelField.getWay();
                     Model relationModel = newModel(fieldType, curr);
                     // 设置全部关联属性为空，避免多重查询
-                    Object localValue = ModelUtil.getFieldValue(curr.getMClass(), curr, one.localKey());
+                    Object localValue = ReflectUtil.getFieldValue(curr.getMClass(), curr, one.localKey());
                     Object fieldValue = relationModel.where(one.foreignKey(), localValue).find();  // 查询结果
                     curr.data(fieldName, fieldValue);
                     return fieldValue;
@@ -988,7 +989,7 @@ public class Model {
                         ParameterizedType pt = (ParameterizedType) field.getGenericType();
                         Class<?> genericClazz = (Class<?>) pt.getActualTypeArguments()[0];
                         Model relationModel = newModel(genericClazz, curr);
-                        Object localValue = ModelUtil.getFieldValue(curr.getMClass(), curr, many.localKey());
+                        Object localValue = ReflectUtil.getFieldValue(curr.getMClass(), curr, many.localKey());
                         Object fieldValue = relationModel.where(many.foreignKey(), localValue).select();  // 查询结果
                         curr.data(fieldName, fieldValue);
                         return fieldValue;
@@ -1018,7 +1019,7 @@ public class Model {
     @Override
     public String toString() {
         Map<String, Object> dataMap = new LinkedHashMap<>(data());
-        __meta.relationMap().forEach((name, relation) -> dataMap.put(name, SqlUtil.getFieldValue(this, name)));
+        __meta.relationMap().forEach((name, relation) -> dataMap.put(name, ReflectUtil.getFieldValue(this, name)));
         return getMClass().getSimpleName() + dataMap;
     }
 }

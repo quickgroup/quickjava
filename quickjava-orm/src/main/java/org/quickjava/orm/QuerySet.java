@@ -6,7 +6,7 @@ package org.quickjava.orm;
 
 import org.quickjava.orm.contain.*;
 import org.quickjava.orm.drive.Drive;
-import org.quickjava.orm.utils.BeanUtil;
+import org.quickjava.common.utils.BeanUtil;
 import org.quickjava.orm.utils.ORMHelper;
 import org.quickjava.orm.utils.QueryException;
 import org.quickjava.orm.utils.SqlUtil;

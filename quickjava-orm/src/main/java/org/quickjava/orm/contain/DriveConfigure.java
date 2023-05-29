@@ -16,21 +16,21 @@ package org.quickjava.orm.contain;
  */
 public class DriveConfigure {
 
-    public String fieldBefore = "";
+    public String fieldL = "";
 
-    public String fieldAfter = "";
+    public String fieldR = "";
 
-    public String whereValBefore = "";
+    public String whereValL = "";
 
-    public String whereValAfter = "";
+    public String whereValR = "";
 
     public DriveConfigure() {
     }
 
-    public DriveConfigure(String fieldBefore, String fieldAfter, String whereValBefore, String whereValAfter) {
-        this.fieldBefore = fieldBefore;
-        this.fieldAfter = fieldAfter;
-        this.whereValBefore = whereValBefore;
-        this.whereValAfter = whereValAfter;
+    public DriveConfigure(String fieldL, String fieldR, String whereValL, String whereValR) {
+        this.fieldL = fieldL;
+        this.fieldR = fieldR;
+        this.whereValL = whereValL;
+        this.whereValR = whereValR;
     }
 }

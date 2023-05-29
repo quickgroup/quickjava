@@ -1,4 +1,4 @@
-package org.quickjava.common;
+package org.quickjava.common.utils;
 
 /*
  * Copyright (c) 2020~2022 http://www.quickjava.org All rights reserved.

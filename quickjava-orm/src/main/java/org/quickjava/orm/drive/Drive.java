@@ -100,7 +100,7 @@ public abstract class Drive {
             for (Map.Entry<String, Object> entry : query.__Data().entrySet()) {
                 if (fi++ > 0)
                     dataSql.append(",");
-                String item = String.format("%s%s%s=%s", config.fieldBefore, entry.getKey(), config.fieldAfter,
+                String item = String.format("%s%s%s=%s", config.fieldL, entry.getKey(), config.fieldR,
                         Value.pretreatment(entry.getValue())
                 );
                 dataSql.append(item);

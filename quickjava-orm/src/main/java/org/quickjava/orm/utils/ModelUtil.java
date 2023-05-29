@@ -1,6 +1,7 @@
 package org.quickjava.orm.utils;
 
 import net.sf.cglib.proxy.Enhancer;
+import org.quickjava.common.utils.ReflectUtil;
 import org.quickjava.orm.Model;
 import org.quickjava.orm.contain.ModelMeta;
 
@@ -86,7 +87,7 @@ public class ModelUtil extends SqlUtil {
                     field.set(o, child);
                 }
             } else {
-                SqlUtil.setFieldValue(o, field, value);
+                ReflectUtil.setFieldValue(o, field, value);
             }
         } catch (IllegalAccessException e) {
             e.printStackTrace();

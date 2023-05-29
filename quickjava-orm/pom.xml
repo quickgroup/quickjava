@@ -3,11 +3,16 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
+    <parent>
+        <groupId>org.quickjava.core</groupId>
+        <artifactId>quickjava</artifactId>
+        <version>1.2.1</version>
+    </parent>
+
     <!-- 框架信息 -->
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.quickjava.core</groupId>
     <artifactId>quickjava-orm</artifactId>
-    <version>1.2.5</version>
+    <version>1.2.6</version>
     <packaging>jar</packaging>
     <name>quickjava-orm</name>
     <description>QuickJava ORM Framework</description>
@@ -31,6 +36,11 @@
 
     <!-- 依赖包 -->
     <dependencies>
+
+        <dependency>
+            <groupId>org.quickjava.core</groupId>
+            <artifactId>quickjava-common</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>

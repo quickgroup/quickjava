@@ -2,14 +2,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 
+    <parent>
+        <groupId>org.quickjava.core</groupId>
+        <artifactId>quickjava</artifactId>
+        <version>1.2.1</version>
+    </parent>
+
     <!-- 框架信息 -->
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.quickjava.core</groupId>
     <artifactId>quickjava-common</artifactId>
-    <version>1.2.5</version>
+    <version>${common.version}</version>
     <packaging>jar</packaging>
     <name>quickjava-common</name>
-    <description>QuickJava ORM Framework</description>
+    <description>QuickJava common</description>
     <url>http://www.quickjava.org/</url>
 
     <!-- 配置 -->
@@ -27,9 +32,5 @@
         <projectUrl>https://github.com/quickgroup/quickjava.git</projectUrl>
         <serverId>ossrh</serverId>
     </properties>
-
-    <dependencies>
-
-    </dependencies>
 
 </project>

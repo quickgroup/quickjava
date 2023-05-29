@@ -1,4 +1,4 @@
-package org.quickjava.common;
+package org.quickjava.common.utils;
 
 import java.util.Map;
 
@@ -19,7 +19,7 @@ import java.util.Map;
 public class BeanUtil {
 
     public static <T> T mapToBeanIgnoreCase(Map<?, ?> map, Class<T> beanClass, boolean isIgnoreError) {
-
+        return null;
     }
 
     public static <T> T mapToBean(Map<?, ?> map, Class<T> beanClass) {
@@ -27,7 +27,7 @@ public class BeanUtil {
     }
 
     public static <T> T toBeanIgnoreCase(Object source, Class<T> clazz, boolean ignoreError) {
-
+        return null;
     }
 
 }

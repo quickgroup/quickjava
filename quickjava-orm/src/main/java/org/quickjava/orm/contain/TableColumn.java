@@ -1,5 +1,6 @@
 package org.quickjava.orm.contain;
 
+import org.quickjava.common.utils.ReflectUtil;
 import org.quickjava.orm.utils.SqlUtil;
 
 import java.util.Map;
@@ -33,7 +34,7 @@ public class TableColumn {
     }
 
     public TableColumn(Map<String, String> info) {
-        info.forEach((k, v) -> SqlUtil.setFieldValue(this, k, v));
+        info.forEach((k, v) -> ReflectUtil.setFieldValue(this, k, v));
     }
 
     @Override
