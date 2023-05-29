@@ -113,7 +113,7 @@ public abstract class WhereBase {
     public String toString(DriveConfigure cfg) {
         // 嵌套查询
         if (children != null) {
-            return getLogicStr() + " " + taskOutFirstLogic(SqlUtil.collJoin(" ", children));
+            return getLogicStr() + " " + cutFirstLogic(SqlUtil.collJoin(" ", children));
         }
         // 输出
         if ("RAW".equals(operator)) {
@@ -144,7 +144,7 @@ public abstract class WhereBase {
      * @param whereSql 查询语句
      * @return 连接符AND、OR
      * */
-    public static String taskOutFirstLogic(String whereSql) {
+    public static String cutFirstLogic(String whereSql) {
         if (whereSql.toUpperCase().startsWith("AND ")) {
             return whereSql.substring(4);
         } else if (whereSql.toUpperCase().startsWith("OR ")) {

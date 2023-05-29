@@ -133,7 +133,7 @@ public abstract class Drive {
         // WHERE
         if (query.__WhereList().size() > 0) {
             sqlList.add("WHERE");
-            sqlList.add(WhereBase.taskOutFirstLogic(WhereBase.toSql(query.__WhereList(), config)));
+            sqlList.add(WhereBase.cutFirstLogic(WhereBase.toSql(query.__WhereList(), config)));
         }
 
         // ORDER BY
