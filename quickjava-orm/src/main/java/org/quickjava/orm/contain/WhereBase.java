@@ -5,7 +5,6 @@
 
 package org.quickjava.orm.contain;
 
-import cn.hutool.core.collection.CollectionUtil;
 import org.quickjava.orm.utils.SqlUtil;
 
 import java.util.LinkedHashMap;
@@ -30,12 +29,6 @@ public abstract class WhereBase {
         this.setField(field);
         this.setOperator(operator);
         this.setValue(value);
-    }
-
-    public WhereBase(WhereBase where) {
-        if (children == null)
-            children = new LinkedList<>();
-        children.add(where);
     }
 
     public int getLogic() {
@@ -89,7 +82,7 @@ public abstract class WhereBase {
         this.operator = operator;
     }
 
-    public Object getValue(StatementConfig config) {
+    public Object getValue(DriveConfigure config) {
         Object result;
         if (value == null) {
             result = "NULL";
@@ -100,7 +93,7 @@ public abstract class WhereBase {
         } else if (value instanceof Double) {
             result = Double.toString((Double) value);
         } else if (value instanceof Iterable) {
-            result = CollectionUtil.join(((Iterable<?>) value), ",");
+            result = SqlUtil.collJoin(",", ((Iterable<?>) value));
         } else {
             result = String.format("%s%s%s", config.whereValBefore, SqlUtil.escapeSql(String.valueOf(value)), config.whereValAfter);
         }
@@ -116,10 +109,10 @@ public abstract class WhereBase {
         return getLogicStr() + " " + field + " " + operator + " " + value;
     }
 
-    public String toString(StatementConfig config) {
+    public String toString(DriveConfigure config) {
         // 嵌套查询
         if (children != null) {
-            return getLogicStr() + " " + taskOutFirstLogic(SqlUtil.strJoin(" ", children));
+            return getLogicStr() + " " + taskOutFirstLogic(SqlUtil.collJoin(" ", children));
         }
         // 输出
         if ("RAW".equals(operator)) {
@@ -130,10 +123,10 @@ public abstract class WhereBase {
         return getLogicStr() + " " + getField() + " " + getOperator() + " " + getValue(config);
     }
 
-    public static String toSql(List<WhereBase> wheres, StatementConfig config) {
+    public static String toSql(List<WhereBase> wheres, DriveConfigure config) {
         List<String> sql = new LinkedList<>();
         wheres.forEach(where-> sql.add(where.toString(config)));
-        return SqlUtil.strJoin(" ", sql);
+        return SqlUtil.collJoin(" ", sql);
     }
 
     /**

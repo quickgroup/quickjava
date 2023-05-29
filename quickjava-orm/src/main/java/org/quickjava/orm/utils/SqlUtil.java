@@ -1,13 +1,11 @@
 package org.quickjava.orm.utils;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.ReflectUtil;
-import cn.hutool.core.util.StrUtil;
 import org.quickjava.orm.contain.ModelField;
 import org.quickjava.orm.contain.TableColumn;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,10 +24,11 @@ import java.util.Map;
  * License: Apache Licence 2.0
  * +-------------------------------------------------------------------
  */
-public class SqlUtil {
+public class SqlUtil extends ORMHelper {
 
     /**
      * 获取类上的泛型
+     *
      * @param clazz 目标类
      * @param index 泛型位置
      * @return 泛型实际类
@@ -40,7 +39,8 @@ public class SqlUtil {
 
     /**
      * 直接读取属性值，不走getter
-     * @param o 对象
+     *
+     * @param o         对象
      * @param fieldName 属性名
      * @return 属性值
      */
@@ -57,7 +57,7 @@ public class SqlUtil {
             if (clazz.getSuperclass() != null) {    // 向上找父类的属性
                 return getFieldValue(clazz.getSuperclass(), o, fieldName);
             }
-        } catch(IllegalAccessException ignored) {
+        } catch (IllegalAccessException ignored) {
         }
         return null;
     }
@@ -71,9 +71,27 @@ public class SqlUtil {
         }
     }
 
+    public static <T> T invoke(Object obj, String methodName, Object... args)
+    {
+        try {
+            Class<?>[] argsClasses = new Class<?>[args.length];
+            for (int i = 0; i < args.length; i++) {
+                argsClasses[i] = args[i] instanceof Class<?> ? (Class<?>) args[i] : args[i].getClass();
+            }
+            Method method = obj.getClass().getDeclaredMethod(methodName, argsClasses);
+            method.setAccessible(true);
+            return (T) method.invoke(obj, args);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
     /**
      * 直接设置属性值，不走setter
-     * @param o 对象
+     *
+     * @param o     对象
      * @param field 属性名
      * @param value 属性值
      */
@@ -95,7 +113,14 @@ public class SqlUtil {
     public static void setFieldValue(Object o, Field field, Object value) {
         try {
             field.setAccessible(true);
-            ReflectUtil.setFieldValue(o, field, value);
+            // setter
+            String setterName = field.getName();
+            setterName = "set" + setterName.substring(0, 1).toUpperCase() + setterName.substring(1);
+            Method method = o.getClass().getDeclaredMethod(setterName, value.getClass());
+            method.setAccessible(true);
+            method.invoke(o, value);
+//            ReflectUtil.setFieldValue(o, field, value);
+
         } catch (Exception e) {
             System.out.println("设置对象字段数据时异常 o=" + o + "\nfield=" + field + ", value=" + value + "\nmsg=" + e.getMessage());
             e.printStackTrace();
@@ -111,21 +136,23 @@ public class SqlUtil {
         for (int i = 0; i < str.length(); i++) {
             char src = str.charAt(i);
             switch (src) {
-                case '\'': sb.append('\\').append("'"); break;
+                case '\'':
+                    sb.append('\\').append("'");
+                    break;
                 case '\"':
-                case '\\': sb.append('\\');
-                default: sb.append(src); break;
+                case '\\':
+                    sb.append('\\');
+                default:
+                    sb.append(src);
+                    break;
             }
         }
         return sb.toString();
     }
 
-    public static boolean isEmpty(Object obj) {
-        return ObjectUtil.isEmpty(obj);
-    }
-
     /**
      * 是全大写字符串
+     *
      * @param str 名称
      * @return 是否全大写
      */
@@ -141,50 +168,43 @@ public class SqlUtil {
 
     /**
      * 反引号包围
+     *
      * @param str 字段名称
      * @return 结果
-     * */
+     */
     public static String backQuote(String str) {
         return "`" + str + "`";
     }
 
     /**
-     * 转为驼峰名称，如：userType，和 {@link SqlUtil#fieldLineName} 相反用法
-     * @param field 字段名称
-     * @return 结果
-     * */
-    public static String fieldName(String field) {
-        return StrUtil.toCamelCase(field);
-    }
-
-    /**
-     * 转为下划线字段名称，如：user_type，和 {@link SqlUtil#fieldName} 相反用法
-     * @param field 字段名称
-     * @return 结果
-     */
-    public static String fieldLineName(String field) {
-        return StrUtil.toUnderlineCase(field);
-    }
-
-    /**
      * List转字符串
-     * @param conjunction 连接字符
+     *
+     * @param sequence 连接字符
      * @param iterable 可迭代对象
+     * @param <T>      对象
      * @return 拼接语句
-     * @param <T> 对象
      */
-    public static <T> String strJoin(CharSequence conjunction, Iterable<T> iterable) {
-        return CollUtil.join(iterable, conjunction);
+    public static <T> String collJoin(CharSequence sequence, Iterable<T> iterable) {
+        StringBuilder sb = new StringBuilder();
+        int count = 0;
+        for (T t : iterable) {
+            sb.append(t).append(sequence);
+            count++;
+        }
+        if (count > 1) {
+            sb.deleteCharAt(sb.length() - sequence.length());
+        }
+        return sb.toString();
     }
 
     /**
      * map的键连接
-     * @param str 语句
-     * @param map 字段集
+     *
+     * @param str      语句
+     * @param map      字段集
      * @param callback 处理方法
      */
-    public static void mapKeyJoin(StringBuilder str, Map<String, Object> map, MapJoinCallback callback)
-    {
+    public static void mapKeyJoin(StringBuilder str, Map<String, Object> map, MapJoinCallback callback) {
         str.append("(");
         int fi = 0;
         for (Map.Entry<String, Object> entry : map.entrySet()) {
@@ -201,12 +221,12 @@ public class SqlUtil {
 
     /**
      * map的键连接
-     * @param str 构造语句
-     * @param data 数据集
+     *
+     * @param str      构造语句
+     * @param data     数据集
      * @param callback 数据处理方法
-     * */
-    public static void mapValueJoin(StringBuilder str, Map<String, Object> data, MapJoinCallback callback)
-    {
+     */
+    public static void mapValueJoin(StringBuilder str, Map<String, Object> data, MapJoinCallback callback) {
         str.append("(");
         int fi = 0;
         for (Map.Entry<String, Object> entry : data.entrySet()) {
@@ -234,8 +254,8 @@ public class SqlUtil {
         Map<String, Object> ret = new LinkedHashMap<>();
         Map<String, ModelField> fieldMap = ModelUtil.getMeta(clazz).fieldMap();
         data.forEach((k, v) -> {
-            if (fieldMap.containsKey(SqlUtil.fieldName(k))) {
-                ret.put(SqlUtil.fieldName(k), v);
+            if (fieldMap.containsKey(SqlUtil.toCamelCase(k))) {
+                ret.put(SqlUtil.toCamelCase(k), v);
             }
         });
         return ret;
@@ -250,6 +270,20 @@ public class SqlUtil {
 
     public static void setTableColumns(String table, List<TableColumn> columns) {
         tableColumnCache.put(table, columns);
+    }
+
+    // 数组查询
+    public static boolean inArray(Object[] arr, Object target) {
+        for (Object o : arr) {
+            if (o == target) {
+                return true;
+            } else if (o != null && o.equals(target)) {
+                return true;
+            } else if (target != null && target.equals(o)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

@@ -1,7 +1,5 @@
 package org.quickjava.orm.utils;
 
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
 import org.quickjava.orm.Q;
 import org.quickjava.orm.QuerySet;
 import org.quickjava.orm.contain.TableOri;
@@ -37,7 +35,7 @@ public class QuerySetHelper {
             Object value = entry.getValue();
             String[] nameArr = parseQueryField(name);
             String field = nameArr[0], condition = nameArr[1];
-            if (ObjectUtil.isEmpty(name) || ObjectUtil.isEmpty(value) || (ObjectUtil.isEmpty(field) && ObjectUtil.isEmpty(condition))) {
+            if (SqlUtil.isEmpty(name) || SqlUtil.isEmpty(value) || (SqlUtil.isEmpty(field) && SqlUtil.isEmpty(condition))) {
                 continue;
             }
             field = "`"+field+"`";
@@ -59,7 +57,7 @@ public class QuerySetHelper {
                 if (valueArr != null && valueArr.size() == 2) {
                     querySet.between(field, valueArr.get(0), valueArr.get(1));
                 }
-            } else if (ObjectUtil.isNotEmpty(field) && ObjectUtil.isNotEmpty(value)) {
+            } else if (SqlUtil.isNotEmpty(field) && SqlUtil.isNotEmpty(value)) {
                 querySet.where(field, condition, value);
             }
         }
@@ -79,7 +77,7 @@ public class QuerySetHelper {
     public static String[] parseQueryField(String name) {
         if (name.contains("__")) {
             String[] nameArr = name.split("__");
-            nameArr[0] = StrUtil.toUnderlineCase(nameArr[0]);   // 驼峰属性名称转数据下划线字段
+            nameArr[0] = SqlUtil.toUnderlineCase(nameArr[0]);   // 驼峰属性名称转数据下划线字段
             nameArr[1] = nameArr[1].toUpperCase();
             return nameArr;
         }

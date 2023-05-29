@@ -14,7 +14,7 @@ package org.quickjava.orm.contain;
  * License: Apache Licence 2.0
  * +-------------------------------------------------------------------
  */
-public class StatementConfig {
+public class DriveConfigure {
 
     public String fieldBefore = "";
 
@@ -24,10 +24,10 @@ public class StatementConfig {
 
     public String whereValAfter = "";
 
-    public StatementConfig() {
+    public DriveConfigure() {
     }
 
-    public StatementConfig(String fieldBefore, String fieldAfter, String whereValBefore, String whereValAfter) {
+    public DriveConfigure(String fieldBefore, String fieldAfter, String whereValBefore, String whereValAfter) {
         this.fieldBefore = fieldBefore;
         this.fieldAfter = fieldAfter;
         this.whereValBefore = whereValBefore;

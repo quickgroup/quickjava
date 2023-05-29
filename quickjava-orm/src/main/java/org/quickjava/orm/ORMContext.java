@@ -15,9 +15,9 @@ package org.quickjava.orm;
  * +-------------------------------------------------------------------
  */
 
-import cn.hutool.core.util.ReflectUtil;
 import org.quickjava.orm.drive.*;
 import org.quickjava.orm.utils.QuickConnection;
+import org.quickjava.orm.utils.SqlUtil;
 
 import java.sql.Connection;
 import java.util.LinkedHashMap;
@@ -89,12 +89,12 @@ public class ORMContext {
             throws ClassNotFoundException
     {
         Class<?> kernelClazz = ORMContext.class.getClassLoader().loadClass("org.quickjava.framework.Kernel");
-        Object config = ReflectUtil.getFieldValue(kernelClazz, "config");
-        Object database = ReflectUtil.invoke(config, "get", "database");
+        Object config = SqlUtil.getFieldValue(kernelClazz, "config");
+        Object database = SqlUtil.invoke(config, "get", "database");
         QuickConnection quickConnection = new QuickConnection(
-                ReflectUtil.invoke(database, "getString", "url"),
-                ReflectUtil.invoke(database, "getString", "username"),
-                ReflectUtil.invoke(database, "getString", "password")
+                SqlUtil.invoke(database, "getString", "url"),
+                SqlUtil.invoke(database, "getString", "username"),
+                SqlUtil.invoke(database, "getString", "password")
         );
         quickConnection.connectionFormType = 1;
         quickConnection.connectStart();

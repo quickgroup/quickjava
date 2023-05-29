@@ -1,6 +1,5 @@
 package org.quickjava.orm;
 
-import cn.hutool.core.util.ArrayUtil;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -17,6 +16,7 @@ import org.quickjava.orm.contain.ModelMeta;
 import org.quickjava.orm.contain.Pagination;
 import org.quickjava.orm.enums.RelationType;
 import org.quickjava.orm.utils.ModelUtil;
+import org.quickjava.orm.utils.ORMHelper;
 import org.quickjava.orm.utils.QuerySetHelper;
 import org.quickjava.orm.utils.SqlUtil;
 import org.quickjava.orm.contain.Relation;
@@ -112,7 +112,7 @@ public class Model {
     public Model where(Map<String, Object> query) {
         // 处理字段名：标准字段名你：驼峰转下划线组成
         Map<String, Object> queryRet = new LinkedHashMap<>();
-        query.forEach((name, val) -> queryRet.put(ModelUtil.fieldLineName(name), val));
+        query.forEach((name, val) -> queryRet.put(ModelUtil.toUnderlineCase(name), val));
         // 调用querySet加载条件
         QuerySetHelper.loadQuery(query(), queryRet);
         return this;
@@ -157,7 +157,7 @@ public class Model {
      * - 预载入补全表名
      * */
     private String whereFieldName(String field) {
-        field = ModelUtil.fieldLineName(field);
+        field = ModelUtil.toUnderlineCase(field);
         if (__withs != null) {
             if (!field.contains(".")) {
                 field = __meta.table() + "." + field;
@@ -229,7 +229,7 @@ public class Model {
     }
 
     public String pk() {
-        return ModelUtil.fieldName(query().getColumnPk());
+        return ModelUtil.toCamelCase(query().getColumnPk());
     }
 
     public String pkOri() {
@@ -264,18 +264,18 @@ public class Model {
      * @return 模型对象
      */
     public Model order(String field, String asc) {
-        query().order(ModelUtil.fieldLineName(field), asc);
+        query().order(ModelUtil.toUnderlineCase(field), asc);
         return this;
     }
 
     public Model order(String field, boolean asc) {
-        order(ModelUtil.fieldLineName(field), asc ? "ASC" : "DESC");
+        order(ModelUtil.toUnderlineCase(field), asc ? "ASC" : "DESC");
         return this;
     }
 
     public Model order(String fields)
     {
-        if (SqlUtil.isEmpty(fields)) {
+        if (ORMHelper.isEmpty(fields)) {
             return this;
         }
         if (fields.contains(",")) {
@@ -373,7 +373,7 @@ public class Model {
             if (field.getWay() != null || Model.class.isAssignableFrom(field.getClazz())) {
                 return;
             }
-            name = ModelUtil.fieldLineName(name);
+            name = ModelUtil.toUnderlineCase(name);
             fields.add(__meta.table() + "." + name + " AS " + __meta.table() + "__" + name);
         });
 
@@ -384,13 +384,13 @@ public class Model {
                 if (field.getWay() != null || Model.class.isAssignableFrom(field.getClazz())) {
                     return;
                 }
-                name = ModelUtil.fieldLineName(name);
+                name = ModelUtil.toUnderlineCase(name);
                 fields.add(aliasName + "." + name + " AS " + aliasName + "__" + name);
             });
             // join
             query().join(meta.table() + " " + aliasName,
-                    String.format("%s.%s = %s.%s", aliasName, ModelUtil.fieldLineName(relation.foreignKey()),
-                    __meta.table(), ModelUtil.fieldLineName(relation.localKey())), "LEFT");
+                    String.format("%s.%s = %s.%s", aliasName, ModelUtil.toUnderlineCase(relation.foreignKey()),
+                    __meta.table(), ModelUtil.toUnderlineCase(relation.localKey())), "LEFT");
         });
         // 查询器
         query().field(fields);
@@ -431,7 +431,7 @@ public class Model {
                 return;
             }
             String aliasName = relationName == null ? model.__meta.table() : relationName;
-            String dataName = aliasName + "__" + ModelUtil.fieldLineName(name);
+            String dataName = aliasName + "__" + ModelUtil.toUnderlineCase(name);
             model.data(name, set.get(dataName));
         });
     }
@@ -481,7 +481,7 @@ public class Model {
         if (__withs != null) {
             __withs.forEach(name -> {
                 Relation relation = __meta.relationMap().get(name);
-                if (relation != null && ArrayUtil.contains(types, relation.getType())) {
+                if (relation != null && SqlUtil.inArray(types, relation.getType())) {
                     relationMap.put(name, __meta.relationMap().get(name));
                 }
             });
@@ -507,7 +507,7 @@ public class Model {
 
     // 提取某字段为list
     public <D> D selectFieldList(String field) {
-        String fieldLine = ModelUtil.fieldLineName(field);
+        String fieldLine = ModelUtil.toUnderlineCase(field);
         List<Map<String, Object>> dataList = query().field(fieldLine).select();
         List<Object> ret = new LinkedList<>();
         dataList.forEach(v -> ret.add(v.get(fieldLine)));
@@ -554,7 +554,7 @@ public class Model {
     public Model data(String name, Object val)
     {
         // 数据保存
-        name = ModelUtil.fieldName(name);
+        name = ModelUtil.toCamelCase(name);
         org.quickjava.orm.contain.ModelField field = __meta.fieldMap().get(name);
         if (field != null && field.getWay() == null) {
             __data.put(name, val);      // 只保存本类字段数据，关联数据不缓存
@@ -583,8 +583,8 @@ public class Model {
         Map<String, org.quickjava.orm.contain.ModelField> fieldMap = ModelUtil.getMeta(clazz).fieldMap();
         Map<String, Object> ret = new LinkedHashMap<>();
         data.forEach((k, v) -> {
-            if (fieldMap.containsKey(ModelUtil.fieldName(k))) {
-                ret.put(ModelUtil.fieldLineName(k), v);
+            if (fieldMap.containsKey(ModelUtil.toCamelCase(k))) {
+                ret.put(ModelUtil.toUnderlineCase(k), v);
             }
         });
         return ret;
@@ -604,7 +604,7 @@ public class Model {
             if (v instanceof Model) {
                 // 关联模型数据不能一起写入
             } else {
-                ret.put(ModelUtil.fieldLineName(name), ModelUtil.valueToSqlValue(v));
+                ret.put(ModelUtil.toUnderlineCase(name), ModelUtil.valueToSqlValue(v));
             }
         });
         return ret;
@@ -647,7 +647,7 @@ public class Model {
         List<DataMap> dataList2 = new LinkedList<>();
         dataList.forEach(map -> {
             DataMap data = new DataMap();
-            map.forEach((k, v) -> data.put(ModelUtil.fieldLineName(k), v));
+            map.forEach((k, v) -> data.put(ModelUtil.toUnderlineCase(k), v));
             dataList2.add(data);
         });
         query().insertAll(dataList2);
@@ -697,7 +697,7 @@ public class Model {
             }
             // setter方法
             if (methodName.startsWith("set")) {
-                String fieldName = ModelUtil.fieldName(methodName.substring(3));
+                String fieldName = ModelUtil.toCamelCase(methodName.substring(3));
                 if (meta.fieldMap().containsKey(fieldName) && objects.length == 1 && method.getReturnType().equals(Void.TYPE)) {
                     Setter(clazz, o, method, objects[0], fieldName);
                 }
@@ -903,7 +903,7 @@ public class Model {
                 tableName = tableName.substring(0, tableName.lastIndexOf("Model"));
             }
         }
-        return ModelUtil.fieldLineName(tableName);
+        return ModelUtil.toUnderlineCase(tableName);
     }
 
     /**

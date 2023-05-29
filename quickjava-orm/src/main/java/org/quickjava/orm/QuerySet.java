@@ -4,12 +4,10 @@
 
 package org.quickjava.orm;
 
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.util.ObjectUtil;
 import org.quickjava.orm.contain.*;
 import org.quickjava.orm.drive.Drive;
-import org.quickjava.orm.drive.Mysql;
-import org.quickjava.orm.utils.DBConfig;
+import org.quickjava.orm.utils.BeanUtil;
+import org.quickjava.orm.utils.ORMHelper;
 import org.quickjava.orm.utils.QueryException;
 import org.quickjava.orm.utils.SqlUtil;
 
@@ -80,7 +78,7 @@ public class QuerySet {
 
     public QuerySet where(String field, String operator, Object value)
     {
-        if (SqlUtil.isEmpty(field)) {
+        if (ORMHelper.isEmpty(field)) {
             return this;
         }
         whereList.add(new Where(field, operator, value));
@@ -133,7 +131,7 @@ public class QuerySet {
 
     public QuerySet group(String fields)
     {
-        if (SqlUtil.isEmpty(fields)) {
+        if (ORMHelper.isEmpty(fields)) {
             return this;
         }
         groupBy = fields; //field.split(",");
@@ -153,7 +151,7 @@ public class QuerySet {
 
     public QuerySet order(String field)
     {
-        if (SqlUtil.isEmpty(field)) {
+        if (ORMHelper.isEmpty(field)) {
             return this;
         }
         if (field.contains(",")) {
@@ -192,7 +190,7 @@ public class QuerySet {
 
     public QuerySet field(String fields)
     {
-        if (SqlUtil.isEmpty(fields)) {
+        if (ORMHelper.isEmpty(fields)) {
             return this;
         }
         field(fields.split(","));
@@ -220,7 +218,7 @@ public class QuerySet {
     public List<Map<String, Object>> select()
     {
         List<Map<String, Object>> resultSet = executeSql();
-        return ObjectUtil.isEmpty(resultSet) ? new LinkedList<>() : resultSet;
+        return SqlUtil.isEmpty(resultSet) ? new LinkedList<>() : resultSet;
     }
 
     public <T> List<T> select(Class<T> clazz) {
@@ -232,7 +230,7 @@ public class QuerySet {
     {
         limit(0, 1);
         List<Map<String, Object>> resultSet = select();
-        return ObjectUtil.isEmpty(resultSet) ? null : resultSet.get(0);
+        return SqlUtil.isEmpty(resultSet) ? null : resultSet.get(0);
     }
 
     public <T> T find(Class<T> clazz)
@@ -315,7 +313,7 @@ public class QuerySet {
 //        table = (SqlUtil.isUpperString(table) ? table : SqlUtil.backQuote(table));
         String sql = "SHOW FULL COLUMNS FROM " + table;
         List<Map<String, String>> columns = (List<Map<String, String>>) this.executeSql(sql);
-        if (SqlUtil.isEmpty(columns)) {
+        if (ORMHelper.isEmpty(columns)) {
             return new LinkedList<>();
         }
         List<TableColumn> columns1 = new LinkedList<>();

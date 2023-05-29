@@ -1,6 +1,6 @@
 package org.quickjava.orm.utils;
 
-import cn.hutool.core.util.ObjectUtil;
+import java.util.Map;
 
 /*
  * Copyright (c) 2020~2023 http://www.quickjava.org All rights reserved.
@@ -9,21 +9,25 @@ import cn.hutool.core.util.ObjectUtil;
  * +-------------------------------------------------------------------
  * Author: Qlo1062
  * +-------------------------------------------------------------------
- * File: HelperController
+ * File: BeanUtil
  * +-------------------------------------------------------------------
- * Date: 2023-3-14 11:52
+ * Date: 2023-5-29 16:17
  * +-------------------------------------------------------------------
  * License: Apache Licence 2.0
  * +-------------------------------------------------------------------
  */
-public abstract class Helper {
+public class BeanUtil {
 
-    public static boolean isEmpty(Object obj) {
-        return ObjectUtil.isEmpty(obj);
+    public static <T> T mapToBeanIgnoreCase(Map<?, ?> map, Class<T> beanClass, boolean isIgnoreError) {
+
     }
 
-    public static boolean isNotEmpty(Object obj) {
-        return ObjectUtil.isNotEmpty(obj);
+    public static <T> T mapToBean(Map<?, ?> map, Class<T> beanClass) {
+        return mapToBeanIgnoreCase(map, beanClass, true);
+    }
+
+    public static <T> T toBeanIgnoreCase(Object source, Class<T> clazz, boolean ignoreError) {
+
     }
 
 }

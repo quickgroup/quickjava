@@ -7,7 +7,7 @@ package org.quickjava.orm.drive;
 
 import org.quickjava.orm.QuerySet;
 import org.quickjava.orm.contain.Action;
-import org.quickjava.orm.contain.StatementConfig;
+import org.quickjava.orm.contain.DriveConfigure;
 import org.quickjava.orm.contain.Value;
 import org.quickjava.orm.contain.WhereBase;
 import org.quickjava.orm.utils.QueryException;
@@ -16,7 +16,6 @@ import org.quickjava.orm.utils.SqlUtil;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,21 +25,21 @@ import java.util.Map;
  */
 public abstract class Drive {
 
-    private StatementConfig statementConfig = null;
+    private DriveConfigure configure = null;
 
-    private static final StatementConfig statementConfigDefault = new StatementConfig(
+    private static final DriveConfigure CONFIGURE_DEFAULT = new DriveConfigure(
             "", "",
             "'", "'"
     );
 
     private QuickConnection quickConnection = null;
 
-    public StatementConfig getStatementConfig() {
-        return statementConfig == null ? statementConfigDefault : statementConfig;
+    public DriveConfigure getConfigure() {
+        return configure == null ? CONFIGURE_DEFAULT : configure;
     }
 
-    public void setStatementConfig(StatementConfig statementConfig) {
-        this.statementConfig = statementConfig;
+    public void setConfigure(DriveConfigure configure) {
+        this.configure = configure;
     }
 
     public void setQuickConnection(QuickConnection quickConnection) {
@@ -73,7 +72,7 @@ public abstract class Drive {
         **/
 
         List<String> sqlList = new ArrayList<>();
-        StatementConfig config = getStatementConfig();
+        DriveConfigure config = getConfigure();
 
         // action
         Action action = query.__Action();
@@ -81,7 +80,7 @@ public abstract class Drive {
 
         // action is SELECT
         if (action == Action.SELECT) {
-            sqlList.add(SqlUtil.strJoin(",", query.__FieldList()));
+            sqlList.add(SqlUtil.collJoin(",", query.__FieldList()));
             sqlList.add("FROM");
         }
 
@@ -140,7 +139,7 @@ public abstract class Drive {
 
         // ORDER BY
         if (query.__Orders().size() > 0) {
-            sqlList.add(String.format("ORDER BY %s", SqlUtil.strJoin(",", query.__Orders())));
+            sqlList.add(String.format("ORDER BY %s", SqlUtil.collJoin(",", query.__Orders())));
         }
 
         // Limit
@@ -148,7 +147,7 @@ public abstract class Drive {
             sqlList.add(String.format("LIMIT %d,%d", query.__Limit(), query.__LimitSize()));
         }
 
-        return SqlUtil.strJoin(" ", sqlList);
+        return SqlUtil.collJoin(" ", sqlList);
     }
 
     public <T> T executeSql(QuerySet query) {

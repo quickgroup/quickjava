@@ -115,13 +115,13 @@ public class ModelUtil extends SqlUtil {
                         field.set(dst, data.get(field.getName()));
                         continue;
                     }
-                    String fieldName = ModelUtil.fieldName(field.getName());
+                    String fieldName = ModelUtil.toCamelCase(field.getName());
                     if (data.containsKey(fieldName)) {
                         field.setAccessible(true);
                         field.set(dst, data.get(fieldName));
                         continue;
                     }
-                    fieldName = ModelUtil.fieldLineName(field.getName());
+                    fieldName = ModelUtil.toUnderlineCase(field.getName());
                     if (data.containsKey(fieldName)) {
                         field.setAccessible(true);
                         field.set(dst, data.get(fieldName));

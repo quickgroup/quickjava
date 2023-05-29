@@ -1,9 +1,6 @@
 package org.quickjava.orm.drive;
 
-import org.quickjava.orm.QuerySet;
-import org.quickjava.orm.contain.Action;
-import org.quickjava.orm.contain.StatementConfig;
-import org.quickjava.orm.utils.QuickConnection;
+import org.quickjava.orm.contain.DriveConfigure;
 
 /*
  * Copyright (c) 2020~2023 http://www.quickjava.org All rights reserved.
@@ -21,14 +18,14 @@ import org.quickjava.orm.utils.QuickConnection;
  */
 public class Oracle extends Drive {
 
-    private static final StatementConfig statementConfig = new StatementConfig(
+    private static final DriveConfigure CONFIGURE = new DriveConfigure(
             "", "",
             "'", "'"
     );
 
     @Override
-    public StatementConfig getStatementConfig() {
-        return statementConfig;
+    public DriveConfigure getConfigure() {
+        return CONFIGURE;
     }
 
 }
