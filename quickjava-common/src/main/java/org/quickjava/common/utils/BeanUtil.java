@@ -1,5 +1,6 @@
 package org.quickjava.common.utils;
 
+import java.lang.reflect.Field;
 import java.util.Map;
 
 /*
@@ -18,16 +19,41 @@ import java.util.Map;
  */
 public class BeanUtil {
 
-    public static <T> T mapToBeanIgnoreCase(Map<?, ?> map, Class<T> beanClass, boolean isIgnoreError) {
-        return null;
+    public static <T> T mapToBean(Map<?, ?> map, Class<T> beanClass, boolean isIgnoreError)
+    {
+        try {
+            T bean = beanClass.newInstance();
+            map.forEach((key, val) -> {
+                try {
+                    String name = key.toString();
+                    if (val instanceof Map) {
+                        Field field = ReflectUtil.getField(bean, name);
+                        if (field != null) {
+                            Object child = mapToBean((Map<?, ?>) val, field.getDeclaringClass(), isIgnoreError);
+                            ReflectUtil.setFieldValue(bean, name, child);
+                        }
+                    } else {
+                        ReflectUtil.setFieldValue(bean, name, val);
+                    }
+                } catch (Exception e) {
+                    if (!isIgnoreError) {
+                        throw e;
+                    }
+                }
+            });
+            return bean;
+
+        } catch (Exception e) {
+            if (!isIgnoreError) {
+                e.printStackTrace();
+                throw new RuntimeException(e.getMessage());
+            }
+            return null;
+        }
     }
 
     public static <T> T mapToBean(Map<?, ?> map, Class<T> beanClass) {
-        return mapToBeanIgnoreCase(map, beanClass, true);
-    }
-
-    public static <T> T toBeanIgnoreCase(Object source, Class<T> clazz, boolean ignoreError) {
-        return null;
+        return mapToBean(map, beanClass, true);
     }
 
 }

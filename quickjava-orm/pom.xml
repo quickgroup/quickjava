@@ -12,7 +12,7 @@
     <!-- 框架信息 -->
     <modelVersion>4.0.0</modelVersion>
     <artifactId>quickjava-orm</artifactId>
-    <version>1.2.6</version>
+    <version>${orm.version}</version>
     <packaging>jar</packaging>
     <name>quickjava-orm</name>
     <description>QuickJava ORM Framework</description>
@@ -40,6 +40,7 @@
         <dependency>
             <groupId>org.quickjava.core</groupId>
             <artifactId>quickjava-common</artifactId>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>

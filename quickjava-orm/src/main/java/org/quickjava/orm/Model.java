@@ -560,7 +560,7 @@ public class Model {
         if (field != null && field.getWay() == null) {
             __data.put(name, val);      // 只保存本类字段数据，关联数据不缓存
         }
-        ModelUtil.setFieldValue(this, name, val);
+        ReflectUtil.setFieldValue(this, name, val);
 
         // 被修改的字段
         if (__modified == null) {
@@ -676,7 +676,7 @@ public class Model {
         }
         // 设置父类
         if (!ModelUtil.isEmpty(parent)) {
-            ModelUtil.setFieldValue(model, "__parent", parent);
+            ReflectUtil.setFieldValueDirect(model, "__parent", parent);
         }
         return model;
     }

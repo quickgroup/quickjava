@@ -118,4 +118,15 @@ public abstract class ComUtil {
             return sb.toString();
         }
     }
+
+    public static String firstUpper(String str)
+    {
+        if (isEmpty(str)) {
+            return str;
+        } else if (str.length() == 1) {
+            return str.substring(0, 1).toUpperCase();
+        }
+        str = str.substring(0, 1).toUpperCase() + str.substring(1);
+        return str;
+    }
 }

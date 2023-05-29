@@ -236,7 +236,7 @@ public class QuerySet {
     public <T> T find(Class<T> clazz)
     {
         Map<String, Object> result = find();
-        return result == null ? null : BeanUtil.mapToBeanIgnoreCase(result, clazz, true);
+        return result == null ? null : BeanUtil.mapToBean(result, clazz);
     }
 
     public QuerySet data(String field, String value)
@@ -403,7 +403,7 @@ public class QuerySet {
             return new LinkedList<>();
         }
         List<T> beanList = new LinkedList<>();
-        resultSet.forEach(row -> beanList.add(BeanUtil.toBeanIgnoreCase(row, clazz, true)));
+        resultSet.forEach(row -> beanList.add(toBean(clazz, row)));
         return beanList;
     }
 
@@ -411,7 +411,7 @@ public class QuerySet {
         if (row == null) {
             return null;
         }
-        return BeanUtil.toBeanIgnoreCase(row, clazz, true);
+        return BeanUtil.mapToBean(row, clazz);
     }
 
     //TODO::--------------- 事务操作方法 ---------------
