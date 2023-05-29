@@ -1,4 +1,4 @@
-package org.quickjava.orm.utils;
+package org.quickjava.common;
 
 import java.util.Map;
 

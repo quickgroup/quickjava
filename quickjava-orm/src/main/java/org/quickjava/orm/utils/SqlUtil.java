@@ -5,7 +5,6 @@ import org.quickjava.orm.contain.TableColumn;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,6 +70,7 @@ public class SqlUtil extends ORMHelper {
         }
     }
 
+    // FIXME::该方法兼容性差
     public static <T> T invoke(Object obj, String methodName, Object... args)
     {
         try {

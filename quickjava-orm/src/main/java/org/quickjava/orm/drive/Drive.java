@@ -11,7 +11,6 @@ import org.quickjava.orm.contain.DriveConfigure;
 import org.quickjava.orm.contain.Value;
 import org.quickjava.orm.contain.WhereBase;
 import org.quickjava.orm.utils.QueryException;
-import org.quickjava.orm.utils.QuickConnection;
 import org.quickjava.orm.utils.SqlUtil;
 
 import java.sql.SQLException;

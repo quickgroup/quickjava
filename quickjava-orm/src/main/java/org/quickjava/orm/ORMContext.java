@@ -16,7 +16,7 @@ package org.quickjava.orm;
  */
 
 import org.quickjava.orm.drive.*;
-import org.quickjava.orm.utils.QuickConnection;
+import org.quickjava.orm.drive.QuickConnection;
 import org.quickjava.orm.utils.SqlUtil;
 
 import java.sql.Connection;

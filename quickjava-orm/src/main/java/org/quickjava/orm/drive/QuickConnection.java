@@ -1,4 +1,6 @@
-package org.quickjava.orm.utils;
+package org.quickjava.orm.drive;
+
+import org.quickjava.orm.utils.QueryException;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

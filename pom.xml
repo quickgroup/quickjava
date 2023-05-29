@@ -10,6 +10,7 @@
     <version>1.0-SNAPSHOT</version>
 
     <modules>
+        <module>quickjava-common</module>
         <module>quickjava-core</module>
         <module>quickjava-orm</module>
         <module>quickjava-www</module>
