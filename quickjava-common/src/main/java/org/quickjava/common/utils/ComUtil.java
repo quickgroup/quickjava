@@ -49,23 +49,47 @@ public abstract class ComUtil {
         return !isEmpty(obj);
     }
 
+    public static boolean isAllUpperCase(String str) {
+        for (int i = 0; i < str.length(); i++) {
+            char c = str.charAt(i);
+            if (Character.isLetter(c) && !Character.isUpperCase(c)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     /**
      * 转为驼峰名称，如：userType，和 {@link #toUnderlineCase} 相反用法
      *
-     * @param str 字符串
+     * @param inputString 字符串
      * @return 结果
      */
-    public static String toCamelCase(String str) {
-        Matcher matcher = UNDERLINE_PATTERN.matcher(str);
-        StringBuffer sb = new StringBuffer(str);
-        if (matcher.find()) {
-            sb = new StringBuffer();
-            matcher.appendReplacement(sb, matcher.group(1).toUpperCase());
-            matcher.appendTail(sb);
-        } else {
-            return sb.toString().replaceAll("_", "");
+    public static String toCamelCase(String inputString) {
+        if (!inputString.contains("_")) {
+            // 全大写字符串且不含分隔符，直接全部转小写，兼容ORACLE
+            if (isAllUpperCase(inputString)) {
+                return inputString.toLowerCase();
+            }
+            return inputString;
         }
-        return toCamelCase(sb.toString());
+
+        StringBuilder result = new StringBuilder();
+        boolean capitalizeNextChar = false;
+        // 遍历输入字符串中的每个字符
+        for (int i = 0; i < inputString.length(); i++) {
+            char currentChar = inputString.charAt(i);
+            if (currentChar == '_') {
+                capitalizeNextChar = true;
+            } else if (capitalizeNextChar) {
+                result.append(Character.toUpperCase(currentChar));
+                capitalizeNextChar = false;
+            } else {
+                result.append(Character.toLowerCase(currentChar));
+            }
+        }
+
+        return result.toString();
     }
 
     /**

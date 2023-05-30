@@ -524,11 +524,6 @@ public class QuerySet {
         return orderByList;
     }
 
-    public Map<String, Object> __Data()
-    {
-        return data;
-    }
-
     public List<Map<String, Object>> __DataList() {
         return dataList;
     }

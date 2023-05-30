@@ -57,18 +57,18 @@ public abstract class Drive {
     public String pretreatment(QuerySet query)
     {
         /*
-        SQL执行顺序：
-        FROM table1 left join table2 on 将table1和table2中的数据产生笛卡尔积，生成Temp1
-        JOIN table2 所以先是确定表，再确定关联条件
-        ON table1.column = table2.columu 确定表的绑定条件 由Temp1产生中间表Temp2
-        WHERE 对中间表Temp2产生的结果进行过滤 产生中间表Temp3
-        GROUP BY 对中间表Temp3进行分组，产生中间表Temp4
-        HAVING 对分组后的记录进行聚合 产生中间表Temp5
-        SELECT 对中间表Temp5进行列筛选，产生中间表 Temp6
-        DISTINCT 对中间表 Temp6进行去重，产生中间表 Temp7
-        ORDER BY 对Temp7中的数据进行排序，产生中间表Temp8
-        LIMIT 对中间表Temp8进行分页，产生中间表Temp9
-        **/
+         * SQL关键字顺序
+            以下是 SQL 查询中常见的关键字的一种典型顺序：
+            SELECT：选择要检索的列或表达式。
+            FROM：指定要查询的表名或视图。
+            JOIN：用于连接多个表的关键字。根据连接类型，可能还有 LEFT JOIN、RIGHT JOIN、INNER JOIN 等。
+            WHERE：用于筛选要返回的行，根据指定的条件。
+            GROUP BY：用于对结果进行分组，通常与聚合函数一起使用。
+            HAVING：用于在 GROUP BY 之后对结果进行筛选，根据指定的条件。
+            ORDER BY：用于对结果进行排序，可以指定一个或多个列，并选择升序（ASC）或降序（DESC）。
+            LIMIT：用于限制结果集的行数，指定要返回的行数。
+            OFFSET（可选）：用于跳过结果集中的前几行，通常与 LIMIT 一起使用。
+         */
 
         List<String> sqlList = new ArrayList<>();
         DriveConfigure config = getConfigure();
@@ -93,11 +93,28 @@ public abstract class Drive {
             });
         }
 
+        // INSERT-DATA
+        if (action == Action.INSERT) {
+            StringBuilder dataSql = new StringBuilder();
+            // field
+            SqlUtil.mapKeyJoin(dataSql, query.__DataList().get(0));
+            // values
+            dataSql.append(" VALUES ");
+            // 数据处理方法
+            SqlUtil.MapJoinCallback joinCallback = entry -> Value.pretreatment(entry.getValue());
+            for (int i = 0; i < query.__DataList().size(); i++) {
+                if (i > 0)
+                    dataSql.append(',');
+                SqlUtil.mapBracketsJoin(dataSql, query.__DataList().get(i), joinCallback);
+            }
+            sqlList.add(dataSql.toString());
+        }
+
         // UPDATE
         if (action == Action.UPDATE) {
             StringBuilder dataSql = new StringBuilder();
             int fi = 0;
-            for (Map.Entry<String, Object> entry : query.__Data().entrySet()) {
+            for (Map.Entry<String, Object> entry : query.__DataList().get(0).entrySet()) {
                 if (fi++ > 0)
                     dataSql.append(",");
                 String item = String.format("%s%s%s=%s", config.fieldL, entry.getKey(), config.fieldR,
@@ -109,32 +126,14 @@ public abstract class Drive {
             sqlList.add(dataSql.toString());
         }
 
-        // INSERT-DATA
-        if (action == Action.INSERT) {
-            StringBuilder dataSql = new StringBuilder();
-            // field
-            SqlUtil.mapKeyJoin(dataSql, query.__DataList().isEmpty() ? query.__Data() : query.__DataList().get(0));
-            // 数据处理方法
-            SqlUtil.MapJoinCallback joinCallback = entry -> Value.pretreatment(entry.getValue());
-            // values
-            dataSql.append(" VALUES ");
-            if (query.__DataList().isEmpty()) {
-                SqlUtil.mapValueJoin(dataSql, query.__Data(), joinCallback);
-            } else {
-                for (int i = 0; i < query.__DataList().size(); i++) {
-                    if (i > 0)
-                        dataSql.append(',');
-                    SqlUtil.mapValueJoin(dataSql, query.__DataList().get(i), joinCallback);
-                }
-            }
-            sqlList.add(dataSql.toString());
-        }
-
         // WHERE
         if (query.__WhereList().size() > 0) {
             sqlList.add("WHERE");
             sqlList.add(WhereBase.cutFirstLogic(WhereBase.toSql(query.__WhereList(), config)));
         }
+
+        // GROUP BY
+        // HAVING
 
         // ORDER BY
         if (query.__Orders().size() > 0) {
@@ -198,7 +197,7 @@ public abstract class Drive {
 //            if (action == Action.INSERT) {
 //                printSql = sql.length() < 512 ? sql: sql.substring(0, 512);
 //            }
-            String msg = "SQL execution time " + ((double) (endTime - startTime)) / 1000000 + "ms " + printSql;
+            String msg = "Execution " + ((double) (endTime - startTime)) / 1000000 + "ms, SQL=" + printSql;
             System.out.println(msg);
 
             // 主动关闭连接
@@ -209,7 +208,11 @@ public abstract class Drive {
     }
 
     public void setAutoCommit(boolean autoCommit) {
-        quickConnection.setAutoCommit(autoCommit);
+        try {
+            quickConnection.setAutoCommit(autoCommit);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void startTrans() {
@@ -217,10 +220,24 @@ public abstract class Drive {
     }
 
     public void commit() {
-        quickConnection.commit();
+        try {
+            quickConnection.commit();
+            quickConnection.setAutoCommit(true);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            quickConnection.close();        // druid连接池：事务完成后返回连接
+        }
     }
 
     public void rollback() {
-        quickConnection.rollback();
+        try {
+            quickConnection.rollback();
+            quickConnection.setAutoCommit(true);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            quickConnection.close();        // druid连接池：事务完成后返回连接
+        }
     }
 }

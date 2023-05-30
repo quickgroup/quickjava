@@ -20,17 +20,23 @@ public class DriveConfigure {
 
     public String fieldR = "";
 
-    public String whereValL = "\"";
+    /**
+     * 字符串数据左边连接符
+     */
+    public String strL = "\"";
 
-    public String whereValR = "\"";
+    /**
+     * 字符串数据右边连接符
+     */
+    public String strR = "\"";
 
     public DriveConfigure() {
     }
 
-    public DriveConfigure(String fieldL, String fieldR, String whereValL, String whereValR) {
+    public DriveConfigure(String fieldL, String fieldR, String strL, String strR) {
         this.fieldL = fieldL;
         this.fieldR = fieldR;
-        this.whereValL = whereValL;
-        this.whereValR = whereValR;
+        this.strL = strL;
+        this.strR = strR;
     }
 }

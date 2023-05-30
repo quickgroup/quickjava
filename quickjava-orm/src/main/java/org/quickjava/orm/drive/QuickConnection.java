@@ -117,36 +117,20 @@ public class QuickConnection {
         UNKNOWN,
     }
 
-    public void setAutoCommit(boolean autoCommit) {
-        try {
-            connection.setAutoCommit(autoCommit);
-            this.autoCommit = autoCommit;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+    public void setAutoCommit(boolean autoCommit) throws SQLException {
+        this.autoCommit = autoCommit;
+        connection.setAutoCommit(autoCommit);
     }
 
-    public void startTrans() {
+    public void startTrans() throws SQLException {
         setAutoCommit(false);
     }
 
-    public void commit() {
-        try {
-            connection.commit();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } finally {
-            close();        // druid连接池：事务完成后返回连接
-        }
+    public void commit() throws SQLException {
+        connection.commit();
     }
 
-    public void rollback() {
-        try {
-            connection.rollback();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } finally {
-            close();        // druid连接池：事务完成后返回连接
-        }
+    public void rollback() throws SQLException {
+        connection.rollback();
     }
 }

@@ -89,32 +89,10 @@ public class SqlUtil extends ORMHelper {
      * map的键连接
      *
      * @param str      语句
-     * @param map      字段集
+     * @param data      字段集
      * @param callback 处理方法
      */
-    public static void mapKeyJoin(StringBuilder str, Map<String, Object> map, MapJoinCallback callback) {
-        str.append("(");
-        int fi = 0;
-        for (Map.Entry<String, Object> entry : map.entrySet()) {
-            if (fi++ > 0)
-                str.append(",");
-            str.append(callback.call(entry));
-        }
-        str.append(")");
-    }
-
-    public static void mapKeyJoin(StringBuilder str, Map<String, Object> map) {
-        mapKeyJoin(str, map, mapJoinKeyCallback);
-    }
-
-    /**
-     * map的键连接
-     *
-     * @param str      构造语句
-     * @param data     数据集
-     * @param callback 数据处理方法
-     */
-    public static void mapValueJoin(StringBuilder str, Map<String, Object> data, MapJoinCallback callback) {
+    public static void mapBracketsJoin(StringBuilder str, Map<String, Object> data, MapJoinCallback callback) {
         str.append("(");
         int fi = 0;
         for (Map.Entry<String, Object> entry : data.entrySet()) {
@@ -125,8 +103,8 @@ public class SqlUtil extends ORMHelper {
         str.append(")");
     }
 
-    public static void mapValueJoin(StringBuilder str, Map<String, Object> map) {
-        mapValueJoin(str, map, mapJoinValueCallback);
+    public static void mapKeyJoin(StringBuilder str, Map<String, Object> map) {
+        mapBracketsJoin(str, map, mapJoinKeyCallback);
     }
 
     public static MapJoinCallback mapJoinKeyCallback = Map.Entry::getKey;

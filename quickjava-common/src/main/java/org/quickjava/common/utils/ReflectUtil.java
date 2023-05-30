@@ -6,6 +6,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Clob;
 import java.util.Arrays;
+import java.util.Date;
 
 /*
  * Copyright (c) 2020~2023 http://www.quickjava.org All rights reserved.
@@ -130,11 +131,7 @@ public class ReflectUtil {
             Field field = getField(clazz, fieldName, true);
             if (field != null) {
                 field.setAccessible(true);
-                if (String.class.isAssignableFrom(field.getType())) {
-                    field.set(o, valueConv(value));     // clob类型
-                } else {
-                    field.set(o, value);
-                }
+                field.set(o, valueConv(field.getType(), value));
             }
 
         } catch (Exception e) {
@@ -143,18 +140,19 @@ public class ReflectUtil {
     }
 
     public static void setFieldValueDirect(Object o, String fieldName, Object value) {
+        setFieldValueDirect(o.getClass(), o, fieldName, value);
+    }
+
+    public static void setFieldValueDirect(Class<?> clazz, Object o, String fieldName, Object value) {
         try {
-            // 处理clob类未string
-            value = valueConv(value);
-            // 类型
-            Class<?> clazz = o instanceof Class ? (Class<?>) o : o.getClass();
             Field field = getField(clazz, fieldName);
             if (field != null) {
+                value = valueConv(field.getType(), value);
                 field.setAccessible(true);
                 field.set(o, value);
             } else {
                 if (clazz.getSuperclass() != null) {
-                    setFieldValue(clazz.getSuperclass(), o, fieldName, value);
+                    setFieldValueDirect(clazz.getSuperclass(), o, fieldName, value);
                 }
             }
         } catch (Exception e) {
@@ -228,17 +226,13 @@ public class ReflectUtil {
     }
 
     // 数据转换
-    public static Object valueConv(Object value)
+    public static Object valueConv(Class<?> retClazz, Object value)
     {
-        if (value instanceof Clob) {
-            try {
-                Clob clob = (Clob) value;
-                return clob.getSubString(1, (int) clob.length());
-            } catch (Exception ignored) {
-            }
+        try {
+            return DbClassConv.valueConv(retClazz, value);
+        } catch (Exception ignored) {
         }
         return value;
     }
-
 
 }

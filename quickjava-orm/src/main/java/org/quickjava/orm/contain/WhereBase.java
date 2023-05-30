@@ -80,21 +80,20 @@ public abstract class WhereBase {
     }
 
     public Object valueConv(Object value, DriveConfigure config) {
-        Object result;
         if (value == null) {
-            result = "NULL";
+            return "NULL";
         } else if (value instanceof Integer || value instanceof Long) {
-            result = String.valueOf(value);
+            return String.valueOf(value);
         } else if (value instanceof Float) {
-            result = Float.toString((Float) value);
+            return Float.toString((Float) value);
         } else if (value instanceof Double) {
-            result = Double.toString((Double) value);
+            return Double.toString((Double) value);
         } else if (value instanceof Iterable) {
-            result = SqlUtil.collJoin(",", ((Iterable<?>) value));
+            return SqlUtil.collJoin(",", ((Iterable<?>) value));
         } else {
-            result = String.format("%s%s%s", config.whereValL, SqlUtil.escapeSql(String.valueOf(value)), config.whereValR);
+            value = SqlUtil.escapeSql(String.valueOf(value));
+            return String.format("%s%s%s", config.strL, value, config.strR);
         }
-        return result;
     }
 
     public Object getValue(DriveConfigure config) {
@@ -127,6 +126,8 @@ public abstract class WhereBase {
             } else if (value instanceof List) {
                 List<?> list = (List<?>) value;
                 arr = new Object[]{list.get(0), list.get(1)};
+            } else if (value instanceof String) {
+                arr = ((String) value).split(",");
             }
             return getLogicStr() + " " + getField() + " BETWEEN " + valueConv(arr[0], cfg) + " AND " + valueConv(arr[1], cfg);
         }
