@@ -197,7 +197,7 @@ public abstract class Drive {
 //            if (action == Action.INSERT) {
 //                printSql = sql.length() < 512 ? sql: sql.substring(0, 512);
 //            }
-            String msg = "Execution " + ((double) (endTime - startTime)) / 1000000 + "ms, SQL=" + printSql;
+            String msg = "SQL Execution " + ((double) (endTime - startTime)) / 1000000 + "ms: " + printSql;
             System.out.println(msg);
 
             // 主动关闭连接

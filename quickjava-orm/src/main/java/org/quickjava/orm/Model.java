@@ -114,7 +114,7 @@ public class Model {
     public Model where(Map<String, Object> query) {
         // 处理字段名：标准字段名你：驼峰转下划线组成
         Map<String, Object> queryRet = new LinkedHashMap<>();
-        query.forEach((name, val) -> queryRet.put(ModelUtil.toUnderlineCase(name), val));
+        query.forEach((name, val) -> queryRet.put(fieldToUnderlineCase(name), val));
         // 调用querySet加载条件
         QuerySetHelper.loadQuery(query(), queryRet);
         return this;
@@ -159,7 +159,7 @@ public class Model {
      * - 预载入补全表名
      * */
     private String whereFieldName(String field) {
-        field = ModelUtil.toUnderlineCase(field);
+        field = fieldToUnderlineCase(field);
         if (__withs != null) {
             if (!field.contains(".")) {
                 field = __meta.table() + "." + field;
@@ -266,12 +266,25 @@ public class Model {
      * @return 模型对象
      */
     public Model order(String field, String asc) {
-        query().order(ModelUtil.toUnderlineCase(field), asc);
+        query().order(fieldToUnderlineCase(field), asc);
         return this;
     }
 
+    /**
+     * 字段转下划线格式
+     * @param field 属性名
+     * @return 结果
+     */
+    private static String fieldToUnderlineCase(String field) {
+        if (field.contains(".")) {
+            String[] arr = field.split("\\.");
+            return arr[0] + "." + ModelUtil.toUnderlineCase(arr[1]);
+        }
+        return field;
+    }
+
     public Model order(String field, boolean asc) {
-        order(ModelUtil.toUnderlineCase(field), asc ? "ASC" : "DESC");
+        order(field, asc ? "ASC" : "DESC");
         return this;
     }
 
@@ -509,7 +522,7 @@ public class Model {
 
     // 提取某字段为list
     public <D> D selectFieldList(String field) {
-        String fieldLine = ModelUtil.toUnderlineCase(field);
+        String fieldLine = fieldToUnderlineCase(field);
         List<Map<String, Object>> dataList = query().field(fieldLine).select();
         List<Object> ret = new LinkedList<>();
         dataList.forEach(v -> ret.add(v.get(fieldLine)));
@@ -586,7 +599,7 @@ public class Model {
         Map<String, Object> ret = new LinkedHashMap<>();
         data.forEach((k, v) -> {
             if (fieldMap.containsKey(ModelUtil.toCamelCase(k))) {
-                ret.put(ModelUtil.toUnderlineCase(k), v);
+                ret.put(fieldToUnderlineCase(k), v);
             }
         });
         return ret;
@@ -606,7 +619,7 @@ public class Model {
             if (v instanceof Model) {
                 // 关联模型数据不能一起写入
             } else {
-                ret.put(ModelUtil.toUnderlineCase(name), ModelUtil.valueToSqlValue(v));
+                ret.put(fieldToUnderlineCase(name), ModelUtil.valueToSqlValue(v));
             }
         });
         return ret;
@@ -649,7 +662,7 @@ public class Model {
         List<DataMap> dataList2 = new LinkedList<>();
         dataList.forEach(map -> {
             DataMap data = new DataMap();
-            map.forEach((k, v) -> data.put(ModelUtil.toUnderlineCase(k), v));
+            map.forEach((k, v) -> data.put(fieldToUnderlineCase(k), v));
             dataList2.add(data);
         });
         query().insertAll(dataList2);
