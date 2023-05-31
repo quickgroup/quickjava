@@ -10,11 +10,14 @@ public class ApplicationBoot {
     public static void main(String[] args)
     {
         QuickJavaBoot.start(ApplicationBoot.class, args);
-        System.out.println("user_type=" + ComUtil.toCamelCase("userTypeText"));
-        System.out.println("user_type=" + ComUtil.toCamelCase("user_type_Text"));
+        System.out.println("userTypeText=" + ComUtil.toCamelCase("userTypeText"));
+        System.out.println("USER_TYPE_TEXT=" + ComUtil.toCamelCase("USER_TYPE_TEXT"));
+        System.out.println("user_type_Text=" + ComUtil.toCamelCase("user_Type_text"));
+        System.out.println("user_type_text=" + ComUtil.toCamelCase("user_type_text"));
 
-        System.out.println("user_type=" + ComUtil.toUnderlineCase("userTypeText"));
-        System.out.println("user_type=" + ComUtil.toUnderlineCase("user_type_Text"));
+        System.out.println("userTypeText=" + ComUtil.toUnderlineCase("userTypeText"));
+        System.out.println("USER_TYPE_TEXT=" + ComUtil.toUnderlineCase("USER_TYPE_TEXT"));
+        System.out.println("user_type_Text=" + ComUtil.toUnderlineCase("user_type_Text"));
     }
 
 }

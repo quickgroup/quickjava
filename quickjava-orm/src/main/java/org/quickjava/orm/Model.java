@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
+import org.quickjava.common.utils.ComUtil;
 import org.quickjava.common.utils.ReflectUtil;
 import org.quickjava.orm.annotation.ModelName;
 import org.quickjava.orm.annotation.ModelField;
@@ -759,6 +760,7 @@ public class Model {
             return this;
         }
         this.__withs = Arrays.asList(fields.split(","));
+        ComUtil.trimList(this.__withs);
         return this;
     }
 

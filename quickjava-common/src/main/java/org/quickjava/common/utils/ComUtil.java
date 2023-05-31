@@ -2,6 +2,7 @@ package org.quickjava.common.utils;
 
 import java.lang.reflect.Array;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -152,5 +153,32 @@ public abstract class ComUtil {
         }
         str = str.substring(0, 1).toUpperCase() + str.substring(1);
         return str;
+    }
+
+    /**
+     * 去除字符串数组中每个元素左右空格
+     * @param array 目标数组
+     */
+    public static String[] trimArray(String[] array) {
+        for (int i = 0; i < array.length; i++) {
+            if (array[i] != null) {
+                array[i] = array[i].trim();
+            }
+        }
+        return array;
+    }
+
+    /**
+     * 去除字符串list中每个元素左右空格
+     * @param list 目标数组
+     */
+    public static List<String> trimList(List<String> list) {
+        for (int i = 0; i < list.size(); i++) {
+            String str = list.get(i);
+            if (str != null) {
+                list.set(i, str.trim());
+            }
+        }
+        return list;
     }
 }
