@@ -58,7 +58,7 @@ public class SpringAutoConfiguration implements InitializingBean {
     }
 
     public Config.DBType getConnectionType() {
-        synchronized (dbType) {
+        synchronized (SpringAutoConfiguration.class) {
             if (dbType == null) {
                 try {
                     Connection connection = getDataSource().getConnection();

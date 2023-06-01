@@ -58,7 +58,9 @@ public class ORMContext {
     {
         // 加载驱动操作类
         try {
-            return driveMap.get(config.type).newInstance();
+            Drive drive = driveMap.get(config.type).newInstance();
+            ReflectUtil.setFieldValueDirect(drive, "config", config);
+            return drive;
         } catch (InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
