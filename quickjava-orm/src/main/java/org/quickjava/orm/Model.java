@@ -279,8 +279,9 @@ public class Model {
         if (field.contains(".")) {
             String[] arr = field.split("\\.");
             return arr[0] + "." + ModelUtil.toUnderlineCase(arr[1]);
+        } else {
+            return ModelUtil.toUnderlineCase(field);
         }
-        return field;
     }
 
     public Model order(String field, boolean asc) {
@@ -474,7 +475,7 @@ public class Model {
                     return;
                 }
                 Model queryModel = newModel(relation.getClazz());
-                List<Model> rows = queryModel.where(relation.foreignKey(), "IN", conditionMap.get(fieldName)).select();
+                List<Model> rows = queryModel.where(fieldToUnderlineCase(relation.foreignKey()), "IN", conditionMap.get(fieldName)).select();
                 // 数据装填
                 models.forEach(model -> {
                     Object modelKeyVal = ReflectUtil.getFieldValue(model, relation.localKey());
