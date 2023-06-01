@@ -44,7 +44,7 @@ public class Config {
         MYSQL,
         ORACLE,
         SQL_SERVER,
-        UNKNOWN,
+        DEFAULT,
     }
 
     public enum DBSubject {
@@ -61,8 +61,9 @@ public class Config {
         parseTypeFromUrl(url);
     }
 
-    public Config(DBSubject subject) {
+    public Config(DBSubject subject, DBType dbType) {
         this.subject = subject;
+        this.type = dbType;
     }
 
     private void parseTypeFromUrl(String url)
@@ -71,24 +72,33 @@ public class Config {
             this.type = DBType.MYSQL;
         } else if (url.toLowerCase().contains("oracle://")) {
             this.type = DBType.ORACLE;
+        } else {
+            this.type = DBType.DEFAULT;
         }
     }
 
-    private void parseTypeFromConnection(Connection connection) {
+    public static DBType parseTypeFromConnection(Connection connection) {
         try {
             String driverName = connection.getMetaData().getDriverName().toUpperCase();
             if (driverName.contains("MYSQL")) {
-                this.type = DBType.MYSQL;
+                return DBType.MYSQL;
             } else if (driverName.contains("SQL SERVER")) {
-                this.type = DBType.SQL_SERVER;
+                return DBType.SQL_SERVER;
             } else if (driverName.contains("ORACLE")) {
-                this.type = DBType.ORACLE;
+                return DBType.ORACLE;
             } else {
-                this.type = DBType.UNKNOWN;
+                return DBType.DEFAULT;
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public DBType getType() {
+        if (type != null) {
+            return type;
+        }
+        throw new RuntimeException("未配置连接类型的配置");
     }
 
 }

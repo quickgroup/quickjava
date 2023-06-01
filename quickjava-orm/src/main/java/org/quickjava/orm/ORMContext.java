@@ -19,6 +19,8 @@ import org.quickjava.common.utils.ReflectUtil;
 import org.quickjava.orm.contain.Config;
 import org.quickjava.orm.drive.*;
 
+import javax.sql.DataSource;
+import java.sql.Connection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -32,7 +34,7 @@ public class ORMContext {
     static {
         driveMap.put(Config.DBType.MYSQL, Mysql.class);
         driveMap.put(Config.DBType.ORACLE, Oracle.class);
-        driveMap.put(Config.DBType.UNKNOWN, DefaultDrive.class);
+        driveMap.put(Config.DBType.DEFAULT, DefaultDrive.class);
     }
 
     public static Drive getDrive() {
@@ -40,7 +42,7 @@ public class ORMContext {
         synchronized (Drive.class) {
             // 检测spring
             if (SpringAutoConfiguration.instance != null) {
-                config = new Config(Config.DBSubject.SPRING);
+                config = SpringAutoConfiguration.instance.getConfig();
             } else {
                 config = getQuickJavaConfig();
             }
