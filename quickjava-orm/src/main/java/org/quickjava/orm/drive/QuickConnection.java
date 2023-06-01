@@ -1,98 +1,81 @@
 package org.quickjava.orm.drive;
 
+import org.quickjava.common.utils.ReflectUtil;
+import org.quickjava.orm.ORMContext;
+import org.quickjava.orm.contain.Config;
 import org.quickjava.orm.utils.QueryException;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public class QuickConnection {
 
-    public DBType type = DBType.MYSQL;
+    private Config config;
 
-    public String url = null;		//数据库地址
+    private Connection connection;
 
-    public String database = null;		//数据库
+    public boolean autoCommit;
 
-    public String username = null;		//数据库用户名
-
-    public String password = null;		//数据库密码
-
-    public String driver = "com.mysql.jdbc.Driver";		//mysql驱动，测试写死
-
-    public Connection connection = null;
-
-    public Integer connectionFormType = 0;  // 0=自行连接；1=quickjava；2=spring
-
-    public boolean autoCommit = true;
-
-    public QuickConnection(DBType type, String url, String database, String username, String password, String driver) {
-        this.type = type;
-        this.url = url;
-        this.database = database;
-        this.username = username;
-        this.password = password;
-        this.driver = driver;
-        init();
-    }
-
-    public QuickConnection(String url, String username, String password) {
-        this.url = url;
-        this.username = username;
-        this.password = password;
-        init();
-    }
-
-    public QuickConnection(String url) {
-        if (url.toLowerCase().contains("mysql://")) {
-            this.type = DBType.MYSQL;
-        } else if (url.toLowerCase().contains("oracle://")) {
-            this.type = DBType.ORACLE;
-        }
-        this.url = url;
-        init();
-    }
-
-    public QuickConnection(Connection connection, Integer connectionFormType) {
-        this.connection = connection;
-        this.connectionFormType = connectionFormType;
-        init();
-    }
-
-    public void init() {
-        try {
-            String driverName = connection.getMetaData().getDriverName().toUpperCase();
-            if (driverName.contains("MYSQL")) {
-                this.type = DBType.MYSQL;
-            } else if (driverName.contains("SQL SERVER")) {
-                this.type = DBType.SQL_SERVER;
-            } else if (driverName.contains("ORACLE")) {
-                this.type = DBType.ORACLE;
-            } else {
-                this.type = DBType.UNKNOWN;
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+    public QuickConnection(Config config) {
+        this.config = config;
     }
 
     /**
      * 连接数据库
      * @return 数据库连接
      */
-    public Connection connectStart()
+    public QuickConnection connect()
     {
-        try {
-            Class.forName(driver);
+        // 根据配置连接 or QuickJava框架中使用
+        if (config.subject == Config.DBSubject.CONFIG || config.subject == Config.DBSubject.QUICKJAVA) {
             try {
-                connection = DriverManager.getConnection(url, username, password);
+                Class.forName(config.driver);
+                this.connection = DriverManager.getConnection(config.url, config.username, config.password);
+            }  catch (ClassNotFoundException e) {
+                throw new QueryException(e.toString());
             } catch (SQLException e) {
-                throw new QueryException("数据库连接失败：" + url + "=>" + e.getMessage());
+                throw new QueryException("数据库连接失败：" + config.url + "=>" + e.getMessage());
             }
-        } catch (ClassNotFoundException e) {
-            throw new QueryException(e.toString());
         }
-        return connection;
+
+        // Spring 框架中使用
+        else if (config.subject == Config.DBSubject.SPRING) {
+            try {
+                this.connection = SpringAutoConfiguration.instance.getDataSource().getConnection();
+            } catch (SQLException e) {
+                throw new QueryException("获取连接失败");
+            }
+        }
+
+        return this;
+    }
+
+    public void setAutoCommit(boolean autoCommit) {
+        try {
+            this.autoCommit = autoCommit;
+            connection.setAutoCommit(autoCommit);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void commit() {
+        try {
+            connection.commit();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void rollback() {
+        try {
+            connection.rollback();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -100,7 +83,7 @@ public class QuickConnection {
      */
     public void close()
     {
-        if(connection != null) {
+        if (connection != null) {
             try {
                 connection.close();
                 connection = null;
@@ -110,27 +93,80 @@ public class QuickConnection {
         }
     }
 
-    public enum DBType {
-        MYSQL,
-        ORACLE,
-        SQL_SERVER,
-        UNKNOWN,
+    /**
+     * 数据插入
+     * @param sql 语句
+     * @return map
+     * @throws SQLException e
+     */
+    public Map<String, Object> insert(String sql)
+            throws SQLException
+    {
+        Statement statement = connection.createStatement();
+        statement.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
+
+        ResultSet generatedKeys = statement.getGeneratedKeys();
+        List<String> fieldNameArr = prepareField(generatedKeys);
+        if (fieldNameArr.isEmpty()) {
+            return null;
+        }
+        Map<String, Object> map = new LinkedHashMap<>();
+        generatedKeys.next();
+        for (int fi = 1; fi <= generatedKeys.getRow(); fi++) {
+            map.put(fieldNameArr.get(fi - 1), generatedKeys.getObject(fi));
+        }
+        return map;
     }
 
-    public void setAutoCommit(boolean autoCommit) throws SQLException {
-        this.autoCommit = autoCommit;
-        connection.setAutoCommit(autoCommit);
+    public Integer update(String sql)
+            throws SQLException
+    {
+        Statement statement = connection.createStatement();
+        return statement.executeUpdate(sql);
     }
 
-    public void startTrans() throws SQLException {
-        setAutoCommit(false);
+    public Integer delete(String sql)
+            throws SQLException
+    {
+        Statement statement = connection.createStatement();
+        return statement.executeUpdate(sql);
     }
 
-    public void commit() throws SQLException {
-        connection.commit();
+    public List<Map<String, Object>> select(String sql)
+            throws SQLException
+    {
+        List<Map<String, Object>> rows = new LinkedList<>();
+        ResultSet resultSet = null;
+
+        try {
+            Statement statement = connection.createStatement();
+            resultSet = statement.executeQuery(sql);
+            List<String> fieldNameArr = prepareField(resultSet);
+            // 数据组装
+            while (resultSet.next()) {
+                Map<String, Object> item = new LinkedHashMap<>();
+                for (int fi = 0; fi < fieldNameArr.size(); fi++) {
+                    item.put(fieldNameArr.get(fi), resultSet.getObject(fi + 1));
+                }
+                rows.add(item);
+            }
+
+        } finally {
+            if (resultSet != null) {
+                resultSet.close();
+            }
+        }
+
+        return rows;
     }
 
-    public void rollback() throws SQLException {
-        connection.rollback();
+    private static List<String> prepareField(ResultSet resultSet) throws SQLException
+    {
+        ResultSetMetaData metaData = resultSet.getMetaData();
+        List<String> fieldNameArr = new LinkedList<>();
+        for (int i = 1; i <= metaData.getColumnCount(); i++) {
+            fieldNameArr.add(metaData.getColumnLabel(i));
+        }
+        return fieldNameArr;
     }
 }

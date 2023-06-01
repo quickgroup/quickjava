@@ -2,7 +2,7 @@ package org.quickjava.orm.utils;
 
 import org.quickjava.orm.Q;
 import org.quickjava.orm.QuerySet;
-import org.quickjava.orm.contain.TableOri;
+import org.quickjava.orm.contain.TableMeta;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,17 +13,17 @@ import java.util.Map;
 public class QuerySetHelper {
 
     // 表信息缓存
-    private static Map<String, TableOri> tableOriMap = new LinkedHashMap<>();
+    private static Map<String, TableMeta> tableOriMap = new LinkedHashMap<>();
 
     public static boolean existTableOri(String name) {
         return tableOriMap.containsKey(name);
     }
 
-    public static TableOri getTableOri(String name) {
+    public static TableMeta getTableOri(String name) {
         return tableOriMap.get(name);
     }
 
-    public static TableOri setTableOri(String name, TableOri tableOri) {
+    public static TableMeta setTableOri(String name, TableMeta tableOri) {
         tableOriMap.put(name, tableOri);
         return tableOri;
     }

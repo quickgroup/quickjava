@@ -24,7 +24,7 @@ public class Mysql extends Drive {
     );
 
     @Override
-    public DriveConfigure getConfigure() {
+    public DriveConfigure getDriveConfigure() {
         return CONFIGURE;
     }
 }

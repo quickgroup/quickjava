@@ -6,13 +6,12 @@
 package org.quickjava.orm.drive;
 
 import org.quickjava.orm.QuerySet;
-import org.quickjava.orm.contain.Action;
-import org.quickjava.orm.contain.DriveConfigure;
-import org.quickjava.orm.contain.Value;
-import org.quickjava.orm.contain.WhereBase;
+import org.quickjava.orm.contain.*;
 import org.quickjava.orm.utils.QueryException;
 import org.quickjava.orm.utils.SqlUtil;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,33 +23,35 @@ import java.util.Map;
  */
 public abstract class Drive {
 
-    private DriveConfigure configure = null;
+    private Config config = null;
 
-    private static final DriveConfigure CONFIGURE_DEFAULT = new DriveConfigure(
+    // 开启事务后将连接放到线程缓存中
+    private static final ThreadLocal<QuickConnection> __THREAD_CONNECTION = new ThreadLocal<>();
+
+    private static final DriveConfigure DRIVE_CONFIGURE_DEF = new DriveConfigure(
             "", "",
             "'", "'"
     );
 
-    private QuickConnection quickConnection = null;
-
-    public DriveConfigure getConfigure() {
-        return configure == null ? CONFIGURE_DEFAULT : configure;
-    }
-
-    public void setConfigure(DriveConfigure configure) {
-        this.configure = configure;
-    }
-
-    public void setQuickConnection(QuickConnection quickConnection) {
-        this.quickConnection = quickConnection;
-    }
-
-    public QuickConnection getQuickConnection() {
-        return quickConnection;
+    public DriveConfigure getDriveConfigure() {
+        return DRIVE_CONFIGURE_DEF;
     }
 
     /**
-     * 语句准备
+     * 获取连接
+     * @return 连接
+     */
+    public QuickConnection getQuickConnection() {
+        // 事务中、线程中的数据库连接
+        if (__THREAD_CONNECTION.get() != null) {
+            return __THREAD_CONNECTION.get();
+        }
+        // 连接数据库
+        return new QuickConnection(config).connect();
+    }
+
+    /**
+     * 语句编译
      * @param query 查询器
      * @return 准备的语句
      */
@@ -71,7 +72,7 @@ public abstract class Drive {
          */
 
         List<String> sqlList = new ArrayList<>();
-        DriveConfigure config = getConfigure();
+        DriveConfigure config = getDriveConfigure();
 
         // action
         Action action = query.__Action();
@@ -168,7 +169,7 @@ public abstract class Drive {
         try {
             // 执行操作
             if (action == Action.INSERT) {
-                Map<String, Object> generatedKeys = JdbcDock.insert(quickConnection.connection, sql);
+                Map<String, Object> generatedKeys = quickConnection.insert(sql);
                 if (generatedKeys == null || generatedKeys.isEmpty()) {
                     return null;
                 }
@@ -176,13 +177,13 @@ public abstract class Drive {
                 number = gk instanceof Long ? (Long) gk : Long.valueOf(String.valueOf(gk));
 
             } else if (action == Action.DELETE) {
-                number = JdbcDock.delete(quickConnection.connection, sql).longValue();
+                number = quickConnection.delete(sql).longValue();
 
             } else if (action == Action.UPDATE) {
-                number = JdbcDock.update(quickConnection.connection, sql).longValue();
+                number = quickConnection.update(sql).longValue();
 
             } else if (action == Action.SELECT) {
-                List<Map<String, Object>> rows = JdbcDock.select(quickConnection.connection, sql);
+                List<Map<String, Object>> rows = quickConnection.select(sql);
                 return (T) rows;
             }
             return (T) number;
@@ -208,11 +209,13 @@ public abstract class Drive {
     }
 
     public void setAutoCommit(boolean autoCommit) {
-        try {
-            quickConnection.setAutoCommit(autoCommit);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        QuickConnection connection = getQuickConnection();
+        if (autoCommit) {
+            __THREAD_CONNECTION.set(null);
+        } else {
+            __THREAD_CONNECTION.set(connection);
         }
+        connection.setAutoCommit(autoCommit);
     }
 
     public void startTrans() {
@@ -220,24 +223,22 @@ public abstract class Drive {
     }
 
     public void commit() {
-        try {
-            quickConnection.commit();
-            quickConnection.setAutoCommit(true);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } finally {
-            quickConnection.close();        // druid连接池：事务完成后返回连接
+        QuickConnection connection = __THREAD_CONNECTION.get();
+        if (connection != null) {
+            connection.commit();
+            connection.setAutoCommit(true);
+            connection.close();
+            __THREAD_CONNECTION.set(null);
         }
     }
 
     public void rollback() {
-        try {
-            quickConnection.rollback();
-            quickConnection.setAutoCommit(true);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } finally {
-            quickConnection.close();        // druid连接池：事务完成后返回连接
+        QuickConnection connection = __THREAD_CONNECTION.get();
+        if (connection != null) {
+            connection.rollback();
+            connection.setAutoCommit(true);
+            connection.close();
+            __THREAD_CONNECTION.set(null);
         }
     }
 }

@@ -16,11 +16,9 @@ package org.quickjava.orm;
  */
 
 import org.quickjava.common.utils.ReflectUtil;
+import org.quickjava.orm.contain.Config;
 import org.quickjava.orm.drive.*;
-import org.quickjava.orm.drive.QuickConnection;
-import org.quickjava.orm.utils.SqlUtil;
 
-import java.sql.Connection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -29,52 +27,36 @@ import java.util.Map;
  */
 public class ORMContext {
 
-    private static final ThreadLocal<QuickConnection> __quickConnection = new ThreadLocal<>();
-
-    public static Map<QuickConnection.DBType, Class<? extends Drive>> driveMap = new LinkedHashMap<>();
+    public static Map<Config.DBType, Class<? extends Drive>> driveMap = new LinkedHashMap<>();
 
     static {
-        driveMap.put(QuickConnection.DBType.MYSQL, Mysql.class);
-        driveMap.put(QuickConnection.DBType.ORACLE, Oracle.class);
-        driveMap.put(QuickConnection.DBType.UNKNOWN, DefaultDrive.class);
+        driveMap.put(Config.DBType.MYSQL, Mysql.class);
+        driveMap.put(Config.DBType.ORACLE, Oracle.class);
+        driveMap.put(Config.DBType.UNKNOWN, DefaultDrive.class);
+    }
+
+    public static Drive getDrive() {
+        Config config;
+        synchronized (Drive.class) {
+            // 检测spring
+            if (SpringAutoConfiguration.instance != null) {
+                config = new Config(Config.DBSubject.SPRING);
+            } else {
+                config = getQuickJavaConfig();
+            }
+        }
+        return getDrive(config);
     }
 
     /**
      * 获取当前环境数据库驱动
      * @return 驱动连接
      */
-    public static Drive getDrive()
+    public static Drive getDrive(Config config)
     {
-        synchronized (Drive.class) {
-            // 为空时、连接不存在时
-            if (__quickConnection.get() == null || __quickConnection.get().connection == null) {
-                try {
-                    // TODO::使用
-                    Connection connection = SpringAutoConfiguration.instance.getDataSource().getConnection();
-
-                    __quickConnection.set(new QuickConnection(connection, 2));
-
-                } catch (Exception e) {
-                    try {
-                        __quickConnection.set(getConnectionByQuick());
-                    } catch (Exception e2) {
-                        throw new RuntimeException(e2);
-                    }
-                }
-            }
-        }
-
-        // 实例化驱动
-        QuickConnection quickConnection = __quickConnection.get();
-        if (quickConnection == null) {
-            throw new RuntimeException("未连接到数据库");
-        }
-
         // 加载驱动操作类
         try {
-            Drive drive = driveMap.get(quickConnection.type).newInstance();
-            drive.setQuickConnection(quickConnection);
-            return drive;
+            return driveMap.get(config.type).newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
@@ -82,24 +64,25 @@ public class ORMContext {
 
 
     /**
-     * FIXME::从QuickJava读取配置连接数据库
-     * @return 新的数据库连接
-     * @throws ClassNotFoundException 异常
+     * FIXME::从QuickJava读取数据库配置
      * */
-    public static QuickConnection getConnectionByQuick()
-            throws ClassNotFoundException
+    public static Config getQuickJavaConfig()
     {
-        Class<?> kernelClazz = ORMContext.class.getClassLoader().loadClass("org.quickjava.framework.Kernel");
-        Object config = ReflectUtil.getFieldValue(kernelClazz, "config");
-        Object database = ReflectUtil.invoke(config, "get", "database");
-        QuickConnection quickConnection = new QuickConnection(
-                ReflectUtil.invoke(database, "getString", "url"),
-                ReflectUtil.invoke(database, "getString", "username"),
-                ReflectUtil.invoke(database, "getString", "password")
-        );
-        quickConnection.connectionFormType = 1;
-        quickConnection.connectStart();
-        return quickConnection;
+        try {
+            Class<?> kernelClazz = ORMContext.class.getClassLoader().loadClass("org.quickjava.framework.Kernel");
+            Object configMap = ReflectUtil.getFieldValue(kernelClazz, "config");
+            Object databaseMap = ReflectUtil.invoke(configMap, "get", "database");
+            Config config1 = new Config(
+                    Config.DBSubject.QUICKJAVA,
+                    ReflectUtil.invoke(databaseMap, "getString", "url"),
+                    ReflectUtil.invoke(databaseMap, "getString", "username"),
+                    ReflectUtil.invoke(databaseMap, "getString", "password")
+            );
+            config1.subject = Config.DBSubject.QUICKJAVA;
+            return config1;
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

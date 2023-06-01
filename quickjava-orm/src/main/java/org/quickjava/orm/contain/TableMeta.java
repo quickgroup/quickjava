@@ -14,7 +14,7 @@ package org.quickjava.orm.contain;
  * License: Apache Licence 2.0
  * +-------------------------------------------------------------------
  */
-public class TableOri {
+public class TableMeta {
 
     private String name;
 
