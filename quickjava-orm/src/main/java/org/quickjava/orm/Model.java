@@ -513,6 +513,8 @@ public class Model {
         // 数据组装
         Pagination<Model> pagination1 = new Pagination<>(pagination);
         pagination1.rows = resultTranshipment(getMClass(), pagination.rows);
+        // 查询后
+        queryAfter(pagination1.rows);
         return (Pagination<D>) pagination1;
     }
 
