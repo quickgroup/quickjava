@@ -21,6 +21,7 @@ public class QuickConnection {
 
     public QuickConnection(Config config) {
         this.config = config;
+        this.autoCommit = config.autoCommit;
     }
 
     /**

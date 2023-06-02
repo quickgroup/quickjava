@@ -36,8 +36,6 @@ public class Config {
     // jdbc驱动
     public String driver = "com.mysql.jdbc.Driver";
 
-    public Integer connectionFormType = 0;  // 0=自行连接；1=quickjava；2=spring
-
     public boolean autoCommit = true;
 
     public enum DBType {
