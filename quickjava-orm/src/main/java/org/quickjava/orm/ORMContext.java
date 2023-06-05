@@ -52,6 +52,7 @@ public class ORMContext {
 
     /**
      * 获取当前环境数据库驱动
+     * @param config 链接配置
      * @return 驱动连接
      */
     public static Drive getDrive(Config config)
@@ -69,6 +70,7 @@ public class ORMContext {
 
     /**
      * FIXME::从QuickJava读取数据库配置
+     * @return 链接配置
      * */
     public static Config getQuickJavaConfig()
     {

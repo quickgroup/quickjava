@@ -5,7 +5,6 @@ import org.quickjava.common.QuickLog;
 import org.quickjava.common.utils.FileUtils;
 import org.quickjava.framework.bean.Dict;
 import org.quickjava.framework.config.AppConfig;
-import org.quickjava.framework.database.DBMan;
 import org.quickjava.framework.http.Request;
 import org.quickjava.framework.server.TomcatServer;
 import org.quickjava.framework.view.ViewMan;
@@ -71,7 +70,7 @@ public class Kernel {
             ViewMan.init();
 
             // 数据库
-            DBMan.init();
+//            DBMan.init();
 
             Hook.call("app_init_complete");
 

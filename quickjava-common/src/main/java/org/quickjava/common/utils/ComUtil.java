@@ -158,6 +158,7 @@ public abstract class ComUtil {
     /**
      * 去除字符串数组中每个元素左右空格
      * @param array 目标数组
+     * @return 结果
      */
     public static String[] trimArray(String[] array) {
         for (int i = 0; i < array.length; i++) {
@@ -171,6 +172,7 @@ public abstract class ComUtil {
     /**
      * 去除字符串list中每个元素左右空格
      * @param list 目标数组
+     * @return 结果
      */
     public static List<String> trimList(List<String> list) {
         for (int i = 0; i < list.size(); i++) {
