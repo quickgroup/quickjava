@@ -36,7 +36,7 @@
     </dependencyManagement>
 
     <modules>
-        <module>quickjava-common</module>
+        <module>quickjava-common2</module>
         <module>quickjava-web</module>
         <module>quickjava-orm</module>
         <module>quickjava-www</module>
