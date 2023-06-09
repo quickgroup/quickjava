@@ -5,18 +5,13 @@
 
 package org.quickjava.www.application.common.model;
 
-import org.quickjava.framework.Model;
+import org.quickjava.orm.Model;
 
 /**
  * @author Qlo1062-(QloPC-zs)
  * @date 2021/1/20 12:53
  */
-public class UserModel extends Model<UserModel> {
-
-    /**
-     * 模型参数
-     */
-    public String name = "user";
+public class UserModel extends Model {
 
     /**
      * 表字段

@@ -7,7 +7,7 @@ package org.quickjava.orm.contain;
 
 public class Where extends WhereBase {
 
-    public Where(String field, String operator, Object value) {
+    public Where(String field, Operator operator, Object value) {
         super(1, field, operator, value);
     }
 

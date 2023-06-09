@@ -9,19 +9,16 @@ import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 import org.quickjava.common.utils.ComUtil;
 import org.quickjava.common.utils.ReflectUtil;
-import org.quickjava.orm.annotation.ModelName;
 import org.quickjava.orm.annotation.ModelField;
+import org.quickjava.orm.annotation.ModelName;
 import org.quickjava.orm.annotation.OneToMany;
 import org.quickjava.orm.annotation.OneToOne;
-import org.quickjava.orm.contain.DataMap;
-import org.quickjava.orm.contain.ModelMeta;
-import org.quickjava.orm.contain.Pagination;
+import org.quickjava.orm.contain.*;
 import org.quickjava.orm.enums.RelationType;
 import org.quickjava.orm.utils.ModelUtil;
 import org.quickjava.orm.utils.ORMHelper;
 import org.quickjava.orm.utils.QuerySetHelper;
 import org.quickjava.orm.utils.SqlUtil;
-import org.quickjava.orm.contain.Relation;
 
 import java.io.Serializable;
 import java.lang.reflect.*;
@@ -92,7 +89,7 @@ public class Model {
         initModel(this, getClass());
     }
 
-    public synchronized QuerySet query() {
+    private synchronized QuerySet query() {
         synchronized (Model.class) {
             if (__querySet == null) {
                 __querySet = QuerySet.table(parseModelTableName(getClass()));
@@ -101,13 +98,13 @@ public class Model {
         return __querySet;
     }
 
-    public Model where(String field, String opr, Object val) {
+    public Model where(String field, Operator opr, Object val) {
         query().where(whereFieldName(field), opr, val);
         return this;
     }
 
     public Model where(String field, Object val) {
-        where(field, "EQ", val);
+        where(field, Operator.EQ, val);
         return this;
     }
 
@@ -126,7 +123,7 @@ public class Model {
      * @return 模型对象
      */
     public Model where(String sql) {
-        query().where(sql, "RAW", null);
+        query().where(sql, Operator.RAW, null);
         return this;
     }
 
@@ -135,23 +132,43 @@ public class Model {
     }
 
     public Model neq(String field, Object val) {
-        return where(field, "NEQ", val);
+        return where(field, Operator.NEQ, val);
     }
 
     public Model gt(String field, Object val) {
-        return where(field, "GT", val);
+        return where(field, Operator.GT, val);
     }
 
     public Model gte(String field, Object val) {
-        return where(field, "GTE", val);
+        return where(field, Operator.GTE, val);
     }
 
     public Model lt(String field, Object val) {
-        return where(field, "LT", val);
+        return where(field, Operator.LT, val);
     }
 
     public Model lte(String field, Object val) {
-        return where(field, "LTE", val);
+        return where(field, Operator.LTE, val);
+    }
+
+    public Model in(String field, Object ...args) {
+        return where(field, Operator.IN, args);
+    }
+
+    public Model notIn(String field, Object ...args) {
+        return where(field, Operator.IN, args);
+    }
+
+    public Model isNull(String field) {
+        return where(field, Operator.IS_NULL, null);
+    }
+
+    public Model isNotNull(String field) {
+        return where(field, Operator.IS_NOT_NULL, null);
+    }
+
+    public Model between(String field, Object ...args) {
+        return where(field, Operator.BETWEEN, args);
     }
 
     /**
@@ -475,7 +492,7 @@ public class Model {
                     return;
                 }
                 Model queryModel = newModel(relation.getClazz());
-                List<Model> rows = queryModel.where(fieldToUnderlineCase(relation.foreignKey()), "IN", conditionMap.get(fieldName)).select();
+                List<Model> rows = queryModel.where(fieldToUnderlineCase(relation.foreignKey()), Operator.IN, conditionMap.get(fieldName)).select();
                 // 数据装填
                 models.forEach(model -> {
                     Object modelKeyVal = ReflectUtil.getFieldValue(model, relation.localKey());

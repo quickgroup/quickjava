@@ -2,6 +2,7 @@ package org.quickjava.orm.utils;
 
 import org.quickjava.orm.Q;
 import org.quickjava.orm.QuerySet;
+import org.quickjava.orm.contain.Operator;
 import org.quickjava.orm.contain.TableMeta;
 
 import java.util.ArrayList;
@@ -40,13 +41,13 @@ public class QuerySetHelper {
             }
             field = "`"+field+"`";
             if ("LIKE".equals(condition)) {
-                querySet.where(field, condition, "%" + value + "%");
+                querySet.where(field, Operator.LIKE, "%" + value + "%");
             } else if ("LIKE_RAW".equals(condition)) {
-                querySet.where(field, condition.replace("_RAW",""), value);        // LIKE原生查询
+                querySet.where(field, Operator.LIKE, value);        // LIKE原生查询
             } else if ("IN".equals(condition)) {      // in查询
-                querySet.where(field, condition, parseQueryValueArray(value));
+                querySet.where(field, Operator.IN, parseQueryValueArray(value));
             } else if ("NOT_IN".equals(condition)) {      // not in查询
-                querySet.where(field, condition, parseQueryValueArray(value));
+                querySet.where(field, Operator.NOT_IN, parseQueryValueArray(value));
             }else if ("BETWEEN".equals(condition)) {      // BETWEEN 查询
                 ArrayList<?> valueArr = (ArrayList<?>) value;
                 if (valueArr != null && valueArr.size() == 2) {
@@ -58,7 +59,7 @@ public class QuerySetHelper {
                     querySet.between(field, valueArr.get(0), valueArr.get(1));
                 }
             } else if (SqlUtil.isNotEmpty(field) && SqlUtil.isNotEmpty(value)) {
-                querySet.where(field, condition, value);
+                querySet.where(field, Operator.valueOf(condition), value);
             }
         }
         return querySet;

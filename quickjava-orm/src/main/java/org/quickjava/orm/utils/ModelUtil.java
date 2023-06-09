@@ -6,8 +6,11 @@ import org.quickjava.orm.Model;
 import org.quickjava.orm.contain.ModelMeta;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 /*
  * Copyright (c) 2020~2023 http://www.quickjava.org All rights reserved.
@@ -177,6 +180,35 @@ public class ModelUtil extends SqlUtil {
         } else {
             return false;
         }
+    }
+
+    /**
+     * 获取方法引用传递的方法名称
+     * @return 对应属性名称
+     */
+    public static String getSupplierConvFieldName(Supplier<?> getter)
+    {
+        Method method = getter.getClass().getDeclaredMethods()[0];
+        String fieldName = method.getName();
+        if (fieldName.startsWith("get") || fieldName.startsWith("set")) {
+            fieldName = fieldName.substring(2);
+        }
+        return toUnderlineCase(fieldName);
+    }
+
+    /**
+     * 获取方法引用传递的方法名称
+     * @return 对应属性名称
+     */
+    public static String getFunctionConvFieldName(Function<?, ?> function)
+    {
+        Method method = function.getClass().getDeclaredMethods()[0];
+        String fieldName = method.getName();
+        if (fieldName.startsWith("get") || fieldName.startsWith("set")) {
+            fieldName = fieldName.substring(2);
+        }
+        System.out.println("fieldName=" + fieldName);
+        return toUnderlineCase(fieldName);
     }
 
 }

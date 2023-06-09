@@ -39,6 +39,8 @@ public class SpringAutoConfiguration implements InitializingBean {
 
     private Config.DBType dbType;
 
+    private Config dbConfig;
+
     public SpringAutoConfiguration(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
         this.instance = this;
@@ -73,6 +75,9 @@ public class SpringAutoConfiguration implements InitializingBean {
     }
 
     public Config getConfig() {
-        return new Config(Config.DBSubject.SPRING, getConnectionType());
+        if (dbConfig == null) {
+            dbConfig = new Config(Config.DBSubject.SPRING, getConnectionType());
+        }
+        return dbConfig;
     }
 }

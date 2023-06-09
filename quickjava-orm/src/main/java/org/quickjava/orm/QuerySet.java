@@ -73,10 +73,10 @@ public class QuerySet {
 
     public QuerySet where(String field, Object value)
     {
-        return this.where(field, "=", value);
+        return this.where(field, Operator.EQ, value);
     }
 
-    public QuerySet where(String field, String operator, Object value)
+    public QuerySet where(String field, Operator operator, Object value)
     {
         if (ORMHelper.isEmpty(field)) {
             return this;
@@ -92,19 +92,19 @@ public class QuerySet {
      * */
     public QuerySet where(String sql)
     {
-        where(sql, "RAW", null);
+        where(sql, Operator.RAW, null);
         return this;
     }
 
     public QuerySet between(String field, Object val1, Object val2)
     {
-        whereList.add(new Where(field, "BETWEEN", new Object[]{val1, val2}));
+        whereList.add(new Where(field, Operator.BETWEEN, new Object[]{val1, val2}));
         return this;
     }
 
     public QuerySet between(String field, Object[] valArr)
     {
-        whereList.add(new Where(field, "BETWEEN", valArr));
+        whereList.add(new Where(field, Operator.BETWEEN, valArr));
         return this;
     }
 

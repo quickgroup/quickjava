@@ -15,13 +15,13 @@ public abstract class WhereBase {
 
     private String field = null;
 
-    private String operator = null;
+    private Operator operator = null;
 
     private Object value = null;
 
     private List<WhereBase> children = null;
 
-    public WhereBase(int logic, String field, String operator, Object value) {
+    public WhereBase(int logic, String field, Operator operator, Object value) {
         this.logic = logic;
         this.setField(field);
         this.setOperator(operator);
@@ -72,10 +72,10 @@ public abstract class WhereBase {
     }
 
     public String getOperator() {
-        return OpMap.getOrDefault(operator, "=");
+        return OpMap.getOrDefault(operator.name(), "=");
     }
 
-    public void setOperator(String operator) {
+    public void setOperator(Operator operator) {
         this.operator = operator;
     }
 
@@ -115,11 +115,11 @@ public abstract class WhereBase {
             return getLogicStr() + " " + cutFirstLogic(SqlUtil.collJoin(" ", children));
         }
         // 输出
-        if ("RAW".equals(operator)) {
+        if (Operator.RAW == operator) {
             return field;
-        } else if ("IN".equals(operator) || "NOT_IN".equals(operator)) {
+        } else if (Operator.IN == operator || Operator.NOT_IN == operator) {
             return getLogicStr() + " " + getField() + " " + getOperator() + " (" + getValue(cfg) + ")";
-        } else if ("BETWEEN".equals(operator)) {
+        } else if (Operator.BETWEEN.equals(operator)) {
             Object[] arr = new Object[]{null, null};
             if (value.getClass().isArray()) {
                 arr = (Object[]) value;

@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.quickjava.common.QuickUtil;
 import org.quickjava.framework.QuickJavaRunner;
-import org.quickjava.framework.database.Q;
+import org.quickjava.orm.QuerySet;
 
 import java.util.*;
 
@@ -32,19 +32,19 @@ public class TestDb {
         data.put("update_time", new Date());
 
         // TODO::查询
-        Q.table("user").field("id").select();
+        QuerySet.table("user").field("id").select();
 
         Long startTime = QuickUtil.getNanoTime();
 
         // TODO::新增
-        Long result = Q.table("user").insert(data);
+        Long result = QuerySet.table("user").insert(data);
 
         System.out.println("INSERT.return=" + result);
         System.out.println("耗时=" + QuickUtil.endNanoTimeMS(startTime) + "ms");
         startTime = QuickUtil.getNanoTime();
 
         // TODO::删除
-        Integer number = Q.table("user").where("id", 1).where("status", 1).delete();
+        Integer number = QuerySet.table("user").where("id", 1).where("status", 1).delete();
 
         System.out.println("DELETE.return=" + number);
         System.out.println("耗时=" + QuickUtil.endNanoTimeMS(startTime) + "ms");
@@ -55,13 +55,13 @@ public class TestDb {
         updateData.put("age", 15);
 
         // TODO::更新
-        number = Q.table("user").where("name", "longlong").update(updateData);
+        number = QuerySet.table("user").where("name", "longlong").update(updateData);
 
         System.out.println("UPDATE.return=" + number);
         System.out.println("耗时=" + QuickUtil.endNanoTimeMS(startTime) + "ms");
 
         // 查
-        List<Map> rows = Q.table("user").where("name", "xiaolong").order("create_time", "DESC").select();
+        List<Map<String, Object>> rows = QuerySet.table("user").where("name", "xiaolong").order("create_time", "DESC").select();
         System.out.println("SELECT.return=" + rows);
     }
 
