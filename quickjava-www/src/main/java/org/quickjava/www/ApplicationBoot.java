@@ -7,6 +7,8 @@ import org.quickjava.orm.Model;
 import org.quickjava.orm.ModelQuery;
 import org.quickjava.orm.example.Article;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.function.Supplier;
 
 @ApplicationQuickBoot
@@ -14,7 +16,6 @@ public class ApplicationBoot {
 
     public static void main(String[] args)
     {
-        QuickJavaBoot.start(ApplicationBoot.class, args);
 
         // 测试字段名称转换
 //        System.out.println("userTypeText=" + ComUtil.toCamelCase("userTypeText"));
@@ -27,8 +28,26 @@ public class ApplicationBoot {
 
         // 测试方法引用传递
         System.out.println("article=" + new Article().where("id", 1));
-//        System.out.println("article=" + new Article().eq(Article::getId, 1).find());
-        System.out.println("article=" + new ModelQuery<Article>().eq(Article::getId, 1));
+
+        System.out.println("article=" + new ModelQuery<>(Article.class).eq(Article::getId, 1));
+        System.out.println("article=" + ModelQuery.lambda(Article.class).eq(Article::getId, 1));
+
+        QuickJavaBoot.start(ApplicationBoot.class, args);
+    }
+
+    public static Class<?> getGenericType(Object obj) {
+        Type genericSuperclass = obj.getClass().getGenericSuperclass();
+        if (genericSuperclass instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType) genericSuperclass;
+            Type[] typeArguments = parameterizedType.getActualTypeArguments();
+            if (typeArguments.length > 0) {
+                Type typeArgument = typeArguments[0];
+                if (typeArgument instanceof Class) {
+                    return (Class<?>) typeArgument;
+                }
+            }
+        }
+        return null;
     }
 
 }

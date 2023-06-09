@@ -65,6 +65,12 @@
             <version>${tomcat.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>4.0.1</version>
+        </dependency>
+
         <!-- https://mvnrepository.com/artifact/org.freemarker/freemarker -->
         <dependency>
             <groupId>org.freemarker</groupId>

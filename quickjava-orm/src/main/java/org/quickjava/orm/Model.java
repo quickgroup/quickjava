@@ -103,6 +103,11 @@ public class Model {
         return this;
     }
 
+    public Model where(String field, String opr, Object val) {
+        query().where(whereFieldName(field), Operator.valueOf(opr), val);
+        return this;
+    }
+
     public Model where(String field, Object val) {
         where(field, Operator.EQ, val);
         return this;

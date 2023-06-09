@@ -1,13 +1,14 @@
 package org.quickjava.orm;
 
-import org.quickjava.common.utils.GenericsUtils;
-
 public class ModelQuery<T> extends ModelQueryWrapper<T, ModelFunction<T, ?>> {
 
-    public ModelQuery() {
-        Class<?> modelClass = GenericsUtils.getSuperClassGenericsType(this.getClass(), 0);
+    public static<T> ModelQuery<T> lambda(Class<T> tClass) {
+        return new ModelQuery<>(tClass);
+    }
+
+    public ModelQuery(Class<T> tClass) {
         try {
-            this.model = (Model) modelClass.newInstance();
+            this.model = tClass.newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }

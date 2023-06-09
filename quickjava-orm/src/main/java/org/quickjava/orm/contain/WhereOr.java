@@ -7,7 +7,7 @@ package org.quickjava.orm.contain;
 
 public class WhereOr extends WhereBase {
 
-    public WhereOr(String field, String operator, Object value) {
+    public WhereOr(String field, Operator operator, Object value) {
         super(2, field, operator, value);
     }
 }

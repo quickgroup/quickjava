@@ -7,6 +7,7 @@ import org.quickjava.orm.contain.ModelMeta;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -207,7 +208,8 @@ public class ModelUtil extends SqlUtil {
         if (fieldName.startsWith("get") || fieldName.startsWith("set")) {
             fieldName = fieldName.substring(2);
         }
-        System.out.println("fieldName=" + fieldName);
+        System.out.println("function.getDeclaredFields()=" + Arrays.toString(function.getClass().getDeclaredFields()));
+        System.out.println("function.getDeclaredMethods()=" + Arrays.toString(function.getClass().getDeclaredMethods()));
         return toUnderlineCase(fieldName);
     }
 

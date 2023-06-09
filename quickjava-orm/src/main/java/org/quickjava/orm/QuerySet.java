@@ -108,7 +108,7 @@ public class QuerySet {
         return this;
     }
 
-    public QuerySet whereOr(String field, String operator, String value)
+    public QuerySet whereOr(String field, Operator operator, String value)
     {
         whereList.add(new WhereOr(field, operator, value));
         return this;
@@ -116,7 +116,7 @@ public class QuerySet {
 
     public QuerySet whereOr(String field, String value)
     {
-        return this.whereOr(field, "=", value);
+        return this.whereOr(field, Operator.EQ, value);
     }
 
     public QuerySet join(String table, String condition) {
