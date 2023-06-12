@@ -131,7 +131,7 @@ public abstract class Drive {
         // WHERE
         if (helper.__WhereList().size() > 0) {
             sqlList.add("WHERE");
-            sqlList.add(WhereBase.cutFirstLogic(WhereBase.toSql(helper.__WhereList(), config)));
+            sqlList.add(WhereBase.cutFirstLogic(WhereBase.collectSql(helper.__WhereList(), config)));
         }
 
         // GROUP BY

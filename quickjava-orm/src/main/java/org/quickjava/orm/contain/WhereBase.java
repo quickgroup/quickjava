@@ -121,10 +121,10 @@ public abstract class WhereBase {
         return getLogicStr() + " " + field + " " + operator + " " + value;
     }
 
-    public String toString(DriveConfigure cfg) {
+    public String toSql(DriveConfigure cfg) {
         // 嵌套查询
         if (children != null) {
-            List<String> sqlList = children.stream().map(it -> it.toString(cfg)).collect(Collectors.toList());
+            List<String> sqlList = children.stream().map(it -> it.toSql(cfg)).collect(Collectors.toList());
             return getLogicStr() + " (" + cutFirstLogic(SqlUtil.collJoin(" ", sqlList)) + ")";
         }
         // 输出
@@ -147,9 +147,9 @@ public abstract class WhereBase {
         return getLogicStr() + " " + getField() + " " + getOperator() + " " + getValue(cfg);
     }
 
-    public static String toSql(List<WhereBase> wheres, DriveConfigure config) {
+    public static String collectSql(List<WhereBase> wheres, DriveConfigure config) {
         List<String> sql = new LinkedList<>();
-        wheres.forEach(where-> sql.add(where.toString(config)));
+        wheres.forEach(where-> sql.add(where.toSql(config)));
         return SqlUtil.collJoin(" ", sql);
     }
 
