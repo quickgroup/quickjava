@@ -1,15 +1,12 @@
 package org.quickjava.www;
 
-import org.quickjava.common.utils.ComUtil;
 import org.quickjava.framework.QuickJavaBoot;
 import org.quickjava.framework.annotation.ApplicationQuickBoot;
-import org.quickjava.orm.Model;
-import org.quickjava.orm.ModelQuery;
+import org.quickjava.orm.modelQuery.ModelQuery;
 import org.quickjava.orm.example.Article;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.function.Supplier;
 
 @ApplicationQuickBoot
 public class ApplicationBoot {
@@ -27,27 +24,29 @@ public class ApplicationBoot {
 //        System.out.println("user_type_Text=" + ComUtil.toUnderlineCase("user_type_Text"));
 
         // 测试方法引用传递
-        System.out.println("article=" + new Article().where("id", 1));
+//        System.out.println("article=" + new Article().where("id", 1));
+
+//        System.out.println("article=" + new ModelQuery<Article>().eq(Article::getId, 1));
+
+//        ModelQuery<Article> query = new ModelQuery<Article>(){};
+//        // 获取泛型类型
+//        Type genericType = query.getClass().getGenericSuperclass();
+//        if (genericType instanceof ParameterizedType) {
+//            ParameterizedType parameterizedType = (ParameterizedType) genericType;
+//            Type[] typeArguments = parameterizedType.getActualTypeArguments();
+//
+//            if (typeArguments.length > 0) {
+//                Type typeArgument = typeArguments[0];
+//                System.out.println("泛型类: " + typeArgument.getTypeName());
+//            }
+//        }
+
 
         System.out.println("article=" + new ModelQuery<>(Article.class).eq(Article::getId, 1));
         System.out.println("article=" + ModelQuery.lambda(Article.class).eq(Article::getId, 1));
+        System.out.println("article=" + ModelQuery.lambda(Article.class).eq(Article::getId, 1));
 
         QuickJavaBoot.start(ApplicationBoot.class, args);
-    }
-
-    public static Class<?> getGenericType(Object obj) {
-        Type genericSuperclass = obj.getClass().getGenericSuperclass();
-        if (genericSuperclass instanceof ParameterizedType) {
-            ParameterizedType parameterizedType = (ParameterizedType) genericSuperclass;
-            Type[] typeArguments = parameterizedType.getActualTypeArguments();
-            if (typeArguments.length > 0) {
-                Type typeArgument = typeArguments[0];
-                if (typeArgument instanceof Class) {
-                    return (Class<?>) typeArgument;
-                }
-            }
-        }
-        return null;
     }
 
 }

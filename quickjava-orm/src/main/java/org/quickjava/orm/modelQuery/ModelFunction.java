@@ -1,4 +1,4 @@
-package org.quickjava.orm;
+package org.quickjava.orm.modelQuery;
 
 import java.io.Serializable;
 import java.util.function.Function;

@@ -197,20 +197,4 @@ public class ModelUtil extends SqlUtil {
         return toUnderlineCase(fieldName);
     }
 
-    /**
-     * 获取方法引用传递的方法名称
-     * @return 对应属性名称
-     */
-    public static String getFunctionConvFieldName(Function<?, ?> function)
-    {
-        Method method = function.getClass().getDeclaredMethods()[0];
-        String fieldName = method.getName();
-        if (fieldName.startsWith("get") || fieldName.startsWith("set")) {
-            fieldName = fieldName.substring(2);
-        }
-        System.out.println("function.getDeclaredFields()=" + Arrays.toString(function.getClass().getDeclaredFields()));
-        System.out.println("function.getDeclaredMethods()=" + Arrays.toString(function.getClass().getDeclaredMethods()));
-        return toUnderlineCase(fieldName);
-    }
-
 }
