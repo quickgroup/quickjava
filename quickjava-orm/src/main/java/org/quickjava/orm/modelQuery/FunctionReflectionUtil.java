@@ -36,12 +36,10 @@ public class FunctionReflectionUtil {
             String implMethodName = serializedLambda.getImplMethodName();
             if (implMethodName.startsWith("get") && implMethodName.length() > 3) {
                 fieldName = Introspector.decapitalize(implMethodName.substring(3));
-
             } else if (implMethodName.startsWith("is") && implMethodName.length() > 2) {
                 fieldName = Introspector.decapitalize(implMethodName.substring(2));
             } else if (implMethodName.startsWith("lambda$")) {
-                throw new IllegalArgumentException("SerializableFunction不能传递lambda表达式,只能使用方法引用");
-
+                throw new IllegalArgumentException("不不支持传递lambda表达式，只能使用方法引用");
             } else {
                 throw new IllegalArgumentException(implMethodName + "不是Getter方法引用");
             }
