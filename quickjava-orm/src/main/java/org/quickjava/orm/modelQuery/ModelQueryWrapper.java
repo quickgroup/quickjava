@@ -35,7 +35,7 @@ public abstract class ModelQueryWrapper<T, R extends Function<T, ?>> implements 
     }
 
     private String findFieldName(R function) {
-        return FunctionReflectionUtil.findFieldName((Function<?, ?>) function);
+        return FunctionReflectionUtil.getFieldName((Function<?, ?>) function);
     }
 
 }

@@ -27,12 +27,12 @@ public class FunctionReflectionUtil {
 
     public static <T, R> Field findField(Function<T, R> function) {
         try {
-            String fieldName = null;
-            // 第1步 获取SerializedLambda
+            String fieldName;
+
             Method method = function.getClass().getDeclaredMethod("writeReplace");
             method.setAccessible(Boolean.TRUE);
             SerializedLambda serializedLambda = (SerializedLambda) method.invoke(function);
-            // 第2步 implMethodName 即为Field对应的Getter方法名
+
             String implMethodName = serializedLambda.getImplMethodName();
             if (implMethodName.startsWith("get") && implMethodName.length() > 3) {
                 fieldName = Introspector.decapitalize(implMethodName.substring(3));
@@ -43,22 +43,15 @@ public class FunctionReflectionUtil {
             } else {
                 throw new IllegalArgumentException(implMethodName + "不是Getter方法引用");
             }
-            // 第3步 获取的Class是字符串，并且包名是“/”分割，需要替换成“.”，才能获取到对应的Class对象
+
             String declaredClass = serializedLambda.getImplClass().replace("/", ".");
             Class<?> aClass = Class.forName(declaredClass, false, ClassUtils.getDefaultClassLoader());
-
-            // 第4步  Spring 中的反射工具类获取Class中定义的Field
             return ReflectionUtils.findField(aClass, fieldName);
 
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
-    }
-
-    public static <T, R> String findFieldName(Function<T, R> function) {
-        Field field = findField(function);
-        return ModelUtil.toUnderlineCase(field.getName());
     }
 
 }
