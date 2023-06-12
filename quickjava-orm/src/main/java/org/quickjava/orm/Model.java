@@ -191,8 +191,8 @@ public class Model {
         return where(field, Operator.IS_NOT_NULL, null);
     }
 
-    public Model between(String field, Object ...args) {
-        return where(field, Operator.BETWEEN, args);
+    public Model between(String field, Object val1, Object val2) {
+        return where(field, Operator.BETWEEN, new Object[]{val1, val2});
     }
 
     /**

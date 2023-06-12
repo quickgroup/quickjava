@@ -38,6 +38,8 @@ public class Config {
 
     public boolean autoCommit = true;
 
+    public boolean underscoreToCamelCase = true;
+
     public enum DBType {
         MYSQL,
         ORACLE,

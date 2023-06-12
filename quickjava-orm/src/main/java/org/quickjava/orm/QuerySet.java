@@ -72,6 +72,16 @@ public class QuerySet {
         return new QuerySet(table);
     }
 
+    public QuerySet join(String table, String condition) {
+        return join(table, condition, "INNER");
+    }
+
+    public QuerySet join(String table, String condition, String type)
+    {
+        joinList.add(new String[]{table, condition, type});
+        return this;
+    }
+
     public QuerySet where(String field, Object value)
     {
         return this.where(field, Operator.EQ, value);
@@ -118,18 +128,6 @@ public class QuerySet {
         return this;
     }
 
-    public QuerySet between(String field, Object val1, Object val2)
-    {
-        whereList.add(new Where(field, Operator.BETWEEN, new Object[]{val1, val2}));
-        return this;
-    }
-
-    public QuerySet between(String field, Object[] valArr)
-    {
-        whereList.add(new Where(field, Operator.BETWEEN, valArr));
-        return this;
-    }
-
     public QuerySet whereOr(String field, Operator operator, Object value)
     {
         whereList.add(new WhereOr(field, operator, value));
@@ -157,13 +155,9 @@ public class QuerySet {
         return this;
     }
 
-    public QuerySet join(String table, String condition) {
-        return join(table, condition, "INNER");
-    }
-
-    public QuerySet join(String table, String condition, String type)
+    public QuerySet between(String field, Object v1, Object v2)
     {
-        joinList.add(new String[]{table, condition, type});
+        whereList.add(new Where(field, Operator.BETWEEN, new Object[]{v1, v2}));
         return this;
     }
 
