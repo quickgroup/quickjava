@@ -97,6 +97,12 @@ public class QuerySet {
         return this;
     }
 
+    public QuerySet where(WhereBase where)
+    {
+        whereList.add(where);
+        return this;
+    }
+
     /**
      * 闭包查询
      * @param callback 闭包方法

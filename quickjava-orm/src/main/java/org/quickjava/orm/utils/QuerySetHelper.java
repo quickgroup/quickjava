@@ -1,14 +1,14 @@
 package org.quickjava.orm.utils;
 
+import org.quickjava.common.utils.ReflectUtil;
 import org.quickjava.orm.Q;
 import org.quickjava.orm.QuerySet;
+import org.quickjava.orm.contain.Action;
 import org.quickjava.orm.contain.Operator;
 import org.quickjava.orm.contain.TableMeta;
+import org.quickjava.orm.contain.WhereBase;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 // 用户querySet的增强和助手方法
 public class QuerySetHelper {
@@ -105,5 +105,40 @@ public class QuerySetHelper {
     }
 
     // 获取QuerySet数据
+    public static Action __Action(QuerySet query) {
+        return ReflectUtil.invoke(query, "__Action");
+    }
+
+    public static List<String> __FieldList(QuerySet query) {
+        return ReflectUtil.invoke(query, "__FieldList");
+    }
+
+    public static String __Table(QuerySet query) {
+        return ReflectUtil.invoke(query, "__Table");
+    }
+
+    public static List<String[]> __JoinList(QuerySet query) {
+        return ReflectUtil.invoke(query, "__JoinList");
+    }
+
+    public static List<Map<String, Object>> __DataList(QuerySet query) {
+        return ReflectUtil.invoke(query, "__DataList");
+    }
+
+    public static List<WhereBase> __WhereList(QuerySet query) {
+        return ReflectUtil.invoke(query, "__WhereList");
+    }
+
+    public static List<String> __Orders(QuerySet query) {
+        return ReflectUtil.invoke(query, "__Orders");
+    }
+
+    public static Integer __Limit(QuerySet query) {
+        return ReflectUtil.invoke(query, "__Limit");
+    }
+
+    public static Integer __LimitSize(QuerySet query) {
+        return ReflectUtil.invoke(query, "__LimitSize");
+    }
 
 }

@@ -30,8 +30,15 @@ public class ApplicationBoot {
 //        System.out.println("article=" + ModelQuery.lambda(Article.class).eq(Article::getId, 1));
 //        System.out.println("article=" + ModelQuery.lambda(Article.class).eq(Article::getId, 1).eq(Article::user, 1));
 
-        // 闭包查询
+        // querySet闭包查询
         System.out.println("article=" + QuerySet.table("article").where("status", 1).where(query -> {
+            query.where("id", 20).where("user_id", 10);
+        }).whereOr(query -> {
+            query.where("id", 21).where("user_id", 11);
+        }).fetchSql());
+
+        // 模型闭包查询
+        System.out.println("article=" + new Article().where("status", 1).where(query -> {
             query.where("id", 20).where("user_id", 10);
         }).whereOr(query -> {
             query.where("id", 21).where("user_id", 11);

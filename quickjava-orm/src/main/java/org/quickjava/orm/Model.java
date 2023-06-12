@@ -15,10 +15,7 @@ import org.quickjava.orm.annotation.OneToMany;
 import org.quickjava.orm.annotation.OneToOne;
 import org.quickjava.orm.contain.*;
 import org.quickjava.orm.enums.RelationType;
-import org.quickjava.orm.utils.ModelUtil;
-import org.quickjava.orm.utils.ORMHelper;
-import org.quickjava.orm.utils.QuerySetHelper;
-import org.quickjava.orm.utils.SqlUtil;
+import org.quickjava.orm.utils.*;
 
 import java.io.Serializable;
 import java.lang.reflect.*;
@@ -123,12 +120,34 @@ public class Model {
     }
 
     /**
-     * 高级sql语句查询
+     * sql语句查询
      * @param sql 原生sql语句
      * @return 模型对象
      */
     public Model where(String sql) {
         query().where(sql, Operator.RAW, null);
+        return this;
+    }
+
+    /**
+     * 闭包查询
+     * @param callback 闭包方法
+     * @return 模型对象
+     */
+    public Model where(WhereCallback callback)
+    {
+        query().where(callback);
+        return this;
+    }
+
+    /**
+     * 闭包查询
+     * @param callback 闭包方法
+     * @return 模型对象
+     */
+    public Model whereOr(WhereCallback callback)
+    {
+        query().whereOr(callback);
         return this;
     }
 
@@ -291,6 +310,12 @@ public class Model {
         query().order(fieldToUnderlineCase(field), asc);
         return this;
     }
+
+    public String fetchSql() {
+        return query().fetchSql();
+    }
+
+    //TODO::--------------模型自用方法--------------
 
     /**
      * 字段转下划线格式
