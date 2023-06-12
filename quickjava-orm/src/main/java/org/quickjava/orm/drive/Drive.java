@@ -73,23 +73,24 @@ public abstract class Drive {
 
         List<String> sqlList = new ArrayList<>();
         DriveConfigure config = getDriveConfigure();
+        DriveHelper helper = new DriveHelper(query, config);
 
         // action
-        Action action = query.__Action();
+        Action action = helper.getAction();
         sqlList.add(action.beginSymbol());
 
         // action is SELECT
         if (action == Action.SELECT) {
-            sqlList.add(SqlUtil.collJoin(",", query.__FieldList()));
+            sqlList.add(SqlUtil.collJoin(",", helper.getFieldList()));
             sqlList.add("FROM");
         }
 
         // table name
-        sqlList.add(query.__Table().toString());
+        sqlList.add(helper.getTable());
 
         // TODO::JOIN
-        if (query.__JoinList().size() > 0) {
-            query.__JoinList().forEach(arr -> {
+        if (helper.getJoinList().size() > 0) {
+            helper.getJoinList().forEach(arr -> {
                 sqlList.add(String.format("%s JOIN %s ON %s", arr[2], arr[0], arr[1]));
             });
         }
@@ -98,15 +99,15 @@ public abstract class Drive {
         if (action == Action.INSERT) {
             StringBuilder dataSql = new StringBuilder();
             // field
-            SqlUtil.mapKeyJoin(dataSql, query.__DataList().get(0));
+            SqlUtil.mapKeyJoin(dataSql, helper.getDataList().get(0));
             // values
             dataSql.append(" VALUES ");
             // 数据处理方法
             SqlUtil.MapJoinCallback joinCallback = entry -> Value.pretreatment(entry.getValue());
-            for (int i = 0; i < query.__DataList().size(); i++) {
+            for (int i = 0; i < helper.getDataList().size(); i++) {
                 if (i > 0)
                     dataSql.append(',');
-                SqlUtil.mapBracketsJoin(dataSql, query.__DataList().get(i), joinCallback);
+                SqlUtil.mapBracketsJoin(dataSql, helper.getDataList().get(i), joinCallback);
             }
             sqlList.add(dataSql.toString());
         }
@@ -115,7 +116,7 @@ public abstract class Drive {
         if (action == Action.UPDATE) {
             StringBuilder dataSql = new StringBuilder();
             int fi = 0;
-            for (Map.Entry<String, Object> entry : query.__DataList().get(0).entrySet()) {
+            for (Map.Entry<String, Object> entry : helper.getDataList().get(0).entrySet()) {
                 if (fi++ > 0)
                     dataSql.append(",");
                 String item = String.format("%s%s%s=%s", config.fieldL, entry.getKey(), config.fieldR,
@@ -128,29 +129,29 @@ public abstract class Drive {
         }
 
         // WHERE
-        if (query.__WhereList().size() > 0) {
+        if (helper.__WhereList().size() > 0) {
             sqlList.add("WHERE");
-            sqlList.add(WhereBase.cutFirstLogic(WhereBase.toSql(query.__WhereList(), config)));
+            sqlList.add(WhereBase.cutFirstLogic(WhereBase.toSql(helper.__WhereList(), config)));
         }
 
         // GROUP BY
         // HAVING
 
         // ORDER BY
-        if (query.__Orders().size() > 0) {
-            sqlList.add(String.format("ORDER BY %s", SqlUtil.collJoin(",", query.__Orders())));
+        if (helper.__Orders().size() > 0) {
+            sqlList.add(String.format("ORDER BY %s", SqlUtil.collJoin(",", helper.__Orders())));
         }
 
         // Limit
-        if (action == Action.SELECT && query.__Limit() != null) {
-            sqlList.add(String.format("LIMIT %d,%d", query.__Limit(), query.__LimitSize()));
+        if (action == Action.SELECT && helper.__Limit() != null) {
+            sqlList.add(String.format("LIMIT %d,%d", helper.__Limit(), helper.__LimitSize()));
         }
 
         return SqlUtil.collJoin(" ", sqlList);
     }
 
     public <T> T executeSql(QuerySet query) {
-        return executeSql(query.__Action(), pretreatment(query));
+        return executeSql(DriveHelper.getAction(query), pretreatment(query));
     }
 
     /**

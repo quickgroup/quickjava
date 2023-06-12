@@ -220,8 +220,8 @@ public class ReflectUtil {
             return (T) method.invoke(obj, args);
 
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e.getMessage());
+//            throw new RuntimeException(e.getMessage());
+            return null;
         }
     }
 

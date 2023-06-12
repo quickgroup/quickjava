@@ -10,6 +10,7 @@ import org.quickjava.common.utils.BeanUtil;
 import org.quickjava.orm.utils.ORMHelper;
 import org.quickjava.orm.utils.QueryException;
 import org.quickjava.orm.utils.SqlUtil;
+import org.quickjava.orm.utils.WhereCallback;
 
 import java.util.*;
 
@@ -88,11 +89,26 @@ public class QuerySet {
     /**
      * 高级sql语句查询
      * @param sql SQL语句
-     * @return 查询取
+     * @return 查询器
      * */
     public QuerySet where(String sql)
     {
         where(sql, Operator.RAW, null);
+        return this;
+    }
+
+    /**
+     * 闭包查询
+     * @param callback 闭包方法
+     * @return 查询器
+     * */
+    public QuerySet where(WhereCallback callback)
+    {
+        QuerySet querySet = new QuerySet();
+        callback.call(querySet);
+        if (querySet.whereList.size() > 0) {
+            whereList.add(new Where(querySet.whereList));
+        }
         return this;
     }
 
@@ -108,15 +124,31 @@ public class QuerySet {
         return this;
     }
 
-    public QuerySet whereOr(String field, Operator operator, String value)
+    public QuerySet whereOr(String field, Operator operator, Object value)
     {
         whereList.add(new WhereOr(field, operator, value));
         return this;
     }
 
-    public QuerySet whereOr(String field, String value)
+    public QuerySet whereOr(String field, Object value)
     {
         return this.whereOr(field, Operator.EQ, value);
+    }
+
+    public QuerySet whereOr(String sql)
+    {
+        where(sql, Operator.RAW, null);
+        return this;
+    }
+
+    public QuerySet whereOr(WhereCallback callback)
+    {
+        QuerySet querySet = new QuerySet();
+        callback.call(querySet);
+        if (querySet.whereList.size() > 0) {
+            whereList.add(new WhereOr(querySet.whereList));
+        }
+        return this;
     }
 
     public QuerySet join(String table, String condition) {
@@ -494,41 +526,41 @@ public class QuerySet {
 
 
     //TODO::--------------- 类自用方法 ---------------
-    public List<WhereBase> __WhereList() {
-        return this.whereList;
-    }
-
-    public Action __Action() {
+    private Action __Action() {
         return this.action;
     }
 
-    public List<String> __FieldList() {
+    private List<String> __FieldList() {
         if (fieldList.size() == 0)
             field("*");
         return fieldList;
     }
 
-    public Field __Table() {
-        return new Field(this.table);
+    private String __Table() {
+        return this.table;
     }
 
-    public Integer __Limit() {
-        return limitIndex;
+    private List<String[]> __JoinList() {
+        return joinList;
     }
 
-    public Integer __LimitSize() {
-        return limitSize;
-    }
-
-    public List<String> __Orders() {
-        return orderByList;
-    }
-
-    public List<Map<String, Object>> __DataList() {
+    private List<Map<String, Object>> __DataList() {
         return dataList;
     }
 
-    public List<String[]> __JoinList() {
-        return joinList;
+    private List<WhereBase> __WhereList() {
+        return this.whereList;
+    }
+
+    private List<String> __Orders() {
+        return orderByList;
+    }
+
+    private Integer __Limit() {
+        return limitIndex;
+    }
+
+    private Integer __LimitSize() {
+        return limitSize;
     }
 }

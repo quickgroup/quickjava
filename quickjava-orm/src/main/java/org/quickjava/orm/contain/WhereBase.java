@@ -8,6 +8,7 @@ package org.quickjava.orm.contain;
 import org.quickjava.orm.utils.SqlUtil;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public abstract class WhereBase {
 
@@ -28,17 +29,24 @@ public abstract class WhereBase {
         this.setValue(value);
     }
 
+    public WhereBase(int logic, List<WhereBase> wheres) {
+        this.logic = logic;
+        this.children = wheres;
+    }
+
     public int getLogic() {
         return logic;
     }
 
     public String getLogicStr() {
         // 如果字段带有logic就返回空字符串
-        String fieldClear = this.field.toUpperCase().trim();
-        if (fieldClear.startsWith("AND") || fieldClear.startsWith("OR")) {
-            return "";
+        if (this.field != null && this.operator == Operator.RAW) {
+            String fieldClear = this.field.toUpperCase().trim();
+            if (fieldClear.startsWith(LOGIC_AND) || fieldClear.startsWith(LOGIC_OR)) {
+                return "";
+            }
         }
-        return logic == 2 ? "OR" : "AND";
+        return logic == 1 ? LOGIC_AND : LOGIC_OR;
     }
 
     public String getField() {
@@ -48,6 +56,10 @@ public abstract class WhereBase {
     public void setField(String field) {
         this.field = field;
     }
+
+    public static final String LOGIC_OR = "OR";
+
+    public static final String LOGIC_AND = "AND";
 
     public static Map<String, String> OpMap = new LinkedHashMap<>();
 
@@ -112,7 +124,8 @@ public abstract class WhereBase {
     public String toString(DriveConfigure cfg) {
         // 嵌套查询
         if (children != null) {
-            return getLogicStr() + " " + cutFirstLogic(SqlUtil.collJoin(" ", children));
+            List<String> sqlList = children.stream().map(it -> it.toString(cfg)).collect(Collectors.toList());
+            return getLogicStr() + " (" + cutFirstLogic(SqlUtil.collJoin(" ", sqlList)) + ")";
         }
         // 输出
         if (Operator.RAW == operator) {

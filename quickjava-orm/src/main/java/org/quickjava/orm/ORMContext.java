@@ -86,9 +86,11 @@ public class ORMContext {
             );
             config1.subject = Config.DBSubject.QUICKJAVA;
             return config1;
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
+        } catch (Throwable th) {
+            return defaultConfig;
         }
     }
+
+    private static Config defaultConfig = new Config(Config.DBSubject.CONFIG, Config.DBType.DEFAULT);
 
 }

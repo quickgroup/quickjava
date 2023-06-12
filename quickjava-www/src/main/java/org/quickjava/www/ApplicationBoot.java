@@ -2,8 +2,10 @@ package org.quickjava.www;
 
 import org.quickjava.framework.QuickJavaBoot;
 import org.quickjava.framework.annotation.ApplicationQuickBoot;
+import org.quickjava.orm.QuerySet;
 import org.quickjava.orm.modelQuery.ModelQuery;
 import org.quickjava.orm.example.Article;
+import org.quickjava.orm.utils.WhereCallback;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -24,27 +26,16 @@ public class ApplicationBoot {
 //        System.out.println("user_type_Text=" + ComUtil.toUnderlineCase("user_type_Text"));
 
         // 测试方法引用传递
-//        System.out.println("article=" + new Article().where("id", 1));
+//        System.out.println("article=" + new ModelQuery<>(Article.class).eq(Article::getId, 1));
+//        System.out.println("article=" + ModelQuery.lambda(Article.class).eq(Article::getId, 1));
+//        System.out.println("article=" + ModelQuery.lambda(Article.class).eq(Article::getId, 1).eq(Article::user, 1));
 
-//        System.out.println("article=" + new ModelQuery<Article>().eq(Article::getId, 1));
-
-//        ModelQuery<Article> query = new ModelQuery<Article>(){};
-//        // 获取泛型类型
-//        Type genericType = query.getClass().getGenericSuperclass();
-//        if (genericType instanceof ParameterizedType) {
-//            ParameterizedType parameterizedType = (ParameterizedType) genericType;
-//            Type[] typeArguments = parameterizedType.getActualTypeArguments();
-//
-//            if (typeArguments.length > 0) {
-//                Type typeArgument = typeArguments[0];
-//                System.out.println("泛型类: " + typeArgument.getTypeName());
-//            }
-//        }
-
-
-        System.out.println("article=" + new ModelQuery<>(Article.class).eq(Article::getId, 1));
-        System.out.println("article=" + ModelQuery.lambda(Article.class).eq(Article::getId, 1));
-        System.out.println("article=" + ModelQuery.lambda(Article.class).eq(Article::getId, 1));
+        // 闭包查询
+        System.out.println("article=" + QuerySet.table("article").where("status", 1).where(query -> {
+            query.where("id", 20).where("user_id", 10);
+        }).whereOr(query -> {
+            query.where("id", 21).where("user_id", 11);
+        }).fetchSql());
 
         QuickJavaBoot.start(ApplicationBoot.class, args);
     }
