@@ -342,7 +342,7 @@ public class Model {
             return this;
         }
         if (fields.contains(",")) {
-            return order(Arrays.asList(fields.split(",")));
+            return this.order(fields.split(","));
         }
         String[] arr = fields.trim().split(" ");
         return arr.length == 2 ? order(arr[0], arr[1]) : order(arr[0], "ASC");

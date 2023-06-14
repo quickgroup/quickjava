@@ -181,15 +181,15 @@ public class QuerySet {
         return order(field, asc ? "ASC" : "DESC");
     }
 
-    public QuerySet order(String field)
+    public QuerySet order(String fields)
     {
-        if (ORMHelper.isEmpty(field)) {
+        if (ORMHelper.isEmpty(fields)) {
             return this;
         }
-        if (field.contains(",")) {
-            return order(Arrays.asList(field.split(",")));
+        if (fields.contains(",")) {
+            return this.order(fields.split(","));
         }
-        String[] arr = field.trim().split(" ");
+        String[] arr = fields.trim().split(" ");
         return arr.length == 2 ? order(arr[0], arr[1]) : order(arr[0], "ASC");
     }
 
@@ -430,13 +430,13 @@ public class QuerySet {
     public <T> Pagination<T> pagination(Class<T> clazz, Integer page, Integer pageSize)
     {
         Pagination<Map<String, Object>> pag = pagination(page, pageSize);
-        return new Pagination<T>(pag.page, pag.pageSize, pag.total, toBeanList(clazz, pag.rows));
+        return new Pagination<>(pag.page, pag.pageSize, pag.total, toBeanList(clazz, pag.rows));
     }
 
     public <T> Pagination<T> pagination(Class<T> clazz)
     {
         Pagination<Map<String, Object>> pag = pagination();
-        return new Pagination<T>(pag.page, pag.pageSize, pag.total, toBeanList(clazz, pag.rows));
+        return new Pagination<>(pag.page, pag.pageSize, pag.total, toBeanList(clazz, pag.rows));
     }
 
     //TODO::--------------- 统计方法 ---------------
