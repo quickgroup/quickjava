@@ -4,6 +4,7 @@
 
 package org.quickjava.orm;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.quickjava.orm.contain.*;
 import org.quickjava.orm.drive.Drive;
 import org.quickjava.common.utils.BeanUtil;
@@ -24,47 +25,40 @@ import java.util.*;
  */
 public class QuerySet {
 
-    private static QuerySet __defaultQuerySet = null;
-
+    @JsonIgnore
     private String table = null;
 
+    @JsonIgnore
     private Action action = Action.SELECT;
 
+    @JsonIgnore
     private final List<String> fieldList = new ArrayList<>();
 
+    @JsonIgnore
+    private final List<String[]> joinList = new LinkedList<>();
+
+    @JsonIgnore
     private final List<WhereBase> whereList = new LinkedList<>();
 
+    @JsonIgnore
     private final List<String> orderByList = new LinkedList<>();
 
-    private final Map<String, Object> data = new LinkedHashMap<>();
-
+    @JsonIgnore
     private final List<Map<String, Object>> dataList = new LinkedList<>();
 
+    @JsonIgnore
     private String groupBy = null;
 
+    @JsonIgnore
     private Integer limitIndex = null;
 
+    @JsonIgnore
     private Integer limitSize = null;
-
-    private final List<String[]> joinList = new LinkedList<>();
 
     public QuerySet() {}
 
     public QuerySet(String table) {
         this.table = table;
-    }
-
-    /**
-     * 连接数据库（返回默认链接
-     * @return 查询器
-     * */
-    public static QuerySet connect() {
-        synchronized (QuerySet.class) {
-            if (__defaultQuerySet == null) {
-                __defaultQuerySet = new QuerySet();
-            }
-        }
-        return __defaultQuerySet;
     }
 
     public static QuerySet table(String table)
@@ -134,6 +128,12 @@ public class QuerySet {
         return this;
     }
 
+    /**
+     * OR查询
+     * @param field 字段名
+     * @param value 数值
+     * @return 查询器
+     */
     public QuerySet whereOr(String field, Object value)
     {
         return this.whereOr(field, Operator.EQ, value);
@@ -166,7 +166,7 @@ public class QuerySet {
         if (ORMHelper.isEmpty(fields)) {
             return this;
         }
-        groupBy = fields; //field.split(",");
+        groupBy = fields;
         return this;
     }
 
@@ -220,29 +220,45 @@ public class QuerySet {
         return limit((page - 1) * size, size);
     }
 
-    public QuerySet field(String fields)
+    /**
+     * 限定查询返回的数据字段
+     * @param field 字段
+     * @return 查询器
+     */
+    public QuerySet field(String field)
     {
-        if (ORMHelper.isEmpty(fields)) {
+        if (ORMHelper.isEmpty(field)) {
             return this;
         }
-        field(fields.split(","));
+        if (field.contains(",")) {
+            Arrays.stream(field.split(",")).forEach(this::field);
+        } else {
+//            this.fieldList.add(field.contains("\\.") ? field.split("\\.") : new String[]{field});
+            this.fieldList.add(field);
+        }
         return this;
     }
 
+    /**
+     * 限定查询返回的数据字段
+     * @param fields 字段
+     * @return 查询器
+     */
     public QuerySet field(List<String> fields)
     {
-        field(fields.toArray(new String[0]));
+        fields.forEach(this::field);
         return this;
     }
 
-    public QuerySet field(String[] fieldArr) {
-        for (String item : fieldArr) {
-            String[] arr = item.split("\\.");
-            if (arr.length == 2) {
-                this.fieldList.add(new Field(arr[0], arr[1]).toString());
-            } else {
-                this.fieldList.add(new Field(arr[0]).toString());
-            }
+    /**
+     * 限定查询返回的数据字段
+     * 支持书写格式：table.field、table.field tableField、table.field table_field、field
+     * @param fields 字段
+     * @return 查询器
+     */
+    public QuerySet field(String[] fields) {
+        for (String item : fields) {
+            field(item);
         }
         return this;
     }
@@ -271,27 +287,33 @@ public class QuerySet {
         return result == null ? null : BeanUtil.mapToBean(result, clazz);
     }
 
-    public QuerySet data(String field, String value)
+    public QuerySet data(String field, Object value)
     {
-        this.data.put(field, value);
+        if (dataList.size() == 0) {
+            dataList.add(new LinkedHashMap<>());
+        }
+        this.dataList.get(0).put(field, value);
         return this;
     }
 
-    public QuerySet data(Map<String, String> data)
+    public QuerySet data(Map<String, Object> data)
     {
-        this.data.putAll(data);
+        if (dataList.size() == 0) {
+            dataList.add(new LinkedHashMap<>());
+        }
+        this.dataList.get(0).putAll(data);
         return this;
     }
 
     public Map<String, Object> data()
     {
-        return this.data;
+        return this.dataList.size() > 0 ? this.dataList.get(0) : null;
     }
 
     public Integer update(Map<String, Object> data)
     {
         action = Action.UPDATE;
-        this.data.putAll(data);
+        this.data(data);
         executeSql();
         return null;
     }
@@ -306,7 +328,7 @@ public class QuerySet {
     public Long insert(Map<String, Object> data)
     {
         this.action = Action.INSERT;
-        this.data.putAll(data);
+        this.data(data);
         return executeSql();
     }
 
@@ -344,7 +366,7 @@ public class QuerySet {
         }
 //        table = (SqlUtil.isUpperString(table) ? table : SqlUtil.backQuote(table));
         String sql = "SHOW FULL COLUMNS FROM " + table;
-        List<Map<String, String>> columns = (List<Map<String, String>>) this.executeSql(sql);
+        List<Map<String, String>> columns = this.executeSql(sql);
         if (ORMHelper.isEmpty(columns)) {
             return new LinkedList<>();
         }
@@ -355,7 +377,7 @@ public class QuerySet {
     }
 
     // 获取表主键字段
-    public String getColumnPk() {
+    public String pk() {
         List<TableColumn> columns = getColumns();
         for (TableColumn column : columns) {
             if ("PRI".equals(column.Key))
@@ -369,7 +391,7 @@ public class QuerySet {
         return ORMContext.getDrive().pretreatment(this);
     }
 
-    public Object executeSql(String sql)
+    public <T> T executeSql(String sql)
     {
         return ORMContext.getDrive().executeSql(Action.SELECT, sql);
     }
@@ -422,8 +444,9 @@ public class QuerySet {
         return count("COUNT(*)");
     }
 
-    public Integer count(String field) {
-        fieldList.add(field);
+    public Integer count(String field)
+    {
+        field(field);
         List<Map<String, Object>> resultSet = executeSql();
         return Math.toIntExact((Long) resultSet.get(0).get(field));
     }
@@ -451,10 +474,6 @@ public class QuerySet {
      * 开启事务
      * */
     public static void startTrans() {
-        startTrans(connect());
-    }
-
-    public static void startTrans(QuerySet querySet) {
         startTrans(ORMContext.getDrive());
     }
 
@@ -466,10 +485,6 @@ public class QuerySet {
      * 提交事务
      * */
     public static void commit() {
-        commit(connect());
-    }
-
-    public static void commit(QuerySet querySet) {
         commit(ORMContext.getDrive());
     }
 
@@ -482,10 +497,6 @@ public class QuerySet {
      * 事务回滚
      * */
     public static void rollback() {
-        rollback(connect());
-    }
-
-    public static void rollback(QuerySet querySet) {
         rollback(ORMContext.getDrive());
     }
 
@@ -500,23 +511,17 @@ public class QuerySet {
      * */
     public static void transaction(TransactionCallback callback)
     {
-        startTrans();
-        try {
-            callback.call();
-            commit();
-        } catch (Throwable th){
-            rollback();
-        }
+        transaction(ORMContext.getDrive(), callback);
     }
 
-    public static void transaction(QuerySet querySet, TransactionCallback callback)
+    public static void transaction(Drive drive, TransactionCallback callback)
     {
-        startTrans(querySet);
+        startTrans(drive);
         try {
             callback.call();
-            commit(querySet);
+            commit(drive);
         } catch (Throwable th){
-            rollback(querySet);
+            rollback(drive);
         }
     }
 
@@ -550,6 +555,10 @@ public class QuerySet {
 
     private List<WhereBase> __WhereList() {
         return this.whereList;
+    }
+
+    private String __GroupBy() {
+        return groupBy;
     }
 
     private List<String> __Orders() {

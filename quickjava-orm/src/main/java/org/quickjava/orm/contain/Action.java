@@ -18,25 +18,18 @@ public enum Action {
     SELECT,
     ;
 
-    public String beginSymbol() {
-        return ActionString.str(this);
+    @Override
+    public String toString() {
+        return __NAME_MAP.getOrDefault(this.name(), null);
     }
 
-    public static class ActionString {
+    private static final Map<String, String> __NAME_MAP = new HashMap<>();
 
-        static Map<String, String> nameMap = new HashMap<>();
-
-        static {
-            nameMap.put(INSERT.name(), "INSERT INTO");
-            nameMap.put(DELETE.name(), "DELETE FROM");
-            nameMap.put(UPDATE.name(), "UPDATE");
-            nameMap.put(SELECT.name(), "SELECT");
-        }
-
-        public static String str(Action action) {
-            String name = action.name();
-            return nameMap.getOrDefault(name, null);
-        }
+    static {
+        __NAME_MAP.put(INSERT.name(), "INSERT INTO");
+        __NAME_MAP.put(DELETE.name(), "DELETE FROM");
+        __NAME_MAP.put(UPDATE.name(), "UPDATE");
+        __NAME_MAP.put(SELECT.name(), "SELECT");
     }
 
 }

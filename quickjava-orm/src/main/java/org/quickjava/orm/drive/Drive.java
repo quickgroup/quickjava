@@ -77,7 +77,7 @@ public abstract class Drive {
 
         // action
         Action action = QuerySetHelper.__Action(query);
-        sqlList.add(action.beginSymbol());
+        sqlList.add(action.toString());
 
         // action is SELECT
         if (action == Action.SELECT) {

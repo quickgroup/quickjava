@@ -272,11 +272,11 @@ public class Model {
     }
 
     public String pk() {
-        return ModelUtil.toCamelCase(query().getColumnPk());
+        return ModelUtil.toCamelCase(query().pk());
     }
 
     public String pkOri() {
-        return query().getColumnPk();
+        return query().pk();
     }
 
     public Object pkVal() {
@@ -404,7 +404,7 @@ public class Model {
     }
 
     public <D extends Model> D find(Serializable id) {
-        query().where(query().getColumnPk(), id);
+        query().where(query().pk(), id);
         return find();
     }
 
