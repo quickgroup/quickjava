@@ -3,7 +3,7 @@ package org.quickjava.orm.example;
 import org.quickjava.orm.Model;
 import org.quickjava.orm.annotation.ModelField;
 import org.quickjava.orm.annotation.ModelName;
-import org.quickjava.orm.contain.ModelFieldFill;
+import org.quickjava.orm.enums.ModelFieldFill;
 
 import java.util.Date;
 import java.util.List;

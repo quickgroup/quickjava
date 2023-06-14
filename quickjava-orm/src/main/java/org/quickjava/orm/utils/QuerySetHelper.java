@@ -4,7 +4,7 @@ import org.quickjava.common.utils.ReflectUtil;
 import org.quickjava.orm.Q;
 import org.quickjava.orm.QuerySet;
 import org.quickjava.orm.contain.Action;
-import org.quickjava.orm.contain.Operator;
+import org.quickjava.orm.enums.Operator;
 import org.quickjava.orm.contain.TableMeta;
 import org.quickjava.orm.contain.WhereBase;
 

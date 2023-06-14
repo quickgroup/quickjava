@@ -1,4 +1,4 @@
-package org.quickjava.orm.contain;
+package org.quickjava.orm.enums;
 
 public enum Operator {
     /**

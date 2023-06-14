@@ -84,6 +84,16 @@ public abstract class ModelQueryWrapper<M extends Model, R extends Function<M, ?
         return this.order(function, false);
     }
 
+    public ModelQueryWrapper<M, R> limit(int index, int count) {
+        model().limit(index, count);
+        return this;
+    }
+
+    public ModelQueryWrapper<M, R> limit(int count) {
+        model().limit(count);
+        return this;
+    }
+
     public ModelQueryWrapper<M, R> page(int page) {
         model().page(page);
         return this;
@@ -91,6 +101,46 @@ public abstract class ModelQueryWrapper<M extends Model, R extends Function<M, ?
 
     public ModelQueryWrapper<M, R> page(int page, int pageSize) {
         model().page(page, pageSize);
+        return this;
+    }
+
+    public ModelQueryWrapper<M, R> group(String fields) {
+        model().group(fields);
+        return this;
+    }
+
+    public ModelQueryWrapper<M, R> having(String fields) {
+        model().having(fields);
+        return this;
+    }
+
+    public ModelQueryWrapper<M, R> union(String sql) {
+        model().union(sql);
+        return this;
+    }
+
+    public ModelQueryWrapper<M, R> union(String[] sqlArr) {
+        model().union(sqlArr);
+        return this;
+    }
+
+    public ModelQueryWrapper<M, R> distinct() {
+        model().distinct();
+        return this;
+    }
+
+    public ModelQueryWrapper<M, R> distinct(boolean distinct) {
+        model().distinct(distinct);
+        return this;
+    }
+
+    public ModelQueryWrapper<M, R> lock() {
+        model().lock();
+        return this;
+    }
+
+    public ModelQueryWrapper<M, R> lock(boolean lock) {
+        model().lock(lock);
         return this;
     }
 

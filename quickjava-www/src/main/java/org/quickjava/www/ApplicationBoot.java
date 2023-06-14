@@ -35,14 +35,14 @@ public class ApplicationBoot {
             query.where("id", 20).where("user_id", 10);
         }).whereOr(query -> {
             query.where("id", 21).where("user_id", 11);
-        }).fetchSql());
+        }).buildSql());
 
         // 模型闭包查询
         System.out.println("article=" + new Article().where("status", 1).where(query -> {
             query.where("id", 20).where("user_id", 10);
         }).whereOr(query -> {
             query.where("id", 21).where("user_id", 11);
-        }).fetchSql());
+        }).buildSql());
 
         QuickJavaBoot.start(ApplicationBoot.class, args);
     }

@@ -14,6 +14,7 @@ import org.quickjava.orm.annotation.ModelName;
 import org.quickjava.orm.annotation.OneToMany;
 import org.quickjava.orm.annotation.OneToOne;
 import org.quickjava.orm.contain.*;
+import org.quickjava.orm.enums.Operator;
 import org.quickjava.orm.enums.RelationType;
 import org.quickjava.orm.utils.*;
 
@@ -228,49 +229,6 @@ public class Model {
         }
     }
 
-    /**
-     * 新增
-     * @return 模型对象
-     */
-    public Model insert()
-    {
-        Long pkVal = query().insert(this.sqlData());
-        data(pk(), pkVal);
-        return ModelUtil.isProxyModel(this) ? this : newProxyModel(getMClass(), data());
-    }
-
-    /**
-     * 使用数据集新增
-     * @param data 数据集
-     * @return 模型对象
-     */
-    public Model insert(DataMap data) {
-        data(data);
-        return insert();
-    }
-
-    /**
-     * 更新
-     * @return 模型对象
-     */
-    public Model update()
-    {
-        query().update(this.sqlData());
-        return ModelUtil.isProxyModel(this) ? this : newProxyModel(getMClass(), data());
-    }
-
-    public Model update(DataMap data) {
-        data(data);
-        return update();
-    }
-
-    public Model updateById() {
-        String pk = pk();
-        where(pk, data(pk));
-        __data.remove(pk);  // 不去更新主键
-        return update();
-    }
-
     public String pk() {
         return ModelUtil.toCamelCase(query().pk());
     }
@@ -311,8 +269,8 @@ public class Model {
         return this;
     }
 
-    public String fetchSql() {
-        return query().fetchSql();
+    public String buildSql() {
+        return query().buildSql();
     }
 
     //TODO::--------------模型自用方法--------------
@@ -360,6 +318,15 @@ public class Model {
         return this;
     }
 
+    public Model limit(Integer index, Integer count) {
+        query().limit(index, count);
+        return this;
+    }
+
+    public Model limit(Integer count) {
+        return limit(0, count);
+    }
+
     /**
      * 分页
      * @param page 页数
@@ -381,7 +348,95 @@ public class Model {
         return this;
     }
 
-    //---------- TODO::数据查询方法 ----------//
+    public Model group(String fields) {
+        query().group(fields);
+        return this;
+    }
+
+    public Model having(String fields) {
+        query().having(fields);
+        return this;
+    }
+
+    public Model union(String sql) {
+        query().union(sql);
+        return this;
+    }
+
+    public Model union(String[] sqlArr) {
+        query().union(sqlArr);
+        return this;
+    }
+
+    public Model distinct() {
+        return distinct(true);
+    }
+
+    public Model distinct(boolean distinct) {
+        query().distinct(distinct);
+        return this;
+    }
+
+    public Model lock() {
+        return lock(true);
+    }
+
+    public Model lock(boolean lock) {
+        query().lock(lock);
+        return this;
+    }
+
+    //---------- TODO::数据方法 ----------//
+    /**
+     * 新增
+     * @return 模型对象
+     */
+    public Model insert()
+    {
+        Long pkVal = query().insert(this.sqlData());
+        data(pk(), pkVal);
+        return ModelUtil.isProxyModel(this) ? this : newProxyModel(getMClass(), data());
+    }
+
+    /**
+     * 使用数据集新增
+     * @param data 数据集
+     * @return 模型对象
+     */
+    public Model insert(DataMap data) {
+        data(data);
+        return insert();
+    }
+
+    /**
+     * 删除
+     * @return 1
+     */
+    public int delete() {
+        return query().delete();
+    }
+
+    /**
+     * 更新
+     * @return 模型对象
+     */
+    public Model update()
+    {
+        query().update(this.sqlData());
+        return ModelUtil.isProxyModel(this) ? this : newProxyModel(getMClass(), data());
+    }
+
+    public Model update(DataMap data) {
+        data(data);
+        return update();
+    }
+
+    public Model updateById() {
+        String pk = pk();
+        where(pk, data(pk));
+        __data.remove(pk);  // 不去更新主键
+        return update();
+    }
 
     /**
      * 查询一条数据
@@ -583,10 +638,6 @@ public class Model {
     public <D> D selectFieldArray(String field) {
         List<Object> ret = selectFieldList(field);
         return (D) ret.toArray();
-    }
-
-    public int delete() {
-        return query().delete();
     }
 
     //---------- TODO::数据操作方法 ----------//

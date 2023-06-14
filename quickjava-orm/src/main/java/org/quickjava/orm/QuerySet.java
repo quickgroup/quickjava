@@ -5,9 +5,13 @@
 package org.quickjava.orm;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.quickjava.common.enums.DatetimeCurrType;
+import org.quickjava.common.enums.DatetimeRangeType;
+import org.quickjava.common.utils.DatetimeUtil;
 import org.quickjava.orm.contain.*;
 import org.quickjava.orm.drive.Drive;
 import org.quickjava.common.utils.BeanUtil;
+import org.quickjava.orm.enums.Operator;
 import org.quickjava.orm.utils.ORMHelper;
 import org.quickjava.orm.utils.QueryException;
 import org.quickjava.orm.utils.SqlUtil;
@@ -50,6 +54,9 @@ public class QuerySet {
     private String groupBy = null;
 
     @JsonIgnore
+    private String having = null;
+
+    @JsonIgnore
     private Integer limitIndex = null;
 
     @JsonIgnore
@@ -75,6 +82,50 @@ public class QuerySet {
         joinList.add(new String[]{table, condition, type});
         return this;
     }
+
+    /**
+     * 限定查询返回的数据字段
+     * @param field 字段
+     * @return 查询器
+     */
+    public QuerySet field(String field)
+    {
+        if (ORMHelper.isEmpty(field)) {
+            return this;
+        }
+        if (field.contains(",")) {
+            Arrays.stream(field.split(",")).forEach(this::field);
+        } else {
+//            this.fieldList.add(field.contains("\\.") ? field.split("\\.") : new String[]{field});
+            this.fieldList.add(field);
+        }
+        return this;
+    }
+
+    /**
+     * 限定查询返回的数据字段
+     * @param fields 字段
+     * @return 查询器
+     */
+    public QuerySet field(List<String> fields)
+    {
+        fields.forEach(this::field);
+        return this;
+    }
+
+    /**
+     * 限定查询返回的数据字段
+     * 支持书写格式：table.field、table.field tableField、table.field table_field、field
+     * @param fields 字段
+     * @return 查询器
+     */
+    public QuerySet field(String[] fields) {
+        for (String item : fields) {
+            field(item);
+        }
+        return this;
+    }
+
 
     public QuerySet where(String field, Object value)
     {
@@ -119,6 +170,18 @@ public class QuerySet {
         if (querySet.whereList.size() > 0) {
             whereList.add(new Where(querySet.whereList));
         }
+        return this;
+    }
+
+    public QuerySet where(String field, DatetimeRangeType range)
+    {
+        whereList.add(new WhereOr(field, Operator.BETWEEN, DatetimeUtil.rangeType(range)));
+        return this;
+    }
+
+    public QuerySet where(String field, DatetimeCurrType currType)
+    {
+        whereList.add(new WhereOr(field, Operator.EQ, DatetimeUtil.currType(currType)));
         return this;
     }
 
@@ -170,9 +233,17 @@ public class QuerySet {
         return this;
     }
 
+    public QuerySet having(String fields)
+    {
+        if (ORMHelper.isEmpty(fields)) {
+            return this;
+        }
+        having = fields;
+        return this;
+    }
+
     public QuerySet order(String field, String sort)
     {
-//        field = SqlUtil.isUpperString(field) ? field : SqlUtil.backQuote(field);
         orderByList.add(String.format("%s %s", field, sort.toUpperCase()));
         return this;
     }
@@ -220,49 +291,31 @@ public class QuerySet {
         return limit((page - 1) * size, size);
     }
 
-    /**
-     * 限定查询返回的数据字段
-     * @param field 字段
-     * @return 查询器
-     */
-    public QuerySet field(String field)
-    {
-        if (ORMHelper.isEmpty(field)) {
-            return this;
-        }
-        if (field.contains(",")) {
-            Arrays.stream(field.split(",")).forEach(this::field);
-        } else {
-//            this.fieldList.add(field.contains("\\.") ? field.split("\\.") : new String[]{field});
-            this.fieldList.add(field);
-        }
+    public QuerySet union(String sql) {
         return this;
     }
 
-    /**
-     * 限定查询返回的数据字段
-     * @param fields 字段
-     * @return 查询器
-     */
-    public QuerySet field(List<String> fields)
-    {
-        fields.forEach(this::field);
+    public QuerySet union(String[] sqlArr) {
         return this;
     }
 
-    /**
-     * 限定查询返回的数据字段
-     * 支持书写格式：table.field、table.field tableField、table.field table_field、field
-     * @param fields 字段
-     * @return 查询器
-     */
-    public QuerySet field(String[] fields) {
-        for (String item : fields) {
-            field(item);
-        }
+    public QuerySet distinct() {
+        return distinct(true);
+    }
+
+    public QuerySet distinct(boolean distinct) {
         return this;
     }
 
+    public QuerySet lock() {
+        return lock(true);
+    }
+
+    public QuerySet lock(boolean lock) {
+        return this;
+    }
+
+    //TODO::----------- 数据方法 -----------
     public List<Map<String, Object>> select()
     {
         List<Map<String, Object>> resultSet = executeSql();
@@ -386,12 +439,13 @@ public class QuerySet {
         return null;
     }
 
-    public String fetchSql()
+    //TODO::--------------- 语句方法 ---------------
+    public String buildSql()
     {
         return ORMContext.getDrive().pretreatment(this);
     }
 
-    public <T> T executeSql(String sql)
+    private  <T> T executeSql(String sql)
     {
         return ORMContext.getDrive().executeSql(Action.SELECT, sql);
     }
@@ -399,6 +453,14 @@ public class QuerySet {
     private <T> T executeSql()
     {
         return ORMContext.getDrive().executeSql(this);
+    }
+
+    public <T> T execute(String sql) {
+        return ORMContext.getDrive().executeSql(Action.INSERT, sql);
+    }
+
+    public <T> T query(String sql) {
+        return ORMContext.getDrive().executeSql(Action.SELECT, sql);
     }
 
     //TODO::--------------- 增强方法 ---------------

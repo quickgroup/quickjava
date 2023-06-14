@@ -5,6 +5,8 @@
 
 package org.quickjava.orm.contain;
 
+import org.quickjava.orm.enums.Operator;
+
 import java.util.List;
 
 public class WhereOr extends WhereBase {

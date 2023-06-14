@@ -5,6 +5,7 @@
 
 package org.quickjava.orm.contain;
 
+import org.quickjava.orm.enums.Operator;
 import org.quickjava.orm.utils.SqlUtil;
 
 import java.util.*;
