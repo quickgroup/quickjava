@@ -139,23 +139,23 @@ public abstract class Drive {
         }
 
         // WHERE
-        if (QuerySetHelper.__WhereList(query) != null) {
+        if (action == Action.SELECT && QuerySetHelper.__WhereList(query) != null) {
             sqlList.add("WHERE");
             sqlList.add(WhereBase.cutFirstLogic(WhereBase.collectSql(QuerySetHelper.__WhereList(query), config)));
         }
 
         // GROUP BY
-        if (QuerySetHelper.__GroupBy(query) != null) {
+        if (action == Action.SELECT && QuerySetHelper.__GroupBy(query) != null) {
             sqlList.add(QuerySetHelper.__GroupBy(query));
         }
 
         // HAVING
-        if (QuerySetHelper.__Having(query) != null) {
+        if (action == Action.SELECT && QuerySetHelper.__Having(query) != null) {
             sqlList.add(QuerySetHelper.__Having(query));
         }
 
         // ORDER BY
-        if (QuerySetHelper.__Orders(query) != null) {
+        if (action == Action.SELECT && QuerySetHelper.__Orders(query) != null) {
             sqlList.add(String.format("ORDER BY %s", SqlUtil.collJoin(",", QuerySetHelper.__Orders(query))));
         }
 
@@ -165,7 +165,7 @@ public abstract class Drive {
         }
 
         // lock
-        if (isTrue(QuerySetHelper.__lock(query))) {
+        if (action == Action.SELECT && isTrue(QuerySetHelper.__lock(query))) {
             sqlList.add("FOR UPDATE");
         }
 
