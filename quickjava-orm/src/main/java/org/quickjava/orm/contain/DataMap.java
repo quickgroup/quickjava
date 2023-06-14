@@ -34,11 +34,6 @@ public class DataMap extends LinkedHashMap<String, Object> {
         return this;
     }
 
-    public DataMap putAll2(Map<? extends String, ?> data) {
-        super.putAll(data);
-        return this;
-    }
-
     public DataMap getMap(String key) {
         return (DataMap) get(key);
     }

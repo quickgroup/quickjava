@@ -1110,10 +1110,6 @@ public class Model {
         return ModelUtil.getModelClass(clazz);
     }
 
-    private static Class<?> getModelClass(Object obj) {
-        return ModelUtil.getModelClass(obj);
-    }
-
     private static String fieldAlias(String table, String field) {
         return table + "." + field + " AS " + table + "__" + field;
     }
