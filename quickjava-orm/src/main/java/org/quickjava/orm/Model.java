@@ -52,13 +52,6 @@ public class Model {
     private ModelMeta __meta;
 
     /**
-     * 关联的父模型对象
-     * */
-    @JsonIgnore
-    @TableField(exist = false)
-    private Model __parent;
-
-    /**
      * 预载入属性
      * */
     @JsonIgnore
@@ -70,7 +63,7 @@ public class Model {
      */
     @JsonIgnore
     @TableField(exist = false)
-    private DataMap __data = new DataMap();
+    private final DataMap __data = new DataMap();
 
     /**
      * 修改的字段
@@ -82,6 +75,13 @@ public class Model {
     @JsonIgnore
     @TableField(exist = false)
     private QuerySet __querySet = null;
+
+    /**
+     * 关联的父模型对象
+     * */
+    @JsonIgnore
+    @TableField(exist = false)
+    private Model __parent;
 
     public Model() {
         initModel(this, getClass());
@@ -212,8 +212,8 @@ public class Model {
 
     /**
      *
-     * 如果当前对象素模型（不是代理模型），就加载一次对象上的数据
-     * - 不是：在 insert、update 时需要收集字段数据
+     * 如果当前对象素模型（不是代理模型）
+     * - 是素模型：在 insert、update 时收集数据，包含null（因为java无法表明该属性是否被修改）
      * - 收集字段数据
      */
     private void loadingVegetarianModel()
@@ -222,19 +222,13 @@ public class Model {
             // 收集字段数据
             __meta.fieldMap().forEach((name, field) -> {
                 Object val = ReflectUtil.getFieldValue(this, field.getField());
-                if (__data.containsKey(name) && !ModelUtil.objectEquals(__data.get(name), val)) {
-                    data(field.getName(), val);
-                }
+                data(field.getName(), val);
             });
         }
     }
 
     public String pk() {
         return ModelUtil.toCamelCase(query().pk());
-    }
-
-    public String pkOri() {
-        return query().pk();
     }
 
     public Object pkVal() {
@@ -271,22 +265,6 @@ public class Model {
 
     public String buildSql() {
         return query().buildSql();
-    }
-
-    //TODO::--------------模型自用方法--------------
-
-    /**
-     * 字段转下划线格式
-     * @param field 属性名
-     * @return 结果
-     */
-    private static String fieldToUnderlineCase(String field) {
-        if (field.contains(".")) {
-            String[] arr = field.split("\\.");
-            return arr[0] + "." + ModelUtil.toUnderlineCase(arr[1]);
-        } else {
-            return ModelUtil.toUnderlineCase(field);
-        }
     }
 
     public Model order(String field, boolean asc) {
@@ -475,42 +453,46 @@ public class Model {
         return (List<D>) models;
     }
 
+    //TODO::---------- 模型控制方法 ----------
     /**
      * 查询前处理预载入
-     * - 一对一的字段声明
+     * T1：一对一的字段声明
      * */
-    private void queryBefore() {
+    private void queryBefore()
+    {
         Map<String, Relation> relationMap = getWithRelation(new RelationType[]{RelationType.OneToOne});
-        if (relationMap == null || relationMap.size() == 0) {
+        if (relationMap.size() == 0) {
             return;
         }
 
-        // 本表字段声明
+        // T1::字段声明
         List<String> fields = new LinkedList<>();
+        // 主表字段声明
         __meta.fieldMap().forEach((name, field) -> {
             if (field.getWay() != null || Model.class.isAssignableFrom(field.getClazz())) {
                 return;
             }
-            name = ModelUtil.toUnderlineCase(name);
-            fields.add(__meta.table() + "." + name + " AS " + __meta.table() + "__" + name);
+            name = toUnderlineCase(name);
+            fields.add(fieldAlias(__meta.table(), name));
         });
 
-        // 关联表字段声明
-        relationMap.forEach((aliasName, relation) -> {
+        // 关联表
+        relationMap.forEach((relationName, relation) -> {
             ModelMeta meta = ModelUtil.getMeta(relation.getClazz());
+            // 关联表字段声明
             meta.fieldMap().forEach((name, field) -> {
                 if (field.getWay() != null || Model.class.isAssignableFrom(field.getClazz())) {
                     return;
                 }
-                name = ModelUtil.toUnderlineCase(name);
-                fields.add(aliasName + "." + name + " AS " + aliasName + "__" + name);
+                name = toUnderlineCase(name);
+                fields.add(fieldAlias(relationName, name));
             });
-            // join
-            query().join(meta.table() + " " + aliasName,
-                    String.format("%s.%s = %s.%s", aliasName, ModelUtil.toUnderlineCase(relation.foreignKey()),
-                    __meta.table(), ModelUtil.toUnderlineCase(relation.localKey())), "LEFT");
+            // 关联方式声明
+            query().join(meta.table() + " " + relationName,
+                    String.format("%s.%s = %s.%s", relationName, toUnderlineCase(relation.foreignKey()),
+                    __meta.table(), toUnderlineCase(relation.localKey())), "LEFT");
         });
-        // 查询器
+        // 装填字段
         query().field(fields);
     }
 
@@ -548,8 +530,8 @@ public class Model {
             if (field.getWay() != null || Model.class.isAssignableFrom(field.getClazz())) {
                 return;
             }
-            String aliasName = relationName == null ? model.__meta.table() : relationName;
-            String dataName = aliasName + "__" + ModelUtil.toUnderlineCase(name);
+            String tableName = relationName == null ? model.__meta.table() : relationName;
+            String dataName = tableName + "__" + toUnderlineCase(name);
             model.data(name, set.get(dataName));
         });
     }
@@ -797,7 +779,7 @@ public class Model {
     }
 
     @JsonIgnore
-    private static MethodInterceptor modelProxyMethodInterceptor = new MethodInterceptor () {
+    private static final MethodInterceptor modelProxyMethodInterceptor = new MethodInterceptor () {
         @Override
         public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
             /*
@@ -1020,7 +1002,7 @@ public class Model {
                 tableName = tableName.substring(0, tableName.lastIndexOf("Model"));
             }
         }
-        return ModelUtil.toUnderlineCase(tableName);
+        return toUnderlineCase(tableName);
     }
 
     /**
@@ -1130,6 +1112,28 @@ public class Model {
 
     private static Class<?> getModelClass(Object obj) {
         return ModelUtil.getModelClass(obj);
+    }
+
+    private static String fieldAlias(String table, String field) {
+        return table + "." + field + " AS " + table + "__" + field;
+    }
+
+    /**
+     * 字段转下划线格式
+     * @param field 属性名
+     * @return 结果
+     */
+    private static String fieldToUnderlineCase(String field) {
+        if (field.contains(".")) {
+            String[] arr = field.split("\\.");
+            return arr[0] + "." + toUnderlineCase(arr[1]);
+        } else {
+            return toUnderlineCase(field);
+        }
+    }
+
+    private static String toUnderlineCase(String name) {
+        return ModelUtil.toUnderlineCase(name);
     }
 
     @Override

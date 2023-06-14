@@ -18,7 +18,7 @@ import org.quickjava.orm.enums.RelationType;
  */
 public class Relation {
 
-    // 关联类型类
+    // 关联表类
     private Class<?> clazz;
 
     // 关联类型：一对一、一对多
