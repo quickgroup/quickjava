@@ -9,6 +9,7 @@ import org.quickjava.orm.QuerySet;
 import org.quickjava.orm.contain.*;
 import org.quickjava.orm.utils.QueryException;
 import org.quickjava.orm.utils.QuerySetHelper;
+import org.quickjava.orm.utils.QuickORMException;
 import org.quickjava.orm.utils.SqlUtil;
 
 import java.sql.Connection;
@@ -79,8 +80,14 @@ public abstract class Drive {
         Action action = QuerySetHelper.__Action(query);
         sqlList.add(action.toString());
 
-        // action is SELECT
+        // SELECT
         if (action == Action.SELECT) {
+            // DISTINCT
+            if (isTrue(QuerySetHelper.__distinct(query))) {
+                sqlList.add("DISTINCT");
+            }
+            // field
+            checkNull(QuerySetHelper.__FieldList(query), "Missing field");
             sqlList.add(SqlUtil.collJoin(",", QuerySetHelper.__FieldList(query)));
             sqlList.add("FROM");
         }
@@ -89,7 +96,7 @@ public abstract class Drive {
         sqlList.add(QuerySetHelper.__Table(query));
 
         // TODO::JOIN
-        if (QuerySetHelper.__JoinList(query).size() > 0) {
+        if (QuerySetHelper.__JoinList(query) != null) {
             QuerySetHelper.__JoinList(query).forEach(arr -> {
                 sqlList.add(String.format("%s JOIN %s ON %s", arr[2], arr[0], arr[1]));
             });
@@ -98,6 +105,7 @@ public abstract class Drive {
         List<Map<String, Object>> dataList = QuerySetHelper.__DataList(query);
         // INSERT-DATA
         if (action == Action.INSERT) {
+            checkNull(dataList, "Missing insert data");
             StringBuilder dataSql = new StringBuilder();
             // field
             SqlUtil.mapKeyJoin(dataSql, dataList.get(0));
@@ -115,6 +123,7 @@ public abstract class Drive {
 
         // UPDATE
         if (action == Action.UPDATE) {
+            checkNull(dataList, "Missing update data");
             StringBuilder dataSql = new StringBuilder();
             int fi = 0;
             for (Map.Entry<String, Object> entry : dataList.get(0).entrySet()) {
@@ -130,22 +139,34 @@ public abstract class Drive {
         }
 
         // WHERE
-        if (QuerySetHelper.__WhereList(query).size() > 0) {
+        if (QuerySetHelper.__WhereList(query) != null) {
             sqlList.add("WHERE");
             sqlList.add(WhereBase.cutFirstLogic(WhereBase.collectSql(QuerySetHelper.__WhereList(query), config)));
         }
 
         // GROUP BY
+        if (QuerySetHelper.__GroupBy(query) != null) {
+            sqlList.add(QuerySetHelper.__GroupBy(query));
+        }
+
         // HAVING
+        if (QuerySetHelper.__Having(query) != null) {
+            sqlList.add(QuerySetHelper.__Having(query));
+        }
 
         // ORDER BY
-        if (QuerySetHelper.__Orders(query).size() > 0) {
+        if (QuerySetHelper.__Orders(query) != null) {
             sqlList.add(String.format("ORDER BY %s", SqlUtil.collJoin(",", QuerySetHelper.__Orders(query))));
         }
 
         // Limit
         if (action == Action.SELECT && QuerySetHelper.__Limit(query) != null) {
             sqlList.add(String.format("LIMIT %d,%d", QuerySetHelper.__Limit(query), QuerySetHelper.__LimitSize(query)));
+        }
+
+        // lock
+        if (isTrue(QuerySetHelper.__lock(query))) {
+            sqlList.add("FOR UPDATE");
         }
 
         return SqlUtil.collJoin(" ", sqlList);
@@ -208,6 +229,16 @@ public abstract class Drive {
                 quickConnection.close();
             }
         }
+    }
+
+    private static void checkNull(Object obj, String msg) {
+        if (obj == null) {
+            throw new QuickORMException(msg);
+        }
+    }
+
+    private static boolean isTrue(Boolean bool) {
+        return bool != null && bool;
     }
 
     public void setAutoCommit(boolean autoCommit) {

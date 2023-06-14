@@ -27,10 +27,10 @@ import java.util.*;
 public class QuerySet {
 
     @JsonIgnore
-    private String table;
+    private String __table;
 
     @JsonIgnore
-    private Action action;
+    private Action __action;
 
     @JsonIgnore
     private List<String> fieldList;
@@ -45,13 +45,13 @@ public class QuerySet {
     private List<String> orderByList;
 
     @JsonIgnore
-    private List<Map<String, Object>> dataList;
+    private List<Map<String, Object>> __dataList;
 
     @JsonIgnore
     private String groupBy;
 
     @JsonIgnore
-    private String having;
+    private String __having;
 
     @JsonIgnore
     private Integer limitIndex;
@@ -59,10 +59,16 @@ public class QuerySet {
     @JsonIgnore
     private Integer limitSize;
 
+    @JsonIgnore
+    private Boolean __distinct;
+
+    @JsonIgnore
+    private Boolean __lock;
+
     public QuerySet() {}
 
     public QuerySet(String table) {
-        this.table = table;
+        this.__table = table;
     }
 
     public static QuerySet table(String table)
@@ -238,7 +244,7 @@ public class QuerySet {
         if (ORMHelper.isEmpty(fields)) {
             return this;
         }
-        having = fields;
+        __having = fields;
         return this;
     }
 
@@ -305,6 +311,7 @@ public class QuerySet {
     }
 
     public QuerySet distinct(boolean distinct) {
+        __distinct = distinct;
         return this;
     }
 
@@ -313,6 +320,7 @@ public class QuerySet {
     }
 
     public QuerySet lock(boolean lock) {
+        __lock = lock;
         return this;
     }
 
@@ -343,32 +351,32 @@ public class QuerySet {
 
     public QuerySet data(String field, Object value)
     {
-        dataList = QuerySetHelper.initList(dataList);
-        if (dataList.size() == 0) {
-            dataList.add(new LinkedHashMap<>());
+        __dataList = QuerySetHelper.initList(__dataList);
+        if (__dataList.size() == 0) {
+            __dataList.add(new LinkedHashMap<>());
         }
-        this.dataList.get(0).put(field, value);
+        this.__dataList.get(0).put(field, value);
         return this;
     }
 
     public QuerySet data(Map<String, Object> data)
     {
-        dataList = QuerySetHelper.initList(dataList);
-        if (dataList.size() == 0) {
-            dataList.add(new LinkedHashMap<>());
+        __dataList = QuerySetHelper.initList(__dataList);
+        if (__dataList.size() == 0) {
+            __dataList.add(new LinkedHashMap<>());
         }
-        this.dataList.get(0).putAll(data);
+        this.__dataList.get(0).putAll(data);
         return this;
     }
 
     public Map<String, Object> data()
     {
-        return dataList == null || dataList.size() == 0 ? null : dataList.get(0);
+        return __dataList == null || __dataList.size() == 0 ? null : __dataList.get(0);
     }
 
     public Integer update(Map<String, Object> data)
     {
-        action = Action.UPDATE;
+        __action = Action.UPDATE;
         this.data(data);
         executeSql();
         return null;
@@ -376,23 +384,23 @@ public class QuerySet {
 
     public Integer update()
     {
-        this.action = Action.UPDATE;
+        this.__action = Action.UPDATE;
         executeSql();
         return 1;
     }
 
     public Long insert(Map<String, Object> data)
     {
-        this.action = Action.INSERT;
+        this.__action = Action.INSERT;
         this.data(data);
         return executeSql();
     }
 
     public Integer insertAll(List<DataMap> dataList)
     {
-        action = Action.INSERT;
-        this.dataList = QuerySetHelper.initList(this.dataList);
-        this.dataList.addAll(dataList);
+        __action = Action.INSERT;
+        this.__dataList = QuerySetHelper.initList(this.__dataList);
+        this.__dataList.addAll(dataList);
         return executeSql();
     }
 
@@ -401,7 +409,7 @@ public class QuerySet {
         if (whereList == null) {
             throw new QueryException("不允许空条件的删除执行");
         }
-        this.action = Action.DELETE;
+        this.__action = Action.DELETE;
         Long result = executeSql();
         return result.intValue();
     }
@@ -411,7 +419,7 @@ public class QuerySet {
      * @return 字段列表
      * */
     public List<TableColumn> getColumns() {
-        return getColumns(table);
+        return getColumns(__table);
     }
 
     public List<TableColumn> getColumns(String table)
@@ -598,7 +606,7 @@ public class QuerySet {
 
     //TODO::--------------- 类自用方法 ---------------
     private Action __Action() {
-        return this.action;
+        return this.__action;
     }
 
     private List<String> __FieldList()
@@ -610,7 +618,7 @@ public class QuerySet {
     }
 
     private String __Table() {
-        return this.table;
+        return this.__table;
     }
 
     private List<String[]> __JoinList() {
@@ -618,7 +626,7 @@ public class QuerySet {
     }
 
     private List<Map<String, Object>> __DataList() {
-        return dataList;
+        return __dataList;
     }
 
     private List<WhereBase> __WhereList() {
@@ -627,6 +635,10 @@ public class QuerySet {
 
     private String __GroupBy() {
         return groupBy;
+    }
+
+    private String __Having() {
+        return __having;
     }
 
     private List<String> __Orders() {
@@ -639,5 +651,13 @@ public class QuerySet {
 
     private Integer __LimitSize() {
         return limitSize;
+    }
+
+    private Boolean __distinct() {
+        return __distinct;
+    }
+
+    private Boolean __lock() {
+        return __lock;
     }
 }

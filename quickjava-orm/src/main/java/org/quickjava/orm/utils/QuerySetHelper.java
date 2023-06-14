@@ -134,6 +134,14 @@ public class QuerySetHelper {
         return ReflectUtil.invoke(query, "__WhereList");
     }
 
+    public static String __GroupBy(QuerySet query) {
+        return ReflectUtil.invoke(query, "__GroupBy");
+    }
+
+    public static String __Having(QuerySet query) {
+        return ReflectUtil.invoke(query, "__Having");
+    }
+
     public static List<String> __Orders(QuerySet query) {
         return ReflectUtil.invoke(query, "__Orders");
     }
@@ -144,6 +152,14 @@ public class QuerySetHelper {
 
     public static Integer __LimitSize(QuerySet query) {
         return ReflectUtil.invoke(query, "__LimitSize");
+    }
+
+    public static Boolean __distinct(QuerySet query) {
+        return ReflectUtil.invoke(query, "__distinct");
+    }
+
+    public static Boolean __lock(QuerySet query) {
+        return ReflectUtil.invoke(query, "__lock");
     }
 
 }
