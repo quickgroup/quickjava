@@ -104,6 +104,11 @@ public class QuerySetHelper {
         return valArr;
     }
 
+    // 初始化list
+    public static<T> List<T> initList(List<T> list) {
+        return list == null ? new LinkedList<>() : list;
+    }
+
     // 获取QuerySet数据
     public static Action __Action(QuerySet query) {
         return ReflectUtil.invoke(query, "__Action");

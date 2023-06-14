@@ -1,11 +1,8 @@
 package org.quickjava.orm.utils;
 
-import org.quickjava.common.utils.GenericsUtils;
-import org.quickjava.orm.contain.ModelField;
+import org.quickjava.orm.contain.ModelFieldO;
 import org.quickjava.orm.contain.TableColumn;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -118,7 +115,7 @@ public class SqlUtil extends ORMHelper {
     // 数据字段转驼峰
     public static Map<String, Object> dataFieldConv(Map<String, Object> data, Class<?> clazz) {
         Map<String, Object> ret = new LinkedHashMap<>();
-        Map<String, ModelField> fieldMap = ModelUtil.getMeta(clazz).fieldMap();
+        Map<String, ModelFieldO> fieldMap = ModelUtil.getMeta(clazz).fieldMap();
         data.forEach((k, v) -> {
             if (fieldMap.containsKey(SqlUtil.toCamelCase(k))) {
                 ret.put(SqlUtil.toCamelCase(k), v);

@@ -17,7 +17,7 @@ import java.lang.reflect.Method;
  * License: Apache Licence 2.0
  * +-------------------------------------------------------------------
  */
-public class ModelField {
+public class ModelFieldO {
 
     private String name;
 
@@ -41,16 +41,16 @@ public class ModelField {
 
     private boolean softDelete = false;
 
-    public ModelField() {
+    public ModelFieldO() {
     }
 
-    public ModelField(Field field) {
+    public ModelFieldO(Field field) {
         this.name = field.getName();
         this.clazz = field.getType();
         this.field = field;
     }
 
-    public ModelField(Field field, Object way, Method setter, Method getter) {
+    public ModelFieldO(Field field, Object way, Method setter, Method getter) {
         this.name = field.getName();
         this.clazz = field.getType();
         this.field = field;

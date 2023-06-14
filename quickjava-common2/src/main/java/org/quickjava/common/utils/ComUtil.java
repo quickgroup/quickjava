@@ -94,7 +94,7 @@ public abstract class ComUtil {
     }
 
     /**
-     * 转为下划线字段名称，如：user_type，和 {@link #toCamelCase} 相反用法
+     * 转为下划线字段名称，如：userType转为user_type，和 {@link #toCamelCase} 相反用法
      *
      * @param str 字符串
      * @return 结果

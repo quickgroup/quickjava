@@ -26,7 +26,7 @@ public class ModelMeta {
     private String table;
 
     // 属性字段
-    private Map<String, ModelField> fieldMap;
+    private Map<String, ModelFieldO> fieldMap;
 
     // 全部关联关系
     private Map<String, Relation> relationMap = new LinkedHashMap<>();
@@ -34,7 +34,7 @@ public class ModelMeta {
     public ModelMeta() {
     }
 
-    public ModelMeta(Class<?> clazz, String table, Map<String, ModelField> fieldMap, Map<String, Relation> relationMap) {
+    public ModelMeta(Class<?> clazz, String table, Map<String, ModelFieldO> fieldMap, Map<String, Relation> relationMap) {
         this.clazz = clazz;
         this.table = table;
         this.fieldMap = fieldMap;
@@ -57,11 +57,11 @@ public class ModelMeta {
         this.table = table;
     }
 
-    public Map<String, ModelField> fieldMap() {
+    public Map<String, ModelFieldO> fieldMap() {
         return fieldMap;
     }
 
-    public void setFieldMap(Map<String, ModelField> fieldMap) {
+    public void setFieldMap(Map<String, ModelFieldO> fieldMap) {
         this.fieldMap = fieldMap;
     }
 

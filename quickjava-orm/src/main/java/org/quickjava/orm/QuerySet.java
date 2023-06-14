@@ -12,10 +12,7 @@ import org.quickjava.orm.contain.*;
 import org.quickjava.orm.drive.Drive;
 import org.quickjava.common.utils.BeanUtil;
 import org.quickjava.orm.enums.Operator;
-import org.quickjava.orm.utils.ORMHelper;
-import org.quickjava.orm.utils.QueryException;
-import org.quickjava.orm.utils.SqlUtil;
-import org.quickjava.orm.utils.WhereCallback;
+import org.quickjava.orm.utils.*;
 
 import java.util.*;
 
@@ -30,37 +27,37 @@ import java.util.*;
 public class QuerySet {
 
     @JsonIgnore
-    private String table = null;
+    private String table;
 
     @JsonIgnore
-    private Action action = Action.SELECT;
+    private Action action;
 
     @JsonIgnore
-    private final List<String> fieldList = new ArrayList<>();
+    private List<String> fieldList;
 
     @JsonIgnore
-    private final List<String[]> joinList = new LinkedList<>();
+    private List<String[]> joinList;
 
     @JsonIgnore
-    private final List<WhereBase> whereList = new LinkedList<>();
+    private List<WhereBase> whereList;
 
     @JsonIgnore
-    private final List<String> orderByList = new LinkedList<>();
+    private List<String> orderByList;
 
     @JsonIgnore
-    private final List<Map<String, Object>> dataList = new LinkedList<>();
+    private List<Map<String, Object>> dataList;
 
     @JsonIgnore
-    private String groupBy = null;
+    private String groupBy;
 
     @JsonIgnore
-    private String having = null;
+    private String having;
 
     @JsonIgnore
-    private Integer limitIndex = null;
+    private Integer limitIndex;
 
     @JsonIgnore
-    private Integer limitSize = null;
+    private Integer limitSize;
 
     public QuerySet() {}
 
@@ -79,6 +76,7 @@ public class QuerySet {
 
     public QuerySet join(String table, String condition, String type)
     {
+        joinList = QuerySetHelper.initList(joinList);
         joinList.add(new String[]{table, condition, type});
         return this;
     }
@@ -97,6 +95,7 @@ public class QuerySet {
             Arrays.stream(field.split(",")).forEach(this::field);
         } else {
 //            this.fieldList.add(field.contains("\\.") ? field.split("\\.") : new String[]{field});
+            this.fieldList = QuerySetHelper.initList(this.fieldList);
             this.fieldList.add(field);
         }
         return this;
@@ -137,7 +136,7 @@ public class QuerySet {
         if (ORMHelper.isEmpty(field)) {
             return this;
         }
-        whereList.add(new Where(field, operator, value));
+        where(new Where(field, operator, value));
         return this;
     }
 
@@ -154,6 +153,7 @@ public class QuerySet {
 
     public QuerySet where(WhereBase where)
     {
+        whereList = QuerySetHelper.initList(whereList);
         whereList.add(where);
         return this;
     }
@@ -167,27 +167,27 @@ public class QuerySet {
     {
         QuerySet querySet = new QuerySet();
         callback.call(querySet);
-        if (querySet.whereList.size() > 0) {
-            whereList.add(new Where(querySet.whereList));
+        if (querySet.whereList != null) {
+            where(new Where(querySet.whereList));
         }
         return this;
     }
 
     public QuerySet where(String field, DatetimeRangeType range)
     {
-        whereList.add(new WhereOr(field, Operator.BETWEEN, DatetimeUtil.rangeType(range)));
+        where(new WhereOr(field, Operator.BETWEEN, DatetimeUtil.rangeType(range)));
         return this;
     }
 
     public QuerySet where(String field, DatetimeCurrType currType)
     {
-        whereList.add(new WhereOr(field, Operator.EQ, DatetimeUtil.currType(currType)));
+        where(new WhereOr(field, Operator.EQ, DatetimeUtil.currType(currType)));
         return this;
     }
 
     public QuerySet whereOr(String field, Operator operator, Object value)
     {
-        whereList.add(new WhereOr(field, operator, value));
+        where(new WhereOr(field, operator, value));
         return this;
     }
 
@@ -212,15 +212,15 @@ public class QuerySet {
     {
         QuerySet querySet = new QuerySet();
         callback.call(querySet);
-        if (querySet.whereList.size() > 0) {
-            whereList.add(new WhereOr(querySet.whereList));
+        if (querySet.whereList != null) {
+            where(new WhereOr(querySet.whereList));
         }
         return this;
     }
 
     public QuerySet between(String field, Object v1, Object v2)
     {
-        whereList.add(new Where(field, Operator.BETWEEN, new Object[]{v1, v2}));
+        where(new Where(field, Operator.BETWEEN, new Object[]{v1, v2}));
         return this;
     }
 
@@ -244,6 +244,7 @@ public class QuerySet {
 
     public QuerySet order(String field, String sort)
     {
+        orderByList = QuerySetHelper.initList(orderByList);
         orderByList.add(String.format("%s %s", field, sort.toUpperCase()));
         return this;
     }
@@ -342,6 +343,7 @@ public class QuerySet {
 
     public QuerySet data(String field, Object value)
     {
+        dataList = QuerySetHelper.initList(dataList);
         if (dataList.size() == 0) {
             dataList.add(new LinkedHashMap<>());
         }
@@ -351,6 +353,7 @@ public class QuerySet {
 
     public QuerySet data(Map<String, Object> data)
     {
+        dataList = QuerySetHelper.initList(dataList);
         if (dataList.size() == 0) {
             dataList.add(new LinkedHashMap<>());
         }
@@ -360,7 +363,7 @@ public class QuerySet {
 
     public Map<String, Object> data()
     {
-        return this.dataList.size() > 0 ? this.dataList.get(0) : null;
+        return dataList == null || dataList.size() == 0 ? null : dataList.get(0);
     }
 
     public Integer update(Map<String, Object> data)
@@ -388,14 +391,14 @@ public class QuerySet {
     public Integer insertAll(List<DataMap> dataList)
     {
         action = Action.INSERT;
-        this.dataList.clear();
+        this.dataList = QuerySetHelper.initList(this.dataList);
         this.dataList.addAll(dataList);
         return executeSql();
     }
 
     public Integer delete()
     {
-        if (whereList.size() == 0) {
+        if (whereList == null) {
             throw new QueryException("不允许空条件的删除执行");
         }
         this.action = Action.DELETE;
@@ -467,6 +470,7 @@ public class QuerySet {
     // 分页查询
     public Pagination<Map<String, Object>> pagination()
     {
+        this.fieldList = QuerySetHelper.initList(this.fieldList);
         List<String> cacheFiledList = new LinkedList<>(fieldList);
         // 获取总数
         fieldList.clear();
@@ -597,7 +601,9 @@ public class QuerySet {
         return this.action;
     }
 
-    private List<String> __FieldList() {
+    private List<String> __FieldList()
+    {
+        this.fieldList = QuerySetHelper.initList(this.fieldList);
         if (fieldList.size() == 0)
             field("*");
         return fieldList;

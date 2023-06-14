@@ -70,11 +70,14 @@ public class Model {
      * */
     @JsonIgnore
     @TableField(exist = false)
-    private List<String> __modified;
+    private List<ModelFieldO> __modified;
 
+    /**
+     * 查询器
+     * */
     @JsonIgnore
     @TableField(exist = false)
-    private QuerySet __querySet = null;
+    private QuerySet __querySet;
 
     /**
      * 关联的父模型对象
@@ -409,10 +412,11 @@ public class Model {
         return update();
     }
 
-    public Model updateById() {
+    public Model updateById()
+    {
         String pk = pk();
         where(pk, data(pk));
-        __data.remove(pk);  // 不去更新主键
+//        __data.remove(pk);  // 不去更新主键
         return update();
     }
 
@@ -653,18 +657,20 @@ public class Model {
     {
         // 数据保存
         name = ModelUtil.toCamelCase(name);
-        org.quickjava.orm.contain.ModelField field = __meta.fieldMap().get(name);
-        if (field != null && field.getWay() == null) {
-            __data.put(name, val);      // 只保存本类字段数据，关联数据不缓存
+        ModelFieldO field = __meta.fieldMap().get(name);
+        // 非本表属性或关联属性不设置
+        if (field == null || field.getWay() != null) {
+            return this;
         }
+
+        __data.put(name, val);
         ReflectUtil.setFieldValue(this, name, val);
 
         // 被修改的字段
         if (__modified == null) {
             __modified = new LinkedList<>();
         }
-        __modified.add(name);
-
+        __modified.add(field);
         return this;
     }
 
@@ -677,17 +683,6 @@ public class Model {
         return __data;
     }
 
-    public static Map<String, Object> dataFieldConvLine(Map<String, Object> data, Class<?> clazz) {
-        Map<String, org.quickjava.orm.contain.ModelField> fieldMap = ModelUtil.getMeta(clazz).fieldMap();
-        Map<String, Object> ret = new LinkedHashMap<>();
-        data.forEach((k, v) -> {
-            if (fieldMap.containsKey(ModelUtil.toCamelCase(k))) {
-                ret.put(fieldToUnderlineCase(k), v);
-            }
-        });
-        return ret;
-    }
-
     /**
      * 执行sql的数据
      * - insert、update的数据
@@ -697,13 +692,12 @@ public class Model {
     {
         DataMap data = data();
         DataMap ret = DataMap.one();
-        __modified.forEach(name -> {
-            Object v = data.get(name);
-            if (v instanceof Model) {
-                // 关联模型数据不能一起写入
-            } else {
-                ret.put(fieldToUnderlineCase(name), ModelUtil.valueToSqlValue(v));
+        __modified.forEach(field -> {
+            if (field.getWay() != null) {
+                return;
             }
+            Object v = data.get(field.getName());
+            ret.put(fieldToUnderlineCase(field.getName()), ModelUtil.valueToSqlValue(v));
         });
         return ret;
     }
@@ -790,7 +784,8 @@ public class Model {
             Class<?> clazz = getModelClass(o.getClass());
             String methodName = method.getName();
             ModelMeta meta = ModelUtil.getMeta(clazz);
-            if (meta.relationMap().containsKey(methodName)) {       // 存在关联属性的方法
+            // getter方法和关联方法
+            if (meta.relationMap().containsKey(methodName)) {
                 return LoadingRelationGetter(clazz, o, method, objects);
             }
             // setter方法
@@ -805,7 +800,7 @@ public class Model {
     };
 
     private boolean isEmpty() {
-        return __data == null || __data.isEmpty();
+        return __data.isEmpty();
     }
 
     //---------- TODO::关联方法 ----------//
@@ -932,7 +927,7 @@ public class Model {
             if (Modifier.isStatic(field.getModifiers())) {
                 continue;
             }
-            org.quickjava.orm.contain.ModelField fieldInfo = new org.quickjava.orm.contain.ModelField(field);
+            ModelFieldO fieldInfo = new ModelFieldO(field);
             String fieldName = fieldInfo.getName();
             // 兼容mybatis-plus字段说明
             TableField tableField = field.getAnnotation(TableField.class);
@@ -1014,7 +1009,6 @@ public class Model {
         try {
             Model model = (Model) o;
             model.data(fieldName, arg);
-
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);
@@ -1022,18 +1016,19 @@ public class Model {
     }
 
     /**
-     * 加载属性关联getter
+     * getter懒加载数据
      * */
     private static Object LoadingRelationGetter(Class<?> clazz, Object o, Method method, Object ...objects)
     {
         try {
             // 加载
-            org.quickjava.orm.contain.ModelField modelField = ModelUtil.getMeta(clazz).fieldMap().get(method.getName());
+            ModelFieldO modelField = ModelUtil.getMeta(clazz).fieldMap().get(method.getName());
             Field field = modelField.getField();
             if (Model.class.isAssignableFrom(o.getClass())) {
                 Model curr = (Model) o;
                 String fieldName = field.getName();
                 Class<?> fieldType = field.getType();
+                // 存在数据直接返回
                 if (curr.data().containsKey(fieldName)) {
                     return curr.data().get(fieldName);
                 }
@@ -1089,7 +1084,7 @@ public class Model {
                         Model relationModel = newModel(genericClazz, curr);
                         Object localValue = ReflectUtil.getFieldValue(curr.getMClass(), curr, many.localKey());
                         Object fieldValue = relationModel.where(many.foreignKey(), localValue).select();  // 查询结果
-                        curr.data(fieldName, fieldValue);
+                        curr.data(fieldName, fieldValue);   // 保存查询到的数据
                         return fieldValue;
                     }
                 }
@@ -1098,7 +1093,7 @@ public class Model {
 
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException(e);
+            throw new RuntimeException("getter数据查询异常：" + e);
         }
     }
 
