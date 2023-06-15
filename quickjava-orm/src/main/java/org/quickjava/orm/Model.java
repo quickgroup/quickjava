@@ -270,10 +270,6 @@ public class Model {
         return this;
     }
 
-    public String buildSql() {
-        return query().buildSql();
-    }
-
     public Model order(String field, boolean asc) {
         order(field, asc ? "ASC" : "DESC");
         return this;
@@ -361,6 +357,11 @@ public class Model {
     public Model lock(boolean lock) {
         query().lock(lock);
         return this;
+    }
+
+    // 编译sql，当前只支持查询
+    public String buildSql() {
+        return query().buildSql();
     }
 
     //---------- TODO::数据方法 ----------//
@@ -681,6 +682,10 @@ public class Model {
     private void queryAfter(List<Model> models) {
         // 预载入的数据查询后加载
         if (__withs != null) {
+            // 超过500警告
+            if (models.size() > 500) {
+                System.out.println("QuickJava-ORM：The current query has too much data and may cause the service to crash. models.size=" + models.size());
+            }
             // 数据关联条件：关联属性名=关联id
             Map<String, List<Object>> conditionMap = new LinkedHashMap<>();
             // 一对多数据条件准备
