@@ -576,14 +576,11 @@ public class Model {
      */
     public Integer bulkCreate(List<DataMap> dataList)
     {
-        List<DataMap> dataList2 = new LinkedList<>();
-        dataList.forEach(map -> {
-            DataMap data = new DataMap();
-            map.forEach((k, v) -> data.put(fieldToUnderlineCase(k), v));
-            dataList2.add(data);
+        dataList.forEach(data -> {
+            Model model = newModel(this.getMClass());
+            model.save(data);
         });
-        query().insertAll(dataList2);
-        return dataList2.size();
+        return dataList.size();
     }
 
     //TODO::---------- 模型控制方法 ----------
@@ -696,7 +693,7 @@ public class Model {
                     return;
                 }
                 Model queryModel = newModel(relation.getClazz());
-                List<Model> rows = queryModel.where(fieldToUnderlineCase(relation.foreignKey()), Operator.IN, conditionMap.get(fieldName)).select();
+                List<Model> rows = queryModel.where(relation.foreignKey(), Operator.IN, conditionMap.get(fieldName)).select();
                 // 数据装填
                 models.forEach(model -> {
                     Object modelKeyVal = ReflectUtil.getFieldValue(model, relation.localKey());
@@ -779,10 +776,6 @@ public class Model {
             return methodProxy.invokeSuper(o, objects); // 执行方法后返回数据
         }
     };
-
-    private boolean isEmpty() {
-        return __data.isEmpty();
-    }
 
     //---------- TODO::关联方法 ----------//
     /*
