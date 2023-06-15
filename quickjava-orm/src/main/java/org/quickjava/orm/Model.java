@@ -14,10 +14,10 @@ import org.quickjava.orm.annotation.ModelName;
 import org.quickjava.orm.annotation.OneToMany;
 import org.quickjava.orm.annotation.OneToOne;
 import org.quickjava.orm.callback.WhereCallback;
+import org.quickjava.orm.callback.WhereOptCallback;
 import org.quickjava.orm.contain.*;
 import org.quickjava.orm.enums.Operator;
 import org.quickjava.orm.enums.RelationType;
-import org.quickjava.orm.enums.WhereFieldType;
 import org.quickjava.orm.utils.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,7 +104,8 @@ public class Model {
         synchronized (Model.class) {
             if (__querySet == null) {
                 __querySet = QuerySet.table(parseModelTableName(getClass()));
-                ReflectUtil.setFieldValue(__querySet, "__whereFieldType", WhereFieldType.TO_UNDER_LINE_CASE);
+                QueryReservoir reservoir = ReflectUtil.getFieldValue(__querySet, "reservoir");
+                reservoir.setWhereOptCallback(whereOptCallback);
             }
         }
         return __querySet;
@@ -1123,6 +1124,11 @@ public class Model {
     private static String toUnderlineCase(String name) {
         return ModelUtil.toUnderlineCase(name);
     }
+
+    // 默认转换字段大小写
+    private static WhereOptCallback whereOptCallback = whereBase -> {
+        whereBase.setField(toUnderlineCase(whereBase.getField()));
+    };
 
     @Override
     public String toString() {

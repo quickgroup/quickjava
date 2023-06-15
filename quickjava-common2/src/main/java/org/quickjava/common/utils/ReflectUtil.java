@@ -31,25 +31,25 @@ public class ReflectUtil {
      * @param fieldName 属性名
      * @return 属性值
      */
-    public static Object getFieldValue(Object o, String fieldName) {
+    public static<T> T getFieldValue(Object o, String fieldName) {
         return getFieldValue(o.getClass(), o, fieldName);
     }
 
-    public static Object getFieldValue(Class<?> clazz, Object o, String fieldName) {
+    public static<T> T getFieldValue(Class<?> clazz, Object o, String fieldName) {
         try {
             // getter方法获取
             String getterName = "get" + ComUtil.firstUpper(fieldName);
             Method method = findMethod(clazz, getterName);
             if (method != null) {
                 method.setAccessible(true);
-                return method.invoke(o);
+                return (T) method.invoke(o);
             }
 
             // 直接属性获取值
             Field field = findField(clazz, fieldName);
             if (field != null) {
                 field.setAccessible(true);
-                return field.get(o);
+                return (T) field.get(o);
             }
 
         } catch (IllegalAccessException ignored) {

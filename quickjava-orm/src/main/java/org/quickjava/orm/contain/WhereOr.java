@@ -9,13 +9,13 @@ import org.quickjava.orm.enums.Operator;
 
 import java.util.List;
 
-public class WhereOr extends WhereBase {
+public class WhereOr extends Where {
 
     public WhereOr(String field, Operator operator, Object value) {
         super(2, field, operator, value);
     }
 
-    public WhereOr(List<WhereBase> wheres) {
+    public WhereOr(List<Where> wheres) {
         super(2, wheres);
     }
 

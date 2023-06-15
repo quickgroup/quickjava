@@ -1,8 +1,9 @@
 package org.quickjava.orm;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.quickjava.orm.callback.WhereOptCallback;
 import org.quickjava.orm.contain.Action;
-import org.quickjava.orm.contain.WhereBase;
+import org.quickjava.orm.contain.Where;
 import org.quickjava.orm.enums.WhereFieldType;
 import org.quickjava.orm.utils.QuerySetHelper;
 
@@ -43,7 +44,7 @@ public class QueryReservoir {
     public List<String> unionList;
 
     @JsonIgnore
-    public List<WhereBase> whereList;
+    public List<Where> whereList;
 
     @JsonIgnore
     public List<String> orderByList;
@@ -70,7 +71,10 @@ public class QueryReservoir {
     public Boolean lock;
 
     @JsonIgnore
-    public WhereFieldType whereFieldType;
+    public WhereOptCallback whereOptCallback;
+
+    @JsonIgnore
+    public Boolean fetchSql;
 
     public String getTable() {
         return table;
@@ -115,12 +119,12 @@ public class QueryReservoir {
         this.unionList = unionList;
     }
 
-    public List<WhereBase> getWhereList() {
+    public List<Where> getWhereList() {
         whereList = QuerySetHelper.initList(whereList);
         return whereList;
     }
 
-    public void setWhereList(List<WhereBase> whereList) {
+    public void setWhereList(List<Where> whereList) {
         this.whereList = whereList;
     }
 
@@ -201,11 +205,19 @@ public class QueryReservoir {
         this.lock = lock;
     }
 
-    public WhereFieldType getWhereFieldType() {
-        return whereFieldType;
+    public WhereOptCallback getWhereOptCallback() {
+        return whereOptCallback;
     }
 
-    public void setWhereFieldType(WhereFieldType whereFieldType) {
-        this.whereFieldType = whereFieldType;
+    public void setWhereOptCallback(WhereOptCallback whereOptCallback) {
+        this.whereOptCallback = whereOptCallback;
+    }
+
+    public Boolean getFetchSql() {
+        return fetchSql;
+    }
+
+    public void setFetchSql(Boolean fetchSql) {
+        this.fetchSql = fetchSql;
     }
 }

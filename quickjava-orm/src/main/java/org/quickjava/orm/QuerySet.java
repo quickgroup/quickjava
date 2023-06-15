@@ -40,6 +40,9 @@ public class QuerySet {
         reservoir.setTable(table);
     }
 
+    public QuerySet(Config config) {
+    }
+
     public static QuerySet table(String table)
     {
         return new QuerySet(table);
@@ -109,7 +112,7 @@ public class QuerySet {
         if (ORMHelper.isEmpty(field)) {
             return this;
         }
-        where(new Where(field, operator, value));
+        where(new WhereAnd(field, operator, value));
         return this;
     }
 
@@ -124,8 +127,11 @@ public class QuerySet {
         return this;
     }
 
-    public QuerySet where(WhereBase where)
+    public QuerySet where(Where where)
     {
+        if (reservoir.whereOptCallback != null) {
+            reservoir.whereOptCallback.call(where);
+        }
         reservoir.getWhereList().add(where);
         return this;
     }
@@ -140,14 +146,14 @@ public class QuerySet {
         QuerySet querySet = new QuerySet();
         callback.call(querySet);
         if (querySet.reservoir.whereList != null) {
-            where(new Where(querySet.reservoir.getWhereList()));
+            where(new WhereAnd(querySet.reservoir.getWhereList()));
         }
         return this;
     }
 
     public QuerySet where(String field, DatetimeRangeType range)
     {
-        where(new WhereOr(field, Operator.BETWEEN, DatetimeUtil.rangeType(range)));
+        where(new WhereAnd(field, Operator.BETWEEN, DatetimeUtil.rangeType(range)));
         return this;
     }
 
@@ -192,7 +198,7 @@ public class QuerySet {
 
     public QuerySet between(String field, Object v1, Object v2)
     {
-        where(new Where(field, Operator.BETWEEN, new Object[]{v1, v2}));
+        where(new WhereAnd(field, Operator.BETWEEN, new Object[]{v1, v2}));
         return this;
     }
 
@@ -373,7 +379,6 @@ public class QuerySet {
         if (ret != null) {
             return ret;
         }
-//        table = (SqlUtil.isUpperString(table) ? table : SqlUtil.backQuote(table));
         String sql = "SHOW FULL COLUMNS FROM " + table;
         List<Map<String, String>> columns = this.executeSql(sql);
         if (ORMHelper.isEmpty(columns)) {

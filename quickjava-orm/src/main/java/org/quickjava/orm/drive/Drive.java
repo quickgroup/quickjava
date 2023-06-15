@@ -10,12 +10,9 @@ import org.quickjava.orm.QueryReservoir;
 import org.quickjava.orm.QuerySet;
 import org.quickjava.orm.contain.*;
 import org.quickjava.orm.utils.QueryException;
-import org.quickjava.orm.utils.QuerySetHelper;
 import org.quickjava.orm.utils.QuickORMException;
 import org.quickjava.orm.utils.SqlUtil;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -143,7 +140,7 @@ public abstract class Drive {
         // WHERE
         if (action == Action.SELECT && reservoir.whereList != null) {
             sqlList.add("WHERE");
-            sqlList.add(WhereBase.cutFirstLogic(WhereBase.collectSql(reservoir.whereList, config)));
+            sqlList.add(Where.cutFirstLogic(Where.collectSql(reservoir.whereList, config)));
         }
 
         // GROUP BY
