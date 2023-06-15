@@ -65,6 +65,13 @@ public @interface ModelField {
     String updateFillTarget() default "";
 
     /**
+     * 更新时填充（插入时不填充）
+     * 与 {@link ModelField#insertFill()}类似
+     * @return 填充数据
+     */
+    ModelFieldFill updateFillOnly() default ModelFieldFill.NULL;
+
+    /**
      * 软删除字段
      * - 支持类属性是Date，字段类型是datetime，且可为NULL，查询时将自动追加条件，如：`delete_time` IS NULL
      * @return 软删除字段

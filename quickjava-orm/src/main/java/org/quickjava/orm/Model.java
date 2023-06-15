@@ -8,6 +8,7 @@ import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 import org.quickjava.common.utils.ComUtil;
+import org.quickjava.common.utils.DatetimeUtil;
 import org.quickjava.common.utils.ReflectUtil;
 import org.quickjava.orm.annotation.ModelField;
 import org.quickjava.orm.annotation.ModelName;
@@ -16,6 +17,7 @@ import org.quickjava.orm.annotation.OneToOne;
 import org.quickjava.orm.callback.WhereCallback;
 import org.quickjava.orm.callback.WhereOptCallback;
 import org.quickjava.orm.contain.*;
+import org.quickjava.orm.enums.ModelFieldFill;
 import org.quickjava.orm.enums.Operator;
 import org.quickjava.orm.enums.RelationType;
 import org.quickjava.orm.utils.*;
@@ -123,6 +125,11 @@ public class Model {
 
     public Model where(String field, Object val) {
         where(field, Operator.EQ, val);
+        return this;
+    }
+
+    public Model where(String field, Operator operator) {
+        where(field, operator, null);
         return this;
     }
 
@@ -365,6 +372,17 @@ public class Model {
      */
     public Model insert()
     {
+        // 默认填充数据
+        __meta.fieldMap().forEach((name, field) -> {
+            if (!__data.containsKey(name)) {
+                if (field.getAno().insertFill() != ModelFieldFill.NULL) {
+                    __data.put(name, ModelUtil.fill(field.getAno().insertFill(), field.getAno().insertFillTarget()));
+                } else if (field.getAno().updateFill() != ModelFieldFill.NULL) {
+                    __data.put(name, ModelUtil.fill(field.getAno().insertFill(), field.getAno().updateFillTarget()));
+                }
+            }
+        });
+        // 执行
         Long pkVal = query().insert(this.sqlData());
         data(pk(), pkVal);
         return ModelUtil.isProxyModel(this) ? this : newProxyModel(getMClass(), data());
@@ -384,7 +402,21 @@ public class Model {
      * 删除
      * @return 1
      */
-    public int delete() {
+    public int delete()
+    {
+        // 软删除字段
+        for (ModelFieldO field : __meta.fieldMap().values()) {
+            if (field.getAno().softDelete()) {
+                if (Date.class.isAssignableFrom(field.getField().getType())) {
+                    data(field.getName(), DatetimeUtil.now());      // 字符串去填充的数据
+                    save();
+                } else {
+                    throw new QuickORMException("不支持的软删除字段");
+                }
+                return 1;
+            }
+        }
+        // 真实删除
         return query().delete();
     }
 
@@ -394,6 +426,15 @@ public class Model {
      */
     public Model update()
     {
+        // 默认填充数据
+        __meta.fieldMap().forEach((name, field) -> {
+            if (!__data.containsKey(name)) {
+                if (field.getAno().updateFill() != ModelFieldFill.NULL) {
+                    __data.put(name, ModelUtil.fill(field.getAno().insertFill(), field.getAno().updateFillTarget()));
+                }
+            }
+        });
+        // 执行
         query().update(this.sqlData());
         return ModelUtil.isProxyModel(this) ? this : newProxyModel(getMClass(), data());
     }
@@ -416,7 +457,8 @@ public class Model {
      * @return 模型对象
      * @param <D> 模型类
      */
-    public <D extends Model> D find() {
+    public <D extends Model> D find()
+    {
         // 查询前：预载入字段准备
         queryBefore();
         // 数据装填
@@ -590,6 +632,17 @@ public class Model {
      * */
     private void queryBefore()
     {
+        // 软删除字段
+        for (ModelFieldO field : __meta.fieldMap().values()) {
+            if (field.getAno().softDelete()) {
+                if (Date.class.isAssignableFrom(field.getField().getType())) {
+                    where(field.getName(), Operator.IS_NULL);
+                } else {
+                    throw new QuickORMException("不支持的软删除字段");
+                }
+            }
+        }
+        // 关联属性字段载入
         Map<String, Relation> relationMap = getWithRelation(new RelationType[]{RelationType.OneToOne});
         if (relationMap.size() == 0) {
             return;

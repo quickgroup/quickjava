@@ -1,16 +1,17 @@
 package org.quickjava.orm.utils;
 
 import net.sf.cglib.proxy.Enhancer;
+import org.quickjava.common.utils.DatetimeUtil;
 import org.quickjava.common.utils.ReflectUtil;
 import org.quickjava.orm.Model;
 import org.quickjava.orm.contain.ModelMeta;
+import org.quickjava.orm.enums.ModelFieldFill;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Arrays;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 /*
@@ -195,6 +196,24 @@ public class ModelUtil extends SqlUtil {
             fieldName = fieldName.substring(2);
         }
         return toUnderlineCase(fieldName);
+    }
+
+    // 填充数据
+    public static Object fill(ModelFieldFill fill, String staticMethodStr) {
+        if (fill == ModelFieldFill.DATETIME) {
+            return new Date();
+        } else if (fill == ModelFieldFill.DATE) {
+            return DatetimeUtil.format(new Date(), DatetimeUtil.FORMAT_DATE);
+        } else if (fill == ModelFieldFill.TIME) {
+            return DatetimeUtil.format(new Date(), DatetimeUtil.FORMAT_TIME);
+        } else if (fill == ModelFieldFill.TIMESTAMP) {
+            return System.currentTimeMillis() / 1000;
+        } else if (fill == ModelFieldFill.MILL_TIMESTAMP) {
+            return System.currentTimeMillis();
+        } else if (fill == ModelFieldFill.STATIC_METHOD) {
+            return staticMethodStr;
+        }
+        return null;
     }
 
 }

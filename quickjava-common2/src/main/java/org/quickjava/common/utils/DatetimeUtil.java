@@ -52,11 +52,15 @@ public class DatetimeUtil {
     public static final DateTimeFormatter FORMATTER_HOUR_MINUTE = DateTimeFormatter.ofPattern(FORMAT_HOUR_MINUTE);
     public static final DateTimeFormatter FORMATTER_TIME = DateTimeFormatter.ofPattern(FORMAT_TIME);
 
-    public static String formatDateTime(Date date) {
-        return formatDateTime(date, FORMAT_DEF);
+    public static String now() {
+        return format(new Date(), FORMAT_DEF);
     }
 
-    public static String formatDateTime(Date date, String format) {
+    public static String format(Date date) {
+        return format(date, FORMAT_DEF);
+    }
+
+    public static String format(Date date, String format) {
         SimpleDateFormat dateFormat = new SimpleDateFormat(format);
         return dateFormat.format(date);
     }
