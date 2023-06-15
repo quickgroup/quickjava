@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.quickjava.orm.callback.WhereOptCallback;
 import org.quickjava.orm.contain.Action;
 import org.quickjava.orm.contain.Where;
-import org.quickjava.orm.enums.WhereFieldType;
 import org.quickjava.orm.utils.QuerySetHelper;
 
 import java.util.LinkedHashMap;
@@ -72,6 +71,9 @@ public class QueryReservoir {
 
     @JsonIgnore
     public WhereOptCallback whereOptCallback;
+
+    @JsonIgnore
+    public Object whereOptCallbackData;
 
     @JsonIgnore
     public Boolean fetchSql;
@@ -209,8 +211,9 @@ public class QueryReservoir {
         return whereOptCallback;
     }
 
-    public void setWhereOptCallback(WhereOptCallback whereOptCallback) {
+    public void setWhereOptCallback(WhereOptCallback whereOptCallback, Object userData) {
         this.whereOptCallback = whereOptCallback;
+        this.whereOptCallbackData = userData;
     }
 
     public Boolean getFetchSql() {

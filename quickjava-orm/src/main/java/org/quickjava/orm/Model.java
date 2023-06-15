@@ -105,19 +105,19 @@ public class Model {
             if (__querySet == null) {
                 __querySet = QuerySet.table(parseModelTableName(getClass()));
                 QueryReservoir reservoir = ReflectUtil.getFieldValue(__querySet, "reservoir");
-                reservoir.setWhereOptCallback(whereOptCallback);
+                reservoir.setWhereOptCallback(whereOptCallback, this);
             }
         }
         return __querySet;
     }
 
     public Model where(String field, Operator opr, Object val) {
-        query().where(whereFieldName(field), opr, val);
+        query().where(field, opr, val);
         return this;
     }
 
     public Model where(String field, String opr, Object val) {
-        query().where(whereFieldName(field), Operator.valueOf(opr), val);
+        query().where(field, Operator.valueOf(opr), val);
         return this;
     }
 
@@ -209,20 +209,6 @@ public class Model {
 
     public Model between(String field, Object val1, Object val2) {
         return where(field, Operator.BETWEEN, new Object[]{val1, val2});
-    }
-
-    /**
-     * 补全字段名称
-     * - 预载入补全表名
-     * */
-    private String whereFieldName(String field) {
-        field = fieldToUnderlineCase(field);
-        if (__withs != null) {
-            if (!field.contains(".")) {
-                field = __meta.table() + "." + field;
-            }
-        }
-        return field;
     }
 
     /**
@@ -1126,8 +1112,15 @@ public class Model {
     }
 
     // 默认转换字段大小写
-    private static WhereOptCallback whereOptCallback = whereBase -> {
-        whereBase.setField(toUnderlineCase(whereBase.getField()));
+    private static final WhereOptCallback whereOptCallback = (where, querySet, userData) -> {
+        Model model = (Model) userData;
+        String field = fieldToUnderlineCase(where.getField());
+        if (ComUtil.isNotEmpty(model.__withs)) {
+            if (!field.contains(".")) {
+                field = model.__meta.table() + "." + field;
+            }
+        }
+        where.setField(field);
     };
 
     @Override
