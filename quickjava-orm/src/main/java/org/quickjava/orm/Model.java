@@ -13,6 +13,8 @@ import org.quickjava.orm.annotation.ModelField;
 import org.quickjava.orm.annotation.ModelName;
 import org.quickjava.orm.annotation.OneToMany;
 import org.quickjava.orm.annotation.OneToOne;
+import org.quickjava.orm.callback.ModelCallback;
+import org.quickjava.orm.callback.WhereCallback;
 import org.quickjava.orm.contain.*;
 import org.quickjava.orm.enums.Operator;
 import org.quickjava.orm.enums.RelationType;
@@ -457,6 +459,148 @@ public class Model {
         return (List<D>) models;
     }
 
+    //TODO::---------- 分页方法 ----------
+    public <D> Pagination<D> pagination(Integer page, Integer pageSize) {
+        // 查询前处理：预载入
+        queryBefore();
+        // 执行查询
+        Pagination<Map<String, Object>> pagination = query().pagination(page, pageSize);
+        // 数据组装
+        Pagination<Model> pagination1 = new Pagination<>(pagination);
+        pagination1.rows = resultTranshipment(getMClass(), pagination.rows);
+        // 查询后
+        queryAfter(pagination1.rows);
+        return (Pagination<D>) pagination1;
+    }
+
+    public <D> Pagination<D> pagination() {
+        return pagination(1, 20);
+    }
+
+    //TODO::---------- 数据操作方法 ----------
+
+    /**
+     * 实体通过map装载数据
+     * @param data 数据集
+     * @return 模型对象
+     */
+    public Model data(Map<String, Object> data) {
+        data.forEach(this::data);
+        return this;
+    }
+
+    /**
+     * 获取data中的数据
+     * @param field 属性名
+     * @return 属性值
+     */
+    public Object data(String field) {
+        return data().get(field);
+    }
+
+    /**
+     * 装载数据
+     * @param name 属性名
+     * @param val 属性值
+     * @return 模型对象
+     */
+    public Model data(String name, Object val)
+    {
+        // 数据保存
+        name = ModelUtil.toCamelCase(name);
+        ModelFieldO field = __meta.fieldMap().get(name);
+        // 非本表属性或关联属性不设置
+        if (field == null || field.getWay() != null) {
+            return this;
+        }
+
+        __data.put(name, val);
+        ReflectUtil.setFieldValue(this, name, val);
+
+        // 被修改的字段
+        if (__modified == null) {
+            __modified = new LinkedList<>();
+        }
+        __modified.add(field);
+        return this;
+    }
+
+    /**
+     * 获取data全部数据
+     * @return 模型数据
+     */
+    public DataMap data() {
+        this.loadingVegetarianModel();
+        return __data;
+    }
+
+    /**
+     * 执行sql的数据
+     * - insert、update的数据
+     * @return 数据集
+     */
+    public DataMap sqlData()
+    {
+        DataMap data = data();
+        DataMap ret = DataMap.one();
+        __modified.forEach(field -> {
+            if (field.getWay() != null) {
+                return;
+            }
+            Object v = data.get(field.getName());
+            ret.put(fieldToUnderlineCase(field.getName()), ModelUtil.valueToSqlValue(v));
+        });
+        return ret;
+    }
+
+    //---------- TODO::静态操作方法 ----------//
+
+    /**
+     * 通过 Map 创建对象
+     * @param data 数据集
+     * @return 模型对象
+     */
+    public Model create(Map<String, Object> data)
+    {
+        Model model = newProxyModel(getMClass(), data);
+        model.insert();
+        return model;
+    }
+
+    /**
+     * 通过 DataMap 创建对象
+     * @param data 数据集
+     * @return 模型对象
+     */
+    public Model create(DataMap data) {
+        return create((Map<String, Object>) data);
+    }
+
+    public Model create(Model model) {
+        return model.insert();
+    }
+
+    /**
+     * 批量创建
+     * @param dataList 数据列表
+     * @return 对象数量
+     */
+    public Integer bulkCreate(List<DataMap> dataList)
+    {
+        List<DataMap> dataList2 = new LinkedList<>();
+        dataList.forEach(map -> {
+            DataMap data = new DataMap();
+            map.forEach((k, v) -> data.put(fieldToUnderlineCase(k), v));
+            dataList2.add(data);
+        });
+        query().insertAll(dataList2);
+        return dataList2.size();
+    }
+
+    public void callback(ModelCallback callback) {
+
+    }
+
     //TODO::---------- 模型控制方法 ----------
     /**
      * 查询前处理预载入
@@ -593,159 +737,7 @@ public class Model {
         return relationMap;
     }
 
-    //---------- TODO::分页方法 ----------//
-    public <D> Pagination<D> pagination(Integer page, Integer pageSize) {
-        // 查询前处理：预载入
-        queryBefore();
-        // 执行查询
-        Pagination<Map<String, Object>> pagination = query().pagination(page, pageSize);
-        // 数据组装
-        Pagination<Model> pagination1 = new Pagination<>(pagination);
-        pagination1.rows = resultTranshipment(getMClass(), pagination.rows);
-        // 查询后
-        queryAfter(pagination1.rows);
-        return (Pagination<D>) pagination1;
-    }
-
-    public <D> Pagination<D> pagination() {
-        return pagination(1, 20);
-    }
-
-    // 提取某字段为list
-    public <D> D selectFieldList(String field) {
-        String fieldLine = fieldToUnderlineCase(field);
-        List<Map<String, Object>> dataList = query().field(fieldLine).select();
-        List<Object> ret = new LinkedList<>();
-        dataList.forEach(v -> ret.add(v.get(fieldLine)));
-        return (D) ret;
-    }
-
-    // 提取某字段为数组
-    public <D> D selectFieldArray(String field) {
-        List<Object> ret = selectFieldList(field);
-        return (D) ret.toArray();
-    }
-
-    //---------- TODO::数据操作方法 ----------//
-
-    /**
-     * 实体通过map装载数据
-     * @param data 数据集
-     * @return 模型对象
-     */
-    public Model data(Map<String, Object> data) {
-        data.forEach(this::data);
-        return this;
-    }
-
-    /**
-     * 获取data中的数据
-     * @param field 属性名
-     * @return 属性值
-     */
-    public Object data(String field) {
-        return data().get(field);
-    }
-
-    /**
-     * 装载数据
-     * @param name 属性名
-     * @param val 属性值
-     * @return 模型对象
-     */
-    public Model data(String name, Object val)
-    {
-        // 数据保存
-        name = ModelUtil.toCamelCase(name);
-        ModelFieldO field = __meta.fieldMap().get(name);
-        // 非本表属性或关联属性不设置
-        if (field == null || field.getWay() != null) {
-            return this;
-        }
-
-        __data.put(name, val);
-        ReflectUtil.setFieldValue(this, name, val);
-
-        // 被修改的字段
-        if (__modified == null) {
-            __modified = new LinkedList<>();
-        }
-        __modified.add(field);
-        return this;
-    }
-
-    /**
-     * 获取data全部数据
-     * @return 模型数据
-     */
-    public DataMap data() {
-        this.loadingVegetarianModel();
-        return __data;
-    }
-
-    /**
-     * 执行sql的数据
-     * - insert、update的数据
-     * @return 数据集
-     */
-    public DataMap sqlData()
-    {
-        DataMap data = data();
-        DataMap ret = DataMap.one();
-        __modified.forEach(field -> {
-            if (field.getWay() != null) {
-                return;
-            }
-            Object v = data.get(field.getName());
-            ret.put(fieldToUnderlineCase(field.getName()), ModelUtil.valueToSqlValue(v));
-        });
-        return ret;
-    }
-
-    //---------- TODO::静态操作方法 ----------//
-
-    /**
-     * 通过 Map 创建对象
-     * @param data 数据集
-     * @return 模型对象
-     */
-    public Model create(Map<String, Object> data)
-    {
-        Model model = newProxyModel(getMClass(), data);
-        model.insert();
-        return model;
-    }
-
-    /**
-     * 通过 DataMap 创建对象
-     * @param data 数据集
-     * @return 模型对象
-     */
-    public Model create(DataMap data) {
-        return create((Map<String, Object>) data);
-    }
-
-    public Model create(Model model) {
-        return model.insert();
-    }
-
-    /**
-     * 批量创建
-     * @param dataList 数据列表
-     * @return 对象数量
-     */
-    public Integer bulkCreate(List<DataMap> dataList)
-    {
-        List<DataMap> dataList2 = new LinkedList<>();
-        dataList.forEach(map -> {
-            DataMap data = new DataMap();
-            map.forEach((k, v) -> data.put(fieldToUnderlineCase(k), v));
-            dataList2.add(data);
-        });
-        query().insertAll(dataList2);
-        return dataList2.size();
-    }
-
+    //TODO::---------- 模型实例化----------
     public static<D extends Model> D newProxyModel(Class<?> clazz) {
         return newProxyModel(clazz, null, null);
     }

@@ -16,12 +16,13 @@ package org.quickjava.orm;
  */
 
 import org.quickjava.common.utils.ReflectUtil;
+import org.quickjava.orm.callback.ModelCallback;
 import org.quickjava.orm.contain.Config;
 import org.quickjava.orm.drive.*;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -67,6 +68,8 @@ public class ORMContext {
         }
     }
 
+    // 默认配置
+    private static Config defaultConfig = new Config(Config.DBSubject.CONFIG, Config.DBType.DEFAULT);
 
     /**
      * FIXME::从QuickJava读取数据库配置
@@ -91,6 +94,47 @@ public class ORMContext {
         }
     }
 
-    private static Config defaultConfig = new Config(Config.DBSubject.CONFIG, Config.DBType.DEFAULT);
+    private static final List<ModelCallback> MODEL_CALLBACKS = new LinkedList<>();
+
+    public static final ModelCallback MODEL_CALLBACK = new ModelCallback() {
+        @Override
+        public void insert(Model model) {
+            for (ModelCallback callback : MODEL_CALLBACKS) {
+                callback.insert(model);
+            }
+        }
+
+        @Override
+        public void delete(Model model) {
+            for (ModelCallback callback : MODEL_CALLBACKS) {
+                callback.delete(model);
+            }
+        }
+
+        @Override
+        public void update(Model model) {
+            for (ModelCallback callback : MODEL_CALLBACKS) {
+                callback.update(model);
+            }
+        }
+
+        @Override
+        public void select(Model model) {
+            for (ModelCallback callback : MODEL_CALLBACKS) {
+                callback.select(model);
+            }
+        }
+    };
+
+    //模型回调
+    public static void modelListener(ModelCallback callback) {
+        if (!MODEL_CALLBACKS.contains(callback)) {
+            MODEL_CALLBACKS.add(callback);
+        }
+    }
+
+    public static void modelUnListener(ModelCallback callback) {
+        MODEL_CALLBACKS.remove(callback);
+    }
 
 }

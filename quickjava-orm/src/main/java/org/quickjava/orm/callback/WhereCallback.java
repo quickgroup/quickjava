@@ -1,4 +1,4 @@
-package org.quickjava.orm.utils;
+package org.quickjava.orm.callback;
 
 import org.quickjava.orm.QuerySet;
 
