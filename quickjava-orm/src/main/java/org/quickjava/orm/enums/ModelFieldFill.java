@@ -14,12 +14,26 @@ package org.quickjava.orm.enums;
  * License: Apache Licence 2.0
  * +-------------------------------------------------------------------
  */
-public class ModelFieldFill {
-
-    public static final String DATETIME = "model:datetime";
+public enum ModelFieldFill {
+    NULL,
     /**
-     * 指定类方法填充，method:+类名+方法名，完整例子：method:app.UserUtil.makeNickname
+     * 当前日期时间
      */
-    public static final String METHOD = "method:";
+    DATETIME,
+    DATE,
+    TIME,
+    /**
+     * 当前秒级时间戳
+     */
+    TIMESTAMP,
+    /**
+     * 当前毫秒级时间戳
+     */
+    MILL_TIMESTAMP,
+    /**
+     * 自定义方法回调
+     */
+    STATIC_METHOD,
+    ;
 
 }

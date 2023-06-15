@@ -1,12 +1,14 @@
 package org.quickjava.orm.wrapper;
 
-public class ModelQuery<T> extends ModelQueryWrapper<T, ModelFunction<T, ?>> {
+import org.quickjava.orm.Model;
 
-    public static<T> ModelQuery<T> lambda(Class<T> tClass) {
+public class ModelQuery<M extends Model> extends ModelQueryWrapper<M, ModelFunction<M, ?>> {
+
+    public static<M extends Model> ModelQuery<M> lambda(Class<M> tClass) {
         return new ModelQuery<>(tClass);
     }
 
-    public ModelQuery(Class<T> tClass) {
+    public ModelQuery(Class<M> tClass) {
         try {
             this.model = tClass.newInstance();
         } catch (InstantiationException | IllegalAccessException e) {

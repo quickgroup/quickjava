@@ -3,6 +3,7 @@ package org.quickjava.www;
 import org.quickjava.framework.QuickJavaBoot;
 import org.quickjava.framework.annotation.ApplicationQuickBoot;
 import org.quickjava.orm.QuerySet;
+import org.quickjava.orm.callback.WhereCallback;
 import org.quickjava.orm.example.Article;
 
 @ApplicationQuickBoot
@@ -34,9 +35,15 @@ public class ApplicationBoot {
 
         // 模型闭包查询
         System.out.println("article=" + new Article().where("status", 1).where(query -> {
-            query.where("id", 20).where("user_id", 10);
+            query.where("id", 200).where("user_id", 100);
         }).whereOr(query -> {
-            query.where("id", 21).where("user_id", 11);
+            query.where("id", 210).where("user_id", 110);
+            query.whereOr(query1 -> {
+                query1.where("id", 211).where("user_id", 111);
+            });
+            query.whereOr(query1 -> {
+                query1.where("id", 212).where("user_id", 112);
+            });
         }).buildSql());
 
         QuickJavaBoot.start(ApplicationBoot.class, args);

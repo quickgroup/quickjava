@@ -1,5 +1,7 @@
 package org.quickjava.orm.annotation;
 
+import org.quickjava.orm.enums.ModelFieldFill;
+
 import java.lang.annotation.*;
 
 /*
@@ -38,14 +40,29 @@ public @interface ModelField {
      * - ModelFieldFill.METHOD=调用方法填充数据<br>
      * @return 填充数据
      */
-    String insertFill() default "";
+    ModelFieldFill insertFill() default ModelFieldFill.NULL;
+
+    /**
+     * 插入时填充补充内容<br>
+     * - ModelFieldFill.DATETIME=填充当前时间<br>
+     * - ModelFieldFill.METHOD=调用方法填充数据<br>
+     * @return 填充数据
+     */
+    String insertFillTarget() default "";
 
     /**
      * 更新时填充
      * 与 {@link ModelField#insertFill()}类似
      * @return 填充数据
      */
-    String updateFill() default "";
+    ModelFieldFill updateFill() default ModelFieldFill.NULL;
+
+    /**
+     * 更新时填充
+     * 与 {@link ModelField#insertFill()}类似
+     * @return 填充数据
+     */
+    String updateFillTarget() default "";
 
     /**
      * 软删除字段

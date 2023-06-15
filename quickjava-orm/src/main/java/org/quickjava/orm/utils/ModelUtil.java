@@ -87,7 +87,7 @@ public class ModelUtil extends SqlUtil {
             // 实现对关联属性的数据赋值
             if (Model.class.isAssignableFrom(field.getType())) {
                 if (value instanceof Map) {
-                    Model child = Model.newProxyModel(field.getType(), (Map<String, Object>) value, (Model) o);
+                    Model child = ReflectUtil.invoke(Model.class, "newProxyModel", (Map<String, Object>) value, (Model) o);
                     field.set(o, child);
                 }
             } else {

@@ -2,7 +2,7 @@ package org.quickjava.orm.callback;
 
 import org.quickjava.orm.Model;
 
-public interface ModelCallback {
+public interface ModelListener {
 
     void insert(Model model);
 

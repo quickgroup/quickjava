@@ -307,17 +307,9 @@ public class QuerySet {
         return this;
     }
 
-    public QuerySet distinct() {
-        return distinct(true);
-    }
-
     public QuerySet distinct(boolean distinct) {
         __distinct = distinct;
         return this;
-    }
-
-    public QuerySet lock() {
-        return lock(true);
     }
 
     public QuerySet lock(boolean lock) {
@@ -454,17 +446,19 @@ public class QuerySet {
     //TODO::--------------- 语句方法 ---------------
     public String buildSql()
     {
+        this.__action = this.__action == null ? Action.SELECT : this.__action;
         return ORMContext.getDrive().pretreatment(this);
+    }
+
+    private <T> T executeSql()
+    {
+        this.__action = this.__action == null ? Action.SELECT : this.__action;
+        return ORMContext.getDrive().executeSql(this);
     }
 
     private  <T> T executeSql(String sql)
     {
         return ORMContext.getDrive().executeSql(Action.SELECT, sql);
-    }
-
-    private <T> T executeSql()
-    {
-        return ORMContext.getDrive().executeSql(this);
     }
 
     public <T> T execute(String sql) {

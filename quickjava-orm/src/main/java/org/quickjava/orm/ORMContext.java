@@ -16,7 +16,7 @@ package org.quickjava.orm;
  */
 
 import org.quickjava.common.utils.ReflectUtil;
-import org.quickjava.orm.callback.ModelCallback;
+import org.quickjava.orm.callback.ModelListener;
 import org.quickjava.orm.contain.Config;
 import org.quickjava.orm.drive.*;
 
@@ -94,46 +94,46 @@ public class ORMContext {
         }
     }
 
-    private static final List<ModelCallback> MODEL_CALLBACKS = new LinkedList<>();
+    private static final List<ModelListener> MODEL_CALLBACKS = new LinkedList<>();
 
-    public static final ModelCallback MODEL_CALLBACK = new ModelCallback() {
+    public static final ModelListener MODEL_CALLBACK = new ModelListener() {
         @Override
         public void insert(Model model) {
-            for (ModelCallback callback : MODEL_CALLBACKS) {
+            for (ModelListener callback : MODEL_CALLBACKS) {
                 callback.insert(model);
             }
         }
 
         @Override
         public void delete(Model model) {
-            for (ModelCallback callback : MODEL_CALLBACKS) {
+            for (ModelListener callback : MODEL_CALLBACKS) {
                 callback.delete(model);
             }
         }
 
         @Override
         public void update(Model model) {
-            for (ModelCallback callback : MODEL_CALLBACKS) {
+            for (ModelListener callback : MODEL_CALLBACKS) {
                 callback.update(model);
             }
         }
 
         @Override
         public void select(Model model) {
-            for (ModelCallback callback : MODEL_CALLBACKS) {
+            for (ModelListener callback : MODEL_CALLBACKS) {
                 callback.select(model);
             }
         }
     };
 
     //模型回调
-    public static void modelListener(ModelCallback callback) {
+    public static void modelListener(ModelListener callback) {
         if (!MODEL_CALLBACKS.contains(callback)) {
             MODEL_CALLBACKS.add(callback);
         }
     }
 
-    public static void modelUnListener(ModelCallback callback) {
+    public static void modelUnListener(ModelListener callback) {
         MODEL_CALLBACKS.remove(callback);
     }
 

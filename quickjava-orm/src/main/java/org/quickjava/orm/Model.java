@@ -13,7 +13,6 @@ import org.quickjava.orm.annotation.ModelField;
 import org.quickjava.orm.annotation.ModelName;
 import org.quickjava.orm.annotation.OneToMany;
 import org.quickjava.orm.annotation.OneToOne;
-import org.quickjava.orm.callback.ModelCallback;
 import org.quickjava.orm.callback.WhereCallback;
 import org.quickjava.orm.contain.*;
 import org.quickjava.orm.enums.Operator;
@@ -91,6 +90,9 @@ public class Model {
     public Model() {
         initModel(this, getClass());
     }
+
+    @JsonIgnore
+    protected void __initialize() {}
 
     private synchronized QuerySet query() {
         synchronized (Model.class) {
@@ -351,17 +353,9 @@ public class Model {
         return this;
     }
 
-    public Model distinct() {
-        return distinct(true);
-    }
-
     public Model distinct(boolean distinct) {
         query().distinct(distinct);
         return this;
-    }
-
-    public Model lock() {
-        return lock(true);
     }
 
     public Model lock(boolean lock) {
@@ -539,7 +533,7 @@ public class Model {
      * - insert、update的数据
      * @return 数据集
      */
-    public DataMap sqlData()
+    private DataMap sqlData()
     {
         DataMap data = data();
         DataMap ret = DataMap.one();
@@ -595,10 +589,6 @@ public class Model {
         });
         query().insertAll(dataList2);
         return dataList2.size();
-    }
-
-    public void callback(ModelCallback callback) {
-
     }
 
     //TODO::---------- 模型控制方法 ----------
@@ -738,15 +728,15 @@ public class Model {
     }
 
     //TODO::---------- 模型实例化----------
-    public static<D extends Model> D newProxyModel(Class<?> clazz) {
+    private static<D extends Model> D newProxyModel(Class<?> clazz) {
         return newProxyModel(clazz, null, null);
     }
 
-    public static<D extends Model> D newProxyModel(Class<?> clazz, Map<String, Object> data) {
+    private static<D extends Model> D newProxyModel(Class<?> clazz, Map<String, Object> data) {
         return newProxyModel(clazz, data, null);
     }
 
-    public static<D extends Model> D newProxyModel(Class<?> clazz, Map<String, Object> data, Model parent)
+    private static<D extends Model> D newProxyModel(Class<?> clazz, Map<String, Object> data, Model parent)
     {
         // 创建代理类信息
         Enhancer enhancer = new Enhancer();
@@ -799,7 +789,7 @@ public class Model {
     /*
      * 关联方法
      * */
-    public <D> D relation(String fieldName, Class<?> clazz, RelationType type, String localKey, String foreignKey) {
+    private <D> D relation(String fieldName, Class<?> clazz, RelationType type, String localKey, String foreignKey) {
         // 缓存关联关系
         if (!__meta.relationMap().containsKey(fieldName)) {
             __meta.relationMap().put(fieldName, new Relation(clazz, type, localKey, foreignKey));
@@ -869,11 +859,11 @@ public class Model {
         return model;
     }
 
-    public static boolean isModel(Class<?> clazz) {
+    private static boolean isModel(Class<?> clazz) {
         return Model.class.isAssignableFrom(clazz);
     }
 
-    public static boolean isCollection(Class<?> clazz) {
+    private static boolean isCollection(Class<?> clazz) {
         return Collection.class.isAssignableFrom(clazz);
     }
 
@@ -929,11 +919,9 @@ public class Model {
             ModelField modelField = field.getAnnotation(ModelField.class);
             if (modelField != null) {
                 if (!"".equals(modelField.name())) {
-                    fieldInfo.setName(modelField.name());
+                    fieldInfo.setName(modelField.name()); // 指定字段名称
                 }
-                fieldInfo.setInsertFill(modelField.insertFill());
-                fieldInfo.setUpdateFill(modelField.updateFill());
-                fieldInfo.setSoftDelete(modelField.softDelete());
+                fieldInfo.setAno(modelField);
             }
 
             fieldInfo.setWay(findRelationAno(field));
@@ -959,9 +947,12 @@ public class Model {
 
             meta.fieldMap().put(field.getName(), fieldInfo);
         }
+
+        // 模型初始化方法回调
+        model.__initialize();
     }
 
-    public static Object findRelationAno(Field field)
+    private static Object findRelationAno(Field field)
     {
         if (field.getDeclaredAnnotation(OneToOne.class) != null) {
             return field.getDeclaredAnnotation(OneToOne.class);

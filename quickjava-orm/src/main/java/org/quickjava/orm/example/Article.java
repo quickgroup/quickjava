@@ -54,8 +54,11 @@ public class Article extends Model {
     @ModelField(insertFill = ModelFieldFill.DATETIME)
     private Date createTime;
 
-    @ModelField(updateFill = ModelFieldFill.METHOD + "app.UserUtil.makeNickname")
+    @ModelField(updateFill = ModelFieldFill.DATETIME)
     private Date updateTime;
+
+    @ModelField(softDelete = true)
+    private Date deleteTime;
 
     public User user() {
         return hasOne(User.class, "userId", "id");

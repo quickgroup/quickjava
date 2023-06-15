@@ -1,5 +1,8 @@
 package org.quickjava.orm.contain;
 
+import org.quickjava.orm.annotation.ModelField;
+import org.quickjava.orm.enums.ModelFieldFill;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
@@ -21,6 +24,8 @@ public class ModelFieldO {
 
     private String name;
 
+    private String _name;
+
     // 对应类
     private Class<?> clazz;
 
@@ -35,23 +40,19 @@ public class ModelFieldO {
 
     private Method method;
 
-    private String insertFill = "";
-
-    private String updateFill = "";
-
-    private boolean softDelete = false;
+    private ModelField ano;
 
     public ModelFieldO() {
     }
 
     public ModelFieldO(Field field) {
-        this.name = field.getName();
+        this.name = this._name = field.getName();
         this.clazz = field.getType();
         this.field = field;
     }
 
     public ModelFieldO(Field field, Object way, Method setter, Method getter) {
-        this.name = field.getName();
+        this.name = this._name = field.getName();
         this.clazz = field.getType();
         this.field = field;
         this.way = way;
@@ -115,27 +116,11 @@ public class ModelFieldO {
         this.method = method;
     }
 
-    public String getInsertFill() {
-        return insertFill;
+    public ModelField getAno() {
+        return ano;
     }
 
-    public void setInsertFill(String insertFill) {
-        this.insertFill = insertFill;
-    }
-
-    public String getUpdateFill() {
-        return updateFill;
-    }
-
-    public void setUpdateFill(String updateFill) {
-        this.updateFill = updateFill;
-    }
-
-    public boolean isSoftDelete() {
-        return softDelete;
-    }
-
-    public void setSoftDelete(boolean softDelete) {
-        this.softDelete = softDelete;
+    public void setAno(ModelField ano) {
+        this.ano = ano;
     }
 }

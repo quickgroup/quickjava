@@ -2,7 +2,7 @@ package org.quickjava.orm.callback;
 
 import org.quickjava.orm.QuerySet;
 
-public interface QuerySetCallback {
+public interface QuerySetListener {
 
     void insert(QuerySet query);
 

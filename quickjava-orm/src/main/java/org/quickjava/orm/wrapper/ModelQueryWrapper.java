@@ -122,18 +122,8 @@ public abstract class ModelQueryWrapper<M extends Model, R extends Function<M, ?
         return this;
     }
 
-    public ModelQueryWrapper<M, R> distinct() {
-        model().distinct();
-        return this;
-    }
-
     public ModelQueryWrapper<M, R> distinct(boolean distinct) {
         model().distinct(distinct);
-        return this;
-    }
-
-    public ModelQueryWrapper<M, R> lock() {
-        model().lock();
         return this;
     }
 

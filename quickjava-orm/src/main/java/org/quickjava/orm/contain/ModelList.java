@@ -17,6 +17,7 @@ import java.util.LinkedList;
  * +-------------------------------------------------------------------
  * License: Apache Licence 2.0
  * +-------------------------------------------------------------------
+ * 模型列表，支持模型的全部操作方法
  */
 public class ModelList<E extends Model> extends LinkedList<E> {
 
