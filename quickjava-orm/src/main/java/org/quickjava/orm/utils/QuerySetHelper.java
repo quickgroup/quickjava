@@ -1,7 +1,9 @@
 package org.quickjava.orm.utils;
 
+import org.quickjava.common.utils.BeanUtil;
 import org.quickjava.common.utils.ReflectUtil;
 import org.quickjava.orm.Q;
+import org.quickjava.orm.QueryReservoir;
 import org.quickjava.orm.QuerySet;
 import org.quickjava.orm.contain.Action;
 import org.quickjava.orm.enums.Operator;
@@ -104,62 +106,25 @@ public class QuerySetHelper {
         return valArr;
     }
 
+    public static<T> List<T> toBeanList(Class<T> clazz, List<Map<String, Object>> resultSet) {
+        if (resultSet == null) {
+            return new LinkedList<>();
+        }
+        List<T> beanList = new LinkedList<>();
+        resultSet.forEach(row -> beanList.add(toBean(clazz, row)));
+        return beanList;
+    }
+
+    public static<T> T toBean(Class<T> clazz, Map<String, Object> row) {
+        if (row == null) {
+            return null;
+        }
+        return BeanUtil.mapToBean(row, clazz);
+    }
+
     // 初始化list
     public static<T> List<T> initList(List<T> list) {
         return list == null ? new LinkedList<>() : list;
-    }
-
-    // 获取QuerySet数据
-    public static Action __Action(QuerySet query) {
-        return ReflectUtil.invoke(query, "__Action");
-    }
-
-    public static List<String> __FieldList(QuerySet query) {
-        return ReflectUtil.invoke(query, "__FieldList");
-    }
-
-    public static String __Table(QuerySet query) {
-        return ReflectUtil.invoke(query, "__Table");
-    }
-
-    public static List<String[]> __JoinList(QuerySet query) {
-        return ReflectUtil.invoke(query, "__JoinList");
-    }
-
-    public static List<Map<String, Object>> __DataList(QuerySet query) {
-        return ReflectUtil.invoke(query, "__DataList");
-    }
-
-    public static List<WhereBase> __WhereList(QuerySet query) {
-        return ReflectUtil.invoke(query, "__WhereList");
-    }
-
-    public static String __GroupBy(QuerySet query) {
-        return ReflectUtil.invoke(query, "__GroupBy");
-    }
-
-    public static String __Having(QuerySet query) {
-        return ReflectUtil.invoke(query, "__Having");
-    }
-
-    public static List<String> __Orders(QuerySet query) {
-        return ReflectUtil.invoke(query, "__Orders");
-    }
-
-    public static Integer __Limit(QuerySet query) {
-        return ReflectUtil.invoke(query, "__Limit");
-    }
-
-    public static Integer __LimitSize(QuerySet query) {
-        return ReflectUtil.invoke(query, "__LimitSize");
-    }
-
-    public static Boolean __distinct(QuerySet query) {
-        return ReflectUtil.invoke(query, "__distinct");
-    }
-
-    public static Boolean __lock(QuerySet query) {
-        return ReflectUtil.invoke(query, "__lock");
     }
 
 }

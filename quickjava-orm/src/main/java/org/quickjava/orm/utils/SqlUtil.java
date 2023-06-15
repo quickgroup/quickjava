@@ -124,7 +124,7 @@ public class SqlUtil extends ORMHelper {
         return ret;
     }
 
-    // 表信息缓存
+    // 缓存原始表字段
     public static Map<String, List<TableColumn>> tableColumnCache = new LinkedHashMap<>();
 
     public static List<TableColumn> getTableColumns(String table) {

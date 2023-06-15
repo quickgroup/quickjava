@@ -5,6 +5,8 @@
 
 package org.quickjava.orm.drive;
 
+import org.quickjava.common.utils.ReflectUtil;
+import org.quickjava.orm.QueryReservoir;
 import org.quickjava.orm.QuerySet;
 import org.quickjava.orm.contain.*;
 import org.quickjava.orm.utils.QueryException;
@@ -75,58 +77,58 @@ public abstract class Drive {
 
         List<String> sqlList = new ArrayList<>();
         DriveConfigure config = getDriveConfigure();
+        QueryReservoir reservoir = getQueryReservoir(query);
 
         // action
-        Action action = QuerySetHelper.__Action(query);
-        sqlList.add(action.toString());
+        Action action = reservoir.action;
+        sqlList.add(reservoir.action.toString());
 
         // SELECT
         if (action == Action.SELECT) {
             // DISTINCT
-            if (isTrue(QuerySetHelper.__distinct(query))) {
+            if (isTrue(reservoir.distinct)) {
                 sqlList.add("DISTINCT");
             }
             // field
-            checkNull(QuerySetHelper.__FieldList(query), "Missing field");
-            sqlList.add(SqlUtil.collJoin(",", QuerySetHelper.__FieldList(query)));
+            checkNull(reservoir.fieldList, "Missing field");
+            sqlList.add(SqlUtil.collJoin(",", reservoir.fieldList));
             sqlList.add("FROM");
         }
 
         // table name
-        sqlList.add(QuerySetHelper.__Table(query));
+        sqlList.add(reservoir.table);
 
         // TODO::JOIN
-        if (QuerySetHelper.__JoinList(query) != null) {
-            QuerySetHelper.__JoinList(query).forEach(arr -> {
+        if (reservoir.joinList != null) {
+            reservoir.joinList.forEach(arr -> {
                 sqlList.add(String.format("%s JOIN %s ON %s", arr[2], arr[0], arr[1]));
             });
         }
 
-        List<Map<String, Object>> dataList = QuerySetHelper.__DataList(query);
         // INSERT-DATA
         if (action == Action.INSERT) {
-            checkNull(dataList, "Missing insert data");
+            checkNull(reservoir.dataList, "Missing insert data");
             StringBuilder dataSql = new StringBuilder();
             // field
-            SqlUtil.mapKeyJoin(dataSql, dataList.get(0));
+            SqlUtil.mapKeyJoin(dataSql, reservoir.dataList.get(0));
             // values
             dataSql.append(" VALUES ");
             // 数据处理方法
             SqlUtil.MapJoinCallback joinCallback = entry -> Value.pretreatment(entry.getValue());
-            for (int i = 0; i < dataList.size(); i++) {
+            for (int i = 0; i < reservoir.dataList.size(); i++) {
                 if (i > 0)
                     dataSql.append(',');
-                SqlUtil.mapBracketsJoin(dataSql, dataList.get(i), joinCallback);
+                SqlUtil.mapBracketsJoin(dataSql, reservoir.dataList.get(i), joinCallback);
             }
             sqlList.add(dataSql.toString());
         }
 
         // UPDATE
         if (action == Action.UPDATE) {
-            checkNull(dataList, "Missing update data");
+            checkNull(reservoir.dataList, "Missing update data");
             StringBuilder dataSql = new StringBuilder();
             int fi = 0;
-            for (Map.Entry<String, Object> entry : dataList.get(0).entrySet()) {
+            for (Map.Entry<String, Object> entry : reservoir.dataList.get(0).entrySet()) {
                 if (fi++ > 0)
                     dataSql.append(",");
                 String item = String.format("%s%s%s=%s", config.fieldL, entry.getKey(), config.fieldR,
@@ -139,41 +141,42 @@ public abstract class Drive {
         }
 
         // WHERE
-        if (action == Action.SELECT && QuerySetHelper.__WhereList(query) != null) {
+        if (action == Action.SELECT && reservoir.whereList != null) {
             sqlList.add("WHERE");
-            sqlList.add(WhereBase.cutFirstLogic(WhereBase.collectSql(QuerySetHelper.__WhereList(query), config)));
+            sqlList.add(WhereBase.cutFirstLogic(WhereBase.collectSql(reservoir.whereList, config)));
         }
 
         // GROUP BY
-        if (action == Action.SELECT && QuerySetHelper.__GroupBy(query) != null) {
-            sqlList.add(QuerySetHelper.__GroupBy(query));
+        if (action == Action.SELECT && reservoir.groupBy != null) {
+            sqlList.add(reservoir.groupBy);
         }
 
         // HAVING
-        if (action == Action.SELECT && QuerySetHelper.__Having(query) != null) {
-            sqlList.add(QuerySetHelper.__Having(query));
+        if (action == Action.SELECT && reservoir.having != null) {
+            sqlList.add(reservoir.having);
         }
 
         // ORDER BY
-        if (action == Action.SELECT && QuerySetHelper.__Orders(query) != null) {
-            sqlList.add(String.format("ORDER BY %s", SqlUtil.collJoin(",", QuerySetHelper.__Orders(query))));
+        if (action == Action.SELECT && reservoir.orderByList != null) {
+            sqlList.add(String.format("ORDER BY %s", SqlUtil.collJoin(",", reservoir.orderByList)));
         }
 
         // Limit
-        if (action == Action.SELECT && QuerySetHelper.__Limit(query) != null) {
-            sqlList.add(String.format("LIMIT %d,%d", QuerySetHelper.__Limit(query), QuerySetHelper.__LimitSize(query)));
+        if (action == Action.SELECT && reservoir.limitIndex != null) {
+            reservoir.limitSize = reservoir.limitSize == null ? 20 : reservoir.limitSize;
+            sqlList.add(String.format("LIMIT %d,%d", reservoir.limitIndex, reservoir.limitSize));
         }
 
         // lock
-        if (action == Action.SELECT && isTrue(QuerySetHelper.__lock(query))) {
-            sqlList.add("FOR UPDATE");
+        if (action == Action.SELECT && isTrue(reservoir.lock)) {
+            sqlList.add("FOR UPDATE");  // 不同数据库可能改变，故需要驱动自行处理
         }
 
         return SqlUtil.collJoin(" ", sqlList);
     }
 
     public <T> T executeSql(QuerySet query) {
-        return executeSql(QuerySetHelper.__Action(query), pretreatment(query));
+        return executeSql(getQueryReservoir(query).action, pretreatment(query));
     }
 
     /**
@@ -218,9 +221,9 @@ public abstract class Drive {
         } finally {
             long endTime = System.nanoTime();
             String printSql = sql;
-//            if (action == Action.INSERT) {
-//                printSql = sql.length() < 512 ? sql: sql.substring(0, 512);
-//            }
+            if (action == Action.INSERT) {
+                printSql = sql.length() < 2560 ? sql: sql.substring(0, 2560);
+            }
             String msg = "SQL Execution " + ((double) (endTime - startTime)) / 1000000 + "ms: " + printSql;
             System.out.println(msg);
 
@@ -229,6 +232,11 @@ public abstract class Drive {
                 quickConnection.close();
             }
         }
+    }
+
+    // 获取查询器的数据器
+    public static QueryReservoir getQueryReservoir(QuerySet query) {
+        return ReflectUtil.invoke(query, "reservoir");
     }
 
     private static void checkNull(Object obj, String msg) {

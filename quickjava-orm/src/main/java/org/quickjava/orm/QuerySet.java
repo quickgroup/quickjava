@@ -11,11 +11,15 @@ import org.quickjava.common.utils.DatetimeUtil;
 import org.quickjava.orm.callback.WhereCallback;
 import org.quickjava.orm.contain.*;
 import org.quickjava.orm.drive.Drive;
-import org.quickjava.common.utils.BeanUtil;
 import org.quickjava.orm.enums.Operator;
-import org.quickjava.orm.utils.*;
+import org.quickjava.orm.utils.ORMHelper;
+import org.quickjava.orm.utils.QueryException;
+import org.quickjava.orm.utils.SqlUtil;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 数据操作类，本类主要进行条件构建、查询、数据返回
@@ -28,48 +32,12 @@ import java.util.*;
 public class QuerySet {
 
     @JsonIgnore
-    private String __table;
-
-    @JsonIgnore
-    private Action __action;
-
-    @JsonIgnore
-    private List<String> fieldList;
-
-    @JsonIgnore
-    private List<String[]> joinList;
-
-    @JsonIgnore
-    private List<WhereBase> whereList;
-
-    @JsonIgnore
-    private List<String> orderByList;
-
-    @JsonIgnore
-    private List<Map<String, Object>> __dataList;
-
-    @JsonIgnore
-    private String groupBy;
-
-    @JsonIgnore
-    private String __having;
-
-    @JsonIgnore
-    private Integer limitIndex;
-
-    @JsonIgnore
-    private Integer limitSize;
-
-    @JsonIgnore
-    private Boolean __distinct;
-
-    @JsonIgnore
-    private Boolean __lock;
+    private final QueryReservoir reservoir = new QueryReservoir();
 
     public QuerySet() {}
 
     public QuerySet(String table) {
-        this.__table = table;
+        reservoir.setTable(table);
     }
 
     public static QuerySet table(String table)
@@ -83,8 +51,7 @@ public class QuerySet {
 
     public QuerySet join(String table, String condition, String type)
     {
-        joinList = QuerySetHelper.initList(joinList);
-        joinList.add(new String[]{table, condition, type});
+        reservoir.getJoinList().add(new String[]{table, condition, type});
         return this;
     }
 
@@ -102,8 +69,7 @@ public class QuerySet {
             Arrays.stream(field.split(",")).forEach(this::field);
         } else {
 //            this.fieldList.add(field.contains("\\.") ? field.split("\\.") : new String[]{field});
-            this.fieldList = QuerySetHelper.initList(this.fieldList);
-            this.fieldList.add(field);
+            reservoir.getFieldList().add(field);
         }
         return this;
     }
@@ -160,8 +126,7 @@ public class QuerySet {
 
     public QuerySet where(WhereBase where)
     {
-        whereList = QuerySetHelper.initList(whereList);
-        whereList.add(where);
+        reservoir.getWhereList().add(where);
         return this;
     }
 
@@ -174,8 +139,8 @@ public class QuerySet {
     {
         QuerySet querySet = new QuerySet();
         callback.call(querySet);
-        if (querySet.whereList != null) {
-            where(new Where(querySet.whereList));
+        if (querySet.reservoir.whereList != null) {
+            where(new Where(querySet.reservoir.getWhereList()));
         }
         return this;
     }
@@ -219,8 +184,8 @@ public class QuerySet {
     {
         QuerySet querySet = new QuerySet();
         callback.call(querySet);
-        if (querySet.whereList != null) {
-            where(new WhereOr(querySet.whereList));
+        if (querySet.reservoir.whereList != null) {
+            where(new WhereOr(querySet.reservoir.getWhereList()));
         }
         return this;
     }
@@ -236,7 +201,7 @@ public class QuerySet {
         if (ORMHelper.isEmpty(fields)) {
             return this;
         }
-        groupBy = fields;
+        reservoir.setGroupBy(fields);
         return this;
     }
 
@@ -245,14 +210,13 @@ public class QuerySet {
         if (ORMHelper.isEmpty(fields)) {
             return this;
         }
-        __having = fields;
+        reservoir.setHaving(fields);
         return this;
     }
 
     public QuerySet order(String field, String sort)
     {
-        orderByList = QuerySetHelper.initList(orderByList);
-        orderByList.add(String.format("%s %s", field, sort.toUpperCase()));
+        reservoir.getOrderByList().add(String.format("%s %s", field, sort.toUpperCase()));
         return this;
     }
 
@@ -286,13 +250,13 @@ public class QuerySet {
 
     public QuerySet limit(Integer index, Integer count)
     {
-        this.limitIndex = index;
-        this.limitSize = count;
+        reservoir.limitIndex = index;
+        reservoir.limitSize = count;
         return this;
     }
 
     public QuerySet page(Integer page) {
-        return page(page, limitSize);
+        return page(page, reservoir.limitSize);
     }
 
     public QuerySet page(Integer page, Integer size) {
@@ -300,33 +264,35 @@ public class QuerySet {
     }
 
     public QuerySet union(String sql) {
+        reservoir.getUnionList().add(sql);
         return this;
     }
 
     public QuerySet union(String[] sqlArr) {
+        for (String s : sqlArr) {
+            union(s);
+        }
         return this;
     }
 
     public QuerySet distinct(boolean distinct) {
-        __distinct = distinct;
+        reservoir.distinct = distinct;
         return this;
     }
 
     public QuerySet lock(boolean lock) {
-        __lock = lock;
+        reservoir.lock = lock;
         return this;
     }
 
     //TODO::----------- 数据方法 -----------
     public List<Map<String, Object>> select()
     {
+        // 默认查询全部字段
+        if (reservoir.fieldList.size() == 0)
+            field("*");
         List<Map<String, Object>> resultSet = executeSql();
         return SqlUtil.isEmpty(resultSet) ? new LinkedList<>() : resultSet;
-    }
-
-    public <T> List<T> select(Class<T> clazz) {
-        List<Map<String, Object>> resultSet = select();
-        return toBeanList(clazz, resultSet);
     }
 
     public Map<String, Object> find()
@@ -336,40 +302,26 @@ public class QuerySet {
         return SqlUtil.isEmpty(resultSet) ? null : resultSet.get(0);
     }
 
-    public <T> T find(Class<T> clazz)
-    {
-        Map<String, Object> result = find();
-        return result == null ? null : BeanUtil.mapToBean(result, clazz);
-    }
-
     public QuerySet data(String field, Object value)
     {
-        __dataList = QuerySetHelper.initList(__dataList);
-        if (__dataList.size() == 0) {
-            __dataList.add(new LinkedHashMap<>());
-        }
-        this.__dataList.get(0).put(field, value);
+        reservoir.getData().put(field, value);
         return this;
     }
 
     public QuerySet data(Map<String, Object> data)
     {
-        __dataList = QuerySetHelper.initList(__dataList);
-        if (__dataList.size() == 0) {
-            __dataList.add(new LinkedHashMap<>());
-        }
-        this.__dataList.get(0).putAll(data);
+        reservoir.getData().putAll(data);
         return this;
     }
 
     public Map<String, Object> data()
     {
-        return __dataList == null || __dataList.size() == 0 ? null : __dataList.get(0);
+        return reservoir.dataList == null || reservoir.dataList.size() == 0 ? null : reservoir.getData();
     }
 
     public Integer update(Map<String, Object> data)
     {
-        __action = Action.UPDATE;
+        reservoir.action = Action.UPDATE;
         this.data(data);
         executeSql();
         return null;
@@ -377,32 +329,31 @@ public class QuerySet {
 
     public Integer update()
     {
-        this.__action = Action.UPDATE;
+        reservoir.action = Action.UPDATE;
         executeSql();
         return 1;
     }
 
     public Long insert(Map<String, Object> data)
     {
-        this.__action = Action.INSERT;
+        reservoir.action = Action.INSERT;
         this.data(data);
         return executeSql();
     }
 
     public Integer insertAll(List<DataMap> dataList)
     {
-        __action = Action.INSERT;
-        this.__dataList = QuerySetHelper.initList(this.__dataList);
-        this.__dataList.addAll(dataList);
+        reservoir.action = Action.INSERT;
+        reservoir.getDataList().addAll(dataList);
         return executeSql();
     }
 
     public Integer delete()
     {
-        if (whereList == null) {
+        if (reservoir.whereList == null) {
             throw new QueryException("不允许空条件的删除执行");
         }
-        this.__action = Action.DELETE;
+        reservoir.action = Action.DELETE;
         Long result = executeSql();
         return result.intValue();
     }
@@ -412,11 +363,12 @@ public class QuerySet {
      * @return 字段列表
      * */
     public List<TableColumn> getColumns() {
-        return getColumns(__table);
+        return getColumns(reservoir.table);
     }
 
     public List<TableColumn> getColumns(String table)
     {
+        // 先查内存缓存
         List<TableColumn> ret = SqlUtil.getTableColumns(table);
         if (ret != null) {
             return ret;
@@ -446,13 +398,13 @@ public class QuerySet {
     //TODO::--------------- 语句方法 ---------------
     public String buildSql()
     {
-        this.__action = this.__action == null ? Action.SELECT : this.__action;
+        reservoir.action = reservoir.action == null ? Action.SELECT : reservoir.action;
         return ORMContext.getDrive().pretreatment(this);
     }
 
     private <T> T executeSql()
     {
-        this.__action = this.__action == null ? Action.SELECT : this.__action;
+        reservoir.action = reservoir.action == null ? Action.SELECT : reservoir.action;
         return ORMContext.getDrive().executeSql(this);
     }
 
@@ -473,18 +425,17 @@ public class QuerySet {
     // 分页查询
     public Pagination<Map<String, Object>> pagination()
     {
-        this.fieldList = QuerySetHelper.initList(this.fieldList);
-        List<String> cacheFiledList = new LinkedList<>(fieldList);
+        List<String> cacheFiledList = new LinkedList<>(reservoir.fieldList);
         // 获取总数
-        fieldList.clear();
+        reservoir.fieldList.clear();
         Integer total = count();
         // 执行查询
-        fieldList.clear();
-        fieldList.addAll(cacheFiledList);
+        reservoir.fieldList.clear();
+        reservoir.fieldList.addAll(cacheFiledList);
         List<Map<String, Object>> rows = select();
         // 返回分页
-        int page = limitIndex / limitSize + 1;
-        return new Pagination<>(page, limitSize, total, rows);
+        int page = reservoir.limitIndex / reservoir.limitSize + 1;
+        return new Pagination<>(page, reservoir.limitSize, total, rows);
     }
 
     public Pagination<Map<String, Object>> pagination(Integer page, Integer pageSize) {
@@ -494,18 +445,6 @@ public class QuerySet {
 
     public Pagination<Map<String, Object>> pagination(Integer page) {
         return this.pagination(page, 20);
-    }
-
-    public <T> Pagination<T> pagination(Class<T> clazz, Integer page, Integer pageSize)
-    {
-        Pagination<Map<String, Object>> pag = pagination(page, pageSize);
-        return new Pagination<>(pag.page, pag.pageSize, pag.total, toBeanList(clazz, pag.rows));
-    }
-
-    public <T> Pagination<T> pagination(Class<T> clazz)
-    {
-        Pagination<Map<String, Object>> pag = pagination();
-        return new Pagination<>(pag.page, pag.pageSize, pag.total, toBeanList(clazz, pag.rows));
     }
 
     //TODO::--------------- 统计方法 ---------------
@@ -518,24 +457,6 @@ public class QuerySet {
         field(field);
         List<Map<String, Object>> resultSet = executeSql();
         return Math.toIntExact((Long) resultSet.get(0).get(field));
-    }
-
-
-    //TODO::--------------- 助手方法 ---------------
-    public static<T> List<T> toBeanList(Class<T> clazz, List<Map<String, Object>> resultSet) {
-        if (resultSet == null) {
-            return new LinkedList<>();
-        }
-        List<T> beanList = new LinkedList<>();
-        resultSet.forEach(row -> beanList.add(toBean(clazz, row)));
-        return beanList;
-    }
-
-    public static<T> T toBean(Class<T> clazz, Map<String, Object> row) {
-        if (row == null) {
-            return null;
-        }
-        return BeanUtil.mapToBean(row, clazz);
     }
 
     //TODO::--------------- 事务操作方法 ---------------
@@ -596,63 +517,5 @@ public class QuerySet {
 
     public interface TransactionCallback {
         void call();
-    }
-
-
-    //TODO::--------------- 类自用方法 ---------------
-    private Action __Action() {
-        return this.__action;
-    }
-
-    private List<String> __FieldList()
-    {
-        this.fieldList = QuerySetHelper.initList(this.fieldList);
-        if (fieldList.size() == 0)
-            field("*");
-        return fieldList;
-    }
-
-    private String __Table() {
-        return this.__table;
-    }
-
-    private List<String[]> __JoinList() {
-        return joinList;
-    }
-
-    private List<Map<String, Object>> __DataList() {
-        return __dataList;
-    }
-
-    private List<WhereBase> __WhereList() {
-        return this.whereList;
-    }
-
-    private String __GroupBy() {
-        return groupBy;
-    }
-
-    private String __Having() {
-        return __having;
-    }
-
-    private List<String> __Orders() {
-        return orderByList;
-    }
-
-    private Integer __Limit() {
-        return limitIndex;
-    }
-
-    private Integer __LimitSize() {
-        return limitSize;
-    }
-
-    private Boolean __distinct() {
-        return __distinct;
-    }
-
-    private Boolean __lock() {
-        return __lock;
     }
 }

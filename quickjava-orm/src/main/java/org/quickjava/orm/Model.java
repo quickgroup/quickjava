@@ -17,6 +17,7 @@ import org.quickjava.orm.callback.WhereCallback;
 import org.quickjava.orm.contain.*;
 import org.quickjava.orm.enums.Operator;
 import org.quickjava.orm.enums.RelationType;
+import org.quickjava.orm.enums.WhereFieldType;
 import org.quickjava.orm.utils.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,6 +104,7 @@ public class Model {
         synchronized (Model.class) {
             if (__querySet == null) {
                 __querySet = QuerySet.table(parseModelTableName(getClass()));
+                ReflectUtil.setFieldValue(__querySet, "__whereFieldType", WhereFieldType.TO_UNDER_LINE_CASE);
             }
         }
         return __querySet;
