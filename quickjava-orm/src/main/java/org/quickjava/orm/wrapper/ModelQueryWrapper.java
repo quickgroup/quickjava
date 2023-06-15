@@ -12,8 +12,6 @@ public abstract class ModelQueryWrapper<M extends Model, R extends Function<M, ?
 
     protected M model;
 
-    protected Integer integer = 10;
-
     protected Model model() {
         return (Model) model;
     }
@@ -167,6 +165,10 @@ public abstract class ModelQueryWrapper<M extends Model, R extends Function<M, ?
 
     public M update(DataMap data) {
         return (M) model().update(data);
+    }
+
+    public M save(DataMap data) {
+        return (M) model().save(data);
     }
 
     public M find() {
