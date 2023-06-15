@@ -3,12 +3,7 @@ package org.quickjava.www;
 import org.quickjava.framework.QuickJavaBoot;
 import org.quickjava.framework.annotation.ApplicationQuickBoot;
 import org.quickjava.orm.QuerySet;
-import org.quickjava.orm.modelQuery.ModelQuery;
 import org.quickjava.orm.example.Article;
-import org.quickjava.orm.utils.WhereCallback;
-
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 
 @ApplicationQuickBoot
 public class ApplicationBoot {

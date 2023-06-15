@@ -1,10 +1,4 @@
-package org.quickjava.orm.modelQuery;
-
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+package org.quickjava.orm.wrapper;
 
 public class ModelQuery<T> extends ModelQueryWrapper<T, ModelFunction<T, ?>> {
 

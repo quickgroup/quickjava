@@ -1,4 +1,4 @@
-package org.quickjava.orm.modelQuery;
+package org.quickjava.orm.wrapper;
 
 import org.quickjava.orm.Model;
 import org.quickjava.orm.contain.DataMap;
@@ -141,6 +141,11 @@ public abstract class ModelQueryWrapper<M extends Model, R extends Function<M, ?
 
     public ModelQueryWrapper<M, R> lock(boolean lock) {
         model().lock(lock);
+        return this;
+    }
+
+    public ModelQueryWrapper<M, R> with(R func) {
+        model().with(findFieldName(func));
         return this;
     }
 

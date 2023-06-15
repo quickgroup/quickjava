@@ -850,8 +850,10 @@ public class Model {
         if (ModelUtil.isEmpty(fields)) {
             return this;
         }
-        this.__withs = Arrays.asList(fields.split(","));
-        ComUtil.trimList(this.__withs);
+        List<String> withs = Arrays.asList(fields.split(","));
+        ComUtil.trimList(withs);
+        this.__withs = QuerySetHelper.initList(this.__withs);
+        this.__withs.addAll(withs);
         return this;
     }
 

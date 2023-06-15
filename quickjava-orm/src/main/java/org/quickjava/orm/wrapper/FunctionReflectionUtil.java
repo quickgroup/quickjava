@@ -1,6 +1,5 @@
-package org.quickjava.orm.modelQuery;
+package org.quickjava.orm.wrapper;
 
-import org.quickjava.orm.utils.ModelUtil;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
 
@@ -41,7 +40,7 @@ public class FunctionReflectionUtil {
             } else if (implMethodName.startsWith("lambda$")) {
                 throw new IllegalArgumentException("不不支持传递lambda表达式，只能使用方法引用");
             } else {
-                throw new IllegalArgumentException(implMethodName + "不是Getter方法引用");
+                fieldName = Introspector.decapitalize(implMethodName);
             }
 
             String declaredClass = serializedLambda.getImplClass().replace("/", ".");
