@@ -18,6 +18,8 @@ import org.quickjava.orm.contain.*;
 import org.quickjava.orm.enums.Operator;
 import org.quickjava.orm.enums.RelationType;
 import org.quickjava.orm.utils.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.lang.reflect.*;
@@ -44,6 +46,9 @@ import java.util.stream.Collectors;
  * */
 @JsonIgnoreProperties(value = {"__meta", "__parent", "__withs", "__data", "__modified", "__querySet"}, ignoreUnknown = true)
 public class Model {
+
+    @JsonIgnore
+    private static final Logger logger = LoggerFactory.getLogger(Model.class);
 
     /**
      * 模型元信息
@@ -684,7 +689,7 @@ public class Model {
         if (__withs != null) {
             // 超过500警告
             if (models.size() > 500) {
-                System.out.println("QuickJava-ORM：The current query has too much data and may cause the service to crash. models.size=" + models.size());
+                logger.warn("QuickJava-ORM：The current query has too much data and may cause the service to crash. models.size=" + models.size());
             }
             // 数据关联条件：关联属性名=关联id
             Map<String, List<Object>> conditionMap = new LinkedHashMap<>();
