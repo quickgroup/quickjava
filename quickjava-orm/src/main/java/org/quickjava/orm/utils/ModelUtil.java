@@ -211,7 +211,7 @@ public class ModelUtil extends SqlUtil {
         } else if (fill == ModelFieldFill.MILL_TIMESTAMP) {
             return System.currentTimeMillis();
         } else if (fill == ModelFieldFill.STATIC_METHOD) {
-            return staticMethodStr;
+            return ReflectUtil.invoke(staticMethodStr);
         }
         return null;
     }

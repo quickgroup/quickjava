@@ -229,6 +229,18 @@ public class ReflectUtil {
         }
     }
 
+    // 格式：
+    public static <T> T invoke(String str, Object... args)
+    {
+        try {
+            String[] strArr = str.split("#");
+            Class<?> clazz = Class.forName(strArr[0]);
+            return ReflectUtil.invoke(clazz, strArr[1], args);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     // 数据转换
     public static Object valueConv(Class<?> retClazz, Object value)
     {
