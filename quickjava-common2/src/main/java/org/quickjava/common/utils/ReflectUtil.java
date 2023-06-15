@@ -1,12 +1,9 @@
 package org.quickjava.common.utils;
 
-import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.sql.Clob;
 import java.util.Arrays;
-import java.util.Date;
 
 /*
  * Copyright (c) 2020~2023 http://www.quickjava.org All rights reserved.
@@ -42,23 +39,15 @@ public class ReflectUtil {
         try {
             // getter方法获取
             String getterName = "get" + ComUtil.firstUpper(fieldName);
-            Method method = getMethod(clazz, getterName);
-            if (method == null || method.getParameterTypes().length > 0) {
-                if (clazz.getSuperclass() != null) {
-                    return getFieldValue(clazz.getSuperclass(), o, fieldName);
-                }
-            } else {
+            Method method = findMethod(clazz, getterName);
+            if (method != null) {
                 method.setAccessible(true);
                 return method.invoke(o);
             }
 
             // 直接属性获取值
-            Field field = getField(clazz, fieldName);
-            if (field == null) {
-                if (clazz.getSuperclass() != null) {
-                    return getFieldValue(clazz.getSuperclass(), o, fieldName);
-                }
-            } else {
+            Field field = findField(clazz, fieldName);
+            if (field != null) {
                 field.setAccessible(true);
                 return field.get(o);
             }
@@ -79,8 +68,11 @@ public class ReflectUtil {
         }
     }
 
-    public static Field[] getFields(Object o) {
-        Class<?> clazz = o instanceof Class<?> ? (Class<?>) o : o.getClass();
+    public static Field[] findFields(Object o) {
+        return findFields(o.getClass());
+    }
+
+    public static Field[] findFields(Class<?> clazz) {
         synchronized (ReflectUtil.FIELDS_CACHE) {
             if (!FIELDS_CACHE.contains(clazz)) {
                 // TODO::只能当前类的字段
@@ -90,25 +82,34 @@ public class ReflectUtil {
         return FIELDS_CACHE.get(clazz);
     }
 
-    public static Field getField(Object o, String name) {
-        return getField(o, name, false);
+    public static Field findField(Object o, String name) {
+        return findField(o.getClass(), name);
     }
 
-    public static Field getField(Object o, String name, boolean parent) {
-        for (Field field : getFields(o)) {
+    public static Field findField(Class<?> clazz, String name) {
+        for (Field field : findFields(clazz)) {
             if (field.getName().equals(name)) {
                 return field;
             }
         }
-        Class<?> currClazz = o instanceof Class ? (Class<?>) o : o.getClass();
-        if (parent && currClazz.getSuperclass() != null) {
-            return getField(currClazz.getSuperclass(), name, true);
+        if (clazz.getSuperclass() != null) {
+            return findField(clazz.getSuperclass(), name);
+        }
+        return null;
+    }
+
+    // 只获取自己的属性
+    public static Field findFieldOnly(Class<?> clazz, String name) {
+        for (Field field : findFields(clazz)) {
+            if (field.getName().equals(name)) {
+                return field;
+            }
         }
         return null;
     }
 
     /**
-     * 直接设置属性值，不走setter
+     * 设置属性值，默认走setter，没有则直接设置
      *
      * @param o     对象
      * @param field 属性名
@@ -122,13 +123,13 @@ public class ReflectUtil {
         try {
             // 走setter设置
             String setterName = "set" + ComUtil.firstUpper(fieldName);
-            Method method = getMethod(o, setterName, value);
+            Method method = findMethod(o, setterName, value);
             if (method != null) {       // java方法是可以被继承的
                 method.invoke(o, value);
                 return;
             }
             // 直接设置属性
-            Field field = getField(clazz, fieldName, true);
+            Field field = findField(clazz, fieldName);
             if (field != null) {
                 field.setAccessible(true);
                 field.set(o, valueConv(field.getType(), value));
@@ -145,15 +146,11 @@ public class ReflectUtil {
 
     public static void setFieldValueDirect(Class<?> clazz, Object o, String fieldName, Object value) {
         try {
-            Field field = getField(clazz, fieldName);
+            Field field = findField(clazz, fieldName);
             if (field != null) {
                 value = valueConv(field.getType(), value);
                 field.setAccessible(true);
                 field.set(o, value);
-            } else {
-                if (clazz.getSuperclass() != null) {
-                    setFieldValueDirect(clazz.getSuperclass(), o, fieldName, value);
-                }
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -164,7 +161,7 @@ public class ReflectUtil {
         try {
             // setter
             String setterName = "set" + ComUtil.firstUpper(field.getName());
-            Method method = getMethod(o, setterName, value);
+            Method method = findMethod(o, setterName, value);
             if (method != null) {
                 method.setAccessible(true);
                 method.invoke(o, value);
@@ -181,7 +178,10 @@ public class ReflectUtil {
     }
 
     public static Method[] getMethods(Object o) {
-        Class<?> clazz = o instanceof Class<?> ? (Class<?>) o : o.getClass();
+        return getMethods(o.getClass());
+    }
+
+    public static Method[] getMethods(Class<?> clazz) {
         synchronized (METHODS_CACHE) {
             if (!METHODS_CACHE.contains(clazz)) {
                 // 注意：这里会获取到继承父类的方法
@@ -191,7 +191,7 @@ public class ReflectUtil {
         return METHODS_CACHE.get(clazz);
     }
 
-    public static Method getMethod(Object o, String name, Object... args) {
+    public static Method findMethod(Object o, String name, Object... args) {
         // 参数对象类
         Class<?>[] argsClasses = new Class<?>[args.length];
         for (int i = 0; i < args.length; i++) {
@@ -200,6 +200,10 @@ public class ReflectUtil {
             }
             argsClasses[i] = args[i] instanceof Class<?> ? (Class<?>) args[i] : args[i].getClass();
         }
+        return findMethod(o, name, argsClasses);
+    }
+
+    public static Method findMethod(Object o, String name, Class<?>... argsClasses) {
         for (Method method : getMethods(o)) {
             if (method.getName().equals(name) && Arrays.deepEquals(method.getParameterTypes(), argsClasses)) {
                 return method;
@@ -212,7 +216,7 @@ public class ReflectUtil {
     public static <T> T invoke(Object obj, String methodName, Object... args)
     {
         try {
-            Method method = getMethod(obj, methodName, args);
+            Method method = findMethod(obj, methodName, args);
             if (method == null) {
                 return null;
             }

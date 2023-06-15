@@ -27,7 +27,7 @@ public class BeanUtil {
                 try {
                     String name = key.toString();
                     if (val instanceof Map) {
-                        Field field = ReflectUtil.getField(bean, name);
+                        Field field = ReflectUtil.findField(bean, name);
                         if (field != null) {
                             Object child = mapToBean((Map<?, ?>) val, field.getDeclaringClass(), isIgnoreError);
                             ReflectUtil.setFieldValue(bean, name, child);

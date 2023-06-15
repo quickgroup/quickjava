@@ -236,7 +236,7 @@ public abstract class Drive {
 
     // 获取查询器的数据器
     public static QueryReservoir getQueryReservoir(QuerySet query) {
-        return ReflectUtil.invoke(query, "reservoir");
+        return (QueryReservoir) ReflectUtil.getFieldValue(query, "reservoir");
     }
 
     private static void checkNull(Object obj, String msg) {

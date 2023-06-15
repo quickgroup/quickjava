@@ -289,7 +289,7 @@ public class QuerySet {
     public List<Map<String, Object>> select()
     {
         // 默认查询全部字段
-        if (reservoir.fieldList.size() == 0)
+        if (reservoir.getFieldList().size() == 0)
             field("*");
         List<Map<String, Object>> resultSet = executeSql();
         return SqlUtil.isEmpty(resultSet) ? new LinkedList<>() : resultSet;
@@ -399,6 +399,8 @@ public class QuerySet {
     public String buildSql()
     {
         reservoir.action = reservoir.action == null ? Action.SELECT : reservoir.action;
+        if (reservoir.getFieldList().size() == 0)
+            field("*");
         return ORMContext.getDrive().pretreatment(this);
     }
 
