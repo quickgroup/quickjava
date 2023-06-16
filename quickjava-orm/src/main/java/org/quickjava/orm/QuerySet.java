@@ -130,7 +130,7 @@ public class QuerySet {
     public QuerySet where(Where where)
     {
         if (reservoir.whereOptCallback != null) {
-            reservoir.whereOptCallback.call(where);
+            reservoir.whereOptCallback.call(where, this, reservoir.whereOptCallbackData);
         }
         reservoir.getWhereList().add(where);
         return this;
