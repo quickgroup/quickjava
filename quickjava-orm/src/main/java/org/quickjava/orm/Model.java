@@ -578,7 +578,7 @@ public class Model extends AModel implements IModel {
     {
         // 软删除字段
         for (ModelFieldO field : __meta.fieldMap().values()) {
-            if (field.getAno().softDelete()) {
+            if (field.isSoftDelete()) {
                 if (Date.class.isAssignableFrom(field.getField().getType())) {
                     where(field.getName(), Operator.IS_NULL);
                 } else {
@@ -1118,6 +1118,10 @@ public class Model extends AModel implements IModel {
 
     // 默认转换字段大小写
     private static final WhereOptCallback whereOptCallback = (where, querySet, userData) -> {
+        // 子查询条件不处理
+        if (where.getChildren() != null) {
+            return;
+        }
         Model model = (Model) userData;
         String field = fieldToUnderlineCase(where.getField());
         if (ComUtil.isNotEmpty(model.__withs)) {

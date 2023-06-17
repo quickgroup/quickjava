@@ -117,6 +117,10 @@ public abstract class Where {
         this.value = value;
     }
 
+    public List<Where> getChildren() {
+        return children;
+    }
+
     @Override
     public String toString() {
         return getLogicStr() + " " + field + " " + operator + " " + value;
@@ -129,21 +133,25 @@ public abstract class Where {
             return getLogicStr() + " (" + cutFirstLogic(SqlUtil.collJoin(" ", sqlList)) + ")";
         }
         // 输出
-        if (Operator.RAW == operator) {
-            return field;
-        } else if (Operator.IN == operator || Operator.NOT_IN == operator) {
-            return getLogicStr() + " " + getField() + " " + getOperator() + " (" + getValue(cfg) + ")";
-        } else if (Operator.BETWEEN.equals(operator)) {
-            Object[] arr = new Object[]{null, null};
-            if (value.getClass().isArray()) {
-                arr = (Object[]) value;
-            } else if (value instanceof List) {
-                List<?> list = (List<?>) value;
-                arr = new Object[]{list.get(0), list.get(1)};
-            } else if (value instanceof String) {
-                arr = ((String) value).split(",");
-            }
-            return getLogicStr() + " " + getField() + " BETWEEN " + valueConv(arr[0], cfg) + " AND " + valueConv(arr[1], cfg);
+        switch (operator) {
+            case RAW: return field;
+            case IS_NULL:
+            case IS_NOT_NULL:
+                return getLogicStr() + " " + getField() + " " + getOperator();
+            case IN:
+            case NOT_IN:
+                return getLogicStr() + " " + getField() + " " + getOperator() + " (" + getValue(cfg) + ")";
+            case BETWEEN:
+                Object[] arr = new Object[]{null, null};
+                if (value.getClass().isArray()) {
+                    arr = (Object[]) value;
+                } else if (value instanceof List) {
+                    List<?> list = (List<?>) value;
+                    arr = new Object[]{list.get(0), list.get(1)};
+                } else if (value instanceof String) {
+                    arr = ((String) value).split(",");
+                }
+                return getLogicStr() + " " + getField() + " BETWEEN " + valueConv(arr[0], cfg) + " AND " + valueConv(arr[1], cfg);
         }
         return getLogicStr() + " " + getField() + " " + getOperator() + " " + getValue(cfg);
     }

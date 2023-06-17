@@ -417,6 +417,8 @@ public class QuerySet {
     private <T> T executeSql()
     {
         reservoir.action = reservoir.action == null ? Action.SELECT : reservoir.action;
+        if (reservoir.fetchSql)
+            return null;
         return ORMContext.getDrive().executeSql(this);
     }
 

@@ -64,10 +64,10 @@ public class QueryReservoir {
     public Integer limitSize;
 
     @JsonIgnore
-    public Boolean distinct;
+    public boolean distinct = false;
 
     @JsonIgnore
-    public Boolean lock;
+    public boolean lock = false;
 
     @JsonIgnore
     public WhereOptCallback whereOptCallback;
@@ -76,7 +76,7 @@ public class QueryReservoir {
     public Object whereOptCallbackData;
 
     @JsonIgnore
-    public Boolean fetchSql;
+    public boolean fetchSql = false;
 
     public String getTable() {
         return table;
@@ -191,19 +191,19 @@ public class QueryReservoir {
         this.limitSize = limitSize;
     }
 
-    public Boolean getDistinct() {
+    public boolean getDistinct() {
         return distinct;
     }
 
-    public void setDistinct(Boolean distinct) {
+    public void setDistinct(boolean distinct) {
         this.distinct = distinct;
     }
 
-    public Boolean getLock() {
+    public boolean getLock() {
         return lock;
     }
 
-    public void setLock(Boolean lock) {
+    public void setLock(boolean lock) {
         this.lock = lock;
     }
 
@@ -216,11 +216,11 @@ public class QueryReservoir {
         this.whereOptCallbackData = userData;
     }
 
-    public Boolean getFetchSql() {
+    public boolean getFetchSql() {
         return fetchSql;
     }
 
-    public void setFetchSql(Boolean fetchSql) {
+    public void setFetchSql(boolean fetchSql) {
         this.fetchSql = fetchSql;
     }
 }

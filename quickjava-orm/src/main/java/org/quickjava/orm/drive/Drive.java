@@ -161,7 +161,11 @@ public abstract class Drive {
         // Limit
         if (action == Action.SELECT && reservoir.limitIndex != null) {
             reservoir.limitSize = reservoir.limitSize == null ? 20 : reservoir.limitSize;
-            sqlList.add(String.format("LIMIT %d,%d", reservoir.limitIndex, reservoir.limitSize));
+            if (reservoir.limitIndex == 0) {
+                sqlList.add(String.format("LIMIT %d", reservoir.limitSize));
+            } else {
+                sqlList.add(String.format("LIMIT %d,%d", reservoir.limitIndex, reservoir.limitSize));
+            }
         }
 
         // lock

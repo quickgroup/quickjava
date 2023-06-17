@@ -123,4 +123,8 @@ public class ModelFieldO {
     public void setAno(ModelField ano) {
         this.ano = ano;
     }
+
+    public boolean isSoftDelete() {
+        return getAno() != null && getAno().softDelete();
+    }
 }
