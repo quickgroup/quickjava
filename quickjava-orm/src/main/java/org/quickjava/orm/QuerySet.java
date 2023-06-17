@@ -409,6 +409,11 @@ public class QuerySet {
         return ORMContext.getDrive().pretreatment(this);
     }
 
+    public QuerySet fetchSql(boolean fetch) {
+        reservoir.setFetchSql(true);
+        return this;
+    }
+
     private <T> T executeSql()
     {
         reservoir.action = reservoir.action == null ? Action.SELECT : reservoir.action;

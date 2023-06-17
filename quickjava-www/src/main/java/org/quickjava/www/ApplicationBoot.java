@@ -44,7 +44,9 @@ public class ApplicationBoot {
             query.whereOr(query1 -> {
                 query1.where("id", 212).where("user_id", 112);
             });
-        }).buildSql());
+        }).find());
+
+        new Article();
 
         QuickJavaBoot.start(ApplicationBoot.class, args);
     }

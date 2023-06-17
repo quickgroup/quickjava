@@ -48,52 +48,10 @@ import java.util.stream.Collectors;
  * 模型
  * */
 @JsonIgnoreProperties(value = {"__meta", "__parent", "__withs", "__data", "__modified", "__querySet"}, ignoreUnknown = true)
-public class Model {
+public class Model extends AModel implements IModel {
 
     @JsonIgnore
     private static final Logger logger = LoggerFactory.getLogger(Model.class);
-
-    /**
-     * 模型元信息
-     * */
-    @JsonIgnore
-    @TableField(exist = false)
-    private ModelMeta __meta;
-
-    /**
-     * 预载入属性
-     * */
-    @JsonIgnore
-    @TableField(exist = false)
-    private List<String> __withs;
-
-    /**
-     * 数据
-     */
-    @JsonIgnore
-    @TableField(exist = false)
-    private final DataMap __data = new DataMap();
-
-    /**
-     * 修改的字段
-     * */
-    @JsonIgnore
-    @TableField(exist = false)
-    private List<ModelFieldO> __modified;
-
-    /**
-     * 查询器
-     * */
-    @JsonIgnore
-    @TableField(exist = false)
-    private QuerySet __querySet;
-
-    /**
-     * 关联的父模型对象
-     * */
-    @JsonIgnore
-    @TableField(exist = false)
-    private Model __parent;
 
     public Model() {
         initModel(this, getClass());
@@ -113,27 +71,32 @@ public class Model {
         return __querySet;
     }
 
-    public Model where(String field, Operator opr, Object val) {
+    private QueryReservoir reservoir() {
+        return ReflectUtil.getFieldValue(query(), "reservoir");
+    }
+
+    //TODO:---------- 查询方法 ----------
+    public AModel where(String field, Operator opr, Object val) {
         query().where(field, opr, val);
         return this;
     }
 
-    public Model where(String field, String opr, Object val) {
+    public AModel where(String field, String opr, Object val) {
         query().where(field, Operator.valueOf(opr), val);
         return this;
     }
 
-    public Model where(String field, Object val) {
+    public AModel where(String field, Object val) {
         where(field, Operator.EQ, val);
         return this;
     }
 
-    public Model where(String field, Operator operator) {
+    public AModel where(String field, Operator operator) {
         where(field, operator, null);
         return this;
     }
 
-    public Model where(Map<String, Object> query) {
+    public AModel where(Map<String, Object> query) {
         // 处理字段名：标准字段名你：驼峰转下划线组成
         Map<String, Object> queryRet = new LinkedHashMap<>();
         query.forEach((name, val) -> queryRet.put(fieldToUnderlineCase(name), val));
@@ -142,235 +105,73 @@ public class Model {
         return this;
     }
 
-    /**
-     * sql语句查询
-     * @param sql 原生sql语句
-     * @return 模型对象
-     */
-    public Model where(String sql) {
+    public AModel where(String sql) {
         query().where(sql, Operator.RAW, null);
         return this;
     }
 
-    /**
-     * 闭包查询
-     * @param callback 闭包方法
-     * @return 模型对象
-     */
-    public Model where(WhereCallback callback)
+    public AModel where(WhereCallback callback)
     {
         query().where(callback);
         return this;
     }
 
-    /**
-     * 闭包查询
-     * @param callback 闭包方法
-     * @return 模型对象
-     */
-    public Model whereOr(WhereCallback callback)
+    public AModel whereOr(WhereCallback callback)
     {
         query().whereOr(callback);
         return this;
     }
 
-    public Model eq(String field, Object val) {
+    public AModel eq(String field, Object val) {
         return where(field, val);
     }
 
-    public Model neq(String field, Object val) {
+    public AModel neq(String field, Object val) {
         return where(field, Operator.NEQ, val);
     }
 
-    public Model gt(String field, Object val) {
+    public AModel gt(String field, Object val) {
         return where(field, Operator.GT, val);
     }
 
-    public Model gte(String field, Object val) {
+    public AModel gte(String field, Object val) {
         return where(field, Operator.GTE, val);
     }
 
-    public Model lt(String field, Object val) {
+    public AModel lt(String field, Object val) {
         return where(field, Operator.LT, val);
     }
 
-    public Model lte(String field, Object val) {
+    public AModel lte(String field, Object val) {
         return where(field, Operator.LTE, val);
     }
 
-    public Model in(String field, Object ...args) {
+    public AModel in(String field, Object ...args) {
         return where(field, Operator.IN, args);
     }
 
-    public Model notIn(String field, Object ...args) {
+    public AModel notIn(String field, Object ...args) {
         return where(field, Operator.IN, args);
     }
 
-    public Model isNull(String field) {
+    public AModel isNull(String field) {
         return where(field, Operator.IS_NULL, null);
     }
 
-    public Model isNotNull(String field) {
+    public AModel isNotNull(String field) {
         return where(field, Operator.IS_NOT_NULL, null);
     }
 
-    public Model between(String field, Object val1, Object val2) {
+    public AModel between(String field, Object val1, Object val2) {
         return where(field, Operator.BETWEEN, new Object[]{val1, val2});
     }
 
-    /**
-     *
-     * 如果当前对象素模型（不是代理模型）
-     * - 是素模型：在 insert、update 时收集数据，包含null（因为java无法表明该属性是否被修改）
-     * - 收集字段数据
-     */
-    private void loadingVegetarianModel()
-    {
-        if (ModelUtil.isVegetarianModel(this)) {
-            // 收集字段数据
-            __meta.fieldMap().forEach((name, field) -> {
-                Object val = ReflectUtil.getFieldValue(this, field.getField());
-                data(field.getName(), val);
-            });
-        }
-    }
-
-    public String pk() {
-        return ModelUtil.toCamelCase(query().pk());
-    }
-
-    public Object pkVal() {
-        return data(pk());
-    }
-
-    /**
-     * 保存数据
-     * - 自动判断主键是否为null，为null执行新增，否则进行更新
-     * @return 模型对象
-     */
-    public Model save() {
-        String pk = pk();
-        Object pkVal = data(pk);
-        return pkVal == null ? insert() : where(pk, pkVal).update();
-    }
-
-    public Model save(DataMap data) {
-        data(data);
-        save();
-        return this;
-    }
-
-    /**
-     * 排序
-     * @param field 字段
-     * @param asc 排序方式：ASC、DESC
-     * @return 模型对象
-     */
-    public Model order(String field, String asc) {
-        query().order(fieldToUnderlineCase(field), asc);
-        return this;
-    }
-
-    public Model order(String field, boolean asc) {
-        order(field, asc ? "ASC" : "DESC");
-        return this;
-    }
-
-    public Model order(String fields)
-    {
-        if (ORMHelper.isEmpty(fields)) {
-            return this;
-        }
-        if (fields.contains(",")) {
-            return this.order(fields.split(","));
-        }
-        String[] arr = fields.trim().split(" ");
-        return arr.length == 2 ? order(arr[0], arr[1]) : order(arr[0], "ASC");
-    }
-
-    public Model order(List<String> fields) {
-        fields.forEach(this::order);
-        return this;
-    }
-
-    public Model order(String[] fields) {
-        for (String field : fields) {
-            order(field);
-        }
-        return this;
-    }
-
-    public Model limit(Integer index, Integer count) {
-        query().limit(index, count);
-        return this;
-    }
-
-    public Model limit(Integer count) {
-        return limit(0, count);
-    }
-
-    /**
-     * 分页
-     * @param page 页数
-     * @return 模型对象
-     */
-    public Model page(Integer page) {
-        query().page(page);
-        return this;
-    }
-
-    /**
-     * 分页
-     * @param page 页数
-     * @param size 页大小
-     * @return 模型对象
-     */
-    public Model page(Integer page, Integer size) {
-        query().page(page, size);
-        return this;
-    }
-
-    public Model group(String fields) {
-        query().group(fields);
-        return this;
-    }
-
-    public Model having(String fields) {
-        query().having(fields);
-        return this;
-    }
-
-    public Model union(String sql) {
-        query().union(sql);
-        return this;
-    }
-
-    public Model union(String[] sqlArr) {
-        query().union(sqlArr);
-        return this;
-    }
-
-    public Model distinct(boolean distinct) {
-        query().distinct(distinct);
-        return this;
-    }
-
-    public Model lock(boolean lock) {
-        query().lock(lock);
-        return this;
-    }
-
-    // 编译sql，当前只支持查询
-    public String buildSql() {
-        return query().buildSql();
-    }
-
-    //---------- TODO::数据方法 ----------//
+    //---------- TODO::操作方法：增删改查 ----------
     /**
      * 新增
      * @return 模型对象
      */
-    public Model insert()
+    public AModel insert()
     {
         // 默认填充数据
         __meta.fieldMap().forEach((name, field) -> {
@@ -393,7 +194,7 @@ public class Model {
      * @param data 数据集
      * @return 模型对象
      */
-    public Model insert(DataMap data) {
+    public AModel insert(DataMap data) {
         data(data);
         return insert();
     }
@@ -424,7 +225,7 @@ public class Model {
      * 更新
      * @return 模型对象
      */
-    public Model update()
+    public AModel update()
     {
         // 默认填充数据
         __meta.fieldMap().forEach((name, field) -> {
@@ -439,12 +240,12 @@ public class Model {
         return ModelUtil.isProxyModel(this) ? this : newProxyModel(getMClass(), data());
     }
 
-    public Model update(DataMap data) {
+    public AModel update(DataMap data) {
         data(data);
         return update();
     }
 
-    public Model updateById()
+    public AModel updateById()
     {
         String pk = pk();
         where(pk, data(pk));
@@ -453,41 +254,68 @@ public class Model {
     }
 
     /**
+     * 保存数据
+     * - 自动判断主键是否为null，为null执行新增，否则进行更新
+     * @return 模型对象
+     */
+    public AModel save() {
+        String pk = pk();
+        Object pkVal = data(pk);
+        return pkVal == null ? insert() : where(pk, pkVal).update();
+    }
+
+    public AModel save(DataMap data) {
+        data(data);
+        save();
+        return this;
+    }
+
+    /**
      * 查询一条数据
      * @return 模型对象
      * @param <D> 模型类
      */
-    public <D extends Model> D find()
+    public <D extends IModel> D find()
     {
         // 查询前：预载入字段准备
         queryBefore();
-        // 数据装填
+        // 执行查询
         List<Map<String, Object>> dataList = query().limit(0, 1).select();
+        // 编译sql
+        if (reservoir().fetchSql) {
+            return (D) new ModelSql(query().buildSql());
+        }
+        // 结果为空
         if (ModelUtil.isEmpty(dataList)) {
             return null;
         }
         // 装载
-        List<Model> models = resultTranshipment(getClass(), dataList);
+        List<IModel> models = resultTranshipment(getClass(), dataList);
         // 查询后：一对多数据加载
         queryAfter(models);
         return (D) models.get(0);
     }
 
-    public <D extends Model> D find(Serializable id) {
+    public <D extends IModel> D find(Serializable id) {
         query().where(query().pk(), id);
         return find();
     }
 
-    public <D extends Model> List<D> select() {
+    public <D extends IModel> List<D> select() {
         // 查询前处理：预载入
         queryBefore();
         // 执行查询
         List<Map<String, Object>> dataList = query().select();
+        // 编译sql
+        if (reservoir().fetchSql) {
+            return (List<D>) new ModelListSql(query().buildSql());
+        }
         // 装载
-        List<Model> models = resultTranshipment(getClass(), dataList);
+        List<IModel> models = resultTranshipment(getClass(), dataList);
         // 查询后
         queryAfter(models);
-        return (List<D>) models;
+        List<IModel> iModelList = models;
+        return (List<D>) iModelList;
     }
 
     //TODO::---------- 分页方法 ----------
@@ -497,7 +325,7 @@ public class Model {
         // 执行查询
         Pagination<Map<String, Object>> pagination = query().pagination(page, pageSize);
         // 数据组装
-        Pagination<Model> pagination1 = new Pagination<>(pagination);
+        Pagination<IModel> pagination1 = new Pagination<>(pagination);
         pagination1.rows = resultTranshipment(getMClass(), pagination.rows);
         // 查询后
         queryAfter(pagination1.rows);
@@ -508,14 +336,121 @@ public class Model {
         return pagination(1, 20);
     }
 
-    //TODO::---------- 数据操作方法 ----------
+    //TODO::---------- 操作方法：排序、聚合等 START ----------
+    /**
+     * 排序
+     * @param field 字段
+     * @param asc 排序方式：ASC、DESC
+     * @return 模型对象
+     */
+    public AModel order(String field, String asc) {
+        query().order(fieldToUnderlineCase(field), asc);
+        return this;
+    }
 
+    public AModel order(String field, boolean asc) {
+        order(field, asc ? "ASC" : "DESC");
+        return this;
+    }
+
+    public AModel order(String fields)
+    {
+        if (ORMHelper.isEmpty(fields)) {
+            return this;
+        }
+        if (fields.contains(",")) {
+            return this.order(fields.split(","));
+        }
+        String[] arr = fields.trim().split(" ");
+        return arr.length == 2 ? order(arr[0], arr[1]) : order(arr[0], "ASC");
+    }
+
+    public AModel order(List<String> fields) {
+        fields.forEach(this::order);
+        return this;
+    }
+
+    public AModel order(String[] fields) {
+        for (String field : fields) {
+            order(field);
+        }
+        return this;
+    }
+
+    public AModel limit(Integer index, Integer count) {
+        query().limit(index, count);
+        return this;
+    }
+
+    public AModel limit(Integer count) {
+        return limit(0, count);
+    }
+
+    /**
+     * 分页
+     * @param page 页数
+     * @return 模型对象
+     */
+    public AModel page(Integer page) {
+        query().page(page);
+        return this;
+    }
+
+    /**
+     * 分页
+     * @param page 页数
+     * @param size 页大小
+     * @return 模型对象
+     */
+    public AModel page(Integer page, Integer size) {
+        query().page(page, size);
+        return this;
+    }
+
+    public AModel group(String fields) {
+        query().group(fields);
+        return this;
+    }
+
+    public AModel having(String fields) {
+        query().having(fields);
+        return this;
+    }
+
+    public AModel union(String sql) {
+        query().union(sql);
+        return this;
+    }
+
+    public AModel union(String[] sqlArr) {
+        query().union(sqlArr);
+        return this;
+    }
+
+    public AModel distinct(boolean distinct) {
+        query().distinct(distinct);
+        return this;
+    }
+
+    public AModel lock(boolean lock) {
+        query().lock(lock);
+        return this;
+    }
+
+    // 编译sql，当前只支持查询
+    public AModel fetchSql(boolean fetch) {
+        query().fetchSql(fetch);
+        return this;
+    }
+    //TODO::---------- 操作方法：排序、聚合等 END ----------
+
+    //TODO::---------- 数据方法 START ----------
     /**
      * 实体通过map装载数据
      * @param data 数据集
      * @return 模型对象
      */
-    public Model data(Map<String, Object> data) {
+    public AModel data(DataMap data) {
         data.forEach(this::data);
         return this;
     }
@@ -535,7 +470,7 @@ public class Model {
      * @param val 属性值
      * @return 模型对象
      */
-    public Model data(String name, Object val)
+    public AModel data(String name, Object val)
     {
         // 数据保存
         name = ModelUtil.toCamelCase(name);
@@ -565,8 +500,16 @@ public class Model {
         return __data;
     }
 
+    public String pk() {
+        return ModelUtil.toCamelCase(query().pk());
+    }
+
+    public Object pkVal() {
+        return data(pk());
+    }
+
     /**
-     * 执行sql的数据
+     * 手机执行sql的数据
      * - insert、update的数据
      * @return 数据集
      */
@@ -583,15 +526,15 @@ public class Model {
         });
         return ret;
     }
+    //TODO::---------- 数据方法 END ----------
 
-    //---------- TODO::静态操作方法 ----------//
-
+    //TODO::---------- 静态操作方法 START ----------
     /**
      * 通过 Map 创建对象
      * @param data 数据集
      * @return 模型对象
      */
-    public Model create(Map<String, Object> data)
+    public AModel create(Map<String, Object> data)
     {
         Model model = newProxyModel(getMClass(), data);
         model.insert();
@@ -603,11 +546,11 @@ public class Model {
      * @param data 数据集
      * @return 模型对象
      */
-    public Model create(DataMap data) {
+    public AModel create(DataMap data) {
         return create((Map<String, Object>) data);
     }
 
-    public Model create(Model model) {
+    public AModel create(Model model) {
         return model.insert();
     }
 
@@ -624,6 +567,7 @@ public class Model {
         });
         return dataList.size();
     }
+    //TODO::---------- 静态操作方法 END ----------
 
     //TODO::---------- 模型控制方法 ----------
     /**
@@ -684,7 +628,7 @@ public class Model {
      * - 组装一对一数据
      * - 一对多的关联在主数据返回后再统一查询组装
      * */
-    private <D extends Model> List<D> resultTranshipment(Class<?> clazz, List<Map<String, Object>> dataList) {
+    private <D extends IModel> List<D> resultTranshipment(Class<?> clazz, List<Map<String, Object>> dataList) {
         // 集合对象
         List<D> models = new LinkedList<>();
         dataList.forEach(data -> {
@@ -701,21 +645,22 @@ public class Model {
                     ReflectUtil.setFieldValue(model, relationName, relationModel);
                 });
             } else {
-                model.data(data);
+                ((Model) model).data((DataMap) data);
             }
             models.add(model);
         });
         return models;
     }
 
-    private void resultTranshipmentWith(Model model, Map<String, Object> set, String relationName) {
-        model.__meta.fieldMap().forEach((name, field) -> {
+    private void resultTranshipmentWith(IModel model, Map<String, Object> set, String relationName) {
+        Model modelAbs = ((Model) model);
+        modelAbs.__meta.fieldMap().forEach((name, field) -> {
             if (field.getWay() != null || Model.class.isAssignableFrom(field.getClazz())) {
                 return;
             }
-            String tableName = relationName == null ? model.__meta.table() : relationName;
+            String tableName = relationName == null ? modelAbs.__meta.table() : relationName;
             String dataName = tableName + "__" + toUnderlineCase(name);
-            model.data(name, set.get(dataName));
+            modelAbs.data(name, set.get(dataName));
         });
     }
 
@@ -723,7 +668,7 @@ public class Model {
      * 查询后模型处理
      * @param models 数据集
      * */
-    private void queryAfter(List<Model> models) {
+    private void queryAfter(List<IModel> models) {
         // 预载入的数据查询后加载
         if (__withs != null) {
             // 超过500警告
@@ -777,15 +722,15 @@ public class Model {
     }
 
     //TODO::---------- 模型实例化----------
-    private static<D extends Model> D newProxyModel(Class<?> clazz) {
+    private static<D extends IModel> D newProxyModel(Class<?> clazz) {
         return newProxyModel(clazz, null, null);
     }
 
-    private static<D extends Model> D newProxyModel(Class<?> clazz, Map<String, Object> data) {
+    private static<D extends IModel> D newProxyModel(Class<?> clazz, Map<String, Object> data) {
         return newProxyModel(clazz, data, null);
     }
 
-    private static<D extends Model> D newProxyModel(Class<?> clazz, Map<String, Object> data, Model parent)
+    private static<D extends IModel> D newProxyModel(Class<?> clazz, Map<String, Object> data, Model parent)
     {
         // 创建代理类信息
         Enhancer enhancer = new Enhancer();
@@ -794,7 +739,7 @@ public class Model {
         D model = (D) enhancer.create();
         // 加载数据
         if (!ModelUtil.isEmpty(data)) {
-            model.data(data);
+            ((Model) model).data((DataMap) data);
         }
         // 设置父类
         if (!ModelUtil.isEmpty(parent)) {
@@ -830,6 +775,21 @@ public class Model {
         }
     };
 
+    /**
+     * 如果当前对象素模型（不是代理模型）
+     * - 素模型：在 insert、update 时收集数据，包含null（因为java无法表明该属性是否被修改）
+     */
+    private void loadingVegetarianModel()
+    {
+        if (ModelUtil.isVegetarianModel(this)) {
+            // 收集字段数据
+            __meta.fieldMap().forEach((name, field) -> {
+                Object val = ReflectUtil.getFieldValue(this, field.getField());
+                data(field.getName(), val);
+            });
+        }
+    }
+
     //---------- TODO::关联方法 ----------//
     /*
      * 关联方法
@@ -843,12 +803,12 @@ public class Model {
         return newModel(clazz, this);
     }
 
-    public <D extends Model> D relation(Class<?> clazz, RelationType type, String localKey, String foreignKey) {
+    public <D extends IModel> D relation(Class<?> clazz, RelationType type, String localKey, String foreignKey) {
         String fieldName = Thread.currentThread().getStackTrace()[1].getMethodName();
         return relation(fieldName, clazz, type, localKey, foreignKey);
     }
 
-    public <D extends Model> D relation(String clazzName, RelationType type, String localKey, String foreignKey) {
+    public <D extends IModel> D relation(String clazzName, RelationType type, String localKey, String foreignKey) {
         try {
             Class<?> clazz = getClass().getClassLoader().loadClass(clazzName);
             String fieldName = Thread.currentThread().getStackTrace()[2].getMethodName();
@@ -858,12 +818,12 @@ public class Model {
         }
     }
 
-    public <D extends Model> D hasOne(Class<?> clazz, String localKey, String foreignKey) {
+    public <D extends IModel> D hasOne(Class<?> clazz, String localKey, String foreignKey) {
         String fieldName = Thread.currentThread().getStackTrace()[2].getMethodName();
         return relation(fieldName, clazz, RelationType.OneToOne, localKey, foreignKey);
     }
 
-    public <D extends Model> D hasMany(Class<?> clazz, String localKey, String foreignKey) {
+    public <D extends IModel> D hasMany(Class<?> clazz, String localKey, String foreignKey) {
         String fieldName = Thread.currentThread().getStackTrace()[2].getMethodName();
         return relation(fieldName, clazz, RelationType.OneToMany, localKey, foreignKey);
     }
@@ -873,7 +833,7 @@ public class Model {
      * @param fields 需要预载入的属性名称
      * @return 模型对象
      */
-    public Model with(String fields) {
+    public AModel with(String fields) {
         if (ModelUtil.isEmpty(fields)) {
             return this;
         }
@@ -1065,8 +1025,7 @@ public class Model {
 
                 // 存在递归和toString调用
                 StackTraceElement[] stackTraceArr = Thread.currentThread().getStackTrace();
-                for (int i = 0; i < stackTraceArr.length; i++) {
-                    StackTraceElement ele = stackTraceArr[i];
+                for (StackTraceElement ele : stackTraceArr) {
                     if ("toString".equals(ele.getMethodName())) {
                         return curr.data().get(fieldName);
                     }
