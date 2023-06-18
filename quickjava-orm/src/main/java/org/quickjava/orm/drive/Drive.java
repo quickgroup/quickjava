@@ -29,9 +29,10 @@ public abstract class Drive {
     // 开启事务后将连接放到线程缓存中
     private static final ThreadLocal<QuickConnection> __THREAD_CONNECTION = new ThreadLocal<>();
 
+    // 默认mysql风格
     private static final DriveConfigure DRIVE_CONFIGURE_DEF = new DriveConfigure(
             "", "",
-            "'", "'"
+            "\"", "\""
     );
 
     public DriveConfigure getDriveConfigure() {
@@ -87,7 +88,7 @@ public abstract class Drive {
                 sqlList.add("DISTINCT");
             }
             // field
-            checkNull(reservoir.fieldList, "Missing field");
+            checkEmpty(reservoir.fieldList, "Missing field");
             sqlList.add(SqlUtil.collJoin(",", reservoir.fieldList));
             sqlList.add("FROM");
         }
@@ -104,14 +105,15 @@ public abstract class Drive {
 
         // INSERT-DATA
         if (action == Action.INSERT) {
-            checkNull(reservoir.dataList, "Missing insert data");
+            checkEmpty(reservoir.dataList, "Missing insert data");
+            checkEmpty(reservoir.dataList.get(0), "Missing update data");
             StringBuilder dataSql = new StringBuilder();
             // field
-            SqlUtil.mapKeyJoin(dataSql, reservoir.dataList.get(0));
+            SqlUtil.mapBracketsJoin(dataSql, reservoir.dataList.get(0));
             // values
             dataSql.append(" VALUES ");
             // 数据处理方法
-            SqlUtil.MapJoinCallback joinCallback = entry -> Value.pretreatment(entry.getValue());
+            SqlUtil.MapJoinCallback joinCallback = entry -> Value.pretreatment(entry.getValue(), config);
             for (int i = 0; i < reservoir.dataList.size(); i++) {
                 if (i > 0)
                     dataSql.append(',');
@@ -122,23 +124,17 @@ public abstract class Drive {
 
         // UPDATE
         if (action == Action.UPDATE) {
-            checkNull(reservoir.dataList, "Missing update data");
+            checkEmpty(reservoir.dataList, "Missing update data");
+            checkEmpty(reservoir.dataList.get(0), "Missing update data");
             StringBuilder dataSql = new StringBuilder();
-            int fi = 0;
-            for (Map.Entry<String, Object> entry : reservoir.dataList.get(0).entrySet()) {
-                if (fi++ > 0)
-                    dataSql.append(",");
-                String item = String.format("%s%s%s=%s", config.fieldL, entry.getKey(), config.fieldR,
-                        Value.pretreatment(entry.getValue())
-                );
-                dataSql.append(item);
-            }
             sqlList.add("SET");
+            SqlUtil.MapJoinCallback joinCallback = entry -> String.format("%s=%s", entry.getKey(), Value.pretreatment(entry.getValue(), config));
+            SqlUtil.mapJoin(dataSql, ", ", reservoir.dataList.get(0), joinCallback);
             sqlList.add(dataSql.toString());
         }
 
         // WHERE
-        if (action == Action.SELECT && reservoir.whereList != null) {
+        if ((action == Action.SELECT || action == Action.UPDATE) && reservoir.whereList != null) {
             sqlList.add("WHERE");
             sqlList.add(Where.cutFirstLogic(Where.collectSql(reservoir.whereList, config)));
         }
@@ -237,12 +233,28 @@ public abstract class Drive {
 
     // 获取查询器的数据器
     public static QueryReservoir getQueryReservoir(QuerySet query) {
-        return (QueryReservoir) ReflectUtil.getFieldValue(query, "reservoir");
+        return ReflectUtil.getFieldValue(query, "reservoir");
     }
 
     private static void checkNull(Object obj, String msg) {
         if (obj == null) {
             throw new QuickORMException(msg);
+        }
+    }
+
+    private static void checkEmpty(Object obj, String msg) {
+        if (obj == null) {
+            throw new QuickORMException(msg);
+        } else if (List.class.isAssignableFrom(obj.getClass())) {
+            List<?> list = (List<?>) obj;
+            if (list.isEmpty()) {
+                throw new QuickORMException(msg);
+            }
+        } else if (Map.class.isAssignableFrom(obj.getClass())) {
+            Map<?, ?> map = (Map<?, ?>) obj;
+            if (map.isEmpty()) {
+                throw new QuickORMException(msg);
+            }
         }
     }
 

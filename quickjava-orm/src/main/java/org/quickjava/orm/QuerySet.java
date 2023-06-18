@@ -417,8 +417,10 @@ public class QuerySet {
     private <T> T executeSql()
     {
         reservoir.action = reservoir.action == null ? Action.SELECT : reservoir.action;
-        if (reservoir.fetchSql)
+        if (reservoir.fetchSql) {
+            reservoir.setSql(ORMContext.getDrive().pretreatment(this));
             return null;
+        }
         return ORMContext.getDrive().executeSql(this);
     }
 

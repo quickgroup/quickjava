@@ -17,7 +17,6 @@ import org.quickjava.orm.annotation.OneToOne;
 import org.quickjava.orm.callback.WhereCallback;
 import org.quickjava.orm.callback.WhereOptCallback;
 import org.quickjava.orm.contain.*;
-import org.quickjava.orm.enums.ModelFieldFill;
 import org.quickjava.orm.enums.Operator;
 import org.quickjava.orm.enums.RelationType;
 import org.quickjava.orm.utils.*;
@@ -171,22 +170,26 @@ public class Model extends AModel implements IModel {
      * 新增
      * @return 模型对象
      */
-    public AModel insert()
+    public <D extends IModel> D insert()
     {
         // 默认填充数据
         __meta.fieldMap().forEach((name, field) -> {
             if (!__data.containsKey(name)) {
-                if (field.getAno().insertFill() != ModelFieldFill.NULL) {
-                    __data.put(name, ModelUtil.fill(field.getAno().insertFill(), field.getAno().insertFillTarget()));
-                } else if (field.getAno().updateFill() != ModelFieldFill.NULL) {
-                    __data.put(name, ModelUtil.fill(field.getAno().insertFill(), field.getAno().updateFillTarget()));
+                if (field.isInsertFill()) {
+                    data(name, ModelUtil.fill(field.getModelField().insertFill(), field.getModelField().insertFillTarget()));
+                } else if (field.isUpdateFill()) {
+                    data(name, ModelUtil.fill(field.getModelField().updateFill(), field.getModelField().updateFillTarget()));
                 }
             }
         });
         // 执行
         Long pkVal = query().insert(this.sqlData());
+        // 编译sql
+        if (reservoir().isFetchSql())
+            return toD(new ModelSql(reservoir().getSql()));
+        // 回填主键
         data(pk(), pkVal);
-        return ModelUtil.isProxyModel(this) ? this : newProxyModel(getMClass(), data());
+        return toD(ModelUtil.isProxyModel(this) ? this : newProxyModel(getMClass(), data()));
     }
 
     /**
@@ -194,7 +197,7 @@ public class Model extends AModel implements IModel {
      * @param data 数据集
      * @return 模型对象
      */
-    public AModel insert(DataMap data) {
+    public <D extends IModel> D insert(DataMap data) {
         data(data);
         return insert();
     }
@@ -207,7 +210,7 @@ public class Model extends AModel implements IModel {
     {
         // 软删除字段
         for (ModelFieldO field : __meta.fieldMap().values()) {
-            if (field.getAno().softDelete()) {
+            if (field.isSoftDelete()) {
                 if (Date.class.isAssignableFrom(field.getField().getType())) {
                     data(field.getName(), DatetimeUtil.now());      // 字符串去填充的数据
                     save();
@@ -225,27 +228,31 @@ public class Model extends AModel implements IModel {
      * 更新
      * @return 模型对象
      */
-    public AModel update()
+    public <D extends IModel> D update()
     {
         // 默认填充数据
         __meta.fieldMap().forEach((name, field) -> {
             if (!__data.containsKey(name)) {
-                if (field.getAno().updateFill() != ModelFieldFill.NULL) {
-                    __data.put(name, ModelUtil.fill(field.getAno().insertFill(), field.getAno().updateFillTarget()));
+                if (field.isUpdateFill()) {
+                    data(name, ModelUtil.fill(field.getModelField().updateFill(), field.getModelField().updateFillTarget()));
                 }
             }
         });
         // 执行
         query().update(this.sqlData());
-        return ModelUtil.isProxyModel(this) ? this : newProxyModel(getMClass(), data());
+        // 编译sql
+        if (reservoir().isFetchSql())
+            return toD(new ModelSql(reservoir().getSql()));
+        // 返回模型
+        return toD(ModelUtil.isProxyModel(this) ? this : newProxyModel(getMClass(), data()));
     }
 
-    public AModel update(DataMap data) {
+    public <D extends IModel> D update(DataMap data) {
         data(data);
         return update();
     }
 
-    public AModel updateById()
+    public <D extends IModel> D updateById()
     {
         String pk = pk();
         where(pk, data(pk));
@@ -258,16 +265,16 @@ public class Model extends AModel implements IModel {
      * - 自动判断主键是否为null，为null执行新增，否则进行更新
      * @return 模型对象
      */
-    public AModel save() {
+    public <D extends IModel> D save() {
         String pk = pk();
         Object pkVal = data(pk);
         return pkVal == null ? insert() : where(pk, pkVal).update();
     }
 
-    public AModel save(DataMap data) {
+    public <D extends IModel> D save(DataMap data) {
         data(data);
         save();
-        return this;
+        return toD(this);
     }
 
     /**
@@ -283,7 +290,7 @@ public class Model extends AModel implements IModel {
         List<Map<String, Object>> dataList = query().limit(0, 1).select();
         // 编译sql
         if (reservoir().fetchSql) {
-            return (D) new ModelSql(query().buildSql());
+            return toD(new ModelSql(query().buildSql()));
         }
         // 结果为空
         if (ModelUtil.isEmpty(dataList)) {
@@ -293,7 +300,7 @@ public class Model extends AModel implements IModel {
         List<IModel> models = resultTranshipment(getClass(), dataList);
         // 查询后：一对多数据加载
         queryAfter(models);
-        return (D) models.get(0);
+        return toD(models.get(0));
     }
 
     public <D extends IModel> D find(Serializable id) {
@@ -308,14 +315,13 @@ public class Model extends AModel implements IModel {
         List<Map<String, Object>> dataList = query().select();
         // 编译sql
         if (reservoir().fetchSql) {
-            return (List<D>) new ModelListSql(query().buildSql());
+            return toD(new ModelListSql(reservoir().sql));
         }
         // 装载
         List<IModel> models = resultTranshipment(getClass(), dataList);
         // 查询后
         queryAfter(models);
-        List<IModel> iModelList = models;
-        return (List<D>) iModelList;
+        return toD(models);
     }
 
     //TODO::---------- 分页方法 ----------
@@ -329,7 +335,7 @@ public class Model extends AModel implements IModel {
         pagination1.rows = resultTranshipment(getMClass(), pagination.rows);
         // 查询后
         queryAfter(pagination1.rows);
-        return (Pagination<D>) pagination1;
+        return toD(pagination1);
     }
 
     public <D> Pagination<D> pagination() {
@@ -501,7 +507,8 @@ public class Model extends AModel implements IModel {
     }
 
     public String pk() {
-        return ModelUtil.toCamelCase(query().pk());
+        return __meta.getPkName();
+//        return ModelUtil.toCamelCase(query().pk());
     }
 
     public Object pkVal() {
@@ -517,13 +524,15 @@ public class Model extends AModel implements IModel {
     {
         DataMap data = data();
         DataMap ret = DataMap.one();
-        __modified.forEach(field -> {
-            if (field.getWay() != null) {
-                return;
-            }
-            Object v = data.get(field.getName());
-            ret.put(fieldToUnderlineCase(field.getName()), ModelUtil.valueToSqlValue(v));
-        });
+        if (__modified != null) {
+            __modified.forEach(field -> {
+                if (field.getWay() != null) {
+                    return;
+                }
+                Object v = data.get(field.getName());
+                ret.put(fieldToUnderlineCase(field.getName()), ModelUtil.valueToSqlValue(v));
+            });
+        }
         return ret;
     }
     //TODO::---------- 数据方法 END ----------
@@ -640,7 +649,7 @@ public class Model extends AModel implements IModel {
                 resultTranshipmentWith(model, data, null);
                 // 关联表数据
                 relationMap.forEach((relationName, relation) -> {
-                    Model relationModel = newProxyModel(relation.getClazz());
+                    Model relationModel = newProxyModel(relation.getClazz(), null, model);
                     resultTranshipmentWith(relationModel, data, relationName);
                     ReflectUtil.setFieldValue(model, relationName, relationModel);
                 });
@@ -721,6 +730,10 @@ public class Model extends AModel implements IModel {
         return relationMap;
     }
 
+    private static <D> D toD(Object model) {
+        return (D) model;
+    }
+
     //TODO::---------- 模型实例化----------
     private static<D extends IModel> D newProxyModel(Class<?> clazz) {
         return newProxyModel(clazz, null, null);
@@ -730,13 +743,13 @@ public class Model extends AModel implements IModel {
         return newProxyModel(clazz, data, null);
     }
 
-    private static<D extends IModel> D newProxyModel(Class<?> clazz, Map<String, Object> data, Model parent)
+    private static<D extends IModel> D newProxyModel(Class<?> clazz, Map<String, Object> data, IModel parent)
     {
         // 创建代理类信息
         Enhancer enhancer = new Enhancer();
         enhancer.setSuperclass(clazz);
         enhancer.setCallback(modelProxyMethodInterceptor);
-        D model = (D) enhancer.create();
+        D model = toD(enhancer.create());
         // 加载数据
         if (!ModelUtil.isEmpty(data)) {
             ((Model) model).data((DataMap) data);
@@ -781,7 +794,7 @@ public class Model extends AModel implements IModel {
      */
     private void loadingVegetarianModel()
     {
-        if (ModelUtil.isVegetarianModel(this)) {
+        if (ModelUtil.isVegetarianModel(this) && __vegetarian) {
             // 收集字段数据
             __meta.fieldMap().forEach((name, field) -> {
                 Object val = ReflectUtil.getFieldValue(this, field.getField());
@@ -848,7 +861,7 @@ public class Model extends AModel implements IModel {
     private static<D> D newModel(Class<?> clazz) {
         try {
             if (isModel(clazz)) {
-                D model = (D) clazz.newInstance();
+                D model = toD(clazz.newInstance());
                 ModelUtil.setFieldValue(model, "__table", parseModelTableName(clazz));
                 return model;
             }
@@ -926,7 +939,7 @@ public class Model extends AModel implements IModel {
                 if (!"".equals(modelField.name())) {
                     fieldInfo.setName(modelField.name()); // 指定字段名称
                 }
-                fieldInfo.setAno(modelField);
+                fieldInfo.setModelField(modelField);
             }
 
             fieldInfo.setWay(findRelationAno(field));

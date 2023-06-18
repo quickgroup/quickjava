@@ -1,7 +1,11 @@
 package org.quickjava.orm.example;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import org.quickjava.orm.Model;
 import org.quickjava.orm.annotation.ModelField;
+import org.quickjava.orm.annotation.ModelId;
 import org.quickjava.orm.annotation.ModelName;
 import org.quickjava.orm.enums.ModelFieldFill;
 
@@ -25,6 +29,8 @@ import java.util.List;
 @ModelName
 public class Article extends Model {
 
+    @TableId
+    @ModelId
     private Long id;
 
     private Long userId;

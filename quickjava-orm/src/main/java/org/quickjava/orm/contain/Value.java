@@ -12,23 +12,21 @@ import java.util.Date;
 
 public class Value {
 
-    public static String pretreatment(Object value) {
-        String ret;
+    public static String pretreatment(Object value, DriveConfigure config) {
         if (value == null) {
-            ret = "NULL";
-        } else if (value instanceof Integer) {
-            ret = String.valueOf(value);
-        } else if (value instanceof Date) {
-            ret = datetime((Date) value);
+            return "NULL";
+        } else if (value instanceof Integer || value instanceof Long) {
+            return String.valueOf(value);
+        } else if (value instanceof Float) {
+            return Float.toString((Float) value);
+        } else if (value instanceof Double) {
+            return Double.toString((Double) value);
+        } else if (value instanceof Iterable) {
+            return SqlUtil.collJoin(",", ((Iterable<?>) value));
         } else {
-            ret = String.format("\"%s\"", SqlUtil.escapeSql(String.valueOf(value)));
+            value = SqlUtil.escapeSql(String.valueOf(value));
+            return String.format("%s%s%s", config.strL, value, config.strR);
         }
-        return ret;
     }
 
-    public static String datetime(Date date)
-    {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        return date == null ? "" : format.format(date);
-    }
 }

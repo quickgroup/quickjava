@@ -100,8 +100,21 @@ public class SqlUtil extends ORMHelper {
         str.append(")");
     }
 
-    public static void mapKeyJoin(StringBuilder str, Map<String, Object> map) {
-        mapBracketsJoin(str, map, mapJoinKeyCallback);
+    public static void mapBracketsJoin(StringBuilder str, Map<String, Object> data) {
+        mapBracketsJoin(str, data, mapJoinKeyCallback);
+    }
+
+    public static void mapJoin(StringBuilder str, String symbol, Map<String, Object> data, MapJoinCallback callback) {
+        int fi = 0;
+        for (Map.Entry<String, Object> entry : data.entrySet()) {
+            if (fi++ > 0)
+                str.append(symbol);
+            str.append(callback.call(entry));
+        }
+    }
+
+    public static void mapJoin(StringBuilder str, Map<String, Object> data, MapJoinCallback callback) {
+        mapJoin(str, ",", data, callback);
     }
 
     public static MapJoinCallback mapJoinKeyCallback = Map.Entry::getKey;

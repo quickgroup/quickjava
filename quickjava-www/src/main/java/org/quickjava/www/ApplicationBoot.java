@@ -4,6 +4,7 @@ import org.quickjava.framework.QuickJavaBoot;
 import org.quickjava.framework.annotation.ApplicationQuickBoot;
 import org.quickjava.orm.QuerySet;
 import org.quickjava.orm.callback.WhereCallback;
+import org.quickjava.orm.enums.Operator;
 import org.quickjava.orm.example.Article;
 
 @ApplicationQuickBoot
@@ -27,26 +28,41 @@ public class ApplicationBoot {
 //        System.out.println("article=" + ModelQuery.lambda(Article.class).eq(Article::getId, 1).eq(Article::user, 1));
 
         // querySet闭包查询
-        System.out.println("article=" + QuerySet.table("article").where("status", 1).where(query -> {
-            query.where("id", 20).where("user_id", 10);
-        }).whereOr(query -> {
-            query.where("id", 21).where("user_id", 11);
-        }).buildSql());
+        System.out.println("article=" + QuerySet.table("article").where("status", 1)
+                .where("remark", Operator.LIKE,"%备注内容%") .where(query -> {
+                    query.where("id", 20).where("user_id", 10);
+                }).whereOr(query -> {
+                    query.where("id", 21).where("user_id", 11);
+                }).buildSql());
 
         // 模型闭包查询
-        System.out.println("article=" + new Article().where("status", 1).where(query -> {
-            query.where("id", 200).where("user_id", 100);
-        }).whereOr(query -> {
-            query.where("id", 210).where("user_id", 110);
-            query.whereOr(query1 -> {
-                query1.where("id", 211).where("user_id", 111);
-            });
-            query.whereOr(query1 -> {
-                query1.where("id", 212).where("user_id", 112);
-            });
-        }).fetchSql(true).find());
+//        System.out.println("article.select.sql=" + new Article().where("status", 1).where(query -> {
+//            query.where("id", 200).where("user_id", 100);
+//        }).whereOr(query -> {
+//            query.where("id", 210).where("user_id", 110);
+//            query.whereOr(query1 -> {
+//                query1.where("id", 211).where("user_id", 111);
+//            });
+//            query.whereOr(query1 -> {
+//                query1.where("id", 212).where("user_id", 112);
+//            });
+//        }).fetchSql(true).select());
+//
+//        System.out.println("article.find.sql=" + new Article().where("status", 1).where(query -> {
+//            query.where("id", 200).where("user_id", 100);
+//        }).whereOr(query -> {
+//            query.where("id", 210).where("user_id", 110);
+//            query.whereOr(query1 -> {
+//                query1.where("id", 211).where("user_id", 111);
+//            });
+//            query.whereOr(query1 -> {
+//                query1.where("id", 212).where("user_id", 112);
+//            });
+//        }).fetchSql(true).find());
+//
+//        System.out.println("insert.sql=" + new Article().fetchSql(true).insert());
 
-        new Article();
+        System.out.println("update.sql=" + new Article().where("id", 211).data("id", 123).vegetarian(false).fetchSql(true).update());
 
         QuickJavaBoot.start(ApplicationBoot.class, args);
     }

@@ -72,4 +72,13 @@ public class ModelMeta {
     public void setRelationMap(Map<String, Relation> relationMap) {
         this.relationMap = relationMap;
     }
+
+    public String getPkName() {
+        for (ModelFieldO field : fieldMap.values()) {
+            if (field.getModelId() != null) {
+                return field.getName();
+            }
+        }
+        return null;
+    }
 }

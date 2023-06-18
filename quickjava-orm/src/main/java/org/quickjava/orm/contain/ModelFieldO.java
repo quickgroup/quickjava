@@ -1,6 +1,9 @@
 package org.quickjava.orm.contain;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import org.quickjava.orm.annotation.ModelField;
+import org.quickjava.orm.annotation.ModelId;
 import org.quickjava.orm.enums.ModelFieldFill;
 
 import java.lang.reflect.Field;
@@ -24,6 +27,7 @@ public class ModelFieldO {
 
     private String name;
 
+    // 原始属性名称
     private String _name;
 
     // 对应类
@@ -40,7 +44,14 @@ public class ModelFieldO {
 
     private Method method;
 
-    private ModelField ano;
+    private ModelField modelField;
+
+    private ModelId modelId;
+
+    // 兼容mybatis-plus的注解
+    private TableId tableId;
+
+    private TableField tableField;
 
     public ModelFieldO() {
     }
@@ -116,15 +127,55 @@ public class ModelFieldO {
         this.method = method;
     }
 
-    public ModelField getAno() {
-        return ano;
+    public ModelField getModelField() {
+        return modelField;
     }
 
-    public void setAno(ModelField ano) {
-        this.ano = ano;
+    public void setModelField(ModelField modelField) {
+        this.modelField = modelField;
+    }
+
+    public String get_name() {
+        return _name;
+    }
+
+    public void set_name(String _name) {
+        this._name = _name;
+    }
+
+    public ModelId getModelId() {
+        return modelId;
+    }
+
+    public void setModelId(ModelId modelId) {
+        this.modelId = modelId;
+    }
+
+    public TableId getTableId() {
+        return tableId;
+    }
+
+    public void setTableId(TableId tableId) {
+        this.tableId = tableId;
+    }
+
+    public TableField getTableField() {
+        return tableField;
+    }
+
+    public void setTableField(TableField tableField) {
+        this.tableField = tableField;
+    }
+
+    public boolean isInsertFill() {
+        return getModelField() != null && getModelField().insertFill() != ModelFieldFill.NULL;
+    }
+
+    public boolean isUpdateFill() {
+        return getModelField() != null && getModelField().updateFill() != ModelFieldFill.NULL;
     }
 
     public boolean isSoftDelete() {
-        return getAno() != null && getAno().softDelete();
+        return getModelField() != null && getModelField().softDelete();
     }
 }

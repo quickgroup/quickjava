@@ -78,6 +78,9 @@ public class QueryReservoir {
     @JsonIgnore
     public boolean fetchSql = false;
 
+    @JsonIgnore
+    public String sql = null;
+
     public String getTable() {
         return table;
     }
@@ -216,11 +219,19 @@ public class QueryReservoir {
         this.whereOptCallbackData = userData;
     }
 
-    public boolean getFetchSql() {
+    public boolean isFetchSql() {
         return fetchSql;
     }
 
     public void setFetchSql(boolean fetchSql) {
         this.fetchSql = fetchSql;
+    }
+
+    public String getSql() {
+        return sql;
+    }
+
+    public void setSql(String sql) {
+        this.sql = sql;
     }
 }

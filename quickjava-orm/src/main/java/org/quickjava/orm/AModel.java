@@ -77,6 +77,20 @@ public abstract class AModel implements IModel {
     @TableField(exist = false)
     protected Model __parent;
 
+    /**
+     * 是素模型
+     * */
+    @JsonIgnore
+    @TableField(exist = false)
+    protected boolean __vegetarian = true;
+
+
+    //TODO:---------- 类方法 ----------
+    // 强制修改对象是否是素模型
+    public AModel vegetarian(boolean vegetarian) {
+        this.__vegetarian = vegetarian;
+        return this;
+    }
 
     //TODO:---------- 查询方法 ----------
     public abstract AModel where(String field, Operator opr, Object val);
@@ -118,14 +132,14 @@ public abstract class AModel implements IModel {
     public abstract AModel between(String field, Object val1, Object val2);
 
     //---------- TODO::操作方法：增删改查 ----------
-    public abstract AModel insert();
+    public abstract <D extends IModel> D insert();
 
     /**
      * 使用数据集新增
      * @param data 数据集
      * @return 模型对象
      */
-    public abstract AModel insert(DataMap data);
+    public abstract <D extends IModel> D insert(DataMap data);
 
     /**
      * 删除
@@ -137,20 +151,20 @@ public abstract class AModel implements IModel {
      * 更新
      * @return 模型对象
      */
-    public abstract AModel update();
+    public abstract <D extends IModel> D update();
 
-    public abstract AModel update(DataMap data);
+    public abstract <D extends IModel> D update(DataMap data);
 
-    public abstract AModel updateById();
+    public abstract <D extends IModel> D updateById();
 
     /**
      * 保存数据
      * - 自动判断主键是否为null，为null执行新增，否则进行更新
      * @return 模型对象
      */
-    public abstract AModel save();
+    public abstract <D extends IModel> D save();
 
-    public abstract AModel save(DataMap data);
+    public abstract <D extends IModel> D save(DataMap data);
 
     /**
      * 查询一条数据

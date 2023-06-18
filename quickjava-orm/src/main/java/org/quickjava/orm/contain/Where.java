@@ -92,25 +92,8 @@ public abstract class Where {
         this.operator = operator;
     }
 
-    public Object valueConv(Object value, DriveConfigure config) {
-        if (value == null) {
-            return "NULL";
-        } else if (value instanceof Integer || value instanceof Long) {
-            return String.valueOf(value);
-        } else if (value instanceof Float) {
-            return Float.toString((Float) value);
-        } else if (value instanceof Double) {
-            return Double.toString((Double) value);
-        } else if (value instanceof Iterable) {
-            return SqlUtil.collJoin(",", ((Iterable<?>) value));
-        } else {
-            value = SqlUtil.escapeSql(String.valueOf(value));
-            return String.format("%s%s%s", config.strL, value, config.strR);
-        }
-    }
-
     public Object getValue(DriveConfigure config) {
-        return valueConv(value, config);
+        return Value.pretreatment(value, config);
     }
 
     public void setValue(Object value) {
@@ -151,7 +134,7 @@ public abstract class Where {
                 } else if (value instanceof String) {
                     arr = ((String) value).split(",");
                 }
-                return getLogicStr() + " " + getField() + " BETWEEN " + valueConv(arr[0], cfg) + " AND " + valueConv(arr[1], cfg);
+                return getLogicStr() + " " + getField() + " BETWEEN " + Value.pretreatment(arr[0], cfg) + " AND " + Value.pretreatment(arr[1], cfg);
         }
         return getLogicStr() + " " + getField() + " " + getOperator() + " " + getValue(cfg);
     }
