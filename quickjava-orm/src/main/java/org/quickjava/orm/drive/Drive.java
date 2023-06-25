@@ -12,6 +12,8 @@ import org.quickjava.orm.contain.*;
 import org.quickjava.orm.utils.QueryException;
 import org.quickjava.orm.utils.QuickORMException;
 import org.quickjava.orm.utils.SqlUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -24,6 +26,8 @@ import java.util.Map;
  * &#064;date  2021/1/25 15:54
  */
 public abstract class Drive {
+
+    protected static final Logger logger = LoggerFactory.getLogger(Drive.class);
 
     private Config config = null;
 
@@ -269,6 +273,7 @@ public abstract class Drive {
     {
         if (__THREAD_CONNECTION.get() != null && !autoCommit) {
 //            throw new QuickORMException("已处于事务中");
+            logger.warn("已处于事务中");
             return;
         }
         QuickConnection connection = getQuickConnection();
