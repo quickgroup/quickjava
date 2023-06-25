@@ -4,6 +4,7 @@ import org.quickjava.common.utils.ReflectUtil;
 import org.quickjava.orm.ORMContext;
 import org.quickjava.orm.contain.Config;
 import org.quickjava.orm.utils.QueryException;
+import org.quickjava.orm.utils.QuickORMException;
 
 import java.sql.*;
 import java.util.LinkedHashMap;
@@ -59,7 +60,17 @@ public class QuickConnection {
             this.autoCommit = autoCommit;
             connection.setAutoCommit(autoCommit);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            throw new QuickORMException(e.getMessage());
+        }
+    }
+
+    public void setTransactionIsolation(int level) {
+        try {
+            connection.setTransactionIsolation(level);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new QuickORMException(e.getMessage());
         }
     }
 

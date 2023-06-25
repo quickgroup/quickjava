@@ -13,6 +13,7 @@ import org.quickjava.orm.utils.QueryException;
 import org.quickjava.orm.utils.QuickORMException;
 import org.quickjava.orm.utils.SqlUtil;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -262,12 +263,19 @@ public abstract class Drive {
         return bool != null && bool;
     }
 
-    public void setAutoCommit(boolean autoCommit) {
+    //TODO::---------- 事务方法 ----------
+
+    public void setAutoCommit(boolean autoCommit)
+    {
+        if (__THREAD_CONNECTION.get() != null && !autoCommit) {
+//            throw new QuickORMException("已处于事务中");
+            return;
+        }
         QuickConnection connection = getQuickConnection();
-        if (autoCommit) {
-            __THREAD_CONNECTION.set(null);
-        } else {
-            __THREAD_CONNECTION.set(connection);
+        __THREAD_CONNECTION.set(autoCommit ? null : connection);
+        // 事务隔离
+        if (!autoCommit) {
+            connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
         }
         connection.setAutoCommit(autoCommit);
     }
