@@ -73,12 +73,12 @@ public class SqlUtil extends ORMHelper {
     public static <T> String collJoin(CharSequence sequence, Iterable<T> iterable)
     {
         StringBuilder sb = new StringBuilder();
-        int count = 0;
         for (T t : iterable) {
             sb.append(t).append(sequence);
-            count++;
         }
-        sb.deleteCharAt(sb.length() - sequence.length());
+        if (sb.length() > sequence.length()) {
+            sb.deleteCharAt(sb.length() - sequence.length());
+        }
         return sb.toString();
     }
 

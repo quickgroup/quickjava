@@ -47,7 +47,64 @@ import java.util.stream.Collectors;
  * 模型
  * */
 @JsonIgnoreProperties(value = {"__meta", "__parent", "__withs", "__data", "__modified", "__querySet"}, ignoreUnknown = true)
-public class Model extends AModel implements IModel {
+public class Model implements IModel {
+
+    /**
+     * 模型元信息
+     * */
+    @JsonIgnore
+    @TableField(exist = false)
+    protected ModelMeta __meta;
+
+    /**
+     * 预载入属性
+     * */
+    @JsonIgnore
+    @TableField(exist = false)
+    protected List<String> __withs;
+
+    /**
+     * 数据
+     */
+    @JsonIgnore
+    @TableField(exist = false)
+    protected final DataMap __data = new DataMap();
+
+    /**
+     * 修改的字段
+     * */
+    @JsonIgnore
+    @TableField(exist = false)
+    protected List<ModelFieldO> __modified;
+
+    /**
+     * 查询器
+     * */
+    @JsonIgnore
+    @TableField(exist = false)
+    protected QuerySet __querySet;
+
+    /**
+     * 关联的父模型对象
+     * */
+    @JsonIgnore
+    @TableField(exist = false)
+    protected Model __parent;
+
+    /**
+     * 是素模型
+     * */
+    @JsonIgnore
+    @TableField(exist = false)
+    protected boolean __vegetarian = true;
+
+
+    //TODO:---------- 类方法 ----------
+    // 强制修改对象是否是素模型
+    public Model vegetarian(boolean vegetarian) {
+        this.__vegetarian = vegetarian;
+        return this;
+    }
 
     @JsonIgnore
     private static final Logger logger = LoggerFactory.getLogger(Model.class);
@@ -75,27 +132,27 @@ public class Model extends AModel implements IModel {
     }
 
     //TODO:---------- 查询方法 ----------
-    public AModel where(String field, Operator opr, Object val) {
+    public Model where(String field, Operator opr, Object val) {
         query().where(field, opr, val);
         return this;
     }
 
-    public AModel where(String field, String opr, Object val) {
+    public Model where(String field, String opr, Object val) {
         query().where(field, Operator.valueOf(opr), val);
         return this;
     }
 
-    public AModel where(String field, Object val) {
+    public Model where(String field, Object val) {
         where(field, Operator.EQ, val);
         return this;
     }
 
-    public AModel where(String field, Operator operator) {
+    public Model where(String field, Operator operator) {
         where(field, operator, null);
         return this;
     }
 
-    public AModel where(Map<String, Object> query) {
+    public Model where(Map<String, Object> query) {
         // 处理字段名：标准字段名你：驼峰转下划线组成
         Map<String, Object> queryRet = new LinkedHashMap<>();
         query.forEach((name, val) -> queryRet.put(fieldToUnderlineCase(name), val));
@@ -104,64 +161,64 @@ public class Model extends AModel implements IModel {
         return this;
     }
 
-    public AModel where(String sql) {
+    public Model where(String sql) {
         query().where(sql, Operator.RAW, null);
         return this;
     }
 
-    public AModel where(WhereCallback callback)
+    public Model where(WhereCallback callback)
     {
         query().where(callback);
         return this;
     }
 
-    public AModel whereOr(WhereCallback callback)
+    public Model whereOr(WhereCallback callback)
     {
         query().whereOr(callback);
         return this;
     }
 
-    public AModel eq(String field, Object val) {
+    public Model eq(String field, Object val) {
         return where(field, val);
     }
 
-    public AModel neq(String field, Object val) {
+    public Model neq(String field, Object val) {
         return where(field, Operator.NEQ, val);
     }
 
-    public AModel gt(String field, Object val) {
+    public Model gt(String field, Object val) {
         return where(field, Operator.GT, val);
     }
 
-    public AModel gte(String field, Object val) {
+    public Model gte(String field, Object val) {
         return where(field, Operator.GTE, val);
     }
 
-    public AModel lt(String field, Object val) {
+    public Model lt(String field, Object val) {
         return where(field, Operator.LT, val);
     }
 
-    public AModel lte(String field, Object val) {
+    public Model lte(String field, Object val) {
         return where(field, Operator.LTE, val);
     }
 
-    public AModel in(String field, Object ...args) {
+    public Model in(String field, Object ...args) {
         return where(field, Operator.IN, args);
     }
 
-    public AModel notIn(String field, Object ...args) {
+    public Model notIn(String field, Object ...args) {
         return where(field, Operator.IN, args);
     }
 
-    public AModel isNull(String field) {
+    public Model isNull(String field) {
         return where(field, Operator.IS_NULL, null);
     }
 
-    public AModel isNotNull(String field) {
+    public Model isNotNull(String field) {
         return where(field, Operator.IS_NOT_NULL, null);
     }
 
-    public AModel between(String field, Object val1, Object val2) {
+    public Model between(String field, Object val1, Object val2) {
         return where(field, Operator.BETWEEN, new Object[]{val1, val2});
     }
 
@@ -349,17 +406,17 @@ public class Model extends AModel implements IModel {
      * @param asc 排序方式：ASC、DESC
      * @return 模型对象
      */
-    public AModel order(String field, String asc) {
+    public Model order(String field, String asc) {
         query().order(fieldToUnderlineCase(field), asc);
         return this;
     }
 
-    public AModel order(String field, boolean asc) {
+    public Model order(String field, boolean asc) {
         order(field, asc ? "ASC" : "DESC");
         return this;
     }
 
-    public AModel order(String fields)
+    public Model order(String fields)
     {
         if (ORMHelper.isEmpty(fields)) {
             return this;
@@ -371,24 +428,24 @@ public class Model extends AModel implements IModel {
         return arr.length == 2 ? order(arr[0], arr[1]) : order(arr[0], "ASC");
     }
 
-    public AModel order(List<String> fields) {
+    public Model order(List<String> fields) {
         fields.forEach(this::order);
         return this;
     }
 
-    public AModel order(String[] fields) {
+    public Model order(String[] fields) {
         for (String field : fields) {
             order(field);
         }
         return this;
     }
 
-    public AModel limit(Integer index, Integer count) {
+    public Model limit(Integer index, Integer count) {
         query().limit(index, count);
         return this;
     }
 
-    public AModel limit(Integer count) {
+    public Model limit(Integer count) {
         return limit(0, count);
     }
 
@@ -397,7 +454,7 @@ public class Model extends AModel implements IModel {
      * @param page 页数
      * @return 模型对象
      */
-    public AModel page(Integer page) {
+    public Model page(Integer page) {
         query().page(page);
         return this;
     }
@@ -408,43 +465,43 @@ public class Model extends AModel implements IModel {
      * @param size 页大小
      * @return 模型对象
      */
-    public AModel page(Integer page, Integer size) {
+    public Model page(Integer page, Integer size) {
         query().page(page, size);
         return this;
     }
 
-    public AModel group(String fields) {
+    public Model group(String fields) {
         query().group(fields);
         return this;
     }
 
-    public AModel having(String fields) {
+    public Model having(String fields) {
         query().having(fields);
         return this;
     }
 
-    public AModel union(String sql) {
+    public Model union(String sql) {
         query().union(sql);
         return this;
     }
 
-    public AModel union(String[] sqlArr) {
+    public Model union(String[] sqlArr) {
         query().union(sqlArr);
         return this;
     }
 
-    public AModel distinct(boolean distinct) {
+    public Model distinct(boolean distinct) {
         query().distinct(distinct);
         return this;
     }
 
-    public AModel lock(boolean lock) {
+    public Model lock(boolean lock) {
         query().lock(lock);
         return this;
     }
 
     // 编译sql，当前只支持查询
-    public AModel fetchSql(boolean fetch) {
+    public Model fetchSql(boolean fetch) {
         query().fetchSql(fetch);
         return this;
     }
@@ -456,7 +513,7 @@ public class Model extends AModel implements IModel {
      * @param data 数据集
      * @return 模型对象
      */
-    public AModel data(DataMap data) {
+    public Model data(DataMap data) {
         data.forEach(this::data);
         return this;
     }
@@ -476,7 +533,7 @@ public class Model extends AModel implements IModel {
      * @param val 属性值
      * @return 模型对象
      */
-    public AModel data(String name, Object val)
+    public Model data(String name, Object val)
     {
         // 数据保存
         name = ModelUtil.toCamelCase(name);
@@ -543,7 +600,7 @@ public class Model extends AModel implements IModel {
      * @param data 数据集
      * @return 模型对象
      */
-    public AModel create(Map<String, Object> data)
+    public Model create(Map<String, Object> data)
     {
         Model model = newModel(getMClass(), data);
         model.insert();
@@ -555,11 +612,11 @@ public class Model extends AModel implements IModel {
      * @param data 数据集
      * @return 模型对象
      */
-    public AModel create(DataMap data) {
+    public Model create(DataMap data) {
         return create((Map<String, Object>) data);
     }
 
-    public AModel create(Model model) {
+    public Model create(Model model) {
         return model.insert();
     }
 
@@ -735,11 +792,11 @@ public class Model extends AModel implements IModel {
     }
 
     //TODO::---------- 模型实例化----------
-    private static<D extends IModel> D newModel(Class<?> clazz) {
+    public static<D extends IModel> D newModel(Class<?> clazz) {
         return newModel(clazz, null, null);
     }
 
-    private static<D extends IModel> D newModel(Object entity) {
+    public static<D extends IModel> D newModel(Object entity) {
         return newModel(entity.getClass(), null, null);
     }
 
@@ -856,7 +913,7 @@ public class Model extends AModel implements IModel {
      * @param fields 需要预载入的属性名称
      * @return 模型对象
      */
-    public AModel with(String fields) {
+    public Model with(String fields) {
         if (ModelUtil.isEmpty(fields)) {
             return this;
         }

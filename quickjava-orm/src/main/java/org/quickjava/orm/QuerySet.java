@@ -487,8 +487,13 @@ public class QuerySet {
         this.reservoir.table = reservoirOld.table;
         this.reservoir.fetchSql = reservoirOld.fetchSql;
         this.reservoir.printSql = reservoirOld.printSql;
+        this.reservoir.joinList = reservoirOld.joinList;
+        this.reservoir.unionList = reservoirOld.unionList;
+        this.reservoir.whereList = reservoirOld.whereList;
+        this.reservoir.groupBy = reservoirOld.groupBy;
+        this.reservoir.having = reservoirOld.having;
+        this.reservoir.distinct = reservoirOld.distinct;
         this.field(field);
-        this.where(reservoirOld.getWhereList());
 
         List<Map<String, Object>> resultSet = executeSql();
         // 恢复
