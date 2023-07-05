@@ -10,7 +10,9 @@
     <name>quickjava-orm</name>
     <version>1.2.8</version>
     <packaging>jar</packaging>
-    <description>QuickJava ORM Framework</description>
+    <description>
+        QuickJava ORM Framework
+    </description>
     <url>http://www.quickjava.org/</url>
 
     <!-- 配置 -->

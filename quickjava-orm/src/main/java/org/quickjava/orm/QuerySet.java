@@ -136,6 +136,12 @@ public class QuerySet {
         return this;
     }
 
+    public QuerySet where(List<Where> wheres)
+    {
+        reservoir.getWhereList().addAll(wheres);
+        return this;
+    }
+
     /**
      * 闭包查询
      * @param callback 闭包方法
@@ -470,9 +476,14 @@ public class QuerySet {
 
     public Integer count(String field)
     {
-        field(field);
-        List<Map<String, Object>> resultSet = executeSql();
-        return Math.toIntExact((Long) resultSet.get(0).get(field));
+        Map<String, Object> retMap = new QuerySet().field(field).where(reservoir.getWhereList()).find();
+        for (Map.Entry<String, Object> entry : retMap.entrySet()) {
+            if (entry.getValue() instanceof Integer) {
+                return (Integer) entry.getValue();
+            }
+            return Integer.valueOf(String.valueOf(entry.getValue()));
+        }
+        return 0;
     }
 
     //TODO::--------------- 事务操作方法 ---------------
