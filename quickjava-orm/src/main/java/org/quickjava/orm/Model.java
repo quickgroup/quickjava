@@ -766,7 +766,12 @@ public class Model implements IModel {
                 if (!conditionMap.containsKey(fieldName)) {
                     conditionMap.put(fieldName, new LinkedList<>());
                 }
-                models.forEach(model -> conditionMap.get(fieldName).add(ReflectUtil.getFieldValue(model, relation.localKey())));
+                models.forEach(model -> {
+                    Object localKeyValue = ReflectUtil.getFieldValue(model, relation.localKey());
+                    if (!conditionMap.get(fieldName).contains(localKeyValue)) {
+                        conditionMap.get(fieldName).add(localKeyValue);
+                    }
+                });
             });
             // 查询
             relationMap.forEach((fieldName, relation) -> {

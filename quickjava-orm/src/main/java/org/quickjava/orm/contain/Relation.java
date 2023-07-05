@@ -27,7 +27,7 @@ public class Relation {
     // 本表字段
     private String localKey;
 
-    // 外表关联字段
+    // 关联表字段
     private String foreignKey;
 
     public Relation() {
