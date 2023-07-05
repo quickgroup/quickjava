@@ -116,8 +116,8 @@ public class ReflectUtil {
      * @param value 属性值
      */
     public static void setFieldValue(Object o, String fieldName, Object value) {
-        setFieldValue(o.getClass(), o, fieldName, value);
-
+//        setFieldValue(o.getClass(), o, fieldName, value);
+        cn.hutool.core.util.ReflectUtil.setFieldValue(o, fieldName, value);
     }
 
     private static void setFieldValue(Class<?> clazz, Object o, String fieldName, Object value) {

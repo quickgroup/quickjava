@@ -8,7 +8,7 @@
     <artifactId>quickjava-common2</artifactId>
     <name>quickjava-common2</name>
     <description>QuickJava common2</description>
-    <version>1.2.2</version>
+    <version>1.2.3</version>
     <packaging>jar</packaging>
     <url>http://www.quickjava.org/</url>
 
@@ -27,6 +27,14 @@
         <projectUrl>https://github.com/quickgroup/quickjava.git</projectUrl>
         <serverId>ossrh</serverId>
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>5.8.12</version>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>

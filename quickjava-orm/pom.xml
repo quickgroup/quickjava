@@ -8,7 +8,7 @@
     <groupId>org.quickjava.core</groupId>
     <artifactId>quickjava-orm</artifactId>
     <name>quickjava-orm</name>
-    <version>1.2.8</version>
+    <version>1.2.9</version>
     <packaging>jar</packaging>
     <description>
         QuickJava ORM Framework
@@ -78,12 +78,6 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>1.7.36</version>
-        </dependency>
-
-        <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-all</artifactId>
-            <version>5.8.12</version>
         </dependency>
 
     </dependencies>
