@@ -256,6 +256,10 @@ public class Model implements IModel {
      * @return 模型对象
      */
     public <D extends IModel> D insert(DataMap data) {
+        return insert((Map<String, Object>) data);
+    }
+
+    public <D extends IModel> D insert(Map<String, Object> data) {
         data(data);
         return insert();
     }
@@ -306,6 +310,10 @@ public class Model implements IModel {
     }
 
     public <D extends IModel> D update(DataMap data) {
+        return update((Map<String, Object>) data);
+    }
+
+    public <D extends IModel> D update(Map<String, Object> data) {
         data(data);
         return update();
     }
@@ -330,6 +338,10 @@ public class Model implements IModel {
     }
 
     public <D extends IModel> D save(DataMap data) {
+        return save((Map<String, Object>) data);
+    }
+
+    public <D extends IModel> D save(Map<String, Object> data) {
         data(data);
         save();
         return toD(this);
@@ -515,6 +527,10 @@ public class Model implements IModel {
      * @return 模型对象
      */
     public Model data(DataMap data) {
+        return data((Map<String, Object>) data);
+    }
+
+    public Model data(Map<String, Object> data) {
         data.forEach(this::data);
         return this;
     }
@@ -712,7 +728,7 @@ public class Model implements IModel {
                     ReflectUtil.setFieldValue(model, relationName, relationModel);
                 });
             } else {
-                ((Model) model).data((DataMap) data);
+                ((Model) model).data(data);
             }
             models.add(model);
         });
