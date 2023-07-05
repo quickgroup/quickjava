@@ -107,6 +107,7 @@ public class Model implements IModel {
     }
 
     @JsonIgnore
+    @TableField(exist = false)
     private static final Logger logger = LoggerFactory.getLogger(Model.class);
 
     public Model() {
@@ -829,6 +830,7 @@ public class Model implements IModel {
     }
 
     @JsonIgnore
+    @TableField(exist = false)
     private static final MethodInterceptor modelProxyMethodInterceptor = new MethodInterceptor () {
         @Override
         public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
@@ -1177,6 +1179,8 @@ public class Model implements IModel {
     }
 
     // 默认转换字段大小写
+    @JsonIgnore
+    @TableField(exist = false)
     private static final WhereOptCallback whereOptCallback = (where, querySet, userData) -> {
         // 子查询条件不处理
         if (where.getChildren() != null) {

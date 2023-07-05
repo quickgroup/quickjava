@@ -26,10 +26,10 @@ public class ReflectUtil {
 
     /**
      * 直接读取属性值，不走getter
-     *
-     * @param o         对象
-     * @param fieldName 属性名
-     * @return 属性值
+     * @param o object
+     * @param fieldName fieldName
+     * @return ret
+     * @param <T> T
      */
     public static<T> T getFieldValue(Object o, String fieldName) {
         return getFieldValue(o.getClass(), o, fieldName);
