@@ -79,6 +79,9 @@ public class QueryReservoir {
     public boolean fetchSql = false;
 
     @JsonIgnore
+    public boolean printSql = false;
+
+    @JsonIgnore
     public String sql = null;
 
     public String getTable() {

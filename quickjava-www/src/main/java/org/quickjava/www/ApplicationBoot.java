@@ -64,6 +64,8 @@ public class ApplicationBoot {
 
         System.out.println("update.sql=" + new Article().where("id", 211).data("id", 123).vegetarian(false).fetchSql(true).update());
 
+        System.out.println("update.sql=" + new Article().where("id", 211).data("id", 123).fetchSql(true).pagination(1, 10));
+
         QuickJavaBoot.start(ApplicationBoot.class, args);
     }
 

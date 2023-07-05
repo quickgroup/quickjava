@@ -14,6 +14,7 @@ import org.quickjava.orm.drive.Drive;
 import org.quickjava.orm.enums.Operator;
 import org.quickjava.orm.utils.ORMHelper;
 import org.quickjava.orm.utils.QueryException;
+import org.quickjava.orm.utils.QuerySetHelper;
 import org.quickjava.orm.utils.SqlUtil;
 
 import java.util.Arrays;
@@ -32,7 +33,7 @@ import java.util.Map;
 public class QuerySet {
 
     @JsonIgnore
-    private final QueryReservoir reservoir = new QueryReservoir();
+    private QueryReservoir reservoir = new QueryReservoir();
 
     public QuerySet() {}
 
@@ -425,6 +426,9 @@ public class QuerySet {
         reservoir.action = reservoir.action == null ? Action.SELECT : reservoir.action;
         if (reservoir.fetchSql) {
             reservoir.setSql(ORMContext.getDrive().pretreatment(this));
+            if (reservoir.printSql) {
+                System.out.println(reservoir.getSql());
+            }
             return null;
         }
         return ORMContext.getDrive().executeSql(this);
@@ -447,13 +451,15 @@ public class QuerySet {
     // 分页查询
     public Pagination<Map<String, Object>> pagination()
     {
-        List<String> cacheFiledList = new LinkedList<>(reservoir.fieldList);
+        List<String> cacheFiledList = new LinkedList<>(reservoir.getFieldList());
+        // 分页器开启直接打印sql
+        reservoir.printSql = true;
         // 获取总数
-        reservoir.fieldList.clear();
+        reservoir.getFieldList().clear();
         Integer total = count();
         // 执行查询
-        reservoir.fieldList.clear();
-        reservoir.fieldList.addAll(cacheFiledList);
+        reservoir.getFieldList().clear();
+        reservoir.getFieldList().addAll(cacheFiledList);
         List<Map<String, Object>> rows = select();
         // 返回分页
         int page = reservoir.limitIndex / reservoir.limitSize + 1;
@@ -476,14 +482,23 @@ public class QuerySet {
 
     public Integer count(String field)
     {
-        Map<String, Object> retMap = new QuerySet().field(field).where(reservoir.getWhereList()).find();
-        for (Map.Entry<String, Object> entry : retMap.entrySet()) {
-            if (entry.getValue() instanceof Integer) {
-                return (Integer) entry.getValue();
-            }
-            return Integer.valueOf(String.valueOf(entry.getValue()));
+        QueryReservoir reservoirOld = this.reservoir;
+        this.reservoir = new QueryReservoir();
+        // 聚合count只需要field、where
+        this.reservoir.table = reservoirOld.table;
+        this.reservoir.fetchSql = reservoirOld.fetchSql;
+        this.reservoir.printSql = reservoirOld.printSql;
+        this.field(field);
+        this.where(reservoirOld.getWhereList());
+
+        List<Map<String, Object>> resultSet = executeSql();
+        // 恢复
+        this.reservoir = reservoirOld;
+
+        if (resultSet == null) {
+            return 0;
         }
-        return 0;
+        return Math.toIntExact((Long) resultSet.get(0).get(field));
     }
 
     //TODO::--------------- 事务操作方法 ---------------
