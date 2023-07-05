@@ -189,7 +189,7 @@ public class Model extends AModel implements IModel {
             return toD(new ModelSql(reservoir().getSql()));
         // 回填主键
         data(pk(), pkVal);
-        return toD(ModelUtil.isProxyModel(this) ? this : newProxyModel(getMClass(), data()));
+        return toD(ModelUtil.isProxyModel(this) ? this : newModel(getMClass(), data()));
     }
 
     /**
@@ -244,7 +244,7 @@ public class Model extends AModel implements IModel {
         if (reservoir().isFetchSql())
             return toD(new ModelSql(reservoir().getSql()));
         // 返回模型
-        return toD(ModelUtil.isProxyModel(this) ? this : newProxyModel(getMClass(), data()));
+        return toD(ModelUtil.isProxyModel(this) ? this : newModel(getMClass(), data()));
     }
 
     public <D extends IModel> D update(DataMap data) {
@@ -545,7 +545,7 @@ public class Model extends AModel implements IModel {
      */
     public AModel create(Map<String, Object> data)
     {
-        Model model = newProxyModel(getMClass(), data);
+        Model model = newModel(getMClass(), data);
         model.insert();
         return model;
     }
@@ -641,7 +641,7 @@ public class Model extends AModel implements IModel {
         // 集合对象
         List<D> models = new LinkedList<>();
         dataList.forEach(data -> {
-            D model = newProxyModel(clazz);
+            D model = newModel(clazz);
             // 装载关联属性
             Map<String, Relation> relationMap = getWithRelation(new RelationType[]{RelationType.OneToOne});
             if (relationMap.size() > 0) {
@@ -649,7 +649,7 @@ public class Model extends AModel implements IModel {
                 resultTranshipmentWith(model, data, null);
                 // 关联表数据
                 relationMap.forEach((relationName, relation) -> {
-                    Model relationModel = newProxyModel(relation.getClazz(), null, model);
+                    Model relationModel = newModel(relation.getClazz(), null, model);
                     resultTranshipmentWith(relationModel, data, relationName);
                     ReflectUtil.setFieldValue(model, relationName, relationModel);
                 });
@@ -735,21 +735,31 @@ public class Model extends AModel implements IModel {
     }
 
     //TODO::---------- 模型实例化----------
-    private static<D extends IModel> D newProxyModel(Class<?> clazz) {
-        return newProxyModel(clazz, null, null);
+    private static<D extends IModel> D newModel(Class<?> clazz) {
+        return newModel(clazz, null, null);
     }
 
-    private static<D extends IModel> D newProxyModel(Class<?> clazz, Map<String, Object> data) {
-        return newProxyModel(clazz, data, null);
+    private static<D extends IModel> D newModel(Object entity) {
+        return newModel(entity.getClass(), null, null);
     }
 
-    private static<D extends IModel> D newProxyModel(Class<?> clazz, Map<String, Object> data, IModel parent)
+    private static<D extends IModel> D newModel(Class<?> clazz, Map<String, Object> data) {
+        return newModel(clazz, data, null);
+    }
+
+    private static<D extends IModel> D newModel(Class<?> clazz, Model parent) {
+        return newModel(clazz, null, parent);
+    }
+
+    private static<D extends IModel> D newModel(Class<?> clazz, Map<String, Object> data, IModel parent)
     {
         // 创建代理类信息
         Enhancer enhancer = new Enhancer();
         enhancer.setSuperclass(clazz);
         enhancer.setCallback(modelProxyMethodInterceptor);
         D model = toD(enhancer.create());
+        // 设置
+        ModelUtil.setFieldValue(model, "__table", parseModelTableName(clazz));
         // 加载数据
         if (!ModelUtil.isEmpty(data)) {
             ((Model) model).data((DataMap) data);
@@ -855,26 +865,6 @@ public class Model extends AModel implements IModel {
         this.__withs = QuerySetHelper.initList(this.__withs);
         this.__withs.addAll(withs);
         return this;
-    }
-
-    //---------- TODO::模型初始化 ----------//
-    private static<D> D newModel(Class<?> clazz) {
-        try {
-            if (isModel(clazz)) {
-                D model = toD(clazz.newInstance());
-                ModelUtil.setFieldValue(model, "__table", parseModelTableName(clazz));
-                return model;
-            }
-            throw new RuntimeException("该类不能实例化为模型");
-        } catch (InstantiationException | IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static<D> D newModel(Class<?> clazz, Model parent) {
-        D model = newModel(clazz);
-        ModelUtil.setFieldValue(model, "__parent", parent);   // 设置model上的属性要再获取父类
-        return model;
     }
 
     private static boolean isModel(Class<?> clazz) {

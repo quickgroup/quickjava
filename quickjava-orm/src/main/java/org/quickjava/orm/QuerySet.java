@@ -14,7 +14,6 @@ import org.quickjava.orm.drive.Drive;
 import org.quickjava.orm.enums.Operator;
 import org.quickjava.orm.utils.ORMHelper;
 import org.quickjava.orm.utils.QueryException;
-import org.quickjava.orm.utils.QuerySetHelper;
 import org.quickjava.orm.utils.SqlUtil;
 
 import java.util.Arrays;
