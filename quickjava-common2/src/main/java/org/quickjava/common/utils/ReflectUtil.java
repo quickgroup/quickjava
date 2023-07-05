@@ -112,11 +112,12 @@ public class ReflectUtil {
      * 设置属性值，默认走setter，没有则直接设置
      *
      * @param o     对象
-     * @param field 属性名
+     * @param fieldName 属性名
      * @param value 属性值
      */
-    public static void setFieldValue(Object o, String field, Object value) {
-        setFieldValue(o.getClass(), o, field, value);
+    public static void setFieldValue(Object o, String fieldName, Object value) {
+        setFieldValue(o.getClass(), o, fieldName, value);
+
     }
 
     private static void setFieldValue(Class<?> clazz, Object o, String fieldName, Object value) {
