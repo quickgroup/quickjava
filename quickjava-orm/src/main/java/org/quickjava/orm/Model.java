@@ -768,7 +768,7 @@ public class Model implements IModel {
                 }
                 models.forEach(model -> {
                     Object localKeyValue = ReflectUtil.getFieldValue(model, relation.localKey());
-                    if (!conditionMap.get(fieldName).contains(localKeyValue)) {
+                    if (!conditionMap.get(fieldName).contains(localKeyValue)) {  // 避免相同关联数据重复查询
                         conditionMap.get(fieldName).add(localKeyValue);
                     }
                 });
@@ -780,7 +780,7 @@ public class Model implements IModel {
                 }
                 Model queryModel = newModel(relation.getClazz());
                 List<Model> rows = queryModel.where(relation.foreignKey(), Operator.IN, conditionMap.get(fieldName)).select();
-                // 数据装填
+                // 装填关联模型
                 models.forEach(model -> {
                     Object modelKeyVal = ReflectUtil.getFieldValue(model, relation.localKey());
                     List<Model> set = rows.stream().filter(row -> modelKeyVal.equals(ReflectUtil.getFieldValue(row, relation.foreignKey())))
