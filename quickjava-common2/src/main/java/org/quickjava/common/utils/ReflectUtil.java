@@ -36,43 +36,38 @@ public class ReflectUtil {
     }
 
     public static<T> T getFieldValue(Class<?> clazz, Object o, String fieldName) {
-        if (1==1) {
-            return (T) cn.hutool.core.util.ReflectUtil.getFieldValue(o, fieldName);
-        }
-
-        try {
-            // getter方法获取
-            String getterName = "get" + ComUtil.firstUpper(fieldName);
-            Method method = findMethod(clazz, getterName);
-            if (method != null) {
-                method.setAccessible(true);
-                return (T) method.invoke(o);
-            }
-
-            // 直接属性获取值
-            Field field = findField(clazz, fieldName);
-            if (field != null) {
-                field.setAccessible(true);
-                return (T) field.get(o);
-            }
-
-        } catch (IllegalAccessException ignored) {
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException(e);
-        }
-        return null;
+        return (T) cn.hutool.core.util.ReflectUtil.getFieldValue(o, fieldName);
+//        try {
+//            // getter方法获取
+//            String getterName = "get" + ComUtil.firstUpper(fieldName);
+//            Method method = findMethod(clazz, getterName);
+//            if (method != null) {
+//                method.setAccessible(true);
+//                return (T) method.invoke(o);
+//            }
+//
+//            // 直接属性获取值
+//            Field field = findField(clazz, fieldName);
+//            if (field != null) {
+//                field.setAccessible(true);
+//                return (T) field.get(o);
+//            }
+//
+//        } catch (IllegalAccessException ignored) {
+//        } catch (InvocationTargetException e) {
+//            throw new RuntimeException(e);
+//        }
+//        return null;
     }
 
     public static Object getFieldValue(Object o, Field field) {
-        if (1==1) {
-            return cn.hutool.core.util.ReflectUtil.getFieldValue(o, field);
-        }
-        try {
-            field.setAccessible(true);
-            return field.get(o);
-        } catch (IllegalAccessException ignored) {
-            return null;
-        }
+        return cn.hutool.core.util.ReflectUtil.getFieldValue(o, field);
+//        try {
+//            field.setAccessible(true);
+//            return field.get(o);
+//        } catch (IllegalAccessException ignored) {
+//            return null;
+//        }
     }
 
     public static Field[] findFields(Object o) {
@@ -118,80 +113,77 @@ public class ReflectUtil {
     /**
      * 设置属性值，默认走setter，没有则直接设置
      *
-     * @param o     对象
+     * @param obj     对象
      * @param fieldName 属性名
      * @param value 属性值
      */
-    public static void setFieldValue(Object o, String fieldName, Object value) {
-//        setFieldValue(o.getClass(), o, fieldName, value);
-        cn.hutool.core.util.ReflectUtil.setFieldValue(o, fieldName, value);
+    public static void setFieldValue(Object obj, String fieldName, Object value) {
+        setFieldValue(obj.getClass(), obj, fieldName, value);
     }
 
-    private static void setFieldValue(Class<?> clazz, Object o, String fieldName, Object value) {
-        try {
-            // 走setter设置
-            String setterName = "set" + ComUtil.firstUpper(fieldName);
-            Method method = findMethod(o, setterName, value);
-            if (method != null) {       // java方法是可以被继承的
-                method.invoke(o, value);
-                return;
-            }
-            // 直接设置属性
-            Field field = findField(clazz, fieldName);
-            if (field != null) {
-                field.setAccessible(true);
-                field.set(o, valueConv(field.getType(), value));
-            }
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    private static void setFieldValue(Class<?> clazz, Object obj, String fieldName, Object value) {
+        cn.hutool.core.util.ReflectUtil.setFieldValue(obj, fieldName, value);
+//        try {
+//            // 走setter设置
+//            String setterName = "set" + ComUtil.firstUpper(fieldName);
+//            Method method = findMethod(o, setterName, value);
+//            if (method != null) {       // java方法是可以被继承的
+//                method.invoke(obj, value);
+//                return;
+//            }
+//            // 直接设置属性
+//            Field field = findField(clazz, fieldName);
+//            if (field != null) {
+//                field.setAccessible(true);
+//                field.set(o, valueConv(field.getType(), value));
+//            }
+//
+//        } catch (Exception e) {
+//            throw new RuntimeException(e);
+//        }
     }
 
-    public static void setFieldValueDirect(Object o, String fieldName, Object value) {
-        setFieldValueDirect(o.getClass(), o, fieldName, value);
+    public static void setFieldValueDirect(Object obj, String fieldName, Object value) {
+        setFieldValueDirect(obj.getClass(), obj, fieldName, value);
     }
 
-    public static void setFieldValueDirect(Class<?> clazz, Object o, String fieldName, Object value) {
-        if (1==1) {
-            cn.hutool.core.util.ReflectUtil.setFieldValue(o, fieldName, value);
-            return;
-        }
-
-        try {
-            Field field = findField(clazz, fieldName);
-            if (field != null) {
-                value = valueConv(field.getType(), value);
-                field.setAccessible(true);
-                field.set(o, value);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public static void setFieldValueDirect(Class<?> clazz, Object obj, String fieldName, Object value) {
+        cn.hutool.core.util.ReflectUtil.setFieldValue(obj, fieldName, value);
+//        try {
+//            Field field = findField(clazz, fieldName);
+//            if (field != null) {
+//                value = valueConv(field.getType(), value);
+//                field.setAccessible(true);
+//                field.set(obj, value);
+//            }
+//        } catch (Exception e) {
+//            throw new RuntimeException(e);
+//        }
     }
 
-    public static void setFieldValue(Object o, Field field, Object value) {
-        try {
-            // setter
-            String setterName = "set" + ComUtil.firstUpper(field.getName());
-            Method method = findMethod(o, setterName, value);
-            if (method != null) {
-                method.setAccessible(true);
-                method.invoke(o, value);
-                return;
-            }
-            // 直接设置
-            field.setAccessible(true);
-            field.set(o, value);
-
-        } catch (Exception e) {
-            System.out.println("设置对象字段数据时异常 o=" + o + "\nfield=" + field + ", value=" + value + "\nmsg=" + e.getMessage());
-            e.printStackTrace();
-        }
+    public static void setFieldValue(Object obj, Field field, Object value) {
+        cn.hutool.core.util.ReflectUtil.setFieldValue(obj, field, value);
+//        try {
+//            // setter
+//            String setterName = "set" + ComUtil.firstUpper(field.getName());
+//            Method method = findMethod(o, setterName, value);
+//            if (method != null) {
+//                method.setAccessible(true);
+//                method.invoke(o, value);
+//                return;
+//            }
+//            // 直接设置
+//            field.setAccessible(true);
+//            field.set(o, value);
+//
+//        } catch (Exception e) {
+//            System.out.println("设置对象字段数据时异常 o=" + o + "\nfield=" + field + ", value=" + value + "\nmsg=" + e.getMessage());
+//            e.printStackTrace();
+//        }
     }
 
-    public static Method[] getMethods(Object o) {
-        return getMethods(o.getClass());
+    public static Method[] getMethods(Object obj) {
+        return getMethods(obj.getClass());
     }
 
     public static Method[] getMethods(Class<?> clazz) {
@@ -204,7 +196,7 @@ public class ReflectUtil {
         return METHODS_CACHE.get(clazz);
     }
 
-    public static Method findMethod(Object o, String name, Object... args) {
+    public static Method findMethod(Object obj, String name, Object... args) {
         // 参数对象类
         Class<?>[] argsClasses = new Class<?>[args.length];
         for (int i = 0; i < args.length; i++) {
@@ -213,11 +205,11 @@ public class ReflectUtil {
             }
             argsClasses[i] = args[i] instanceof Class<?> ? (Class<?>) args[i] : args[i].getClass();
         }
-        return findMethod(o, name, argsClasses);
+        return findMethod(obj, name, argsClasses);
     }
 
-    public static Method findMethod(Object o, String name, Class<?>... argsClasses) {
-        for (Method method : getMethods(o)) {
+    public static Method findMethod(Object obj, String name, Class<?>... argsClasses) {
+        for (Method method : getMethods(obj)) {
             if (method.getName().equals(name) && Arrays.deepEquals(method.getParameterTypes(), argsClasses)) {
                 return method;
             }
@@ -228,18 +220,19 @@ public class ReflectUtil {
     // FIXME::该方法兼容性差
     public static <T> T invoke(Object obj, String methodName, Object... args)
     {
-        try {
-            Method method = findMethod(obj, methodName, args);
-            if (method == null) {
-                return null;
-            }
-            method.setAccessible(true);
-            return (T) method.invoke(obj, args);
-
-        } catch (Exception e) {
-//            throw new RuntimeException(e.getMessage());
-            return null;
-        }
+        return cn.hutool.core.util.ReflectUtil.invoke(obj, methodName, args);
+//        try {
+//            Method method = findMethod(obj, methodName, args);
+//            if (method == null) {
+//                return null;
+//            }
+//            method.setAccessible(true);
+//            return (T) method.invoke(obj, args);
+//
+//        } catch (Exception e) {
+////            throw new RuntimeException(e.getMessage());
+//            return null;
+//        }
     }
 
     // 格式：
