@@ -186,6 +186,7 @@ public class ModelUtil extends SqlUtil {
 
     /**
      * 获取方法引用传递的方法名称
+     * @param getter getter
      * @return 对应属性名称
      */
     public static String getSupplierConvFieldName(Supplier<?> getter)

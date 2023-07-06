@@ -224,9 +224,11 @@ public class Model implements IModel {
     }
 
     //TODO::---------- 操作方法-增删改查 ----------
+
     /**
      * 新增
-     * @return 模型对象
+     * @return D
+     * @param <D> D
      */
     public <D extends IModel> D insert()
     {
@@ -254,6 +256,7 @@ public class Model implements IModel {
      * 使用数据集新增
      * @param data 数据集
      * @return 模型对象
+     * @param <D> D
      */
     public <D extends IModel> D insert(DataMap data) {
         return insert((Map<String, Object>) data);
@@ -289,6 +292,7 @@ public class Model implements IModel {
     /**
      * 更新
      * @return 模型对象
+     * @param <D> D
      */
     public <D extends IModel> D update()
     {
@@ -330,6 +334,7 @@ public class Model implements IModel {
      * 保存数据
      * - 自动判断主键是否为null，为null执行新增，否则进行更新
      * @return 模型对象
+     * @param <D> D
      */
     public <D extends IModel> D save() {
         String pk = pk();
