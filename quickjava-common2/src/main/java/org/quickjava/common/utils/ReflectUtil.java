@@ -153,6 +153,11 @@ public class ReflectUtil {
     }
 
     public static void setFieldValueDirect(Class<?> clazz, Object o, String fieldName, Object value) {
+        if (1==1) {
+            cn.hutool.core.util.ReflectUtil.setFieldValue(o, fieldName, value);
+            return;
+        }
+
         try {
             Field field = findField(clazz, fieldName);
             if (field != null) {
