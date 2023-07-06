@@ -5,6 +5,7 @@
 
 package org.quickjava.orm.contain;
 
+import cn.hutool.core.convert.Convert;
 import org.quickjava.orm.utils.SqlUtil;
 
 import java.text.SimpleDateFormat;
@@ -24,8 +25,9 @@ public class Value {
         } else if (value instanceof Iterable) {
             return SqlUtil.collJoin(",", ((Iterable<?>) value));
         } else {
-            value = SqlUtil.escapeSql(String.valueOf(value));
-            return String.format("%s%s%s", config.strL, value, config.strR);
+            String valueConv = Convert.convert(String.class, value);
+            valueConv = SqlUtil.escapeSql(valueConv);
+            return String.format("%s%s%s", config.strL, valueConv, config.strR);
         }
     }
 
