@@ -1,5 +1,7 @@
 package org.quickjava.common.utils;
 
+import cn.hutool.core.convert.Convert;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.math.BigDecimal;
@@ -23,17 +25,21 @@ import java.text.SimpleDateFormat;
  */
 public class DbClassConv {
 
-    public static Object valueConv(Class<?> retClazz, Object value) throws SQLException, IOException {
-        if (retClazz == String.class) {
-            return convertResultSetToString(value);
-        } else if (retClazz == int.class || retClazz == Integer.class) {
-            return convertObjectToInt(value);
-        } else if (retClazz == long.class || retClazz == Long.class) {
-            return convertObjectToLong(value);
-        } else if (retClazz == double.class || retClazz == Double.class) {
-            return convertObjectToDouble(value);
+    public static Object valueConv(Class<?> retClazz, Object value) {
+        try {
+            if (retClazz == String.class) {
+                return convertResultSetToString(value);
+            } else if (retClazz == int.class || retClazz == Integer.class) {
+                return convertObjectToInt(value);
+            } else if (retClazz == long.class || retClazz == Long.class) {
+                return convertObjectToLong(value);
+            } else if (retClazz == double.class || retClazz == Double.class) {
+                return convertObjectToDouble(value);
+            }
+        } catch (Exception ignore) {
         }
-        return value;
+
+        return Convert.convert(retClazz, value);
     }
 
     public static String convertResultSetToString(Object value) throws SQLException, IOException {
@@ -51,7 +57,7 @@ public class DbClassConv {
         } else if (value instanceof Clob) {
             value = convertClobToString((Clob) value);
         }
-        return (String) value;
+        return Convert.convert(String.class, value);
     }
 
     private static String convertClobToString(Clob clob) throws SQLException, IOException {
@@ -70,20 +76,18 @@ public class DbClassConv {
         return sb.toString();
     }
 
-    public static int convertObjectToInt(Object value) {
+    public static Integer convertObjectToInt(Object value) {
         if (value == null) {
             return 0;
         }
-
         if (value instanceof Number) {
             return ((Number) value).intValue();
         }
-
         try {
             return Integer.parseInt(value.toString());
-        } catch (NumberFormatException e) {
-            return 0;
+        } catch (NumberFormatException ignore) {
         }
+        return Convert.convert(Integer.class, value);
     }
 
     public static long convertObjectToLong(Object value) {

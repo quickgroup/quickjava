@@ -1,5 +1,7 @@
 package org.quickjava.common.utils;
 
+import cn.hutool.core.convert.Convert;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -122,6 +124,10 @@ public class ReflectUtil {
     }
 
     private static void setFieldValue(Class<?> clazz, Object obj, String fieldName, Object value) {
+        Field field = findField(clazz, fieldName);
+        if (value != null && field != null && !field.getType().isAssignableFrom(value.getClass())) {
+            value = DbClassConv.valueConv(field.getType(), value);
+        }
         cn.hutool.core.util.ReflectUtil.setFieldValue(obj, fieldName, value);
 //        try {
 //            // 走setter设置
@@ -148,6 +154,10 @@ public class ReflectUtil {
     }
 
     public static void setFieldValueDirect(Class<?> clazz, Object obj, String fieldName, Object value) {
+        Field field = findField(clazz, fieldName);
+        if (value != null && field != null && !field.getType().isAssignableFrom(value.getClass())) {
+            value = DbClassConv.valueConv(field.getType(), value);
+        }
         cn.hutool.core.util.ReflectUtil.setFieldValue(obj, fieldName, value);
 //        try {
 //            Field field = findField(clazz, fieldName);
