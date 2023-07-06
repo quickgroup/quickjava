@@ -36,6 +36,10 @@ public class ReflectUtil {
     }
 
     public static<T> T getFieldValue(Class<?> clazz, Object o, String fieldName) {
+        if (1==1) {
+            return (T) cn.hutool.core.util.ReflectUtil.getFieldValue(o, fieldName);
+        }
+
         try {
             // getter方法获取
             String getterName = "get" + ComUtil.firstUpper(fieldName);
@@ -60,6 +64,9 @@ public class ReflectUtil {
     }
 
     public static Object getFieldValue(Object o, Field field) {
+        if (1==1) {
+            return cn.hutool.core.util.ReflectUtil.getFieldValue(o, field);
+        }
         try {
             field.setAccessible(true);
             return field.get(o);
