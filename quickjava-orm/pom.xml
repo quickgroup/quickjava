@@ -8,7 +8,7 @@
     <groupId>org.quickjava.core</groupId>
     <artifactId>quickjava-orm</artifactId>
     <name>quickjava-orm</name>
-    <version>1.2.12</version>
+    <version>1.2.13</version>
     <packaging>jar</packaging>
     <description>
         QuickJava ORM Framework

@@ -57,7 +57,10 @@ public class ModelUtil extends SqlUtil {
     }
 
     public static Class<?> getModelClass(Class<?> clazz) {
-        return Enhancer.isEnhanced(clazz) ? clazz.getSuperclass() : clazz;
+        if (!Enhancer.isEnhanced(clazz)) {
+            return clazz;
+        }
+        return getModelClass(clazz.getSuperclass());
     }
 
     public static Class<?> getModelClass(Object obj) {

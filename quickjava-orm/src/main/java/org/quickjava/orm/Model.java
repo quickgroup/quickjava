@@ -839,7 +839,7 @@ public class Model implements IModel {
     {
         // 创建代理类信息
         Enhancer enhancer = new Enhancer();
-        enhancer.setSuperclass(clazz);
+        enhancer.setSuperclass(getModelClass(clazz));
         enhancer.setCallback(modelProxyMethodInterceptor);
         D model = toD(enhancer.create());
         // 设置
