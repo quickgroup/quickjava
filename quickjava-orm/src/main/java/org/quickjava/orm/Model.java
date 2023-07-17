@@ -1020,14 +1020,13 @@ public class Model implements IModel {
             fieldInfo.setWay(findRelationAno(field));
 
             // 有关联方法
-            if (methodMap.containsKey(fieldName)) {
+            Method method = methodMap.get(fieldName);
+            if (method != null && Model.class.isAssignableFrom(method.getReturnType())) {
                 try {
-                    Method method = methodMap.get(fieldName);
                     method.invoke(model);
-                } catch (IllegalAccessException | InvocationTargetException e) {
-                    throw new RuntimeException(e);
+                    fieldInfo.setWay(meta.relationMap().get(fieldName));
+                } catch (IllegalAccessException | InvocationTargetException ignore) {
                 }
-                fieldInfo.setWay(meta.relationMap().get(fieldName));
             } else {
                 // 非关联字段且隐藏
                 if (tableField != null && !tableField.exist()) {
