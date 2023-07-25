@@ -399,6 +399,28 @@ public class Model implements IModel {
         return toD(models);
     }
 
+    /**
+     * 获取指定字段的数据
+     * @param field 字段名
+     * @return 字段数据
+     * @param <D> 数据代理类
+     */
+    public <D> D value(String field) {
+        // 指定字段
+        query().field(field);
+        // 查询
+        D ret = find();
+        return ret;
+    }
+
+    public <D extends IModel> D[] values(String field) {
+        // 指定字段
+        query().field(field);
+        // 查询
+        List<D> ret = select();
+        return null;
+    }
+
     //TODO::---------- 分页方法 ----------
     public <D> Pagination<D> pagination(Integer page, Integer pageSize) {
         // 查询前处理：预载入
@@ -682,7 +704,7 @@ public class Model implements IModel {
 
         // T1::字段声明
         List<String> fields = new LinkedList<>();
-        // 主表字段声明
+        // 本表字段声明
         __meta.fieldMap().forEach((name, field) -> {
             if (field.getWay() != null || Model.class.isAssignableFrom(field.getClazz())) {
                 return;
