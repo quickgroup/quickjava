@@ -725,9 +725,10 @@ public class Model implements IModel {
                 fields.add(fieldAlias(relationName, name));
             });
             // 关联方式声明
-            query().join(meta.table() + " " + relationName,
-                    String.format("%s.%s = %s.%s", relationName, toUnderlineCase(relation.foreignKey()),
-                    __meta.table(), toUnderlineCase(relation.localKey())), "LEFT");
+            query().join(meta.table() + " " + relationName, String.format("%s.%s = %s.%s",
+                            relationName, toUnderlineCase(relation.foreignKey()),
+                            __meta.table(), toUnderlineCase(relation.localKey())
+                    ), "LEFT");
         });
         // 装填字段
         query().field(fields);
@@ -739,12 +740,12 @@ public class Model implements IModel {
      * - 一对多的关联在主数据返回后再统一查询组装
      * */
     private <D extends IModel> List<D> resultTranshipment(Class<?> clazz, List<Map<String, Object>> dataList) {
-        // 集合对象
         List<D> models = new LinkedList<>();
+        Map<String, Relation> relationMap = getWithRelation(new RelationType[]{RelationType.OneToOne});
+        // 逐个装载
         dataList.forEach(data -> {
             D model = newModel(clazz);
             // 装载关联属性
-            Map<String, Relation> relationMap = getWithRelation(new RelationType[]{RelationType.OneToOne});
             if (relationMap.size() > 0) {
                 // 主表数据
                 resultTranshipmentWith(model, data, null);
@@ -762,13 +763,13 @@ public class Model implements IModel {
         return models;
     }
 
-    private void resultTranshipmentWith(IModel model, Map<String, Object> set, String relationName) {
+    private void resultTranshipmentWith(IModel model, Map<String, Object> set, String alias) {
         Model modelAbs = ((Model) model);
         modelAbs.__meta.fieldMap().forEach((name, field) -> {
             if (field.getWay() != null || Model.class.isAssignableFrom(field.getClazz())) {
                 return;
             }
-            String tableName = relationName == null ? modelAbs.__meta.table() : relationName;
+            String tableName = alias == null ? modelAbs.__meta.table() : alias;
             String dataName = tableName + "__" + toUnderlineCase(name);
             modelAbs.data(name, set.get(dataName));
         });
