@@ -781,7 +781,7 @@ public class Model implements IModel {
      * */
     private void queryAfter(List<IModel> models) {
         // 预载入的数据查询后加载
-        if (__withs != null) {
+        if (__withs != null && !__withs.isEmpty()) {
             // 超过500警告
             if (models.size() > 500) {
                 logger.warn("QuickJava-ORM：The current query has too much data and may cause the service to crash. models.size=" + models.size());
