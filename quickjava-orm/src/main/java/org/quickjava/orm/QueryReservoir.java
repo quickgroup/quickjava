@@ -237,4 +237,29 @@ public class QueryReservoir {
     public void setSql(String sql) {
         this.sql = sql;
     }
+
+    @Override
+    public String toString() {
+        return "QueryReservoir{" +
+                "table='" + table + '\'' +
+                ", action=" + action +
+                ", fieldList=" + fieldList +
+                ", joinList=" + joinList +
+                ", unionList=" + unionList +
+                ", whereList=" + whereList +
+                ", orderByList=" + orderByList +
+                ", dataList=" + dataList +
+                ", groupBy='" + groupBy + '\'' +
+                ", having='" + having + '\'' +
+                ", limitIndex=" + limitIndex +
+                ", limitSize=" + limitSize +
+                ", distinct=" + distinct +
+                ", lock=" + lock +
+                ", whereOptCallback=" + whereOptCallback +
+                ", whereOptCallbackData=" + whereOptCallbackData +
+                ", fetchSql=" + fetchSql +
+                ", printSql=" + printSql +
+                ", sql='" + sql + '\'' +
+                '}';
+    }
 }

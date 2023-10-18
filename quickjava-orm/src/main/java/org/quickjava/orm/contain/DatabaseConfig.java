@@ -17,7 +17,7 @@ import java.sql.SQLException;
  * License: Apache Licence 2.0
  * +-------------------------------------------------------------------
  */
-public class Config {
+public class DatabaseConfig {
 
     // 连接方式
     public DBSubject subject = DBSubject.CONFIG;
@@ -53,7 +53,7 @@ public class Config {
         SPRING,
     }
 
-    public Config(DBSubject subject, String url, String username, String password) {
+    public DatabaseConfig(DBSubject subject, String url, String username, String password) {
         this.subject = subject;
         this.url = url;
         this.username = username;
@@ -61,7 +61,7 @@ public class Config {
         parseTypeFromUrl(url);
     }
 
-    public Config(DBSubject subject, DBType dbType) {
+    public DatabaseConfig(DBSubject subject, DBType dbType) {
         this.subject = subject;
         this.type = dbType;
     }

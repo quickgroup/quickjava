@@ -1,8 +1,6 @@
 package org.quickjava.orm.drive;
 
-import org.quickjava.common.utils.ReflectUtil;
-import org.quickjava.orm.ORMContext;
-import org.quickjava.orm.contain.Config;
+import org.quickjava.orm.contain.DatabaseConfig;
 import org.quickjava.orm.utils.QueryException;
 import org.quickjava.orm.utils.QuickORMException;
 
@@ -14,13 +12,13 @@ import java.util.Map;
 
 public class QuickConnection {
 
-    private Config config;
+    private DatabaseConfig config;
 
     private Connection connection;
 
     public boolean autoCommit;
 
-    public QuickConnection(Config config) {
+    public QuickConnection(DatabaseConfig config) {
         this.config = config;
         this.autoCommit = config.autoCommit;
     }
@@ -32,7 +30,7 @@ public class QuickConnection {
     public QuickConnection connect()
     {
         // 根据配置连接 or QuickJava框架中使用
-        if (config.subject == Config.DBSubject.CONFIG || config.subject == Config.DBSubject.QUICKJAVA) {
+        if (config.subject == DatabaseConfig.DBSubject.CONFIG || config.subject == DatabaseConfig.DBSubject.QUICKJAVA) {
             try {
                 Class.forName(config.driver);
                 this.connection = DriverManager.getConnection(config.url, config.username, config.password);
@@ -44,7 +42,7 @@ public class QuickConnection {
         }
 
         // Spring 框架中使用
-        else if (config.subject == Config.DBSubject.SPRING) {
+        else if (config.subject == DatabaseConfig.DBSubject.SPRING) {
             try {
                 this.connection = SpringAutoConfiguration.instance.getDataSource().getConnection();
             } catch (SQLException e) {

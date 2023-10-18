@@ -17,7 +17,7 @@ package org.quickjava.orm;
 
 import org.quickjava.common.utils.ReflectUtil;
 import org.quickjava.orm.callback.ModelListener;
-import org.quickjava.orm.contain.Config;
+import org.quickjava.orm.contain.DatabaseConfig;
 import org.quickjava.orm.drive.*;
 
 import java.util.LinkedHashMap;
@@ -30,16 +30,16 @@ import java.util.Map;
  */
 public class ORMContext {
 
-    public static Map<Config.DBType, Class<? extends Drive>> driveMap = new LinkedHashMap<>();
+    public static Map<DatabaseConfig.DBType, Class<? extends Drive>> driveMap = new LinkedHashMap<>();
 
     static {
-        driveMap.put(Config.DBType.MYSQL, Mysql.class);
-        driveMap.put(Config.DBType.ORACLE, Oracle.class);
-        driveMap.put(Config.DBType.DEFAULT, DefaultDrive.class);
+        driveMap.put(DatabaseConfig.DBType.MYSQL, Mysql.class);
+        driveMap.put(DatabaseConfig.DBType.ORACLE, Oracle.class);
+        driveMap.put(DatabaseConfig.DBType.DEFAULT, DefaultDrive.class);
     }
 
     public static Drive getDrive() {
-        Config config;
+        DatabaseConfig config;
         synchronized (Drive.class) {
             // 检测spring
             if (SpringAutoConfiguration.instance != null) {
@@ -56,7 +56,7 @@ public class ORMContext {
      * @param config 链接配置
      * @return 驱动连接
      */
-    public static Drive getDrive(Config config)
+    public static Drive getDrive(DatabaseConfig config)
     {
         // 加载驱动操作类
         try {
@@ -69,25 +69,25 @@ public class ORMContext {
     }
 
     // 默认配置
-    private static Config defaultConfig = new Config(Config.DBSubject.CONFIG, Config.DBType.DEFAULT);
+    private static DatabaseConfig defaultConfig = new DatabaseConfig(DatabaseConfig.DBSubject.CONFIG, DatabaseConfig.DBType.DEFAULT);
 
     /**
      * FIXME::从QuickJava读取数据库配置
      * @return 链接配置
      * */
-    public static Config getQuickJavaConfig()
+    public static DatabaseConfig getQuickJavaConfig()
     {
         try {
             Class<?> kernelClazz = ORMContext.class.getClassLoader().loadClass("org.quickjava.framework.Kernel");
             Object configMap = ReflectUtil.getFieldValue(kernelClazz, "config");
             Object databaseMap = ReflectUtil.invoke(configMap, "get", "database");
-            Config config1 = new Config(
-                    Config.DBSubject.QUICKJAVA,
+            DatabaseConfig config1 = new DatabaseConfig(
+                    DatabaseConfig.DBSubject.QUICKJAVA,
                     ReflectUtil.invoke(databaseMap, "getString", "url"),
                     ReflectUtil.invoke(databaseMap, "getString", "username"),
                     ReflectUtil.invoke(databaseMap, "getString", "password")
             );
-            config1.subject = Config.DBSubject.QUICKJAVA;
+            config1.subject = DatabaseConfig.DBSubject.QUICKJAVA;
             return config1;
         } catch (Throwable th) {
             return defaultConfig;

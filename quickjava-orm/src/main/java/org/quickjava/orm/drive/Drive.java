@@ -29,7 +29,7 @@ public abstract class Drive {
 
     protected static final Logger logger = LoggerFactory.getLogger(Drive.class);
 
-    private Config config = null;
+    private DatabaseConfig config = null;
 
     // 开启事务后将连接放到线程缓存中
     private static final ThreadLocal<QuickConnection> __THREAD_CONNECTION = new ThreadLocal<>();

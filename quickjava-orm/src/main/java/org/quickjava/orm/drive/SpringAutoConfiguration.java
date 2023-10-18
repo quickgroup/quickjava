@@ -1,10 +1,9 @@
 package org.quickjava.orm.drive;
 
-import org.quickjava.orm.contain.Config;
+import org.quickjava.orm.contain.DatabaseConfig;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 
@@ -37,9 +36,9 @@ public class SpringAutoConfiguration implements InitializingBean {
     @Autowired
     private DataSource druidDataSource;
 
-    private Config.DBType dbType;
+    private DatabaseConfig.DBType dbType;
 
-    private Config dbConfig;
+    private DatabaseConfig dbConfig;
 
     public SpringAutoConfiguration(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
@@ -59,12 +58,12 @@ public class SpringAutoConfiguration implements InitializingBean {
         return druidDataSource;
     }
 
-    public Config.DBType getConnectionType() {
+    public DatabaseConfig.DBType getConnectionType() {
         synchronized (SpringAutoConfiguration.class) {
             if (dbType == null) {
                 try {
                     Connection connection = getDataSource().getConnection();
-                    dbType = Config.parseTypeFromConnection(connection);
+                    dbType = DatabaseConfig.parseTypeFromConnection(connection);
                     connection.close();
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
@@ -74,9 +73,9 @@ public class SpringAutoConfiguration implements InitializingBean {
         return dbType;
     }
 
-    public Config getConfig() {
+    public DatabaseConfig getConfig() {
         if (dbConfig == null) {
-            dbConfig = new Config(Config.DBSubject.SPRING, getConnectionType());
+            dbConfig = new DatabaseConfig(DatabaseConfig.DBSubject.SPRING, getConnectionType());
         }
         return dbConfig;
     }
