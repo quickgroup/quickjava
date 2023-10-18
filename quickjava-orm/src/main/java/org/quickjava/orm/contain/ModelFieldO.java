@@ -178,4 +178,22 @@ public class ModelFieldO {
     public boolean isSoftDelete() {
         return getModelField() != null && getModelField().softDelete();
     }
+
+    @Override
+    public String toString() {
+        return "ModelFieldO{" +
+                "name='" + name + '\'' +
+                ", _name='" + _name + '\'' +
+                ", clazz=" + clazz +
+                ", field=" + field +
+                ", way=" + way +
+                ", setter=" + setter +
+                ", getter=" + getter +
+                ", method=" + method +
+                ", modelField=" + modelField +
+                ", modelId=" + modelId +
+                ", tableId=" + tableId +
+                ", tableField=" + tableField +
+                '}';
+    }
 }

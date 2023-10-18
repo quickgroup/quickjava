@@ -38,4 +38,12 @@ public class ModelList<E extends Model> extends LinkedList<E> {
         return this;
     }
 
+    @Override
+    public String toString() {
+        return "ModelList{" +
+                "model=" + model +
+                ", __parent=" + __parent +
+                ", __data=" + __data +
+                '}';
+    }
 }

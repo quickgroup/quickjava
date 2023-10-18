@@ -71,4 +71,14 @@ public class Relation {
     public void setClazz(Class<?> clazz) {
         this.clazz = clazz;
     }
+
+    @Override
+    public String toString() {
+        return "Relation{" +
+                "clazz=" + clazz +
+                ", type=" + type +
+                ", localKey='" + localKey + '\'' +
+                ", foreignKey='" + foreignKey + '\'' +
+                '}';
+    }
 }

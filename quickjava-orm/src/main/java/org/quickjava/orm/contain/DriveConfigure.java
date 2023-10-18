@@ -39,4 +39,14 @@ public class DriveConfigure {
         this.strL = strL;
         this.strR = strR;
     }
+
+    @Override
+    public String toString() {
+        return "DriveConfigure{" +
+                "fieldL='" + fieldL + '\'' +
+                ", fieldR='" + fieldR + '\'' +
+                ", strL='" + strL + '\'' +
+                ", strR='" + strR + '\'' +
+                '}';
+    }
 }

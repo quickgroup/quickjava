@@ -51,7 +51,7 @@ public class Pagination<T> {
         return "Pagination{" +
                 "page=" + page +
                 ", pageSize=" + pageSize +
-                ", lastPage=" + pages +
+                ", pages=" + pages +
                 ", total=" + total +
                 ", rows=" + rows +
                 '}';

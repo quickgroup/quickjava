@@ -101,4 +101,17 @@ public class Config {
         throw new RuntimeException("未配置连接类型的配置");
     }
 
+    @Override
+    public String toString() {
+        return "Config{" +
+                "subject=" + subject +
+                ", type=" + type +
+                ", url='" + url + '\'' +
+                ", database='" + database + '\'' +
+                ", username='" + username + '\'' +
+                ", driver='" + driver + '\'' +
+                ", autoCommit=" + autoCommit +
+                ", underscoreToCamelCase=" + underscoreToCamelCase +
+                '}';
+    }
 }

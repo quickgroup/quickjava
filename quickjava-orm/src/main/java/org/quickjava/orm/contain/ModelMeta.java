@@ -81,4 +81,14 @@ public class ModelMeta {
         }
         return null;
     }
+
+    @Override
+    public String toString() {
+        return "ModelMeta{" +
+                "clazz=" + clazz +
+                ", table='" + table + '\'' +
+                ", fieldMap=" + fieldMap +
+                ", relationMap=" + relationMap +
+                '}';
+    }
 }
