@@ -698,7 +698,8 @@ public class Model implements IModel {
         }
         // 关联属性字段载入
         Map<String, Relation> relationMap = getWithRelation(new RelationType[]{RelationType.OneToOne});
-        if (relationMap.size() == 0) {
+        System.out.println("relationMap=" + relationMap);
+        if (relationMap.isEmpty()) {
             return;
         }
 
