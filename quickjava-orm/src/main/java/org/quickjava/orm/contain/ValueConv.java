@@ -11,13 +11,24 @@ import org.quickjava.orm.annotation.ModelField;
 import org.quickjava.orm.utils.SqlUtil;
 
 import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class ValueConv {
 
     private DriveConfigure configure;
 
+    private static final Map<DriveConfigure, ValueConv> valueConvCache = new LinkedHashMap<>();
+
     public ValueConv(DriveConfigure configure) {
         this.configure = configure;
+    }
+
+    public static ValueConv getConv(DriveConfigure configure) {
+        if (!valueConvCache.containsKey(configure)) {
+            valueConvCache.put(configure, new ValueConv(configure));
+        }
+        return valueConvCache.get(configure);
     }
 
     public String conv(Object value) {

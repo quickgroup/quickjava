@@ -93,7 +93,7 @@ public abstract class Where {
     }
 
     public Object getValue(DriveConfigure config) {
-        return ValueConv.conv(value, config);
+        return ValueConv.getConv(config).conv(value);
     }
 
     public void setValue(Object value) {
@@ -115,6 +115,7 @@ public abstract class Where {
             List<String> sqlList = children.stream().map(it -> it.toSql(cfg)).collect(Collectors.toList());
             return getLogicStr() + " (" + cutFirstLogic(SqlUtil.collJoin(" ", sqlList)) + ")";
         }
+        ValueConv valueConv = ValueConv.getConv(cfg);
         // 输出
         switch (operator) {
             case RAW: return field;
@@ -134,7 +135,7 @@ public abstract class Where {
                 } else if (value instanceof String) {
                     arr = ((String) value).split(",");
                 }
-                return getLogicStr() + " " + getField() + " BETWEEN " + ValueConv.conv(arr[0], cfg) + " AND " + ValueConv.conv(arr[1], cfg);
+                return getLogicStr() + " " + getField() + " BETWEEN " + valueConv.conv(arr[0]) + " AND " + valueConv.conv(arr[1]);
         }
         return getLogicStr() + " " + getField() + " " + getOperator() + " " + getValue(cfg);
     }
