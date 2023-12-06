@@ -1,6 +1,7 @@
 package org.quickjava.orm;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -10,10 +11,7 @@ import net.sf.cglib.proxy.MethodProxy;
 import org.quickjava.common.utils.ComUtil;
 import org.quickjava.common.utils.DatetimeUtil;
 import org.quickjava.common.utils.ReflectUtil;
-import org.quickjava.orm.annotation.ModelField;
-import org.quickjava.orm.annotation.ModelName;
-import org.quickjava.orm.annotation.OneToMany;
-import org.quickjava.orm.annotation.OneToOne;
+import org.quickjava.orm.annotation.*;
 import org.quickjava.orm.callback.WhereCallback;
 import org.quickjava.orm.callback.WhereOptCallback;
 import org.quickjava.orm.contain.*;

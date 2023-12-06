@@ -77,6 +77,8 @@ public class ModelMeta {
         for (ModelFieldO field : fieldMap.values()) {
             if (field.getModelId() != null) {
                 return field.getName();
+            } else if (field.getTableId() != null) {
+                return field.getName();
             }
         }
         return null;

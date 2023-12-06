@@ -48,10 +48,10 @@ public class ModelFieldO {
 
     private ModelId modelId;
 
+    private TableField tableField;
+
     // 兼容mybatis-plus的注解
     private TableId tableId;
-
-    private TableField tableField;
 
     public ModelFieldO() {
     }
@@ -60,12 +60,14 @@ public class ModelFieldO {
         this.name = this._name = field.getName();
         this.clazz = field.getType();
         this.field = field;
+        this.modelField = field.getAnnotation(ModelField.class);
+        this.modelId = field.getAnnotation(ModelId.class);
+        this.tableField = field.getAnnotation(TableField.class);
+        this.tableId = field.getAnnotation(TableId.class);
     }
 
     public ModelFieldO(Field field, Object way, Method setter, Method getter) {
-        this.name = this._name = field.getName();
-        this.clazz = field.getType();
-        this.field = field;
+        this(field);
         this.way = way;
         this.setter = setter;
         this.getter = getter;
