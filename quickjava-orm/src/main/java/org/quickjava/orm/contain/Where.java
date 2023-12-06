@@ -93,7 +93,7 @@ public abstract class Where {
     }
 
     public Object getValue(DriveConfigure config) {
-        return Value.pretreatment(value, config);
+        return ValueConv.conv(value, config);
     }
 
     public void setValue(Object value) {
@@ -134,7 +134,7 @@ public abstract class Where {
                 } else if (value instanceof String) {
                     arr = ((String) value).split(",");
                 }
-                return getLogicStr() + " " + getField() + " BETWEEN " + Value.pretreatment(arr[0], cfg) + " AND " + Value.pretreatment(arr[1], cfg);
+                return getLogicStr() + " " + getField() + " BETWEEN " + ValueConv.conv(arr[0], cfg) + " AND " + ValueConv.conv(arr[1], cfg);
         }
         return getLogicStr() + " " + getField() + " " + getOperator() + " " + getValue(cfg);
     }

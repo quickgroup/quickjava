@@ -72,6 +72,12 @@ public @interface ModelField {
     ModelFieldFill updateFillOnly() default ModelFieldFill.NULL;
 
     /**
+     * 数据写入格式
+     * - Date时生效
+     */
+    String format() default "";
+
+    /**
      * 软删除字段
      * - 支持类属性是Date，字段类型是datetime，且可为NULL，查询时将自动追加条件，如：`delete_time` IS NULL
      * @return 软删除字段

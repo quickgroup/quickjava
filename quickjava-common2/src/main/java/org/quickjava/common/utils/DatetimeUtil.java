@@ -7,6 +7,8 @@ import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /*
  * Copyright (c) 2020~2023 http://www.quickjava.org All rights reserved.
@@ -51,6 +53,8 @@ public class DatetimeUtil {
     public static final DateTimeFormatter FORMATTER_SECOND = DateTimeFormatter.ofPattern(FORMAT_SECOND);
     public static final DateTimeFormatter FORMATTER_HOUR_MINUTE = DateTimeFormatter.ofPattern(FORMAT_HOUR_MINUTE);
     public static final DateTimeFormatter FORMATTER_TIME = DateTimeFormatter.ofPattern(FORMAT_TIME);
+
+    public static final Map<String, SimpleDateFormat> simpleDateFormatCacheMap = new LinkedHashMap<>();
 
     public static String now() {
         return format(new Date(), FORMAT_DEF);
@@ -156,6 +160,13 @@ public class DatetimeUtil {
     public static Integer currTypeInt(DatetimeCurrType type) {
         String ret = currType(type);
         return ret == null ? null : Integer.valueOf(ret.replaceAll("-", "").replaceAll(":", ""));
+    }
+
+    public static SimpleDateFormat getSimpleDateFormat(String format) {
+        if (!simpleDateFormatCacheMap.containsKey(format)) {
+            simpleDateFormatCacheMap.put(format, new SimpleDateFormat(format));
+        }
+        return simpleDateFormatCacheMap.get(format);
     }
 
 }
