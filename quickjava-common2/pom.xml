@@ -8,7 +8,7 @@
     <artifactId>quickjava-common2</artifactId>
     <name>quickjava-common2</name>
     <description>QuickJava common2</description>
-    <version>1.2.6</version>
+    <version>1.2.7</version>
     <packaging>jar</packaging>
     <url>http://www.quickjava.org/</url>
 
