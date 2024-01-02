@@ -33,14 +33,11 @@ public class ModelUtil extends SqlUtil {
     public static final Map<Class<?>, ModelMeta> modelCache = new LinkedHashMap<>();
 
     public static ModelMeta getMeta(Class<?> clazz) {
-        if (!modelCache.containsKey(clazz) && Model.class.isAssignableFrom(clazz)) {
-            try {
-                clazz.newInstance();
-            } catch (InstantiationException | IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
-        }
         return modelCache.get(clazz);
+    }
+
+    public static boolean metaExist(Class<?> clazz) {
+        return modelCache.containsKey(clazz);
     }
 
     public static void setMeta(Class<?> clazz, ModelMeta meta) {

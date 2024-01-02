@@ -993,7 +993,7 @@ public class Model implements IModel {
         }
 
         // 已加载模型元组信息
-        if (ModelUtil.getMeta(clazz) != null) {
+        if (ModelUtil.metaExist(clazz)) {
             model.__meta = ModelUtil.getMeta(clazz);
             return;
         }
