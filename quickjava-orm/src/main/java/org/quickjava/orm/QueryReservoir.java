@@ -27,8 +27,17 @@ import java.util.Map;
  */
 public class QueryReservoir {
 
+    /**
+     * 表名
+     */
     @JsonIgnore
-    public String table;
+    private String table;
+
+    /**
+     * 表查询别名
+     */
+    @JsonIgnore
+    private String name;
 
     @JsonIgnore
     public Action action;
@@ -88,8 +97,20 @@ public class QueryReservoir {
         return table;
     }
 
+    public String tableSql() {
+        return name == null ? table : (table.equals(name) ? table : table + " " + name);
+    }
+
     public void setTable(String __table) {
         this.table = __table;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Action getAction() {

@@ -99,8 +99,8 @@ public abstract class Drive {
             sqlList.add("FROM");
         }
 
-        // table name
-        sqlList.add(reservoir.table);
+        // 主表名称
+        sqlList.add(reservoir.tableSql());
 
         // TODO::JOIN
         if (reservoir.joinList != null) {

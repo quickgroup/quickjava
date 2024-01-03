@@ -56,6 +56,7 @@ public class Model implements IModel {
 
     /**
      * 预载入属性
+     * - 必须是模型必须有的属性
      * */
     @JsonIgnore
     @TableField(exist = false)
@@ -973,6 +974,12 @@ public class Model implements IModel {
         this.__withs.addAll(withs);
         return this;
     }
+
+    /**
+     * 关联查询
+     * @param clazz
+     * @return
+     */
 
     private static boolean isModel(Class<?> clazz) {
         return Model.class.isAssignableFrom(clazz);
