@@ -1212,7 +1212,7 @@ public class Model implements IModel {
     }
 
     private static String fieldAlias(String table, String field) {
-        return table + "." + field + " AS " + table + "__" + field;
+        return ModelUtil.fieldAlias(table, field);
     }
 
     /**

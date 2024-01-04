@@ -22,6 +22,8 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
 
     protected M model;
 
+    protected List<JoinConditionBasic<?>> joinConditionBasicList;
+
     protected Model model() {
         return model;
     }
@@ -214,6 +216,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     @Override
     public Children join(JoinType type, JoinConditionBasic<?> condition) {
         condition.items.forEach(it -> {
+            // 模型元信息
             ModelMeta left = getModelMeta(it.getLeft());
             String leftAlias = SqlUtil.isNotEmpty(it.getLeftAlias()) ? it.getLeftAlias() : left.table();
             ModelMeta right = it.getRight() == null ? ModelUtil.getMeta(this.model.getClass()) : getModelMeta(it.getRight());
@@ -238,6 +241,8 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
             );
             querySet.join(left.table(), conditionSql, type.name());
         });
+        // 缓存，结果拼接使用
+        joinConditionBasicList.add(condition);
         return chain();
     }
 
@@ -257,7 +262,8 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
 
     private void loadModelAccurateFields(QuerySet querySet, ModelMeta meta, String table) {
         meta.getFieldList().forEach(i -> {
-            if (i.isRelation() || !i.isExist()) {
+            // 忽略：关联属性、不存在字段、模型字段
+            if (i.isRelation() || !i.isExist() || Model.class.isAssignableFrom(i.getClazz())) {
                 return;
             }
             querySet.field(SqlUtil.fieldAlias(table, i.name()));
