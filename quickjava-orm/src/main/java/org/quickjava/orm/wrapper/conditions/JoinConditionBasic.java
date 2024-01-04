@@ -32,6 +32,8 @@ public class JoinConditionBasic<Children extends JoinConditionBasic<Children>> {
 
     public static class Item<L extends Model, R extends Model> {
         JoinConditionType type;
+        // 加载左表数据
+        boolean loadLeftData = true;
         // 左表别名
         String leftAlias;
         Class<? extends Model> left;
@@ -62,6 +64,14 @@ public class JoinConditionBasic<Children extends JoinConditionBasic<Children>> {
 
         public void setType(JoinConditionType type) {
             this.type = type;
+        }
+
+        public boolean isLoadLeftData() {
+            return loadLeftData;
+        }
+
+        public void setLoadLeftData(boolean loadLeftData) {
+            this.loadLeftData = loadLeftData;
         }
 
         public String getLeftAlias() {

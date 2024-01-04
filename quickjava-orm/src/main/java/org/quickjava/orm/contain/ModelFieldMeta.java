@@ -1,7 +1,9 @@
 package org.quickjava.orm.contain;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import org.quickjava.common.utils.ComUtil;
 import org.quickjava.orm.annotation.ModelField;
 import org.quickjava.orm.annotation.ModelId;
@@ -35,6 +37,7 @@ public class ModelFieldMeta {
     // mybatis-plus注解
     private TableField tableField;
     private TableId tableId;
+    private TableLogic tableLogic;
 
     public ModelFieldMeta() {
     }
@@ -57,6 +60,10 @@ public class ModelFieldMeta {
     }
 
     public String getName() {
+        return name;
+    }
+
+    public String name() {
         return name;
     }
 
@@ -149,15 +156,30 @@ public class ModelFieldMeta {
     }
 
     public boolean isInsertFill() {
-        return getModelField() != null && getModelField().insertFill() != ModelFieldFill.NULL;
+        if (modelField != null) {
+            return modelField.insertFill() != ModelFieldFill.NULL;
+        } else if (tableField != null) {
+            return tableField.fill() == FieldFill.INSERT || tableField.fill() == FieldFill.INSERT_UPDATE;
+        }
+        return false;
     }
 
     public boolean isUpdateFill() {
-        return getModelField() != null && getModelField().updateFill() != ModelFieldFill.NULL;
+        if (modelField != null) {
+            return modelField.updateFill() != ModelFieldFill.NULL;
+        } else if (tableField != null) {
+            return tableField.fill() == FieldFill.UPDATE || tableField.fill() == FieldFill.INSERT_UPDATE;
+        }
+        return false;
     }
 
     public boolean isSoftDelete() {
-        return getModelField() != null && getModelField().softDelete();
+        if (modelField != null) {
+            return modelField.softDelete();
+        } else if (tableLogic != null) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -165,6 +187,18 @@ public class ModelFieldMeta {
      */
     public boolean isRelation() {
         return getWay() != null;
+    }
+
+    /**
+     * 是否是数据库表字段
+     */
+    public boolean isExist() {
+        if (modelField != null) {
+            return modelField.exist();
+        } else if (tableField != null) {
+            return tableField.exist();
+        }
+        return true;
     }
 
     @Override

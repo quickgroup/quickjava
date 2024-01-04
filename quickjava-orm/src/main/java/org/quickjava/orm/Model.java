@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnoreType;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
@@ -43,6 +44,7 @@ import java.util.stream.Collectors;
 /**
  * 模型
  * */
+@JsonIgnoreType
 @JsonIgnoreProperties(value = {"__meta", "__parent", "__withs", "__data", "__modified", "__querySet"}, ignoreUnknown = true)
 public class Model implements IModel {
 
@@ -745,7 +747,7 @@ public class Model implements IModel {
         dataList.forEach(data -> {
             D model = newModel(clazz);
             // 装载关联属性
-            if (relationMap.size() > 0) {
+            if (!relationMap.isEmpty()) {
                 // 主表数据
                 resultTranshipmentWith(model, data, null);
                 // 关联表数据

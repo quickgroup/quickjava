@@ -229,10 +229,11 @@ public class ModelUtil extends SqlUtil {
     public static String joinConditionSql(String left, String leftField, String conditionType,
                                           String right, String rightField) {
         String conditionStr = Where.OpMap.get(conditionType);
-        String conditionSql = ModelUtil.toUnderlineCase(left) + "." + ModelUtil.toUnderlineCase(leftField)
-                + conditionStr
-                + ModelUtil.toUnderlineCase(right) + "." + ModelUtil.toUnderlineCase(rightField);
-        return conditionSql;
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(toUnderlineCase(left)).append(".").append(toUnderlineCase(leftField));
+        stringBuilder.append(" ").append(conditionStr).append(" ");
+        stringBuilder.append(toUnderlineCase(right)).append(".").append(toUnderlineCase(rightField));
+        return stringBuilder.toString();
     }
 
     //

@@ -162,4 +162,17 @@ public class SqlUtil extends ORMHelper {
         return false;
     }
 
+    public static String tableColumn(String table, String fieldName) {
+        return table + "." + toUnderlineCase(fieldName);
+    }
+
+    /**
+     * 字段别名
+     */
+    public static String fieldAlias(String table, String fieldName) {
+        String column = SqlUtil.toUnderlineCase(fieldName);
+        String columnAlias = table + "__" + fieldName;
+        return table + "." + column + " AS " + columnAlias;
+    }
+
 }

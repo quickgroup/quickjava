@@ -5,6 +5,7 @@
 package org.quickjava.orm;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreType;
 import org.quickjava.common.enums.DatetimeCurrType;
 import org.quickjava.common.enums.DatetimeRangeType;
 import org.quickjava.common.utils.DatetimeUtil;
@@ -29,6 +30,7 @@ import java.util.Map;
  * @author Qlo1062-(QloPC-zs)
  * &#064;date  2021/1/19 10:18
  */
+@JsonIgnoreType
 public class QuerySet {
 
     @JsonIgnore
@@ -415,6 +417,10 @@ public class QuerySet {
         return ORMContext.getDrive().pretreatment(this);
     }
 
+    /**
+     * 1.返回sql类，可以获取sql
+     * 2.改成传入方法进行数据回填，java限制不能直接返回
+     */
     public QuerySet fetchSql(boolean fetch) {
         reservoir.setFetchSql(true);
         return this;

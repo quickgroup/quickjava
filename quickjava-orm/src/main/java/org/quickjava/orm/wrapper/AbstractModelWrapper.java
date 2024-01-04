@@ -1,12 +1,15 @@
 package org.quickjava.orm.wrapper;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import org.quickjava.orm.Model;
+import org.quickjava.orm.QueryReservoir;
 import org.quickjava.orm.QuerySet;
 import org.quickjava.orm.contain.DataMap;
 import org.quickjava.orm.contain.ModelMeta;
 import org.quickjava.orm.contain.Pagination;
 import org.quickjava.orm.utils.ModelUtil;
+import org.quickjava.orm.utils.SqlUtil;
 import org.quickjava.orm.wrapper.conditions.JoinConditionBasic;
 import org.quickjava.orm.wrapper.enums.JoinType;
 
@@ -212,18 +215,27 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     public Children join(JoinType type, JoinConditionBasic<?> condition) {
         condition.items.forEach(it -> {
             ModelMeta left = getModelMeta(it.getLeft());
+            String leftAlias = SqlUtil.isNotEmpty(it.getLeftAlias()) ? it.getLeftAlias() : left.table();
             ModelMeta right = it.getRight() == null ? ModelUtil.getMeta(this.model.getClass()) : getModelMeta(it.getRight());
-            // 声明左表数据字段（自行指定？
+            String rightAlias = SqlUtil.isNotEmpty(it.getRightAlias()) ? it.getRightAlias() : right.table();
+            // 查询器
             QuerySet querySet = ReflectUtil.invoke(this.model, "query");
-//            leftMeta.getFieldList().forEach(i -> {
-//                if (!i.isRelation()) {
-//                    querySet.field(leftMeta.tableField(i.getName()));
-//                }
-//            });
-
+            QueryReservoir reservoir = (QueryReservoir) ReflectUtil.getFieldValue(querySet, "reservoir");
+            // 主表字段
+            if (ObjectUtil.isEmpty(reservoir.fieldList)) {
+                ModelMeta main = ModelUtil.getMeta(this.model.getClass());
+                loadModelAccurateFields(querySet, main, main.table());
+            }
+            // 声明左表数据字段
+            if (it.isLoadLeftData()) {
+                loadModelAccurateFields(querySet, left, leftAlias);
+            }
             // 放到查询器
-            String conditionSql = ModelUtil.joinConditionSql(left.table(), it.getLeftFun().getFieldName(),
-                    it.getType().name(), right.table(), it.getRightFun().getFieldName());
+            String conditionSql = ModelUtil.joinConditionSql(
+                    left.table(), leftAlias, it.getLeftFun().getFieldName(),
+                    it.getType().name(),
+                    right.table(), rightAlias, it.getRightFun().getFieldName()
+            );
             querySet.join(left.table(), conditionSql, type.name());
         });
         return chain();
@@ -241,5 +253,14 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
             }
         }
         return ModelUtil.getMeta(clazz);
+    }
+
+    private void loadModelAccurateFields(QuerySet querySet, ModelMeta meta, String table) {
+        meta.getFieldList().forEach(i -> {
+            if (i.isRelation() || !i.isExist()) {
+                return;
+            }
+            querySet.field(SqlUtil.fieldAlias(table, i.name()));
+        });
     }
 }

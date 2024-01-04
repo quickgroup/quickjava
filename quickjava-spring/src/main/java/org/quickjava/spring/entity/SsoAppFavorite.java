@@ -30,6 +30,10 @@ public class SsoAppFavorite extends BaseSimpleEntity
     @TableField(fill = FieldFill.INSERT)
     private Date createTime;
 
+    // 关联应用信息
+    @TableField(exist = false)
+    private SsoApp app;
+
     public SsoAppFavorite() {
     }
 
@@ -68,5 +72,13 @@ public class SsoAppFavorite extends BaseSimpleEntity
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public SsoApp getApp() {
+        return app;
+    }
+
+    public void setApp(SsoApp app) {
+        this.app = app;
     }
 }
