@@ -371,10 +371,8 @@ public class Model implements IModel {
         if (ModelUtil.isEmpty(dataList)) {
             return null;
         }
-        // 装载
-        List<IModel> models = resultTranshipment(getClass(), dataList);
-        // 查询后：一对多数据加载
-        queryAfter(models);
+        // 装载数据
+        List<IModel> models = ORMHelper.resultTranshipment(this, getClass(), dataList);
         return toD(models.get(0));
     }
 
@@ -393,9 +391,7 @@ public class Model implements IModel {
             return toD(new ModelListSql(reservoir().sql));
         }
         // 装载
-        List<IModel> models = resultTranshipment(getClass(), dataList);
-        // 查询后
-        queryAfter(models);
+        List<IModel> models = ORMHelper.resultTranshipment(this, getClass(), dataList);
         return toD(models);
     }
 
@@ -429,9 +425,7 @@ public class Model implements IModel {
         Pagination<Map<String, Object>> pagination = query().pagination(page, pageSize);
         // 数据组装
         Pagination<IModel> pagination1 = new Pagination<>(pagination);
-        pagination1.rows = resultTranshipment(getMClass(), pagination.rows);
-        // 查询后
-        queryAfter(pagination1.rows);
+        pagination1.rows = ORMHelper.resultTranshipment(this, getMClass(), pagination.rows);
         return toD(pagination1);
     }
 
@@ -736,91 +730,6 @@ public class Model implements IModel {
     }
 
     /**
-     * 查询后处理预载入
-     * - 组装一对一数据
-     * - 一对多的关联在主数据返回后再统一查询组装
-     * */
-    private <D extends IModel> List<D> resultTranshipment(Class<?> clazz, List<Map<String, Object>> dataList) {
-        List<D> models = new LinkedList<>();
-        Map<String, Relation> relationMap = getWithRelation(new RelationType[]{RelationType.OneToOne});
-        // 逐个装载
-        dataList.forEach(data -> {
-            D model = newModel(clazz);
-            // 装载关联属性
-            if (!relationMap.isEmpty()) {
-                // 主表数据
-                resultTranshipmentWith(model, data, null);
-                // 关联表数据
-                relationMap.forEach((relationName, relation) -> {
-                    Model relationModel = newModel(relation.getClazz(), null, model);
-                    resultTranshipmentWith(relationModel, data, relationName);
-                    ReflectUtil.setFieldValue(model, relationName, relationModel);
-                });
-            } else {
-                ((Model) model).data(data);
-            }
-            models.add(model);
-        });
-        return models;
-    }
-
-    private void resultTranshipmentWith(IModel model, Map<String, Object> set, String alias) {
-        Model modelAbs = ((Model) model);
-        modelAbs.__meta.fieldMap().forEach((name, field) -> {
-            if (field.getWay() != null || Model.class.isAssignableFrom(field.getClazz())) {
-                return;
-            }
-            String tableName = alias == null ? modelAbs.__meta.table() : alias;
-            String dataName = tableName + "__" + toUnderlineCase(name);
-            modelAbs.data(name, set.get(dataName));
-        });
-    }
-
-    /**
-     * 查询后模型处理
-     * @param models 数据集
-     * */
-    private void queryAfter(List<IModel> models) {
-        // 预载入的数据查询后加载
-        if (__withs != null && !__withs.isEmpty()) {
-            // 超过500警告
-            if (models.size() > 500) {
-                logger.warn("QuickJava-ORM：The current query has too much data and may cause the service to crash. models.size=" + models.size());
-            }
-            // 数据关联条件：关联属性名=关联id
-            Map<String, List<Object>> conditionMap = new LinkedHashMap<>();
-            // 一对多数据条件准备
-            Map<String, Relation> relationMap = getWithRelation(new RelationType[]{RelationType.OneToMany});
-            relationMap.forEach((fieldName, relation) -> {
-                if (!conditionMap.containsKey(fieldName)) {
-                    conditionMap.put(fieldName, new LinkedList<>());
-                }
-                models.forEach(model -> {
-                    Object localKeyValue = ReflectUtil.getFieldValue(model, relation.localKey());
-                    if (!conditionMap.get(fieldName).contains(localKeyValue)) {  // 避免相同关联数据重复查询
-                        conditionMap.get(fieldName).add(localKeyValue);
-                    }
-                });
-            });
-            // 查询
-            relationMap.forEach((fieldName, relation) -> {
-                if (conditionMap.get(fieldName).size() == 0) {
-                    return;
-                }
-                Model queryModel = newModel(relation.getClazz());
-                List<Model> rows = queryModel.where(relation.foreignKey(), Operator.IN, conditionMap.get(fieldName)).select();
-                // 装填关联模型
-                models.forEach(model -> {
-                    Object modelKeyVal = ReflectUtil.getFieldValue(model, relation.localKey());
-                    List<Model> set = rows.stream().filter(row -> modelKeyVal.equals(ReflectUtil.getFieldValue(row, relation.foreignKey())))
-                            .collect(Collectors.toList());
-                    ReflectUtil.setFieldValue(model, fieldName, set);
-                });
-            });
-        }
-    }
-
-    /**
      * 获取预载入的属性名对应模型类
      * @param types 关联类型
      * @return 关联属性集合
@@ -859,7 +768,7 @@ public class Model implements IModel {
         return newModel(clazz, null, parent);
     }
 
-    private static<D extends IModel> D newModel(Class<?> clazz, Map<String, Object> data, IModel parent)
+    public static<D extends IModel> D newModel(Class<?> clazz, Map<String, Object> data, IModel parent)
     {
         // 创建代理类信息
         Enhancer enhancer = new Enhancer();
@@ -1099,10 +1008,7 @@ public class Model implements IModel {
         }
         // 默认取模型名称转下划线
         if (tableName == null) {
-            tableName = clazz.getSimpleName();
-            if (tableName.endsWith("Model")) {
-                tableName = tableName.substring(0, tableName.lastIndexOf("Model"));
-            }
+            tableName = ModelUtil.getModelAlias(clazz);
         }
         return toUnderlineCase(tableName);
     }

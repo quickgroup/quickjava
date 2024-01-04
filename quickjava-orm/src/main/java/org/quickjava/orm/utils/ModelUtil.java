@@ -76,6 +76,14 @@ public class ModelUtil extends SqlUtil {
         return getModelClass(obj.getClass());
     }
 
+    public static String getModelAlias(Class<?> clazz) {
+        String name = clazz.getSimpleName();
+        if (name.endsWith("Model")) {
+            name = name.substring(0, name.lastIndexOf("Model"));
+        }
+        return name;
+    }
+
     public static void setFieldValue(Object o, String field, Object value) {
         setFieldValue(o.getClass(), o, field, value);
     }

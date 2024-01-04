@@ -9,12 +9,15 @@ import org.quickjava.orm.contain.DataMap;
 import org.quickjava.orm.contain.ModelMeta;
 import org.quickjava.orm.contain.Pagination;
 import org.quickjava.orm.utils.ModelUtil;
+import org.quickjava.orm.utils.ORMHelper;
 import org.quickjava.orm.utils.SqlUtil;
 import org.quickjava.orm.wrapper.conditions.JoinConditionBasic;
 import org.quickjava.orm.wrapper.enums.JoinType;
 
 import java.io.Serializable;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper<Children, M, R>, M extends Model, R extends MFunction<M, ?>>
@@ -194,11 +197,15 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     }
 
     public Pagination<M> pagination(int page, int pageSize) {
-        return model().pagination(page, pageSize);
+        Pagination<Map<String, Object>> pagination = getQuerySet().pagination(page, pageSize);
+        System.out.println("pagination=" + pagination);
+        // 封装数据到对象上
+//        ORMHelper.resultTranshipment(this.model, );
+        return null;
     }
 
     public Pagination<M> pagination() {
-        return model().pagination();
+        return pagination(1, 20);
     }
 
     @Override
@@ -208,6 +215,10 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
 
     private String findFieldName(Function<?, ?> function) {
         return WrapperUtils.getFieldName(function);
+    }
+
+    private QuerySet getQuerySet() {
+        return ReflectUtil.invoke(this.model, "query");
     }
 
     /**
@@ -222,7 +233,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
             ModelMeta right = it.getRight() == null ? ModelUtil.getMeta(this.model.getClass()) : getModelMeta(it.getRight());
             String rightAlias = SqlUtil.isNotEmpty(it.getRightAlias()) ? it.getRightAlias() : right.table();
             // 查询器
-            QuerySet querySet = ReflectUtil.invoke(this.model, "query");
+            QuerySet querySet = getQuerySet();
             QueryReservoir reservoir = (QueryReservoir) ReflectUtil.getFieldValue(querySet, "reservoir");
             // 主表字段
             if (ObjectUtil.isEmpty(reservoir.fieldList)) {
@@ -242,6 +253,9 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
             querySet.join(left.table(), conditionSql, type.name());
         });
         // 缓存，结果拼接使用
+        if (joinConditionBasicList == null) {
+            joinConditionBasicList = new LinkedList<>();
+        }
         joinConditionBasicList.add(condition);
         return chain();
     }

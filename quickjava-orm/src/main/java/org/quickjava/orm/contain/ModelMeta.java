@@ -1,5 +1,7 @@
 package org.quickjava.orm.contain;
 
+import org.quickjava.orm.utils.ModelUtil;
+
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
