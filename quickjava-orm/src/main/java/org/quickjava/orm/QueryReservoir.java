@@ -31,7 +31,7 @@ public class QueryReservoir {
      * 表名
      */
     @JsonIgnore
-    private String table;
+    public String table;
 
     /**
      * 表查询别名

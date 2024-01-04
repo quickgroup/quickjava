@@ -1,6 +1,8 @@
 package org.quickjava.orm.contain;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /*
@@ -26,7 +28,7 @@ public class ModelMeta {
     private String table;
 
     // 属性字段
-    private Map<String, ModelFieldO> fieldMap;
+    private Map<String, ModelFieldMeta> fieldMap;
 
     // 全部关联关系
     private Map<String, Relation> relationMap = new LinkedHashMap<>();
@@ -34,7 +36,7 @@ public class ModelMeta {
     public ModelMeta() {
     }
 
-    public ModelMeta(Class<?> clazz, String table, Map<String, ModelFieldO> fieldMap, Map<String, Relation> relationMap) {
+    public ModelMeta(Class<?> clazz, String table, Map<String, ModelFieldMeta> fieldMap, Map<String, Relation> relationMap) {
         this.clazz = clazz;
         this.table = table;
         this.fieldMap = fieldMap;
@@ -57,12 +59,18 @@ public class ModelMeta {
         this.table = table;
     }
 
-    public Map<String, ModelFieldO> fieldMap() {
+    public Map<String, ModelFieldMeta> fieldMap() {
         return fieldMap;
     }
 
-    public void setFieldMap(Map<String, ModelFieldO> fieldMap) {
+    public void setFieldMap(Map<String, ModelFieldMeta> fieldMap) {
         this.fieldMap = fieldMap;
+    }
+
+    public List<ModelFieldMeta> getFieldList() {
+        List<ModelFieldMeta> ret = new LinkedList<>();
+        fieldMap().forEach((k, v) -> ret.add(v));
+        return ret;
     }
 
     public Map<String, Relation> relationMap() {
@@ -74,7 +82,7 @@ public class ModelMeta {
     }
 
     public String getPkName() {
-        for (ModelFieldO field : fieldMap.values()) {
+        for (ModelFieldMeta field : fieldMap.values()) {
             if (field.getModelId() != null) {
                 return field.getName();
             } else if (field.getTableId() != null) {

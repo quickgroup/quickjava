@@ -1,7 +1,6 @@
 package org.quickjava.orm;
 
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -74,7 +73,7 @@ public class Model implements IModel {
      * */
     @JsonIgnore
     @TableField(exist = false)
-    protected List<ModelFieldO> __modified;
+    protected List<ModelFieldMeta> __modified;
 
     /**
      * 查询器
@@ -273,7 +272,7 @@ public class Model implements IModel {
     public int delete()
     {
         // 软删除字段
-        for (ModelFieldO field : __meta.fieldMap().values()) {
+        for (ModelFieldMeta field : __meta.fieldMap().values()) {
             if (field.isSoftDelete()) {
                 if (Date.class.isAssignableFrom(field.getField().getType())) {
                     data(field.getName(), DatetimeUtil.now());      // 字符串去填充的数据
@@ -580,7 +579,7 @@ public class Model implements IModel {
     {
         // 数据保存
         name = ModelUtil.toCamelCase(name);
-        ModelFieldO field = __meta.fieldMap().get(name);
+        ModelFieldMeta field = __meta.fieldMap().get(name);
         // 非本表属性或关联属性不设置
         if (field == null || field.getWay() != null) {
             return this;
@@ -686,7 +685,7 @@ public class Model implements IModel {
     private void queryBefore()
     {
         // 软删除字段
-        for (ModelFieldO field : __meta.fieldMap().values()) {
+        for (ModelFieldMeta field : __meta.fieldMap().values()) {
             if (field.isSoftDelete()) {
                 if (Date.class.isAssignableFrom(field.getField().getType())) {
                     where(field.getName(), Operator.IS_NULL);
@@ -1033,7 +1032,7 @@ public class Model implements IModel {
             if (Modifier.isStatic(field.getModifiers())) {
                 continue;
             }
-            ModelFieldO fieldInfo = new ModelFieldO(field);
+            ModelFieldMeta fieldInfo = new ModelFieldMeta(field);
             String fieldName = fieldInfo.getName();
             // 兼容mybatis-plus字段说明
             TableField tableField = field.getAnnotation(TableField.class);
@@ -1128,7 +1127,7 @@ public class Model implements IModel {
     {
         try {
             // 加载
-            ModelFieldO modelField = ModelUtil.getMeta(clazz).fieldMap().get(method.getName());
+            ModelFieldMeta modelField = ModelUtil.getMeta(clazz).fieldMap().get(method.getName());
             Field field = modelField.getField();
             if (Model.class.isAssignableFrom(o.getClass())) {
                 Model curr = (Model) o;
