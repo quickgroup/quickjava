@@ -1,10 +1,12 @@
 package org.quickjava.orm.utils;
 
+import cn.hutool.core.util.ObjectUtil;
 import net.sf.cglib.proxy.Enhancer;
 import org.quickjava.common.utils.DatetimeUtil;
 import org.quickjava.common.utils.ReflectUtil;
 import org.quickjava.orm.Model;
 import org.quickjava.orm.contain.ModelMeta;
+import org.quickjava.orm.contain.Where;
 import org.quickjava.orm.enums.ModelFieldFill;
 
 import java.lang.reflect.Field;
@@ -222,6 +224,23 @@ public class ModelUtil extends SqlUtil {
             return ReflectUtil.invoke(staticMethodStr);
         }
         return null;
+    }
+
+    public static String joinConditionSql(String left, String leftField, String conditionType,
+                                          String right, String rightField) {
+        String conditionStr = Where.OpMap.get(conditionType);
+        String conditionSql = ModelUtil.toUnderlineCase(left) + "." + ModelUtil.toUnderlineCase(leftField)
+                + conditionStr
+                + ModelUtil.toUnderlineCase(right) + "." + ModelUtil.toUnderlineCase(rightField);
+        return conditionSql;
+    }
+
+    //
+    public static String joinConditionSql(String left, String leftAlias, String leftField, String conditionType,
+                                          String right, String rightAlias, String rightField) {
+        left = ObjectUtil.isEmpty(leftAlias) || left.equals(leftAlias) ? left : left + " " + leftAlias;
+        right = ObjectUtil.isEmpty(rightAlias) || right.equals(rightAlias) ? right : right + " " + rightAlias;
+        return joinConditionSql(left, leftField, conditionType, right, rightField);
     }
 
 }

@@ -8,7 +8,8 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.function.Function;
 
-public abstract class ModelUpdateWrapper<M extends Model, R extends Function<M, ?>> implements Serializable {
+public abstract class ModelUpdateWrapper<M extends Model, R extends MFunction<M, ?>>
+        implements Compare<ModelUpdateWrapper<M, R>, R>, Serializable {
 
     protected M model;
 
@@ -19,12 +20,6 @@ public abstract class ModelUpdateWrapper<M extends Model, R extends Function<M, 
     public ModelUpdateWrapper<M, R> eq(R function, Object val)
     {
         model().eq(findFieldName(function), val);
-        return this;
-    }
-
-    public ModelUpdateWrapper<M, R> neq(R function, Object val)
-    {
-        model().neq(findFieldName(function), val);
         return this;
     }
 
@@ -183,7 +178,7 @@ public abstract class ModelUpdateWrapper<M extends Model, R extends Function<M, 
     }
 
     private String findFieldName(R function) {
-        return FunctionReflectionUtil.getFieldName((Function<?, ?>) function);
+        return function.getName();
     }
 
 }

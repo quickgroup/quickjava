@@ -55,6 +55,20 @@ public class ModelMeta {
         return table;
     }
 
+    /**
+     * 表别名
+     */
+    public String tableAlias(String alias) {
+        return table + "." + alias;
+    }
+
+    /**
+     * 表名.字段全名
+     */
+    public String tableField(String fieldName) {
+        return table + "." + fieldName;
+    }
+
     public void setTable(String table) {
         this.table = table;
     }

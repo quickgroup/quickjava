@@ -11,17 +11,17 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
-public class FunctionReflectionUtil {
+public class WrapperUtils {
 
     private static final Map<Function<?, ?>, Field> cache = new ConcurrentHashMap<>();
 
     public static <T, R> String getFieldName(Function<T, R> function) {
-        Field field = FunctionReflectionUtil.getField(function);
+        Field field = WrapperUtils.getField(function);
         return field.getName();
     }
 
     public static <T, R> Field getField(Function<T, R> function) {
-        return cache.computeIfAbsent(function, FunctionReflectionUtil::findField);
+        return cache.computeIfAbsent(function, WrapperUtils::findField);
     }
 
     public static <T, R> Field findField(Function<T, R> function) {
