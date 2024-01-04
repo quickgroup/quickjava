@@ -178,24 +178,4 @@ public class QuickUtil {
         }
         return String.join("\n", strings);
     }
-
-    /**
-     * @langCn 转base64
-     * @return
-     */
-    public static String base64Encode(String str) {
-        return Base64.getEncoder().encodeToString(str.getBytes());
-    }
-
-    public static String base64Decode(String str) {
-        return new String(Base64.getDecoder().decode(str.getBytes()));
-    }
-
-    public static byte[] base64EncodeByte(byte[] bytes) {
-        return Base64.getEncoder().encode(bytes);
-    }
-
-    public static byte[] base64DecodeByte(byte[] bytes) {
-        return Base64.getDecoder().decode(bytes);
-    }
 }
