@@ -40,6 +40,18 @@ public abstract class ORMHelper extends ComUtil {
     private static final Logger logger = LoggerFactory.getLogger(ORMHelper.class);
 
     /**
+     * 加载关联数据
+     * 主表实体
+     * 关联关系
+     *      关联表实体
+     *      在主表实体的属性名
+     *      关联表与主表关联条件（可多个条件，左边是关联表字段，右边是主表或其他关联表
+     */
+    public static <D extends IModel> List<D> resultTranshipment(Class<?> clazz, List<Map<String, Object>> dataList) {
+        return null;
+    }
+
+    /**
      * 查询后处理预载入
      * - 组装一对一数据
      * - 一对多的关联在主数据返回后再统一查询组装

@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.quickjava.common.utils.TimeUtils;
 import org.quickjava.orm.contain.Pagination;
-import org.quickjava.orm.wrapper.ModelQueryWrapper;
+import org.quickjava.orm.wrapper.ModelWrapper;
 import org.quickjava.spring.entity.SsoApp;
 import org.quickjava.spring.entity.SsoAppLatest;
 import org.quickjava.spring.entity.SsoAppFavoriteModel;
@@ -24,7 +24,7 @@ public class TestModelJoin {
     public void test1()
     {
         Long startTime = TimeUtils.getNanoTime();
-        Pagination<SsoAppFavoriteModel> pagination = new ModelQueryWrapper<SsoAppFavoriteModel>(SsoAppFavoriteModel.class)
+        Pagination<SsoAppFavoriteModel> pagination = new ModelWrapper<SsoAppFavoriteModel>(SsoAppFavoriteModel.class)
                 .leftJoin(SsoApp.class, SsoApp::getAppId, SsoAppFavoriteModel::getAppId)
                 .leftJoin(SsoAppLatest.class, SsoAppLatest::getAppId, SsoAppFavoriteModel::getAppId)
                 .pagination();

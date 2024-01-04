@@ -15,6 +15,7 @@ import org.quickjava.orm.wrapper.conditions.JoinConditionBasic;
 import org.quickjava.orm.wrapper.enums.JoinType;
 
 import java.io.Serializable;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +26,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
 
     protected M model;
 
-    protected List<JoinConditionBasic<?>> joinConditionBasicList;
+    protected Map<Object, List<JoinConditionBasic.Item<?, ?>>> joinItemsMap;
 
     protected Model model() {
         return model;
@@ -199,8 +200,33 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     public Pagination<M> pagination(int page, int pageSize) {
         Pagination<Map<String, Object>> pagination = getQuerySet().pagination(page, pageSize);
         System.out.println("pagination=" + pagination);
+        if (joinItemsMap == null || joinItemsMap.isEmpty()) {
+            return null;
+        }
+        // 收集一对一关联信息
+
+
+        List<M> models = new LinkedList<>();
+        pagination.rows.forEach(row -> {
+            // 主表
+            M main = Model.newModel(this.model.getClass());
+            ORMHelper.resultTranshipmentWith(main, row, null);
+            // 一对一的数据加载
+        });
         // 封装数据到对象上
-//        ORMHelper.resultTranshipment(this.model, );
+        joinItemsMap.forEach((alias, its) -> {
+            ModelMeta left = getModelMeta(it.getLeft());
+            if (ObjectUtil.isNotEmpty(it.getLeftAlias()) && ReflectUtil.hasField(this.model.getClass(), it.getLeftAlias())) {
+                return;
+            }
+            // 一对一
+            left.fieldMap().forEach((name, fieldMeta) -> {
+                if (fieldMeta.getClazz().equals(it.getLeft())) {
+                    return;
+                }
+            });
+            // 一对多数据
+        });
         return null;
     }
 
@@ -251,12 +277,13 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
                     right.table(), rightAlias, it.getRightFun().getFieldName()
             );
             querySet.join(left.table(), conditionSql, type.name());
+            // 缓存条件
+            if (joinItemsMap == null) {
+                joinItemsMap = new LinkedHashMap<>();
+            }
+            joinItemsMap.computeIfAbsent(leftAlias, k -> new LinkedList<>());
+            joinItemsMap.get(leftAlias).add(it);
         });
-        // 缓存，结果拼接使用
-        if (joinConditionBasicList == null) {
-            joinConditionBasicList = new LinkedList<>();
-        }
-        joinConditionBasicList.add(condition);
         return chain();
     }
 
