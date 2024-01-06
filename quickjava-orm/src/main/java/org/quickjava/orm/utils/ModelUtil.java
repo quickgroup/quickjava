@@ -244,12 +244,4 @@ public class ModelUtil extends SqlUtil {
         return stringBuilder.toString();
     }
 
-    //
-    public static String joinConditionSql(String left, String leftAlias, String leftField, String conditionType,
-                                          String right, String rightAlias, String rightField) {
-        left = ObjectUtil.isEmpty(leftAlias) || left.equals(leftAlias) ? left : left + " " + leftAlias;
-        right = ObjectUtil.isEmpty(rightAlias) || right.equals(rightAlias) ? right : right + " " + rightAlias;
-        return joinConditionSql(left, leftField, conditionType, right, rightField);
-    }
-
 }

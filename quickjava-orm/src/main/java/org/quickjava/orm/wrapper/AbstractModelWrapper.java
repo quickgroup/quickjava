@@ -234,10 +234,11 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
                 if (!it.getRight().equals(mainMeta.getClazz())) {
                     return;
                 }
+                String parentFieldName = join.getFieldFun() == null ? fieldMetaClazzMap.get(relationClazz).getName() : join.getFieldFun().getName();
                 // 一对一
                 Model left = Model.newModel(leftMeta.getClazz(), null, main);
                 ORMHelper.resultTranshipmentWith(left, data, alias);
-                ReflectUtil.setFieldValue(main, fieldMetaClazzMap.get(relationClazz).getName(), left);
+                ReflectUtil.setFieldValue(main, parentFieldName, left);
             });
             //
             models.add(main);
@@ -299,11 +300,11 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
             String rightAlias = SqlUtil.isNotEmpty(it.getRightAlias()) ? it.getRightAlias() : right.table();
             // 放到查询器
             String conditionSql = ModelUtil.joinConditionSql(
-                    left.table(), leftAlias, it.getLeftFun().getFieldName(),
+                    leftAlias, it.getLeftFun().getFieldName(),
                     it.getType().name(),
-                    right.table(), rightAlias, it.getRightFun().getFieldName()
+                    rightAlias, it.getRightFun().getFieldName()
             );
-            querySet.join(left.table(), conditionSql, type.name());
+            querySet.join(left.tableAlias(leftAlias), conditionSql, type.name());
         });
         return chain();
     }

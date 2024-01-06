@@ -22,8 +22,8 @@ public interface ModelJoinWrapper<Children, M extends Model, R extends MFunction
      * 与主表一个条件关联[指定属性]
      * @param fieldFun 数据加载到的主模型属性，就是关联数据在模型撒谎功能的那个属性
      */
-    default <Relation extends Model> Children leftJoin(R fieldFun, Class<Relation> left, MFunction<Relation, ?> lf, R rf) {
-        return join(JoinType.LEFT, new ModelJoinLR<Relation, M>(left, null).eq(lf, rf));
+    default <Relation extends Model> Children leftJoin(Class<Relation> left, MFunction<Relation, ?> lf, R rf, R fieldFun) {
+        return join(JoinType.LEFT, new ModelJoinLR<Relation, M>(left, null).eq(lf, rf).setFieldFun(fieldFun).setLeftAlias(fieldFun.getName()));
     }
 
     /**

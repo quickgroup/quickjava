@@ -138,15 +138,39 @@ public class ModelJoin<Children extends ModelJoin<Children, Left>, Left extends 
         return left;
     }
 
+    public Children setLeft(Class<Left> left) {
+        this.left = left;
+        return chain();
+    }
+
     public String getLeftAlias() {
         return leftAlias;
+    }
+
+    public Children setLeftAlias(String leftAlias) {
+        this.leftAlias = leftAlias;
+        return chain();
     }
 
     public MFunction<?, ?> getFieldFun() {
         return fieldFun;
     }
 
+    public Children setFieldFun(MFunction<?, ?> fieldFun) {
+        this.fieldFun = fieldFun;
+        return chain();
+    }
+
     public boolean isLoadLeftData() {
         return loadLeftData;
+    }
+
+    public Children setLoadLeftData(boolean loadLeftData) {
+        this.loadLeftData = loadLeftData;
+        return chain();
+    }
+
+    public List<Item<?, ?>> getItems() {
+        return items;
     }
 }

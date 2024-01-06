@@ -63,7 +63,7 @@ public class ModelMeta {
      * 表别名
      */
     public String tableAlias(String alias) {
-        return table + "." + alias;
+        return table.equals(alias) ? table : table + " " + alias;
     }
 
     public void setTable(String table) {
