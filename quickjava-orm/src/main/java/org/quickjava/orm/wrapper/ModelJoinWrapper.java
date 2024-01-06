@@ -37,7 +37,7 @@ public interface ModelJoinWrapper<Children, M extends Model, R extends MFunction
     /**
      * 两张子表多个条件关联
      */
-    default <Left extends Model, Right extends Model> Children leftJoin(Class<Left> left, Class<Right> right, JoinClosure<Left, Right> closure) {
+    default <Left extends Model, Right extends Model> Children leftJoin(Class<Left> left, Class<Right> right, JoinConditionClosure<Left, Right> closure) {
         ModelJoinLR<Left, Right> condition = new ModelJoinLR<>(left, right);
         closure.call(condition);
         return join(JoinType.LEFT, condition);
@@ -46,7 +46,7 @@ public interface ModelJoinWrapper<Children, M extends Model, R extends MFunction
     /**
      * 左表关联右多个表多个条件
      */
-    default <Left extends Model> Children leftJoin(Class<Left> left, JoinClosureLeft<Left> closure) {
+    default <Left extends Model> Children leftJoin(Class<Left> left, JoinConditionClosureLeft<Left> closure) {
         ModelJoinRight<Left> condition = new ModelJoinRight<>(left);
         closure.call(condition);
         return join(JoinType.LEFT, condition);
@@ -64,11 +64,11 @@ public interface ModelJoinWrapper<Children, M extends Model, R extends MFunction
     /**
      * 闭包调用
      */
-    public interface JoinClosure<Left extends Model, Right extends Model> {
+    public interface JoinConditionClosure<Left extends Model, Right extends Model> {
         void call(ModelJoinLR<Left, Right> condition);
     }
 
-    public interface JoinClosureLeft<Left extends Model> {
+    public interface JoinConditionClosureLeft<Left extends Model> {
         void call(ModelJoinRight<Left> condition);
     }
 
