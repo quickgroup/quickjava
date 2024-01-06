@@ -44,64 +44,20 @@ import java.util.*;
  * 模型
  * */
 @JsonIgnoreType
-@JsonIgnoreProperties(value = {"__meta", "__parent", "__withs", "__data", "__modified", "__querySet"}, ignoreUnknown = true)
+@JsonIgnoreProperties(value = {"reservoir"}, ignoreUnknown = true)
 public class Model implements IModel {
 
     /**
-     * 模型元信息
+     * 模型数据等封装类
      * */
     @JsonIgnore
     @TableField(exist = false)
-    protected ModelMeta __meta;
-
-    /**
-     * 预载入属性
-     * - 必须是模型必须有的属性
-     * */
-    @JsonIgnore
-    @TableField(exist = false)
-    protected List<String> __withs;
-
-    /**
-     * 数据
-     */
-    @JsonIgnore
-    @TableField(exist = false)
-    protected final DataMap __data = new DataMap();
-
-    /**
-     * 修改的字段
-     * */
-    @JsonIgnore
-    @TableField(exist = false)
-    protected List<ModelFieldMeta> __modified;
-
-    /**
-     * 查询器
-     * */
-    @JsonIgnore
-    @TableField(exist = false)
-    protected QuerySet __querySet;
-
-    /**
-     * 关联的父模型对象
-     * */
-    @JsonIgnore
-    @TableField(exist = false)
-    protected Model __parent;
-
-    /**
-     * 是素模型
-     * */
-    @JsonIgnore
-    @TableField(exist = false)
-    protected boolean __vegetarian = true;
-
+    protected ModelReservoir reservoir;
 
     //TODO:---------- 类方法 ----------
     // 强制修改对象是否是素模型
     public Model vegetarian(boolean vegetarian) {
-        this.__vegetarian = vegetarian;
+        reservoir.vegetarian = vegetarian;
         return this;
     }
 
@@ -118,13 +74,13 @@ public class Model implements IModel {
 
     private synchronized QuerySet query() {
         synchronized (Model.class) {
-            if (__querySet == null) {
-                __querySet = QuerySet.table(parseModelTableName(getClass()));
-                QueryReservoir reservoir = ReflectUtil.getFieldValue(__querySet, "reservoir");
-                reservoir.setWhereOptCallback(whereOptCallback, this);
+            if (reservoir.querySet == null) {
+                reservoir.querySet = QuerySet.table(parseModelTableName(getClass()));
+                QueryReservoir queryReservoir = ReflectUtil.getFieldValue(reservoir.querySet, "reservoir");
+                queryReservoir.setWhereOptCallback(whereOptCallback, this);
             }
         }
-        return __querySet;
+        return reservoir.querySet;
     }
 
     private QueryReservoir reservoir() {

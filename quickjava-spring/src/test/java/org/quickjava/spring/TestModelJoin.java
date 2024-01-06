@@ -24,8 +24,9 @@ public class TestModelJoin {
     public void test1()
     {
         Long startTime = TimeUtils.getNanoTime();
-        Pagination<SsoAppFavoriteModel> pagination = new ModelWrapper<SsoAppFavoriteModel>(SsoAppFavoriteModel.class)
+        Pagination<SsoAppFavoriteModel> pagination = new ModelWrapper<>(SsoAppFavoriteModel.class)
                 .leftJoin(SsoApp.class, SsoApp::getAppId, SsoAppFavoriteModel::getAppId)
+//                .leftJoin(SsoAppFavoriteModel::getApp2, SsoApp.class, SsoApp::getAppId, SsoAppFavoriteModel::getAppId)
                 .leftJoin(SsoAppLatest.class, SsoAppLatest::getAppId, SsoAppFavoriteModel::getAppId)
                 .pagination();
         System.out.println("leftJoin return=" + pagination);

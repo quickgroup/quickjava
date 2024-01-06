@@ -15,7 +15,7 @@ package org.quickjava.orm.wrapper.enums;
  * +-------------------------------------------------------------------
  */
 // Where.OPMap
-public enum JoinConditionType {
+public enum ConditionType {
     /** 等于 */
     EQ,
     /** 不等于 */
