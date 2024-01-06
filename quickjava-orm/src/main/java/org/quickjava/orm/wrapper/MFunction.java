@@ -1,7 +1,6 @@
 package org.quickjava.orm.wrapper;
 
 import cn.hutool.core.text.CharSequenceUtil;
-import org.quickjava.orm.Model;
 
 import java.io.Serializable;
 import java.lang.invoke.SerializedLambda;
@@ -9,7 +8,7 @@ import java.lang.reflect.Method;
 import java.util.function.Function;
 
 @FunctionalInterface
-public interface MFunction<M extends Model, R> extends Function<M, R>, Serializable {
+public interface MFunction<M, R> extends Function<M, R>, Serializable {
 
     default String getFieldName() {
         String methodName = getMethodName();

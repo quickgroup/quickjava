@@ -1,29 +1,8 @@
-package org.quickjava.orm.wrapper;
+package org.quickjava.orm.wrapper.conditions;
 
 import java.io.Serializable;
-import java.util.Map;
-import java.util.function.BiPredicate;
 
-public interface Compare<Children, R> extends Serializable {
-    default <V> Children allEq(Map<R, V> params) {
-        return this.allEq(params, true);
-    }
-
-    default <V> Children allEq(Map<R, V> params, boolean null2IsNull) {
-        return this.allEq(true, params, null2IsNull);
-    }
-
-    <V> Children allEq(boolean condition, Map<R, V> params, boolean null2IsNull);
-
-    default <V> Children allEq(BiPredicate<R, V> filter, Map<R, V> params) {
-        return this.allEq(filter, params, true);
-    }
-
-    default <V> Children allEq(BiPredicate<R, V> filter, Map<R, V> params, boolean null2IsNull) {
-        return this.allEq(true, filter, params, null2IsNull);
-    }
-
-    <V> Children allEq(boolean condition, BiPredicate<R, V> filter, Map<R, V> params, boolean null2IsNull);
+public interface JoinCondition<Children, R> extends Serializable {
 
     default Children eq(R column, Object val) {
         return this.eq(true, column, val);
@@ -32,6 +11,10 @@ public interface Compare<Children, R> extends Serializable {
     Children eq(boolean condition, R column, Object val);
 
     default Children ne(R column, Object val) {
+        return this.ne(true, column, val);
+    }
+
+    default Children neq(R column, Object val) {
         return this.ne(true, column, val);
     }
 
@@ -47,6 +30,10 @@ public interface Compare<Children, R> extends Serializable {
         return this.ge(true, column, val);
     }
 
+    default Children gte(R column, Object val) {
+        return this.ge(true, column, val);
+    }
+
     Children ge(boolean condition, R column, Object val);
 
     default Children lt(R column, Object val) {
@@ -56,6 +43,10 @@ public interface Compare<Children, R> extends Serializable {
     Children lt(boolean condition, R column, Object val);
 
     default Children le(R column, Object val) {
+        return this.le(true, column, val);
+    }
+
+    default Children lte(R column, Object val) {
         return this.le(true, column, val);
     }
 
@@ -96,4 +87,28 @@ public interface Compare<Children, R> extends Serializable {
     }
 
     Children likeRight(boolean condition, R column, Object val);
+
+    default Children in(R column, Object ... val) {
+        return this.in(true, column, val);
+    }
+
+    Children in(boolean condition, R column, Object ... val);
+
+    default Children notIn(R column, Object ... val) {
+        return this.notIn(true, column, val);
+    }
+
+    Children notIn(boolean condition, R column, Object ... val);
+
+    default Children isNull(R column) {
+        return this.isNull(true, column);
+    }
+
+    Children isNull(boolean condition, R column);
+
+    default Children isNotNull(R column) {
+        return this.isNotNull(true, column);
+    }
+
+    Children isNotNull(boolean condition, R column);
 }

@@ -1,4 +1,4 @@
-package org.quickjava.orm.wrapper.conditions;
+package org.quickjava.orm.wrapper.join;
 
 import org.quickjava.orm.Model;
 import org.quickjava.orm.wrapper.MFunction;
@@ -8,7 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 // 根model绑定条件
-public class ModelJoin<Children extends ModelJoin<Children, Left>, Left extends Model> {
+public class JoinConditionBase<Children extends JoinConditionBase<Children, Left>, Left extends Model> {
 
     // 关联模型
     protected Class<Left> left;
@@ -25,20 +25,25 @@ public class ModelJoin<Children extends ModelJoin<Children, Left>, Left extends 
     // 关联条件
     public final List<Item<?, ?>> items = new LinkedList<>();
 
-    public ModelJoin(Class<Left> left, String leftAlias, MFunction<?, ?> fieldFun, boolean loadLeftData) {
+    public JoinConditionBase(Class<Left> left, String leftAlias, MFunction<?, ?> fieldFun, boolean loadLeftData) {
         this.left = left;
         this.leftAlias = leftAlias;
         this.fieldFun = fieldFun;
         this.loadLeftData = loadLeftData;
     }
 
-    public ModelJoin(Class<Left> left, String leftAlias, MFunction<?, ?> fieldFun) {
+    public JoinConditionBase(Class<Left> left, String leftAlias, MFunction<?, ?> fieldFun) {
         this.left = left;
         this.leftAlias = leftAlias;
         this.fieldFun = fieldFun;
     }
 
-    public ModelJoin(Class<Left> left) {
+    public JoinConditionBase(Class<Left> left, MFunction<?, ?> fieldFun) {
+        this.left = left;
+        this.fieldFun = fieldFun;
+    }
+
+    public JoinConditionBase(Class<Left> left) {
         this.left = left;
     }
 
@@ -48,6 +53,10 @@ public class ModelJoin<Children extends ModelJoin<Children, Left>, Left extends 
 
     protected <Right extends Model> Children eq(MFunction<Left, ?> lf, Class<Right> right, MFunction<Right, ?> rf) {
         return add(ConditionType.EQ, lf, right, rf);
+    }
+
+    protected <Right extends Model> Children neq(MFunction<Left, ?> lf, Class<Right> right, MFunction<Right, ?> rf) {
+        return add(ConditionType.NEQ, lf, right, rf);
     }
 
     protected <Right extends Model> Children add(ConditionType type, MFunction<Left, ?> lf, MFunction<Right, ?> rf) {

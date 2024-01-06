@@ -12,8 +12,9 @@ import org.quickjava.orm.contain.Pagination;
 import org.quickjava.orm.utils.ModelUtil;
 import org.quickjava.orm.utils.ORMHelper;
 import org.quickjava.orm.utils.SqlUtil;
-import org.quickjava.orm.wrapper.conditions.ModelJoin;
+import org.quickjava.orm.wrapper.join.JoinConditionBase;
 import org.quickjava.orm.wrapper.enums.JoinType;
+import org.quickjava.orm.wrapper.join.ModelJoinWrapper;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -28,7 +29,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
 
     protected M model;
 
-    protected Map<String, ModelJoin<?, ?>> joinMap;
+    protected Map<String, JoinConditionBase<?, ?>> joinMap;
 
     protected Model model() {
         return model;
@@ -230,7 +231,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
                     return;
                 }
                 // 是和主模型关联的条件
-                ModelJoin.Item<?, ?> it = join.items.get(0);
+                JoinConditionBase.Item<?, ?> it = join.items.get(0);
                 if (!it.getRight().equals(mainMeta.getClazz())) {
                     return;
                 }
@@ -267,7 +268,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
      * 关联查询实现
      */
     @Override
-    public Children join(JoinType type, ModelJoin<?, ?> join) {
+    public Children join(JoinType type, JoinConditionBase<?, ?> join) {
         // 查询器
         ModelMeta mainMeta = getModelMeta(this.model.getClass());
         QuerySet querySet = getQuerySet();
