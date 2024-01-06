@@ -6,6 +6,7 @@ import org.quickjava.orm.contain.DataMap;
 import org.quickjava.orm.contain.ModelFieldMeta;
 import org.quickjava.orm.contain.ModelMeta;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /*
@@ -67,4 +68,13 @@ public class ModelReservoir {
     @JsonIgnore
     public boolean vegetarian = true;
 
+    public List<ModelFieldMeta> getModified() {
+        this.modified = modified == null ? new LinkedList<>() : modified;
+        return modified;
+    }
+
+    public List<String> getWiths() {
+        this.withs = withs == null ? new LinkedList<>() : withs;
+        return withs;
+    }
 }
