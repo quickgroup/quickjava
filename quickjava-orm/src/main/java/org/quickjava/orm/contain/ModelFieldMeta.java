@@ -22,7 +22,7 @@ public class ModelFieldMeta {
     private Field field;
 
     // 关联字段
-    private Object way;
+    private Object relationWay;
 
     private Method setter;
 
@@ -50,21 +50,27 @@ public class ModelFieldMeta {
         this.modelId = field.getAnnotation(ModelId.class);
         this.tableField = field.getAnnotation(TableField.class);
         this.tableId = field.getAnnotation(TableId.class);
+        this.tableLogic = field.getAnnotation(TableLogic.class);
     }
 
-    public ModelFieldMeta(Field field, Object way, Method setter, Method getter) {
+    public ModelFieldMeta(Field field, Object relationWay, Method setter, Method getter) {
         this(field);
-        this.way = way;
+        this.relationWay = relationWay;
         this.setter = setter;
         this.getter = getter;
     }
 
     public String getName() {
+        if (modelField != null) {
+            return "".equals(modelField.name()) ? name:  modelField.name();
+        } else if (tableField != null) {
+            return "".equals(tableField.value()) ? name:  tableField.value();
+        }
         return name;
     }
 
     public String name() {
-        return name;
+        return getName();
     }
 
     public String getNameCamelCase() {
@@ -91,12 +97,12 @@ public class ModelFieldMeta {
         this.field = field;
     }
 
-    public Object getWay() {
-        return way;
+    public Object getRelationWay() {
+        return relationWay;
     }
 
-    public void setWay(Object way) {
-        this.way = way;
+    public void setRelationWay(Object relationWay) {
+        this.relationWay = relationWay;
     }
 
     public Method getSetter() {
@@ -186,7 +192,7 @@ public class ModelFieldMeta {
      * 是关联属性
      */
     public boolean isRelation() {
-        return getWay() != null;
+        return getRelationWay() != null;
     }
 
     /**
@@ -207,7 +213,7 @@ public class ModelFieldMeta {
                 "name='" + name + '\'' +
                 ", clazz=" + clazz +
                 ", field=" + field +
-                ", way=" + way +
+                ", way=" + relationWay +
                 ", setter=" + setter +
                 ", getter=" + getter +
                 ", method=" + method +

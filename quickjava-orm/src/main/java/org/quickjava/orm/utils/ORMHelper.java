@@ -89,6 +89,12 @@ public abstract class ORMHelper extends ComUtil {
         return (List<D>) models;
     }
 
+    /**
+     * 将data数据通过alias找到并装载到模型上
+     * @param iModel
+     * @param data
+     * @param alias
+     */
     public static void resultTranshipmentWith(IModel iModel, Map<String, Object> data, String alias) {
         Model model = ((Model) iModel);
         ModelMeta meta = ReflectUtil.getFieldValue(model, "__meta");

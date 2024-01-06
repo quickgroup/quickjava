@@ -37,6 +37,14 @@ public class Pagination<T> {
         this.rows = new LinkedList<>();
     }
 
+    public Pagination(Pagination<?> pagination, List<T> rows) {
+        this.page = pagination.page;
+        this.pageSize = pagination.pageSize;
+        this.pages = pagination.pages;
+        this.total = pagination.total;
+        this.rows = rows;
+    }
+
     public Pagination(long page, long pageSize, long total, List<T> rows) {
         this.page = page;
         this.pageSize = pageSize;

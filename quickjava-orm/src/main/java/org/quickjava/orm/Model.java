@@ -25,7 +25,6 @@ import java.io.Serializable;
 import java.lang.reflect.*;
 import java.lang.reflect.Field;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /*
  * Copyright (c) 2020~2023 http://www.quickjava.org All rights reserved.
@@ -577,7 +576,7 @@ public class Model implements IModel {
         name = ModelUtil.toCamelCase(name);
         ModelFieldMeta field = __meta.fieldMap().get(name);
         // 非本表属性或关联属性不设置
-        if (field == null || field.getWay() != null) {
+        if (field == null || field.getRelationWay() != null) {
             return this;
         }
 
@@ -621,7 +620,7 @@ public class Model implements IModel {
         DataMap ret = DataMap.one();
         if (__modified != null) {
             __modified.forEach(field -> {
-                if (field.getWay() != null) {
+                if (field.getRelationWay() != null) {
                     return;
                 }
                 Object v = data.get(field.getName());
@@ -701,7 +700,7 @@ public class Model implements IModel {
         List<String> fields = new LinkedList<>();
         // 本表字段声明
         __meta.fieldMap().forEach((name, field) -> {
-            if (field.getWay() != null || Model.class.isAssignableFrom(field.getClazz())) {
+            if (field.getRelationWay() != null || Model.class.isAssignableFrom(field.getClazz())) {
                 return;
             }
             name = toUnderlineCase(name);
@@ -713,7 +712,7 @@ public class Model implements IModel {
             ModelMeta meta = ModelUtil.getMeta(relation.getClazz());
             // 关联表字段声明
             meta.fieldMap().forEach((name, field) -> {
-                if (field.getWay() != null || Model.class.isAssignableFrom(field.getClazz())) {
+                if (field.getRelationWay() != null || Model.class.isAssignableFrom(field.getClazz())) {
                     return;
                 }
                 name = toUnderlineCase(name);
@@ -943,40 +942,26 @@ public class Model implements IModel {
             if (Modifier.isStatic(field.getModifiers())) {
                 continue;
             }
-            ModelFieldMeta fieldInfo = new ModelFieldMeta(field);
-            String fieldName = fieldInfo.getName();
-            // 兼容mybatis-plus字段说明
-            TableField tableField = field.getAnnotation(TableField.class);
-            // 模型字段说明
-            ModelField modelField = field.getAnnotation(ModelField.class);
-            if (modelField != null) {
-                if (!"".equals(modelField.name())) {
-                    fieldInfo.setName(modelField.name()); // 指定字段名称
-                }
-                fieldInfo.setModelField(modelField);
+            ModelFieldMeta fieldMeta = new ModelFieldMeta(field);
+            // 隐藏字段
+            if (!fieldMeta.isExist()) {
+                continue;
             }
 
-            fieldInfo.setWay(findRelationAno(field));
+            // 关联属性的关联注解
+            fieldMeta.setRelationWay(findRelationAno(field));
 
             // 有关联方法
-            Method method = methodMap.get(fieldName);
+            Method method = methodMap.get(fieldMeta.getName());
             if (method != null && Model.class.isAssignableFrom(method.getReturnType())) {
                 try {
                     method.invoke(model);
-                    fieldInfo.setWay(meta.relationMap().get(fieldName));
+                    fieldMeta.setRelationWay(meta.relationMap().get(fieldMeta.getName()));
                 } catch (IllegalAccessException | InvocationTargetException ignore) {
-                }
-            } else {
-                // 非关联字段且隐藏
-                if (tableField != null && !tableField.exist()) {
-                    continue;
-                }
-                if (modelField != null && !modelField.exist()) {
-                    continue;
                 }
             }
 
-            meta.fieldMap().put(field.getName(), fieldInfo);
+            meta.fieldMap().put(field.getName(), fieldMeta);
         }
 
         // 模型初始化方法回调
@@ -1058,8 +1043,8 @@ public class Model implements IModel {
                 }
 
                 // 懒加载二
-                if (modelField.getWay() != null && Relation.class.isAssignableFrom(modelField.getWay().getClass())) {
-                    Relation relation = (Relation) modelField.getWay();
+                if (modelField.getRelationWay() != null && Relation.class.isAssignableFrom(modelField.getRelationWay().getClass())) {
+                    Relation relation = (Relation) modelField.getRelationWay();
                     if (relation.getType() == RelationType.OneToOne) {
                         Model relationModel = newModel(fieldType, curr);
                         // 设置全部关联属性为空，避免多重查询
@@ -1080,16 +1065,16 @@ public class Model implements IModel {
                     }
                 }
                 // 懒加载一
-                else if (isModel(fieldType) && OneToOne.class.isAssignableFrom(modelField.getWay().getClass())) {
-                    OneToOne one = (OneToOne) modelField.getWay();
+                else if (isModel(fieldType) && OneToOne.class.isAssignableFrom(modelField.getRelationWay().getClass())) {
+                    OneToOne one = (OneToOne) modelField.getRelationWay();
                     Model relationModel = newModel(fieldType, curr);
                     // 设置全部关联属性为空，避免多重查询
                     Object localValue = ReflectUtil.getFieldValue(curr.getMClass(), curr, one.localKey());
                     Object fieldValue = relationModel.where(one.foreignKey(), localValue).find();  // 查询结果
                     curr.data(fieldName, fieldValue);
                     return fieldValue;
-                } else if (isCollection(fieldType) && OneToMany.class.isAssignableFrom(modelField.getWay().getClass())) {
-                    OneToMany many = (OneToMany) modelField.getWay();
+                } else if (isCollection(fieldType) && OneToMany.class.isAssignableFrom(modelField.getRelationWay().getClass())) {
+                    OneToMany many = (OneToMany) modelField.getRelationWay();
                     if (field.getGenericType() instanceof ParameterizedType) {
                         ParameterizedType pt = (ParameterizedType) field.getGenericType();
                         Class<?> genericClazz = (Class<?>) pt.getActualTypeArguments()[0];
@@ -1104,7 +1089,7 @@ public class Model implements IModel {
             return null;
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("getter数据查询异常：{}", e.getMessage(), e);
             throw new RuntimeException("getter数据查询异常：" + e);
         }
     }

@@ -6,6 +6,7 @@ import org.quickjava.orm.Model;
 import org.quickjava.orm.QueryReservoir;
 import org.quickjava.orm.QuerySet;
 import org.quickjava.orm.contain.DataMap;
+import org.quickjava.orm.contain.ModelFieldMeta;
 import org.quickjava.orm.contain.ModelMeta;
 import org.quickjava.orm.contain.Pagination;
 import org.quickjava.orm.utils.ModelUtil;
@@ -15,6 +16,7 @@ import org.quickjava.orm.wrapper.conditions.JoinConditionBasic;
 import org.quickjava.orm.wrapper.enums.JoinType;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,7 +28,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
 
     protected M model;
 
-    protected Map<Object, List<JoinConditionBasic.Item<?, ?>>> joinItemsMap;
+    protected Map<String, List<JoinConditionBasic.Item<?, ?>>> joinItemsMap;
 
     protected Model model() {
         return model;
@@ -203,31 +205,44 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         if (joinItemsMap == null || joinItemsMap.isEmpty()) {
             return null;
         }
-        // 收集一对一关联信息
-
-
-        List<M> models = new LinkedList<>();
-        pagination.rows.forEach(row -> {
-            // 主表
-            M main = Model.newModel(this.model.getClass());
-            ORMHelper.resultTranshipmentWith(main, row, null);
-            // 一对一的数据加载
-        });
-        // 封装数据到对象上
-        joinItemsMap.forEach((alias, its) -> {
-            ModelMeta left = getModelMeta(it.getLeft());
-            if (ObjectUtil.isNotEmpty(it.getLeftAlias()) && ReflectUtil.hasField(this.model.getClass(), it.getLeftAlias())) {
-                return;
+        ModelMeta mainMeta = getModelMeta(this.model.getClass());
+        Map<Class<?>, ModelFieldMeta> fieldMetaClazzMap = new LinkedHashMap<>();
+        for (Field field : mainMeta.getClazz().getDeclaredFields()) {
+            if (!fieldMetaClazzMap.containsKey(field.getType())) {
+                fieldMetaClazzMap.put(field.getType(), new ModelFieldMeta(field));
             }
-            // 一对一
-            left.fieldMap().forEach((name, fieldMeta) -> {
-                if (fieldMeta.getClazz().equals(it.getLeft())) {
+        }
+        // 收集一对一关联信息（暂只支持两层即主模型.子模型，后续在关系上支持多层级，在关系上指定父模型的属性名
+        List<M> models = new LinkedList<>();
+        pagination.rows.forEach(data -> {
+            // 主表
+            M main = Model.newModel(mainMeta.getClazz());
+            ORMHelper.resultTranshipmentWith(main, data, mainMeta.table());
+            // 一对一的数据加载
+            joinItemsMap.forEach((alias, its) -> {
+                JoinConditionBasic.Item<?, ?> it = its.get(0);
+                Class<? extends Model> relationClazz = it.getLeft();
+                if (!fieldMetaClazzMap.containsKey(relationClazz)) {
                     return;
                 }
+                // 关联模型元数据
+                ModelMeta leftMeta = getModelMeta(it.getLeft());
+                if (ObjectUtil.isNotEmpty(it.getLeftAlias()) && !ReflectUtil.hasField(mainMeta.getClazz(), it.getLeftAlias())) {
+                    return;
+                }
+                // 是和主模型关联的条件
+                if (!it.getRight().equals(mainMeta.getClazz())) {
+                    return;
+                }
+                // 一对一
+                Model left = Model.newModel(leftMeta.getClazz(), null, main);
+                ORMHelper.resultTranshipmentWith(left, data, alias);
+                ReflectUtil.setFieldValue(main, fieldMetaClazzMap.get(relationClazz).getName(), left);
             });
-            // 一对多数据
+            //
+            models.add(main);
         });
-        return null;
+        return new Pagination<>(pagination, models);
     }
 
     public Pagination<M> pagination() {
@@ -258,6 +273,10 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
             String leftAlias = SqlUtil.isNotEmpty(it.getLeftAlias()) ? it.getLeftAlias() : left.table();
             ModelMeta right = it.getRight() == null ? ModelUtil.getMeta(this.model.getClass()) : getModelMeta(it.getRight());
             String rightAlias = SqlUtil.isNotEmpty(it.getRightAlias()) ? it.getRightAlias() : right.table();
+            // 右条件是主表
+            if (it.getRight() == null) {
+                it.setRight(ModelUtil.getModelClass(this.model.getClass()));
+            }
             // 查询器
             QuerySet querySet = getQuerySet();
             QueryReservoir reservoir = (QueryReservoir) ReflectUtil.getFieldValue(querySet, "reservoir");

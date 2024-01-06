@@ -1,7 +1,5 @@
 package org.quickjava.orm.contain;
 
-import org.quickjava.orm.utils.ModelUtil;
-
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,7 +12,7 @@ import java.util.Map;
  * +-------------------------------------------------------------------
  * Author: Qlo1062
  * +-------------------------------------------------------------------
- * File: ModelInfo
+ * File: ModelMeta
  * +-------------------------------------------------------------------
  * Date: 2023/4/27 23:19
  * +-------------------------------------------------------------------
@@ -23,13 +21,17 @@ import java.util.Map;
  */
 public class ModelMeta {
 
-    // 模型类
+    /**
+     * 模型类
+     * */
     private Class<?> clazz;
 
     // 表名
     private String table;
 
-    // 属性字段
+    /**
+     * 属性字段
+     * */
     private Map<String, ModelFieldMeta> fieldMap;
 
     // 全部关联关系

@@ -62,9 +62,9 @@ public class ModelUtil extends SqlUtil {
         return !isProxyModel(obj.getClass());
     }
 
-    public static Class<?> getModelClass(Class<?> clazz) {
+    public static Class<? extends Model> getModelClass(Class<?> clazz) {
         if (!Enhancer.isEnhanced(clazz)) {
-            return clazz;
+            return Model.class.isAssignableFrom(clazz) ? (Class<? extends Model>) clazz : null;
         }
         return getModelClass(clazz.getSuperclass());
     }

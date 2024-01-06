@@ -171,7 +171,7 @@ public class SqlUtil extends ORMHelper {
      */
     public static String fieldAlias(String table, String fieldName) {
         String column = SqlUtil.toUnderlineCase(fieldName);
-        String columnAlias = table + "__" + fieldName;
+        String columnAlias = table + "__" + column;
         return table + "." + column + " AS " + columnAlias;
     }
 
