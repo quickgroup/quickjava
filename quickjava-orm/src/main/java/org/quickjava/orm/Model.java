@@ -52,7 +52,7 @@ public class Model implements IModel {
      * */
     @JsonIgnore
     @TableField(exist = false)
-    private ModelReservoir reservoir = new ModelReservoir(this);
+    private final ModelReservoir reservoir = new ModelReservoir(this);
 
     //TODO:---------- 类方法 ----------
     // 强制修改对象是否是素模型
@@ -83,7 +83,7 @@ public class Model implements IModel {
         return reservoir.querySet;
     }
 
-    private QueryReservoir reservoir() {
+    private QueryReservoir querySetReservoir() {
         return ReflectUtil.getFieldValue(query(), "reservoir");
     }
 
@@ -200,8 +200,8 @@ public class Model implements IModel {
         // 执行
         Long pkVal = query().insert(this.sqlData());
         // 编译sql
-        if (reservoir().isFetchSql())
-            return toD(new ModelSql(reservoir().getSql()));
+        if (querySetReservoir().isFetchSql())
+            return toD(new ModelSql(querySetReservoir().getSql()));
         // 回填主键
         data(pk(), pkVal);
         return toD(ModelUtil.isProxyModel(this) ? this : newModel(getMClass(), data()));
@@ -262,8 +262,8 @@ public class Model implements IModel {
         // 执行
         query().update(this.sqlData());
         // 编译sql
-        if (reservoir().isFetchSql())
-            return toD(new ModelSql(reservoir().getSql()));
+        if (querySetReservoir().isFetchSql())
+            return toD(new ModelSql(querySetReservoir().getSql()));
         // 返回模型
         return toD(ModelUtil.isProxyModel(this) ? this : newModel(getMClass(), data()));
     }
@@ -319,7 +319,7 @@ public class Model implements IModel {
         // 执行查询
         List<Map<String, Object>> dataList = query().limit(0, 1).select();
         // 编译sql
-        if (reservoir().fetchSql) {
+        if (querySetReservoir().fetchSql) {
             return toD(new ModelSql(query().buildSql()));
         }
         // 结果为空
@@ -342,8 +342,8 @@ public class Model implements IModel {
         // 执行查询
         List<Map<String, Object>> dataList = query().select();
         // 编译sql
-        if (reservoir().fetchSql) {
-            return toD(new ModelListSql(reservoir().sql));
+        if (querySetReservoir().fetchSql) {
+            return toD(new ModelListSql(querySetReservoir().sql));
         }
         // 装载
         List<IModel> models = ORMHelper.resultTranshipment(this, getClass(), dataList);
