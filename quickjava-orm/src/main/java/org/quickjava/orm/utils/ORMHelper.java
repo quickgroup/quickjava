@@ -6,6 +6,7 @@ import org.quickjava.common.utils.ComUtil;
 import org.quickjava.common.utils.ReflectUtil;
 import org.quickjava.orm.IModel;
 import org.quickjava.orm.Model;
+import org.quickjava.orm.ModelReservoir;
 import org.quickjava.orm.contain.ModelMeta;
 import org.quickjava.orm.contain.Relation;
 import org.quickjava.orm.enums.Operator;
@@ -58,9 +59,9 @@ public abstract class ORMHelper extends ComUtil {
      * */
     public static <D extends IModel> List<D> resultTranshipment(Model queryModel, Class<?> clazz, List<Map<String, Object>> dataList) {
         List<IModel> models = new LinkedList<>();
-        List<String> withs = ReflectUtil.getFieldValue(queryModel, "__withs");
+        ModelReservoir reservoir = ReflectUtil.getFieldValue(queryModel, "reservoir");
         // 无预载入
-        if (withs == null || withs.isEmpty()) {
+        if (SqlUtil.isEmpty(reservoir.withs)) {
             dataList.forEach(data -> {
                 D main = Model.newModel(clazz);
                 ((Model) main).data(data);
@@ -75,7 +76,7 @@ public abstract class ORMHelper extends ComUtil {
                 // 主表数据
                 resultTranshipmentWith(main, data, null);
                 // 一对一关联表数据
-                withs.forEach(relationName -> {
+                reservoir.withs.forEach(relationName -> {
                     Relation relation = relationMap.get(relationName);
                     Model relationModel = Model.newModel(relation.getClazz(), null, main);
                     resultTranshipmentWith(relationModel, data, relationName);
@@ -84,7 +85,7 @@ public abstract class ORMHelper extends ComUtil {
                 models.add(main);
             });
             // 一对多
-            resultTranshipmentMany(withs, relationMap, models);
+            resultTranshipmentMany(reservoir.withs, relationMap, models);
         }
         return (List<D>) models;
     }
@@ -97,12 +98,12 @@ public abstract class ORMHelper extends ComUtil {
      */
     public static void resultTranshipmentWith(IModel iModel, Map<String, Object> data, String alias) {
         Model model = ((Model) iModel);
-        ModelMeta meta = ReflectUtil.getFieldValue(model, "__meta");
-        meta.fieldMap().forEach((name, field) -> {
+        ModelReservoir reservoir = ReflectUtil.getFieldValue(model, "reservoir");
+        reservoir.meta.fieldMap().forEach((name, field) -> {
             if (field.isRelation() || Model.class.isAssignableFrom(field.getClazz())) {
                 return;
             }
-            String tableName = alias == null ? meta.table() : alias;
+            String tableName = alias == null ? reservoir.meta.table() : alias;
             String fieldName = tableName + "__" + toUnderlineCase(name);
             model.data(name, data.get(fieldName));
         });
@@ -110,8 +111,8 @@ public abstract class ORMHelper extends ComUtil {
 
     private static Map<String, Relation> getWithRelation(Model model, RelationType[] types) {
         Map<String, Relation> relationMap = new LinkedHashMap<>();
-        ModelMeta meta = ReflectUtil.getFieldValue(model, "__meta");
-        meta.relationMap().forEach((name, relation) -> {
+        ModelReservoir reservoir = ReflectUtil.getFieldValue(model, "reservoir");
+        reservoir.meta.relationMap().forEach((name, relation) -> {
             if (SqlUtil.inArray(types, relation.getType())) {
                 relationMap.put(name, relation);
             }

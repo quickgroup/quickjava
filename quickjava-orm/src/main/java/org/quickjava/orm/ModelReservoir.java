@@ -1,6 +1,5 @@
 package org.quickjava.orm;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.quickjava.orm.contain.DataMap;
 import org.quickjava.orm.contain.ModelFieldMeta;
@@ -24,6 +23,9 @@ import java.util.List;
  * +-------------------------------------------------------------------
  */
 public class ModelReservoir {
+
+    @JsonIgnore
+    private Model model;
 
     /**
      * 模型元信息
@@ -60,13 +62,17 @@ public class ModelReservoir {
      * 关联的父模型对象
      * */
     @JsonIgnore
-    public Model parent;
+    public IModel parent;
 
     /**
      * 是素模型
      * */
     @JsonIgnore
     public boolean vegetarian = true;
+
+    public ModelReservoir(Model model) {
+        this.model = model;
+    }
 
     public List<ModelFieldMeta> getModified() {
         this.modified = modified == null ? new LinkedList<>() : modified;

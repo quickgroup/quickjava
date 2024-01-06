@@ -52,7 +52,7 @@ public class Model implements IModel {
      * */
     @JsonIgnore
     @TableField(exist = false)
-    protected ModelReservoir reservoir;
+    private ModelReservoir reservoir = new ModelReservoir(this);
 
     //TODO:---------- 类方法 ----------
     // 强制修改对象是否是素模型
@@ -727,15 +727,16 @@ public class Model implements IModel {
         enhancer.setSuperclass(getModelClass(clazz));
         enhancer.setCallback(modelProxyMethodInterceptor);
         D model = toD(enhancer.create());
-        // 设置
-        ModelUtil.setFieldValue(model, "__table", parseModelTableName(clazz));
+        ModelReservoir reservoir = ReflectUtil.getFieldValue(model, "reservoir");
+        //
+//        ModelUtil.setFieldValue(model, "__table", parseModelTableName(clazz));
         // 加载数据
         if (!ModelUtil.isEmpty(data)) {
             ((Model) model).data((DataMap) data);
         }
         // 设置父类
         if (!ModelUtil.isEmpty(parent)) {
-            ReflectUtil.setFieldValueDirect(model, "__parent", parent);
+            reservoir.parent = parent;
         }
         return model;
     }
