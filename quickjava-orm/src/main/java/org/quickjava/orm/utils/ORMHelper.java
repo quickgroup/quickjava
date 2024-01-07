@@ -2,12 +2,12 @@ package org.quickjava.orm.utils;
 
 import org.quickjava.common.utils.ComUtil;
 import org.quickjava.common.utils.ReflectUtil;
-import org.quickjava.orm.IModel;
-import org.quickjava.orm.Model;
-import org.quickjava.orm.ModelReservoir;
-import org.quickjava.orm.contain.Relation;
-import org.quickjava.orm.enums.Operator;
-import org.quickjava.orm.enums.RelationType;
+import org.quickjava.orm.model.IModel;
+import org.quickjava.orm.model.Model;
+import org.quickjava.orm.model.ModelReservoir;
+import org.quickjava.orm.model.contain.Relation;
+import org.quickjava.orm.query.enums.Operator;
+import org.quickjava.orm.model.enums.RelationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
  * +-------------------------------------------------------------------
  * Author: Qlo1062
  * +-------------------------------------------------------------------
- * File: HelperController
+ * File: ORMHelper
  * +-------------------------------------------------------------------
  * Date: 2023-3-14 11:52
  * +-------------------------------------------------------------------

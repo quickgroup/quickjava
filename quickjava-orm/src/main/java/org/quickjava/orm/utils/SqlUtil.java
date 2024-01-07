@@ -1,7 +1,7 @@
 package org.quickjava.orm.utils;
 
-import org.quickjava.orm.contain.ModelFieldMeta;
-import org.quickjava.orm.contain.TableColumn;
+import org.quickjava.orm.model.contain.ModelFieldMeta;
+import org.quickjava.orm.query.contain.TableColumnMeta;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -152,13 +152,13 @@ public class SqlUtil extends ORMHelper {
     }
 
     // 缓存原始表字段
-    public static Map<String, List<TableColumn>> tableColumnCache = new LinkedHashMap<>();
+    public static Map<String, List<TableColumnMeta>> tableColumnCache = new LinkedHashMap<>();
 
-    public static List<TableColumn> getTableColumns(String table) {
+    public static List<TableColumnMeta> getTableColumns(String table) {
         return tableColumnCache.get(table);
     }
 
-    public static void setTableColumns(String table, List<TableColumn> columns) {
+    public static void setTableColumns(String table, List<TableColumnMeta> columns) {
         tableColumnCache.put(table, columns);
     }
 

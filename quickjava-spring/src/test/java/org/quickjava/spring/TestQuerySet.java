@@ -8,8 +8,8 @@ package org.quickjava.spring;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.quickjava.common.utils.TimeUtils;
-import org.quickjava.orm.QuerySet;
-import org.quickjava.orm.enums.OrderByType;
+import org.quickjava.orm.query.QuerySet;
+import org.quickjava.orm.query.enums.OrderByType;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 

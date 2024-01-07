@@ -1,13 +1,11 @@
 package org.quickjava.orm.example;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import org.quickjava.orm.Model;
-import org.quickjava.orm.annotation.ModelField;
-import org.quickjava.orm.annotation.ModelId;
-import org.quickjava.orm.annotation.ModelName;
-import org.quickjava.orm.enums.ModelFieldFill;
+import org.quickjava.orm.model.annotation.ModelField;
+import org.quickjava.orm.model.annotation.ModelId;
+import org.quickjava.orm.model.annotation.ModelName;
+import org.quickjava.orm.model.enums.ModelFieldFill;
 
 import java.util.Date;
 import java.util.List;

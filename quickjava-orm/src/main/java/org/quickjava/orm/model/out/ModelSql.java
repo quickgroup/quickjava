@@ -1,8 +1,8 @@
-package org.quickjava.orm.example;
+package org.quickjava.orm.model.out;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import org.quickjava.orm.Model;
-import org.quickjava.orm.model.annotation.ModelName;
+import org.quickjava.orm.model.IModel;
+
+import java.util.List;
 
 /*
  * Copyright (c) 2020~2023 http://www.quickjava.org All rights reserved.
@@ -11,26 +11,32 @@ import org.quickjava.orm.model.annotation.ModelName;
  * +-------------------------------------------------------------------
  * Author: Qlo1062
  * +-------------------------------------------------------------------
- * File: User
+ * File: ModelSql
  * +-------------------------------------------------------------------
- * Date: 2023-3-8 16:26
+ * Date: 2023/6/17 15:32
  * +-------------------------------------------------------------------
  * License: Apache Licence 2.0
  * +-------------------------------------------------------------------
  */
-@ModelName
-public class ArticleTag extends Model {
+public class ModelSql implements IModel {
 
-    private Long id;
+    private String sql;
 
-    private Long articleId;
-
-    private String value;
-
-    @TableField(exist = false)
-    private Article article;
-
-    public Article article() {
-        return hasOne(Article.class, "articleId", "id");
+    public ModelSql(String sql) {
+        this.sql = sql;
     }
+
+    public String getSql() {
+        return sql;
+    }
+
+    public void setSql(String sql) {
+        this.sql = sql;
+    }
+
+    @Override
+    public String toString() {
+        return sql;
+    }
+
 }

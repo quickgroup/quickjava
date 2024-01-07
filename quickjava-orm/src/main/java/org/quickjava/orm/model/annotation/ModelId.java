@@ -1,8 +1,8 @@
-package org.quickjava.orm.example;
+package org.quickjava.orm.model.annotation;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import org.quickjava.orm.Model;
-import org.quickjava.orm.model.annotation.ModelName;
+import com.baomidou.mybatisplus.annotation.IdType;
+
+import java.lang.annotation.*;
 
 /*
  * Copyright (c) 2020~2023 http://www.quickjava.org All rights reserved.
@@ -11,26 +11,27 @@ import org.quickjava.orm.model.annotation.ModelName;
  * +-------------------------------------------------------------------
  * Author: Qlo1062
  * +-------------------------------------------------------------------
- * File: User
+ * File: ModelId
  * +-------------------------------------------------------------------
- * Date: 2023-3-8 16:26
+ * Date: 2023-3-8 16:15
  * +-------------------------------------------------------------------
  * License: Apache Licence 2.0
  * +-------------------------------------------------------------------
  */
-@ModelName
-public class ArticleTag extends Model {
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.FIELD, ElementType.ANNOTATION_TYPE})
+public @interface ModelId {
 
-    private Long id;
+    /**
+     * 字段名称
+     * @return 字段名称
+     * */
+    String value() default "";
 
-    private Long articleId;
-
-    private String value;
-
-    @TableField(exist = false)
-    private Article article;
-
-    public Article article() {
-        return hasOne(Article.class, "articleId", "id");
-    }
+    /**
+     * 主键类型
+     * @return 主键类型
+     * */
+    IdType type() default IdType.NONE;
 }

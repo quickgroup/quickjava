@@ -16,9 +16,10 @@ package org.quickjava.orm;
  */
 
 import org.quickjava.common.utils.ReflectUtil;
-import org.quickjava.orm.callback.ModelListener;
+import org.quickjava.orm.model.callback.ModelListener;
 import org.quickjava.orm.contain.DatabaseConfig;
 import org.quickjava.orm.drive.*;
+import org.quickjava.orm.model.Model;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedList;

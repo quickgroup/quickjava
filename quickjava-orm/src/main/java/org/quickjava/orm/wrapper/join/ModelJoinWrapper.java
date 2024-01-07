@@ -1,9 +1,8 @@
 package org.quickjava.orm.wrapper.join;
 
 import org.quickjava.orm.Model;
-import org.quickjava.orm.enums.Operator;
+import org.quickjava.orm.query.enums.Operator;
 import org.quickjava.orm.wrapper.MFunction;
-import org.quickjava.orm.wrapper.conditions.Condition;
 import org.quickjava.orm.wrapper.enums.JoinType;
 
 import java.io.Serializable;

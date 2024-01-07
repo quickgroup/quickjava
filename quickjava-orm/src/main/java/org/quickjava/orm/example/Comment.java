@@ -2,7 +2,7 @@ package org.quickjava.orm.example;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import org.quickjava.orm.Model;
-import org.quickjava.orm.annotation.ModelName;
+import org.quickjava.orm.model.annotation.ModelName;
 
 /*
  * Copyright (c) 2020~2023 http://www.quickjava.org All rights reserved.

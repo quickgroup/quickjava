@@ -1,18 +1,16 @@
 package org.quickjava.orm.utils;
 
-import cn.hutool.core.util.ObjectUtil;
 import net.sf.cglib.proxy.Enhancer;
-import org.quickjava.common.utils.ComUtil;
 import org.quickjava.common.utils.DatetimeUtil;
 import org.quickjava.common.utils.ReflectUtil;
 import org.quickjava.orm.IModel;
 import org.quickjava.orm.Model;
 import org.quickjava.orm.ModelReservoir;
-import org.quickjava.orm.callback.OrderByOptCallback;
-import org.quickjava.orm.callback.WhereOptCallback;
-import org.quickjava.orm.contain.ModelMeta;
-import org.quickjava.orm.contain.Where;
-import org.quickjava.orm.enums.ModelFieldFill;
+import org.quickjava.orm.query.callback.OrderByOptCallback;
+import org.quickjava.orm.query.callback.WhereOptCallback;
+import org.quickjava.orm.model.contain.ModelMeta;
+import org.quickjava.orm.query.build.Where;
+import org.quickjava.orm.model.enums.ModelFieldFill;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -263,7 +261,7 @@ public class ModelUtil extends SqlUtil {
         if (where.getChildren() != null && !where.getChildren().isEmpty()) {
             return;
         }
-        where.setField(fieldToUnderlineCase(where.getField()));
+        where.setColumn(fieldToUnderlineCase(where.getColumn()));
     };
 
     public static OrderByOptCallback orderByOptCallback = (orderBy, userData) -> {

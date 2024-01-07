@@ -1,6 +1,6 @@
 package org.quickjava.orm.example;
 
-import org.quickjava.orm.QuerySet;
+import org.quickjava.orm.query.QuerySet;
 
 import java.util.Map;
 

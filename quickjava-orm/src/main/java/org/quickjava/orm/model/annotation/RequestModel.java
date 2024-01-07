@@ -1,8 +1,9 @@
-package org.quickjava.orm.example;
+package org.quickjava.orm.model.annotation;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import org.quickjava.orm.Model;
-import org.quickjava.orm.model.annotation.ModelName;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /*
  * Copyright (c) 2020~2023 http://www.quickjava.org All rights reserved.
@@ -11,26 +12,14 @@ import org.quickjava.orm.model.annotation.ModelName;
  * +-------------------------------------------------------------------
  * Author: Qlo1062
  * +-------------------------------------------------------------------
- * File: User
+ * File: RequestModel
  * +-------------------------------------------------------------------
- * Date: 2023-3-8 16:26
+ * Date: 2023-3-14 15:09
  * +-------------------------------------------------------------------
  * License: Apache Licence 2.0
  * +-------------------------------------------------------------------
  */
-@ModelName
-public class ArticleTag extends Model {
-
-    private Long id;
-
-    private Long articleId;
-
-    private String value;
-
-    @TableField(exist = false)
-    private Article article;
-
-    public Article article() {
-        return hasOne(Article.class, "articleId", "id");
-    }
+@Target(ElementType.PARAMETER)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface RequestModel {
 }

@@ -1,8 +1,4 @@
-package org.quickjava.orm.example;
-
-import com.baomidou.mybatisplus.annotation.TableField;
-import org.quickjava.orm.Model;
-import org.quickjava.orm.model.annotation.ModelName;
+package org.quickjava.orm.model.enums;
 
 /*
  * Copyright (c) 2020~2023 http://www.quickjava.org All rights reserved.
@@ -11,26 +7,33 @@ import org.quickjava.orm.model.annotation.ModelName;
  * +-------------------------------------------------------------------
  * Author: Qlo1062
  * +-------------------------------------------------------------------
- * File: User
+ * File: ModelFieldFill
  * +-------------------------------------------------------------------
- * Date: 2023-3-8 16:26
+ * Date: 2023-5-26 10:11
  * +-------------------------------------------------------------------
  * License: Apache Licence 2.0
  * +-------------------------------------------------------------------
  */
-@ModelName
-public class ArticleTag extends Model {
+public enum ModelFieldFill {
+    NULL,
+    /**
+     * 当前日期时间
+     */
+    DATETIME,
+    DATE,
+    TIME,
+    /**
+     * 当前秒级时间戳
+     */
+    TIMESTAMP,
+    /**
+     * 当前毫秒级时间戳
+     */
+    MILL_TIMESTAMP,
+    /**
+     * 自定义方法回调
+     */
+    STATIC_METHOD,
+    ;
 
-    private Long id;
-
-    private Long articleId;
-
-    private String value;
-
-    @TableField(exist = false)
-    private Article article;
-
-    public Article article() {
-        return hasOne(Article.class, "articleId", "id");
-    }
 }
