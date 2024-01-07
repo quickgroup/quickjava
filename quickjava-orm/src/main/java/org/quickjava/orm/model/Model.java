@@ -56,7 +56,7 @@ import java.util.*;
  * */
 @JsonIgnoreType
 @JsonIgnoreProperties(value = {"reservoir", "logger"}, ignoreUnknown = true)
-public class Model implements IModel<Model> {
+public class Model implements IModel {
 
     @JsonIgnore
     @TableField(exist = false)
@@ -187,7 +187,7 @@ public class Model implements IModel<Model> {
      * @return D
      * @param <D> D
      */
-    public <D extends IModel<?>> D insert()
+    public <D extends IModel> D insert()
     {
         // 默认填充数据
         reservoir.meta.fieldMap().forEach((name, field) -> {
@@ -215,11 +215,11 @@ public class Model implements IModel<Model> {
      * @return 模型对象
      * @param <D> D
      */
-    public <D extends IModel<?>> D insert(DataMap data) {
+    public <D extends IModel> D insert(DataMap data) {
         return insert((Map<String, Object>) data);
     }
 
-    public <D extends IModel<?>> D insert(Map<String, Object> data) {
+    public <D extends IModel> D insert(Map<String, Object> data) {
         data(data);
         return insert();
     }
@@ -251,7 +251,7 @@ public class Model implements IModel<Model> {
      * @return 模型对象
      * @param <D> D
      */
-    public <D extends IModel<?>> D update()
+    public <D extends IModel> D update()
     {
         // 默认填充数据
          reservoir.meta.fieldMap().forEach((name, field) -> {
@@ -270,16 +270,16 @@ public class Model implements IModel<Model> {
         return toD(ModelUtil.isProxyModel(this) ? this : newModel(getMClass(), data()));
     }
 
-    public <D extends IModel<?>> D update(DataMap data) {
+    public <D extends IModel> D update(DataMap data) {
         return update((Map<String, Object>) data);
     }
 
-    public <D extends IModel<?>> D update(Map<String, Object> data) {
+    public <D extends IModel> D update(Map<String, Object> data) {
         data(data);
         return update();
     }
 
-    public <D extends IModel<?>> D updateById()
+    public <D extends IModel> D updateById()
     {
         String pk = pk();
         where(pk, data(pk));
@@ -293,17 +293,17 @@ public class Model implements IModel<Model> {
      * @return 模型对象
      * @param <D> D
      */
-    public <D extends IModel<?>> D save() {
+    public <D extends IModel> D save() {
         String pk = pk();
         Object pkVal = data(pk);
         return pkVal == null ? insert() : where(pk, pkVal).update();
     }
 
-    public <D extends IModel<?>> D save(DataMap data) {
+    public <D extends IModel> D save(DataMap data) {
         return save((Map<String, Object>) data);
     }
 
-    public <D extends IModel<?>> D save(Map<String, Object> data) {
+    public <D extends IModel> D save(Map<String, Object> data) {
         data(data);
         save();
         return toD(this);
@@ -314,7 +314,7 @@ public class Model implements IModel<Model> {
      * @return 模型对象
      * @param <D> 模型类
      */
-    public <D extends IModel<?>> D find()
+    public <D extends IModel> D find()
     {
         // 查询前：预载入字段准备
         queryBefore();
@@ -329,16 +329,16 @@ public class Model implements IModel<Model> {
             return null;
         }
         // 装载数据
-        List<IModel<?>> models = ModelUtil.resultTranshipment(this, getClass(), dataList);
+        List<IModel> models = ModelUtil.resultTranshipment(this, getClass(), dataList);
         return toD(models.get(0));
     }
 
-    public <D extends IModel<?>> D find(Serializable id) {
+    public <D extends IModel> D find(Serializable id) {
         query().where(query().pk(), id);
         return find();
     }
 
-    public <D extends IModel<?>> List<D> select() {
+    public <D extends IModel> List<D> select() {
         // 查询前处理：预载入
         queryBefore();
         // 执行查询
@@ -348,7 +348,7 @@ public class Model implements IModel<Model> {
             return toD(new ModelListSql(querySetReservoir().sql));
         }
         // 装载
-        List<IModel<?>> models = ModelUtil.resultTranshipment(this, getClass(), dataList);
+        List<IModel> models = ModelUtil.resultTranshipment(this, getClass(), dataList);
         return toD(models);
     }
 
@@ -372,7 +372,7 @@ public class Model implements IModel<Model> {
         // 执行查询
         Pagination<Map<String, Object>> pagination = query().pagination(page, pageSize);
         // 数据组装
-        Pagination<IModel<?>> pagination1 = new Pagination<>(pagination);
+        Pagination<IModel> pagination1 = new Pagination<>(pagination);
         pagination1.rows = ModelUtil.resultTranshipment(this, getMClass(), pagination.rows);
         return toD(pagination1);
     }
@@ -687,23 +687,23 @@ public class Model implements IModel<Model> {
     }
 
     //TODO::---------- 模型实例化----------
-    public static<D extends IModel<?>> D newModel(Class<?> clazz) {
+    public static<D extends IModel> D newModel(Class<?> clazz) {
         return newModel(clazz, null, null);
     }
 
-    public static<D extends IModel<?>> D newModel(Object entity) {
+    public static<D extends IModel> D newModel(Object entity) {
         return newModel(entity.getClass(), null, null);
     }
 
-    private static<D extends IModel<?>> D newModel(Class<?> clazz, Map<String, Object> data) {
+    private static<D extends IModel> D newModel(Class<?> clazz, Map<String, Object> data) {
         return newModel(clazz, data, null);
     }
 
-    private static<D extends IModel<?>> D newModel(Class<?> clazz, Model parent) {
+    private static<D extends IModel> D newModel(Class<?> clazz, Model parent) {
         return newModel(clazz, null, parent);
     }
 
-    public static<D extends IModel<?>> D newModel(Class<?> clazz, Map<String, Object> data, IModel<?> parent)
+    public static<D extends IModel> D newModel(Class<?> clazz, Map<String, Object> data, IModel parent)
     {
         // 创建代理类信息
         Enhancer enhancer = new Enhancer();
@@ -771,8 +771,7 @@ public class Model implements IModel<Model> {
     /*
      * 关联方法
      * */
-    @Override
-    public Model relation(String fieldName, Class<?> clazz, RelationType type, String localKey, String foreignKey) {
+    public <D extends IModel> D relation(String fieldName, Class<?> clazz, RelationType type, String localKey, String foreignKey) {
         // 缓存关联关系
         if (! reservoir.meta.relationMap().containsKey(fieldName)) {
             reservoir.meta.relationMap().put(fieldName, new Relation(clazz, type, localKey, foreignKey));
@@ -781,12 +780,12 @@ public class Model implements IModel<Model> {
         return toD(newModel(clazz, this));
     }
 
-    public Model relation(Class<?> clazz, RelationType type, String localKey, String foreignKey) {
+    public <D extends Model> D relation(Class<?> clazz, RelationType type, String localKey, String foreignKey) {
         String fieldName = Thread.currentThread().getStackTrace()[1].getMethodName();
         return relation(fieldName, clazz, type, localKey, foreignKey);
     }
 
-    public Model relation(String clazzName, RelationType type, String localKey, String foreignKey) {
+    public <D extends Model> D relation(String clazzName, RelationType type, String localKey, String foreignKey) {
         try {
             Class<?> clazz = getClass().getClassLoader().loadClass(clazzName);
             String fieldName = Thread.currentThread().getStackTrace()[2].getMethodName();
@@ -796,12 +795,12 @@ public class Model implements IModel<Model> {
         }
     }
 
-    public Model hasOne(Class<?> clazz, String localKey, String foreignKey) {
+    public <D extends Model> D hasOne(Class<?> clazz, String localKey, String foreignKey) {
         String fieldName = Thread.currentThread().getStackTrace()[2].getMethodName();
         return relation(fieldName, clazz, RelationType.OneToOne, localKey, foreignKey);
     }
 
-    public Model hasMany(Class<?> clazz, String localKey, String foreignKey) {
+    public <D extends Model> D hasMany(Class<?> clazz, String localKey, String foreignKey) {
         String fieldName = Thread.currentThread().getStackTrace()[2].getMethodName();
         return relation(fieldName, clazz, RelationType.OneToMany, localKey, foreignKey);
     }

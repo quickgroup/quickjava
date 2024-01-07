@@ -16,8 +16,6 @@ import org.quickjava.orm.model.enums.RelationType;
  * License: Apache Licence 2.0
  * +-------------------------------------------------------------------
  */
-public interface IModel<Children> {
-
-    Children relation(String fieldName, Class<?> clazz, RelationType type, String localKey, String foreignKey);
+public interface IModel {
 
 }
