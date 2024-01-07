@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.quickjava.common.utils.TimeUtils;
 import org.quickjava.orm.QuerySet;
+import org.quickjava.orm.enums.OrderByType;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -66,7 +67,8 @@ public class TestModel {
         System.out.println("耗时=" + TimeUtils.endNanoTime(startTime) + "ms");
 
         // 查
-        List<Map<String, Object>> rows = QuerySet.table("user").where("name", "xiaolong").order("create_time", "DESC").select();
+        List<Map<String, Object>> rows = QuerySet.table("user").where("name", "xiaolong")
+                .order("create_time", OrderByType.DESC).select();
         System.out.println("SELECT.return=" + rows);
     }
 

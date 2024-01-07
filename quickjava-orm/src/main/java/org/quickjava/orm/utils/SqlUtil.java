@@ -117,12 +117,26 @@ public class SqlUtil extends ORMHelper {
         mapJoin(str, ",", data, callback);
     }
 
+    public static <D> StringBuilder listJoin(List<D> items, String symbol, MapJoinDCallback<D> callback) {
+        StringBuilder str = new StringBuilder();
+        for (int i = 0; i < items.size(); i++) {
+            if (i > 0)
+                str.append(symbol);
+            str.append(callback.call(items.get(i)));
+        }
+        return str;
+    }
+
     public static MapJoinCallback mapJoinKeyCallback = Map.Entry::getKey;
 
     public static MapJoinCallback mapJoinValueCallback = Map.Entry::getValue;
 
     public interface MapJoinCallback {
         Object call(Map.Entry<String, Object> entry);
+    }
+
+    public interface MapJoinDCallback<D> {
+        Object call(D entry);
     }
 
     // 数据字段转驼峰

@@ -257,17 +257,16 @@ public class ModelUtil extends SqlUtil {
         return stringBuilder.toString();
     }
 
-    // 默认转换字段大小写
-    public static final WhereOptCallback whereOptCallback = (where, querySet, userData) -> {
+    // 回调处理方法
+    public static WhereOptCallback whereOptCallback = (where, querySet, userData) -> {
         // 子查询条件不处理
-        if (where.getChildren() != null) {
+        if (where.getChildren() != null && !where.getChildren().isEmpty()) {
             return;
         }
         where.setField(fieldToUnderlineCase(where.getField()));
     };
 
-    // 默认转换字段大小写
-    public static final OrderByOptCallback orderByOptCallback = (orderBy, userData) -> {
+    public static OrderByOptCallback orderByOptCallback = (orderBy, userData) -> {
         orderBy.setField(fieldToUnderlineCase(orderBy.getField()));
     };
 

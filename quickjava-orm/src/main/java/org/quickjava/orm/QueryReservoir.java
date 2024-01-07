@@ -245,16 +245,26 @@ public class QueryReservoir {
         this.lock = lock;
     }
 
+    public <D extends QuerySetCallback> void setCallback(Class<D> clazz, D callback, Object userData) {
+        if (callbackMap == null) {
+            callbackMap = new LinkedHashMap<>();
+            callbackUserDataMap = new LinkedHashMap<>();
+        }
+        callbackMap.put(clazz, callback);
+        callbackUserDataMap.put(clazz, userData);
+    }
+
     public <D extends QuerySetCallback> D getCallback(Class<D> clazz) {
+        if (callbackMap == null) {
+            return null;
+        }
         return (D) callbackMap.get(clazz);
     }
 
-    public <D extends QuerySetCallback> void setCallback(D callback, Object userData) {
-        callbackMap.put(callback.getClass(), callback);
-        callbackUserDataMap.put(callback.getClass(), userData);
-    }
-
     public <D extends QuerySetCallback, V> V getCallbackUserData(Class<D> clazz) {
+        if (callbackUserDataMap == null) {
+            return null;
+        }
         return (V) callbackUserDataMap.get(clazz);
     }
 

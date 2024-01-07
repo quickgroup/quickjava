@@ -143,6 +143,12 @@ public abstract class Drive {
         // WHERE
         if ((action == Action.SELECT || action == Action.UPDATE) && reservoir.whereList != null) {
             sqlList.add("WHERE");
+            // 自动填充表名
+            if (reservoir.joinList != null) {
+                reservoir.getWhereList().forEach(where -> {
+                    where.setTable(where.getTable() == null ? reservoir.getAlias() : where.getTable());
+                });
+            }
             sqlList.add(Where.cutFirstLogic(Where.collectSql(reservoir.getWhereList(), config)));
         }
 
@@ -158,7 +164,14 @@ public abstract class Drive {
 
         // ORDER BY
         if (action == Action.SELECT && reservoir.orderByList != null) {
-            sqlList.add(String.format("ORDER BY %s", SqlUtil.collJoin(",", reservoir.orderByList)));
+            sqlList.add("ORDER BY");
+            if (reservoir.joinList != null) {
+                reservoir.getOrderByList().forEach(orderBy -> {
+                    orderBy.setTable(orderBy.getTable() == null ? reservoir.getAlias() : orderBy.getTable());
+                });
+            }
+            StringBuilder str = SqlUtil.listJoin(reservoir.getOrderByList(), ", ", entry -> entry.toSql(config));
+            sqlList.add(str.toString());
         }
 
         // Limit

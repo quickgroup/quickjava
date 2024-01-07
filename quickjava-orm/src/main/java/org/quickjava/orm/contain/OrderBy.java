@@ -1,6 +1,7 @@
 package org.quickjava.orm.contain;
 
 import org.quickjava.orm.enums.OrderByType;
+import org.quickjava.orm.utils.SqlUtil;
 
 /*
  * Copyright (c) 2020~2024 http://www.quickjava.org All rights reserved.
@@ -24,6 +25,8 @@ public class OrderBy {
 
     private OrderByType type;
 
+    private DriveConfigure driveConfigure;
+
     public OrderBy(String table, String field, OrderByType type) {
         this.table = table;
         this.field = field;
@@ -42,6 +45,17 @@ public class OrderBy {
         return field;
     }
 
+    public String getFieldSql() {
+        String fieldSql = field;
+        if (driveConfigure.columnLeft != null) {
+            fieldSql = driveConfigure.columnLeft + fieldSql;
+        }
+        if (driveConfigure.columnRight != null) {
+            fieldSql = fieldSql + driveConfigure.columnRight;
+        }
+        return table == null ? fieldSql : SqlUtil.tableColumn(table, fieldSql);
+    }
+
     public void setField(String field) {
         this.field = field;
     }
@@ -52,5 +66,10 @@ public class OrderBy {
 
     public void setType(OrderByType type) {
         this.type = type;
+    }
+
+    public String toSql(DriveConfigure driveConfigure) {
+        this.driveConfigure = driveConfigure;
+        return getFieldSql() + " " + getType().name();
     }
 }

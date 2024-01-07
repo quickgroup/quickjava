@@ -12,6 +12,7 @@ import org.quickjava.common.utils.ComUtil;
 import org.quickjava.common.utils.DatetimeUtil;
 import org.quickjava.common.utils.ReflectUtil;
 import org.quickjava.orm.annotation.*;
+import org.quickjava.orm.callback.OrderByOptCallback;
 import org.quickjava.orm.callback.WhereCallback;
 import org.quickjava.orm.callback.WhereOptCallback;
 import org.quickjava.orm.contain.*;
@@ -78,8 +79,8 @@ public class Model implements IModel {
             if (reservoir.querySet == null) {
                 reservoir.querySet = QuerySet.table(parseModelTableName(getClass()));
                 QueryReservoir queryReservoir = ReflectUtil.getFieldValue(reservoir.querySet, "reservoir");
-                queryReservoir.setCallback(ModelUtil.whereOptCallback, this);
-                queryReservoir.setCallback(ModelUtil.orderByOptCallback, this);
+                queryReservoir.setCallback(WhereOptCallback.class, ModelUtil.whereOptCallback, this);
+                queryReservoir.setCallback(OrderByOptCallback.class, ModelUtil.orderByOptCallback, this);
             }
         }
         return reservoir.querySet;
