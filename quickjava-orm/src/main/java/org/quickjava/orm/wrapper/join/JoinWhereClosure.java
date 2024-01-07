@@ -16,6 +16,6 @@ import org.quickjava.orm.Model;
  * License: Apache Licence 2.0
  * +-------------------------------------------------------------------
  */
-public interface JoinConditionClosure<Left extends Model, Right extends Model> {
+public interface JoinWhereClosure<Left extends Model, Right extends Model> {
     void call(JoinWhere<Left, Right> condition);
 }
