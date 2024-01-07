@@ -8,12 +8,11 @@ import org.quickjava.orm.model.contain.Relation;
 import org.quickjava.orm.model.enums.ModelFieldFill;
 import org.quickjava.orm.model.enums.RelationType;
 import org.quickjava.orm.query.QuerySet;
-import org.quickjava.orm.query.build.Where;
 import org.quickjava.orm.query.callback.OrderByOptCallback;
 import org.quickjava.orm.query.callback.WhereOptCallback;
 import org.quickjava.orm.query.enums.Operator;
 import org.quickjava.orm.utils.SqlUtil;
-import org.quickjava.orm.wrapper.enums.ConditionType;
+import org.quickjava.orm.enums.CompareEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -243,31 +242,20 @@ public class ModelUtil extends SqlUtil {
         return null;
     }
 
-    public static String joinConditionSql(String left, String leftField, ConditionType type,
-                                          String right, String rightField) {
-        if (type == ConditionType.IS_NULL || type == ConditionType.IS_NOT_NULL) {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append(left).append(".").append(toUnderlineCase(leftField));
-            stringBuilder.append(" ").append(type.sql());
-            return stringBuilder.toString();
-        }
-        return joinConditionSql(left, leftField, type.name(), right, rightField);
-    }
-
-    public static String joinConditionSql(String left, String leftField, String conditionType,
+    public static String joinConditionSql(String left, String leftField, CompareEnum type,
                                           String right, String rightField) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(left).append(".").append(toUnderlineCase(leftField));
-        stringBuilder.append(" ").append(Where.OpMap.get(conditionType)).append(" ");
+        stringBuilder.append(" ").append(type.sql()).append(" ");
         stringBuilder.append(right).append(".").append(toUnderlineCase(rightField));
         return stringBuilder.toString();
     }
 
-    public static String joinConditionSql(String left, String leftField, String conditionType,
+    public static String joinConditionSql(String left, String leftField, CompareEnum type,
                                           String rightValue) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(left).append(".").append(toUnderlineCase(leftField));
-        stringBuilder.append(" ").append(Where.OpMap.get(conditionType)).append(" ");
+        stringBuilder.append(" ").append(type.sql()).append(" ");
         stringBuilder.append(rightValue);
         return stringBuilder.toString();
     }

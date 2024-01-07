@@ -6,7 +6,7 @@ import org.quickjava.orm.query.enums.OrderByType;
 import org.quickjava.orm.wrapper.MFunction;
 import org.quickjava.orm.wrapper.Wrapper;
 import org.quickjava.orm.wrapper.WrapperUtil;
-import org.quickjava.orm.wrapper.enums.JoinType;
+import org.quickjava.orm.enums.JoinType;
 
 import java.io.Serializable;
 

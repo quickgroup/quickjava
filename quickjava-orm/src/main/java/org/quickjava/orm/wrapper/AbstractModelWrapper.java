@@ -14,11 +14,10 @@ import org.quickjava.orm.model.ModelUtil;
 import org.quickjava.orm.query.enums.OrderByType;
 import org.quickjava.orm.utils.SqlUtil;
 import org.quickjava.orm.wrapper.join.JoinSpecifyBase;
-import org.quickjava.orm.wrapper.enums.JoinType;
+import org.quickjava.orm.enums.JoinType;
 import org.quickjava.orm.wrapper.join.ModelJoinWrapper;
 
 import java.io.Serializable;
-import java.lang.reflect.Field;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;

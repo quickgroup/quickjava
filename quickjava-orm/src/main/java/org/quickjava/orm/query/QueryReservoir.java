@@ -1,6 +1,7 @@
 package org.quickjava.orm.query;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.quickjava.orm.query.build.Join;
 import org.quickjava.orm.query.build.TableColumn;
 import org.quickjava.orm.query.callback.QuerySetCallback;
 import org.quickjava.orm.query.contain.Action;
@@ -10,7 +11,6 @@ import org.quickjava.orm.query.build.Where;
 import org.quickjava.orm.utils.QuerySetHelper;
 
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -50,7 +50,7 @@ public class QueryReservoir {
     public List<TableColumn> columnList;
 
     @JsonIgnore
-    public List<String[]> joinList;
+    public List<Join> joinList;
 
     @JsonIgnore
     public List<String> unionList;
@@ -137,12 +137,12 @@ public class QueryReservoir {
         this.columnList = columnList;
     }
 
-    public List<String[]> getJoinList() {
+    public List<Join> getJoinList() {
         joinList = QuerySetHelper.initList(joinList);
         return joinList;
     }
 
-    public void setJoinList(List<String[]> joinList) {
+    public void setJoinList(List<Join> joinList) {
         this.joinList = joinList;
     }
 
@@ -189,7 +189,7 @@ public class QueryReservoir {
     }
 
     public Map<String, Object> getData() {
-        if (getDataList().size() == 0) {
+        if (getDataList().isEmpty()) {
             getDataList().add(new LinkedHashMap<>());
         }
         return getDataList().get(0);
@@ -200,7 +200,7 @@ public class QueryReservoir {
     }
 
     public List<TableColumn> getGroupBy() {
-        groupBy = groupBy == null ? new LinkedList<>() : groupBy;
+        groupBy = QuerySetHelper.initList(groupBy);
         return groupBy;
     }
 
@@ -209,6 +209,7 @@ public class QueryReservoir {
     }
 
     public List<TableColumn> getHaving() {
+        having = QuerySetHelper.initList(having);
         return having;
     }
 

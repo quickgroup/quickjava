@@ -1,4 +1,4 @@
-package org.quickjava.orm.wrapper.enums;
+package org.quickjava.orm.enums;
 
 /*
  * Copyright (c) 2020~2023 http://www.quickjava.org All rights reserved.

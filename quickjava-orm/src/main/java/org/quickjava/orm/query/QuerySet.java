@@ -10,6 +10,7 @@ import org.quickjava.common.enums.DatetimeCurrType;
 import org.quickjava.common.enums.DatetimeRangeType;
 import org.quickjava.common.utils.DatetimeUtil;
 import org.quickjava.orm.ORMContext;
+import org.quickjava.orm.enums.JoinType;
 import org.quickjava.orm.model.ModelUtil;
 import org.quickjava.orm.query.build.*;
 import org.quickjava.orm.query.callback.OrderByOptCallback;
@@ -73,6 +74,12 @@ public class QuerySet {
     public QuerySet join(String table, String condition, String type)
     {
         reservoir.getJoinList().add(new String[]{table, condition, type});
+        return this;
+    }
+
+    public QuerySet join(String table, JoinCondition condition, JoinType type)
+    {
+        reservoir.getJoinList().add(new Join(type, table).addCondition(condition));
         return this;
     }
 

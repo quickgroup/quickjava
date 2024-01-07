@@ -101,6 +101,6 @@ public class TableColumn {
 
     public String toSql(DriveConfigure driveConfigure) {
         this.driveConfigure = driveConfigure;
-        return getColumnSql();
+        return null;
     }
 }

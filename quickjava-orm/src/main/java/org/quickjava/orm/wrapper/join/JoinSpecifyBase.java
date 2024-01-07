@@ -2,7 +2,7 @@ package org.quickjava.orm.wrapper.join;
 
 import org.quickjava.orm.model.Model;
 import org.quickjava.orm.wrapper.MFunction;
-import org.quickjava.orm.wrapper.enums.ConditionType;
+import org.quickjava.orm.enums.CompareEnum;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -42,54 +42,54 @@ public class JoinSpecifyBase<Children extends JoinSpecifyBase<Children, Left>, L
     }
 
     protected <Right extends Model> Children eq(MFunction<Left, ?> lf, Class<Right> right, MFunction<Right, ?> rf) {
-        return add(ConditionType.EQ, lf, right, rf);
+        return add(CompareEnum.EQ, lf, right, rf);
     }
 
     protected Children eq(MFunction<Left, ?> lf, Object val) {
-        return add(ConditionType.EQ, lf, val);
+        return add(CompareEnum.EQ, lf, val);
     }
 
     protected <Right extends Model> Children neq(MFunction<Left, ?> lf, Class<Right> right, MFunction<Right, ?> rf) {
-        return add(ConditionType.NEQ, lf, right, rf);
+        return add(CompareEnum.NEQ, lf, right, rf);
     }
 
     protected Children in(MFunction<Left, ?> lf, Object val) {
-        return add(ConditionType.IN, lf, val);
+        return add(CompareEnum.IN, lf, val);
     }
 
     protected Children notIn(MFunction<Left, ?> lf, Object val) {
-        return add(ConditionType.NOT_IN, lf, val);
+        return add(CompareEnum.NOT_IN, lf, val);
     }
 
     protected Children isNull(MFunction<Left, ?> lf) {
-        return add(ConditionType.IS_NULL, lf, null);
+        return add(CompareEnum.IS_NULL, lf, null);
     }
 
     protected Children isNotNull(MFunction<Left, ?> lf) {
-        return add(ConditionType.IS_NOT_NULL, lf, null);
+        return add(CompareEnum.IS_NOT_NULL, lf, null);
     }
 
     protected Children between(MFunction<Left, ?> lf, Object val) {
-        return add(ConditionType.BETWEEN, lf, val);
+        return add(CompareEnum.BETWEEN, lf, val);
     }
 
-    protected <Right extends Model> Children add(ConditionType type, MFunction<Left, ?> lf, MFunction<Right, ?> rf) {
+    protected <Right extends Model> Children add(CompareEnum type, MFunction<Left, ?> lf, MFunction<Right, ?> rf) {
         onList.add(new Item<>(type, lf, rf));
         return chain();
     }
 
-    protected Children add(ConditionType type, MFunction<Left, ?> lf, Object value) {
+    protected Children add(CompareEnum type, MFunction<Left, ?> lf, Object value) {
         onList.add(new Item<>(type, lf, value));
         return chain();
     }
 
-    protected <Right extends Model> Children add(ConditionType type, MFunction<Left, ?> lf, Class<Right> right, MFunction<Right, ?> rf) {
+    protected <Right extends Model> Children add(CompareEnum type, MFunction<Left, ?> lf, Class<Right> right, MFunction<Right, ?> rf) {
         onList.add(new Item<>(type, lf, right, rf));
         return chain();
     }
 
     public static class Item<L extends Model, R extends Model> {
-        private final ConditionType type;
+        private final CompareEnum type;
         // 左表别名
         private final MFunction<L, ?> leftFun;
         // 右表别名
@@ -101,26 +101,26 @@ public class JoinSpecifyBase<Children extends JoinSpecifyBase<Children, Left>, L
         // 右表条件数据
         private Object rightValue;
 
-        public Item(ConditionType type, MFunction<L, ?> leftFun, Class<? extends Model> right, MFunction<R, ?> rightFun) {
+        public Item(CompareEnum type, MFunction<L, ?> leftFun, Class<? extends Model> right, MFunction<R, ?> rightFun) {
             this.type = type;
             this.leftFun = leftFun;
             this.right = right;
             this.rightFun = rightFun;
         }
 
-        public Item(ConditionType type, MFunction<L, ?> leftFun, Object rightValue) {
+        public Item(CompareEnum type, MFunction<L, ?> leftFun, Object rightValue) {
             this.type = type;
             this.leftFun = leftFun;
             this.rightValue = rightValue;
         }
 
-        public Item(ConditionType type, MFunction<L, ?> leftFun, MFunction<R, ?> rightFun) {
+        public Item(CompareEnum type, MFunction<L, ?> leftFun, MFunction<R, ?> rightFun) {
             this.type = type;
             this.leftFun = leftFun;
             this.rightFun = rightFun;
         }
 
-        public ConditionType getType() {
+        public CompareEnum getType() {
             return type;
         }
 

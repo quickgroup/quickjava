@@ -15,10 +15,20 @@ package org.quickjava.orm.query.build;
  * +-------------------------------------------------------------------
  */
 
+import org.quickjava.orm.contain.DriveConfigure;
+import org.quickjava.orm.enums.CompareEnum;
+import org.quickjava.orm.model.ModelUtil;
+import org.quickjava.orm.utils.QuickORMException;
+
 /**
  * join的on条件
  */
 public class JoinCondition extends TableColumn {
+
+    // 1=AND、2=OR
+    protected int logic = 1;
+
+    protected CompareEnum compare;
 
     protected String rightTable;
 
@@ -36,6 +46,22 @@ public class JoinCondition extends TableColumn {
     public JoinCondition(String table, String column, Object rightValue) {
         super(table, column);
         this.rightValue = rightValue;
+    }
+
+    public int getLogic() {
+        return logic;
+    }
+
+    public void setLogic(int logic) {
+        this.logic = logic;
+    }
+
+    public CompareEnum getCompare() {
+        return compare;
+    }
+
+    public void setCompare(CompareEnum compare) {
+        this.compare = compare;
     }
 
     public String getRightTable() {
@@ -60,5 +86,17 @@ public class JoinCondition extends TableColumn {
 
     public void setRightValue(Object rightValue) {
         this.rightValue = rightValue;
+    }
+
+    @Override
+    public String toSql(DriveConfigure driveConfigure) {
+        super.toSql(driveConfigure);
+        // null
+        if (compare == CompareEnum.IS_NULL || compare == CompareEnum.IS_NOT_NULL) {
+            return getTable() + "." + ModelUtil.toUnderlineCase(getColumn()) + " " + compare.sql();
+        } else if (compare == CompareEnum.IN || compare == CompareEnum.NOT_IN) {
+            throw new QuickORMException("暂不支持");
+        }
+        return ModelUtil.joinConditionSql(getTable(), getColumn(), compare, getRightTable(), getRightColumn());
     }
 }

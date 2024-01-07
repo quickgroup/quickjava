@@ -30,7 +30,7 @@ import org.quickjava.orm.model.contain.Relation;
 import org.quickjava.orm.model.out.ModelListSql;
 import org.quickjava.orm.model.out.ModelSql;
 import org.quickjava.orm.utils.*;
-import org.quickjava.orm.wrapper.enums.ConditionType;
+import org.quickjava.orm.enums.CompareEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -647,7 +647,7 @@ public class Model implements IModel {
             // 关联方式声明
             String conditionSql = ModelUtil.joinConditionSql(
                     relationName, relation.foreignKey(),
-                    ConditionType.EQ.name(),
+                    CompareEnum.EQ,
                     reservoir.meta.table(), relation.localKey()
             );
             query().join(meta.table() + " " + relationName, conditionSql, "LEFT");

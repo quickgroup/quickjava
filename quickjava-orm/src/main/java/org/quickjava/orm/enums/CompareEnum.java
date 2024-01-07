@@ -1,4 +1,4 @@
-package org.quickjava.orm.wrapper.enums;
+package org.quickjava.orm.enums;
 
 /*
  * Copyright (c) 2020~2023 http://www.quickjava.org All rights reserved.
@@ -15,7 +15,7 @@ package org.quickjava.orm.wrapper.enums;
  * +-------------------------------------------------------------------
  */
 // Where.OPMap
-public enum ConditionType {
+public enum CompareEnum {
     /** 等于 */
     EQ("="),
     /** 不等于 */
@@ -41,7 +41,7 @@ public enum ConditionType {
 
     private final String sql;
 
-    ConditionType(String sql) {
+    CompareEnum(String sql) {
         this.sql = sql;
     }
 
