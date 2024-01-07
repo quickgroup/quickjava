@@ -13,7 +13,7 @@ public class JoinSpecifyBase<Children extends JoinSpecifyBase<Children, Left>, L
     // 关联模型
     protected Class<Left> left;
 
-    // 关联模型的别名（查询时相同表区分&对应父模型的属性名
+    // 关联模型的别名（查询表别名和在父实体的属性名
     protected String leftAlias;
 
     // 加载表数据
