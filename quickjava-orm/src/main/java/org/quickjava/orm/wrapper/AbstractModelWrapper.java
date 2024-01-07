@@ -255,8 +255,8 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         return model().toString();
     }
 
-    private String findFieldName(Function<?, ?> function) {
-        return WrapperUtils.getFieldName(function);
+    private String findFieldName(MFunction<?, ?> function) {
+        return function.getName();
     }
 
     private QuerySet getQuerySet() {
