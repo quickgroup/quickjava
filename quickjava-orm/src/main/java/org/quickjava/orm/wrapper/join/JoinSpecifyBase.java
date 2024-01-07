@@ -53,6 +53,26 @@ public class JoinSpecifyBase<Children extends JoinSpecifyBase<Children, Left>, L
         return add(ConditionType.NEQ, lf, right, rf);
     }
 
+    protected Children in(MFunction<Left, ?> lf, Object val) {
+        return add(ConditionType.IN, lf, val);
+    }
+
+    protected Children notIn(MFunction<Left, ?> lf, Object val) {
+        return add(ConditionType.NOT_IN, lf, val);
+    }
+
+    protected Children isNull(MFunction<Left, ?> lf) {
+        return add(ConditionType.IS_NULL, lf, null);
+    }
+
+    protected Children isNotNull(MFunction<Left, ?> lf) {
+        return add(ConditionType.IS_NOT_NULL, lf, null);
+    }
+
+    protected Children between(MFunction<Left, ?> lf, Object val) {
+        return add(ConditionType.BETWEEN, lf, val);
+    }
+
     protected <Right extends Model> Children add(ConditionType type, MFunction<Left, ?> lf, MFunction<Right, ?> rf) {
         onList.add(new Item<>(type, lf, rf));
         return chain();

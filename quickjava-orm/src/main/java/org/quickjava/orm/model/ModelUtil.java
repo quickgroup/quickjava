@@ -13,6 +13,7 @@ import org.quickjava.orm.query.callback.OrderByOptCallback;
 import org.quickjava.orm.query.callback.WhereOptCallback;
 import org.quickjava.orm.query.enums.Operator;
 import org.quickjava.orm.utils.SqlUtil;
+import org.quickjava.orm.wrapper.enums.ConditionType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -240,6 +241,17 @@ public class ModelUtil extends SqlUtil {
             return ReflectUtil.invoke(staticMethodStr);
         }
         return null;
+    }
+
+    public static String joinConditionSql(String left, String leftField, ConditionType type,
+                                          String right, String rightField) {
+        if (type == ConditionType.IS_NULL || type == ConditionType.IS_NOT_NULL) {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append(left).append(".").append(toUnderlineCase(leftField));
+            stringBuilder.append(" ").append(type.sql());
+            return stringBuilder.toString();
+        }
+        return joinConditionSql(left, leftField, type.name(), right, rightField);
     }
 
     public static String joinConditionSql(String left, String leftField, String conditionType,

@@ -17,18 +17,35 @@ package org.quickjava.orm.wrapper.enums;
 // Where.OPMap
 public enum ConditionType {
     /** 等于 */
-    EQ,
+    EQ("="),
     /** 不等于 */
-    NEQ,
+    NEQ("!="),
     /** 小于 */
-    LT,
+    LT("<"),
     /** 小于等于 */
-    LTE,
+    LTE("<="),
     /** 大于 */
-    GT,
+    GT(">"),
     /** 大于等于 */
-    GTE,
+    GTE(">="),
     /** LIKE */
-    LIKE,
+    LIKE("LIKE"),
+    /** IN */
+    IN("IN"),
+    NOT_IN("NOT IN"),
+    IS_NULL("IS NULL"),
+    IS_NOT_NULL("IS NOT NULL"),
+    BETWEEN("BETWEEN"),
+    RAW(null),
     ;
+
+    private final String sql;
+
+    ConditionType(String sql) {
+        this.sql = sql;
+    }
+
+    public String sql() {
+        return sql;
+    }
 }

@@ -24,4 +24,12 @@ public class JoinSpecifyLeft<Left extends Model> extends JoinSpecifyBase<JoinSpe
         return super.neq(lf, right, rf);
     }
 
+    public JoinSpecifyLeft<Left> isNull(MFunction<Left, ?> lf) {
+        return super.isNull(lf);
+    }
+
+    public JoinSpecifyLeft<Left> isNotNull(MFunction<Left, ?> lf) {
+        return super.isNotNull(lf);
+    }
+
 }
