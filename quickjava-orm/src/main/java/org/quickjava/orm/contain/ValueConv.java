@@ -16,12 +16,12 @@ import java.util.Map;
 
 public class ValueConv {
 
-    private DriveConfigure configure;
+    private DriveConfigure driveConfigure;
 
     private static final Map<DriveConfigure, ValueConv> valueConvCache = new LinkedHashMap<>();
 
-    public ValueConv(DriveConfigure configure) {
-        this.configure = configure;
+    public ValueConv(DriveConfigure driveConfigure) {
+        this.driveConfigure = driveConfigure;
     }
 
     public static ValueConv getConv(DriveConfigure configure) {
@@ -53,7 +53,7 @@ public class ValueConv {
     }
 
     public String valueStringWrap(String val) {
-        return String.format("%s%s%s", configure.strL, val, configure.strR);
+        return String.format("%s%s%s", driveConfigure.valueStrLeft, val, driveConfigure.valueStrRight);
     }
 
     public String convDate(Date value) {

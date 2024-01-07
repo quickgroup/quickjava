@@ -25,8 +25,10 @@ public class TestModelJoin {
     {
         Long startTime = TimeUtils.getNanoTime();
         Pagination<SsoAppFavoriteModel> pagination = new ModelWrapper<>(SsoAppFavoriteModel.class)
+                // TODO::关联表
                 // 与主表一对一关联join
                 .leftJoin(SsoApp.class, SsoApp::getAppId, SsoAppFavoriteModel::getAppId, SsoAppFavoriteModel::getApp)
+                .leftJoin(SsoApp.class, SsoApp::getAppId, SsoAppFavoriteModel::getAppId, "aliasApp01")
                 // 与主表一对一关联join，复合条件查询
                 .leftJoin(SsoApp.class, "app3", whereLeft -> whereLeft
                         .eq(SsoApp::getAppId, SsoAppFavoriteModel.class, SsoAppFavoriteModel::getAppId)
@@ -35,10 +37,29 @@ public class TestModelJoin {
                 .leftJoin(SsoApp.class, SsoApp::getAppId, SsoAppFavoriteModel::getAppId, SsoAppFavoriteModel::getApp2)
                 // 关联其他表
                 .leftJoin(SsoAppLatest.class, SsoAppLatest::getAppId, SsoAppFavoriteModel::getAppId)
+                // 关联其他表
+                .leftJoin(SsoAppLatest.class, SsoAppLatest::getAppId, SsoAppFavoriteModel::getAppId, SsoAppFavoriteModel::getTestAppInfo)
+
+                // TODO::查询条件
                 // 主表查询条件
-//                .eq(SsoAppFavoriteModel::getUserId, 1)
-//                .neq(SsoAppFavoriteModel::getUserId, 0)
+                .eq(SsoAppFavoriteModel::getUserId, 1)
+                .neq(SsoAppFavoriteModel::getUserId, 0)
+                // 关联表查询字段
+                //      1. 自动识别第一个字段名为别名
+                .eq(SsoApp.class, SsoApp::getAppId, 1)
+                //      2. 指定父属性名为别名
+                .eq(SsoAppFavoriteModel::getApp, SsoApp.class, SsoApp::getAppId, 1)
+                .eq(SsoAppFavoriteModel::getTestAppInfo, SsoApp.class, SsoApp::getAppId, 1)
+                //      3. 字符串别名
+                .eq("aliasApp01", SsoApp::getAppId, 1)
+                .eq("app3", SsoApp::getAppId, 1)
+
+                // TODO::排序字段
+                .order(SsoAppFavoriteModel::getCreateTime)
+
+                // 分页查询
                 .pagination();
+
         System.out.println("leftJoin return=" + pagination);
         System.out.println("耗时=" + TimeUtils.endNanoTime(startTime) + "ms");
     }

@@ -1,8 +1,10 @@
 package org.quickjava.orm;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.quickjava.orm.callback.WhereOptCallback;
+import org.quickjava.orm.callback.QuerySetCallback;
 import org.quickjava.orm.contain.Action;
+import org.quickjava.orm.contain.DriveConfigure;
+import org.quickjava.orm.contain.OrderBy;
 import org.quickjava.orm.contain.Where;
 import org.quickjava.orm.utils.QuerySetHelper;
 
@@ -37,7 +39,7 @@ public class QueryReservoir {
      * 表查询别名
      */
     @JsonIgnore
-    private String name;
+    private String alias;
 
     @JsonIgnore
     public Action action;
@@ -55,7 +57,7 @@ public class QueryReservoir {
     public List<Where> whereList;
 
     @JsonIgnore
-    public List<String> orderByList;
+    public List<OrderBy> orderByList;
 
     @JsonIgnore
     public List<Map<String, Object>> dataList;
@@ -79,16 +81,19 @@ public class QueryReservoir {
     public boolean lock = false;
 
     @JsonIgnore
-    public WhereOptCallback whereOptCallback;
+    public Map<Class<?>, Object> callbackMap;
 
     @JsonIgnore
-    public Object whereOptCallbackData;
+    public Map<Class<?>, Object> callbackUserDataMap;
 
     @JsonIgnore
     public boolean fetchSql = false;
 
     @JsonIgnore
     public boolean printSql = false;
+
+    @JsonIgnore
+    public DriveConfigure driveConfigure = null;
 
     @JsonIgnore
     public String sql = null;
@@ -98,19 +103,19 @@ public class QueryReservoir {
     }
 
     public String tableSql() {
-        return name == null ? table : (table.equals(name) ? table : table + " " + name);
+        return alias == null ? table : (table.equals(alias) ? table : table + " " + alias);
     }
 
     public void setTable(String __table) {
         this.table = __table;
     }
 
-    public String getName() {
-        return name;
+    public String getAlias() {
+        return alias == null ? table : alias;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setAlias(String alias) {
+        this.alias = alias;
     }
 
     public Action getAction() {
@@ -150,6 +155,12 @@ public class QueryReservoir {
 
     public List<Where> getWhereList() {
         whereList = QuerySetHelper.initList(whereList);
+        // 如果是join状态，加上表名前缀
+        whereList.forEach(where -> {
+            if (where.getTable() == null) {
+                where.setTable(getAlias());
+            }
+        });
         return whereList;
     }
 
@@ -157,12 +168,12 @@ public class QueryReservoir {
         this.whereList = whereList;
     }
 
-    public List<String> getOrderByList() {
+    public List<OrderBy> getOrderByList() {
         orderByList = QuerySetHelper.initList(orderByList);
         return orderByList;
     }
 
-    public void setOrderByList(List<String> orderByList) {
+    public void setOrderByList(List<OrderBy> orderByList) {
         this.orderByList = orderByList;
     }
 
@@ -234,13 +245,17 @@ public class QueryReservoir {
         this.lock = lock;
     }
 
-    public WhereOptCallback getWhereOptCallback() {
-        return whereOptCallback;
+    public <D extends QuerySetCallback> D getCallback(Class<D> clazz) {
+        return (D) callbackMap.get(clazz);
     }
 
-    public void setWhereOptCallback(WhereOptCallback whereOptCallback, Object userData) {
-        this.whereOptCallback = whereOptCallback;
-        this.whereOptCallbackData = userData;
+    public <D extends QuerySetCallback> void setCallback(D callback, Object userData) {
+        callbackMap.put(callback.getClass(), callback);
+        callbackUserDataMap.put(callback.getClass(), userData);
+    }
+
+    public <D extends QuerySetCallback, V> V getCallbackUserData(Class<D> clazz) {
+        return (V) callbackUserDataMap.get(clazz);
     }
 
     public boolean isFetchSql() {
@@ -249,6 +264,17 @@ public class QueryReservoir {
 
     public void setFetchSql(boolean fetchSql) {
         this.fetchSql = fetchSql;
+    }
+
+    public DriveConfigure getDriveConfigure() {
+        return driveConfigure;
+    }
+
+    /**
+     * 准备语句编译
+     */
+    public void pretreatment(DriveConfigure driveConfigure) {
+        this.driveConfigure = driveConfigure;
     }
 
     public String getSql() {
@@ -276,8 +302,6 @@ public class QueryReservoir {
                 ", limitSize=" + limitSize +
                 ", distinct=" + distinct +
                 ", lock=" + lock +
-                ", whereOptCallback=" + whereOptCallback +
-                ", whereOptCallbackData=" + whereOptCallbackData +
                 ", fetchSql=" + fetchSql +
                 ", printSql=" + printSql +
                 ", sql='" + sql + '\'' +

@@ -162,8 +162,8 @@ public class SqlUtil extends ORMHelper {
         return false;
     }
 
-    public static String tableColumn(String table, String fieldName) {
-        return table + "." + toUnderlineCase(fieldName);
+    public static String tableColumn(String table, String column) {
+        return table + "." + column;
     }
 
     /**

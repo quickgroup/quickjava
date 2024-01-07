@@ -7,9 +7,11 @@ import org.quickjava.orm.Model;
 import org.quickjava.orm.QueryReservoir;
 import org.quickjava.orm.QuerySet;
 import org.quickjava.orm.contain.*;
+import org.quickjava.orm.enums.Operator;
 import org.quickjava.orm.utils.ModelUtil;
 import org.quickjava.orm.utils.ORMHelper;
 import org.quickjava.orm.utils.SqlUtil;
+import org.quickjava.orm.wrapper.conditions.Condition;
 import org.quickjava.orm.wrapper.join.JoinSpecifyBase;
 import org.quickjava.orm.wrapper.enums.JoinType;
 import org.quickjava.orm.wrapper.join.ModelJoinWrapper;
@@ -38,6 +40,34 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
 
     public Children eq(R function, Object val) {
         model().eq(findFieldName(function), val);
+        return chain();
+    }
+
+    @Override
+    public <Left extends Model> Children where(boolean condition, String leftAlias, Class<Left> left, String column, Operator operator, Object val) {
+        if (condition) {
+            // 如果指定在父实体上的属性
+            String table = leftAlias;
+            // 在主表上的属性名
+            if (table == null) {
+                ModelFieldMeta fieldMeta = getModelClazzFieldMap(getModelMeta(this.model.getClass())).get(left);
+                table = fieldMeta == null ? null : fieldMeta.getName();
+            }
+            // 表名
+            if (table == null) {
+                ModelMeta leftMeta = getModelMeta(left);
+                table = leftMeta == null ? null : leftMeta.table();
+            }
+            getQuerySet().where(table, column, operator, val);
+        }
+        return chain();
+    }
+
+    @Override
+    public Children where(boolean condition, String table, String column, Operator operator, Object val) {
+        if (condition) {
+            getQuerySet().where(table, column, operator, val);
+        }
         return chain();
     }
 
@@ -271,18 +301,25 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
             ModelMeta main = ModelUtil.getMeta(this.model.getClass());
             loadModelAccurateFields(querySet, main, main.table());
         }
-        // 关联表在父模型上的属性名称
-        ModelFieldMeta fieldMeta = getModelClazzFieldMap(mainMeta).get(join.getLeft());
-        if (join.getLeftAlias() == null) {
-            join.setLeftAlias(fieldMeta == null ? null : fieldMeta.getName());
-        }
         // 关联表元信息
-        ModelMeta left = getModelMeta(join.getLeft());
-        // 查询时的表别名
-        String leftAlias = ObjectUtil.defaultIfEmpty(join.getLeftAlias(), left.table());
+        ModelMeta leftMeta = getModelMeta(join.getLeft());
+        if (leftMeta == null) {
+            return chain();
+        }
+        // 如果指定在父实体上的属性
+        String leftAlias = join.getLeftAlias();
+        // 在主表上的属性名
+        if (leftAlias == null) {
+            ModelFieldMeta fieldMeta = getModelClazzFieldMap(mainMeta).get(join.getLeft());
+            leftAlias = fieldMeta == null ? null : fieldMeta.getName();
+        }
+        // 表名
+        if (leftAlias == null) {
+            leftAlias = leftMeta.table();
+        }
         // 声明左表数据字段
         if (join.isLoadLeftData() && ModelUtil.isNotEmpty(leftAlias)) {
-            loadModelAccurateFields(querySet, left, leftAlias);
+            loadModelAccurateFields(querySet, leftMeta, leftAlias);
         }
         // 缓存条件
         if (joinMap == null) {
@@ -290,6 +327,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         }
         // 会覆盖之前的
         joinMap.put(leftAlias, join);
+        join.setLeftAlias(leftAlias);
 
         // 查询条件设置（支持多个
         List<String> onConditions = new LinkedList<>();
@@ -302,20 +340,20 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
             if (it.getRightValue() != null) {
                 // 一：值条件
                 onConditions.add(ModelUtil.joinConditionSql(
-                        leftAlias, it.getLeftFun().getName(),
+                        join.getLeftAlias(), it.getLeftFun().getName(),
                         it.getType().name(),
                         String.valueOf(it.getRightValue())   // 后面下放到驱动进行转换
                 ));
             } else {
                 // 一：方法引用
                 onConditions.add(ModelUtil.joinConditionSql(
-                        leftAlias, it.getLeftFun().getName(),
+                        join.getLeftAlias(), it.getLeftFun().getName(),
                         it.getType().name(),
                         rightAlias, it.getRightFun().getName()
                 ));
             }
         });
-        querySet.join(left.tableAlias(leftAlias), StrUtil.join(" AND ", onConditions), type.name());
+        querySet.join(leftMeta.tableAlias(leftAlias), StrUtil.join(" AND ", onConditions), type.name());
 
         return chain();
     }

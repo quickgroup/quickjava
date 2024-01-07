@@ -1,23 +1,20 @@
 package org.quickjava.orm.utils;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.quickjava.common.utils.ComUtil;
 import org.quickjava.common.utils.ReflectUtil;
 import org.quickjava.orm.IModel;
 import org.quickjava.orm.Model;
 import org.quickjava.orm.ModelReservoir;
-import org.quickjava.orm.contain.ModelMeta;
 import org.quickjava.orm.contain.Relation;
 import org.quickjava.orm.enums.Operator;
 import org.quickjava.orm.enums.RelationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Array;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /*
@@ -36,21 +33,7 @@ import java.util.stream.Collectors;
  */
 public abstract class ORMHelper extends ComUtil {
 
-    @JsonIgnore
-    @TableField(exist = false)
     private static final Logger logger = LoggerFactory.getLogger(ORMHelper.class);
-
-    /**
-     * 加载关联数据
-     * 主表实体
-     * 关联关系
-     *      关联表实体
-     *      在主表实体的属性名
-     *      关联表与主表关联条件（可多个条件，左边是关联表字段，右边是主表或其他关联表
-     */
-    public static <D extends IModel> List<D> resultTranshipment(Class<?> clazz, List<Map<String, Object>> dataList) {
-        return null;
-    }
 
     /**
      * 查询后处理预载入

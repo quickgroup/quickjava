@@ -2,9 +2,14 @@ package org.quickjava.orm.utils;
 
 import cn.hutool.core.util.ObjectUtil;
 import net.sf.cglib.proxy.Enhancer;
+import org.quickjava.common.utils.ComUtil;
 import org.quickjava.common.utils.DatetimeUtil;
 import org.quickjava.common.utils.ReflectUtil;
+import org.quickjava.orm.IModel;
 import org.quickjava.orm.Model;
+import org.quickjava.orm.ModelReservoir;
+import org.quickjava.orm.callback.OrderByOptCallback;
+import org.quickjava.orm.callback.WhereOptCallback;
 import org.quickjava.orm.contain.ModelMeta;
 import org.quickjava.orm.contain.Where;
 import org.quickjava.orm.enums.ModelFieldFill;
@@ -237,19 +242,51 @@ public class ModelUtil extends SqlUtil {
     public static String joinConditionSql(String left, String leftField, String conditionType,
                                           String right, String rightField) {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(toUnderlineCase(left)).append(".").append(toUnderlineCase(leftField));
+        stringBuilder.append(left).append(".").append(toUnderlineCase(leftField));
         stringBuilder.append(" ").append(Where.OpMap.get(conditionType)).append(" ");
-        stringBuilder.append(toUnderlineCase(right)).append(".").append(toUnderlineCase(rightField));
+        stringBuilder.append(right).append(".").append(toUnderlineCase(rightField));
         return stringBuilder.toString();
     }
 
     public static String joinConditionSql(String left, String leftField, String conditionType,
                                           String rightValue) {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(toUnderlineCase(left)).append(".").append(toUnderlineCase(leftField));
+        stringBuilder.append(left).append(".").append(toUnderlineCase(leftField));
         stringBuilder.append(" ").append(Where.OpMap.get(conditionType)).append(" ");
         stringBuilder.append(rightValue);
         return stringBuilder.toString();
+    }
+
+    // 默认转换字段大小写
+    public static final WhereOptCallback whereOptCallback = (where, querySet, userData) -> {
+        // 子查询条件不处理
+        if (where.getChildren() != null) {
+            return;
+        }
+        where.setField(fieldToUnderlineCase(where.getField()));
+    };
+
+    // 默认转换字段大小写
+    public static final OrderByOptCallback orderByOptCallback = (orderBy, userData) -> {
+        orderBy.setField(fieldToUnderlineCase(orderBy.getField()));
+    };
+
+    /**
+     * 字段转下划线格式
+     * @param field 属性名
+     * @return 结果
+     */
+    public static String fieldToUnderlineCase(String field) {
+        if (field.contains(".")) {
+            String[] arr = field.split("\\.");
+            return arr[0] + "." + toUnderlineCase(arr[1]);
+        } else {
+            return toUnderlineCase(field);
+        }
+    }
+
+    public static ModelReservoir getModelReservoir(IModel iModel) {
+        return ReflectUtil.getFieldValue(iModel, "reservoir");
     }
 
 }

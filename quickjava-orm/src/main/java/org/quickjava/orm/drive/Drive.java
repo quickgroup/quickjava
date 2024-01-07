@@ -81,6 +81,7 @@ public abstract class Drive {
         List<String> sqlList = new ArrayList<>();
         DriveConfigure config = getDriveConfigure();
         QueryReservoir reservoir = getQueryReservoir(query);
+        reservoir.pretreatment(config);
         ValueConv valueConv = new ValueConv(config);
 
         // action
@@ -102,7 +103,7 @@ public abstract class Drive {
         // 主表名称
         sqlList.add(reservoir.tableSql());
 
-        // TODO::JOIN
+        // JOIN
         if (reservoir.joinList != null) {
             reservoir.joinList.forEach(arr -> {
                 sqlList.add(String.format("%s JOIN %s ON %s", arr[2], arr[0], arr[1]));
@@ -128,7 +129,7 @@ public abstract class Drive {
             sqlList.add(dataSql.toString());
         }
 
-        // UPDATE
+        // UPDATE-DATA
         if (action == Action.UPDATE) {
             checkEmpty(reservoir.dataList, "Missing update data");
             checkEmpty(reservoir.dataList.get(0), "Missing update data");
@@ -142,7 +143,7 @@ public abstract class Drive {
         // WHERE
         if ((action == Action.SELECT || action == Action.UPDATE) && reservoir.whereList != null) {
             sqlList.add("WHERE");
-            sqlList.add(Where.cutFirstLogic(Where.collectSql(reservoir.whereList, config)));
+            sqlList.add(Where.cutFirstLogic(Where.collectSql(reservoir.getWhereList(), config)));
         }
 
         // GROUP BY

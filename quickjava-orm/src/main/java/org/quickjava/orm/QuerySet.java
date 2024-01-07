@@ -9,10 +9,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreType;
 import org.quickjava.common.enums.DatetimeCurrType;
 import org.quickjava.common.enums.DatetimeRangeType;
 import org.quickjava.common.utils.DatetimeUtil;
+import org.quickjava.orm.callback.OrderByOptCallback;
 import org.quickjava.orm.callback.WhereCallback;
+import org.quickjava.orm.callback.WhereOptCallback;
 import org.quickjava.orm.contain.*;
 import org.quickjava.orm.drive.Drive;
 import org.quickjava.orm.enums.Operator;
+import org.quickjava.orm.enums.OrderByType;
 import org.quickjava.orm.utils.ORMHelper;
 import org.quickjava.orm.utils.QueryException;
 import org.quickjava.orm.utils.SqlUtil;
@@ -118,6 +121,15 @@ public class QuerySet {
         return this;
     }
 
+    public QuerySet where(String table, String field, Operator operator, Object value)
+    {
+        if (ORMHelper.isEmpty(field)) {
+            return this;
+        }
+        where(new WhereAnd(table, field, operator, value));
+        return this;
+    }
+
     /**
      * 高级sql语句查询
      * @param sql SQL语句
@@ -131,8 +143,9 @@ public class QuerySet {
 
     public QuerySet where(Where where)
     {
-        if (reservoir.whereOptCallback != null) {
-            reservoir.whereOptCallback.call(where, this, reservoir.whereOptCallbackData);
+        WhereOptCallback whereOptCallback = reservoir.getCallback(WhereOptCallback.class);
+        if (whereOptCallback != null) {
+            whereOptCallback.call(where, this, reservoir.getCallbackUserData(WhereOptCallback.class));
         }
         reservoir.getWhereList().add(where);
         return this;
@@ -228,14 +241,31 @@ public class QuerySet {
         return this;
     }
 
-    public QuerySet order(String field, String sort)
+    public QuerySet order(String table, String field, OrderByType type)
     {
-        reservoir.getOrderByList().add(String.format("%s %s", field, sort.toUpperCase()));
+        OrderBy orderBy = new OrderBy(table, field, type);
+        // 回调处理
+        OrderByOptCallback orderByOptCallback = reservoir.getCallback(OrderByOptCallback.class);
+        if (orderByOptCallback != null) {
+            orderByOptCallback.call(orderBy, reservoir.getCallbackUserData(WhereOptCallback.class));
+        }
+        reservoir.getOrderByList().add(orderBy);
+        return this;
+    }
+
+    public QuerySet order(String field, OrderByType type)
+    {
+        if (field.contains(".")) {
+            String[] fieldArr = field.split("\\.");
+            order(fieldArr[0], fieldArr[1], type);
+        } else {
+            order(null, field, type);
+        }
         return this;
     }
 
     public QuerySet order(String field, boolean asc) {
-        return order(field, asc ? "ASC" : "DESC");
+        return order(field, asc ? OrderByType.ASC : OrderByType.DESC);
     }
 
     public QuerySet order(String fields)
@@ -247,7 +277,7 @@ public class QuerySet {
             return this.order(fields.split(","));
         }
         String[] arr = fields.trim().split(" ");
-        return arr.length == 2 ? order(arr[0], arr[1]) : order(arr[0], "ASC");
+        return arr.length == 2 ? order(arr[0], OrderByType.getByName(arr[1])) : order(arr[0], OrderByType.ASC);
     }
 
     public QuerySet order(List<String> fields) {

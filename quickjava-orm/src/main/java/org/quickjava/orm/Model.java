@@ -16,6 +16,7 @@ import org.quickjava.orm.callback.WhereCallback;
 import org.quickjava.orm.callback.WhereOptCallback;
 import org.quickjava.orm.contain.*;
 import org.quickjava.orm.enums.Operator;
+import org.quickjava.orm.enums.OrderByType;
 import org.quickjava.orm.enums.RelationType;
 import org.quickjava.orm.utils.*;
 import org.slf4j.Logger;
@@ -77,7 +78,8 @@ public class Model implements IModel {
             if (reservoir.querySet == null) {
                 reservoir.querySet = QuerySet.table(parseModelTableName(getClass()));
                 QueryReservoir queryReservoir = ReflectUtil.getFieldValue(reservoir.querySet, "reservoir");
-                queryReservoir.setWhereOptCallback(whereOptCallback, this);
+                queryReservoir.setCallback(ModelUtil.whereOptCallback, this);
+                queryReservoir.setCallback(ModelUtil.orderByOptCallback, this);
             }
         }
         return reservoir.querySet;
@@ -111,7 +113,7 @@ public class Model implements IModel {
     public Model where(Map<String, Object> query) {
         // 处理字段名：标准字段名你：驼峰转下划线组成
         Map<String, Object> queryRet = new LinkedHashMap<>();
-        query.forEach((name, val) -> queryRet.put(fieldToUnderlineCase(name), val));
+        query.forEach((name, val) -> queryRet.put(ModelUtil.fieldToUnderlineCase(name), val));
         // 调用querySet加载条件
         QuerySetHelper.loadQuery(query(), queryRet);
         return this;
@@ -392,29 +394,23 @@ public class Model implements IModel {
     /**
      * 排序
      * @param field 字段
-     * @param asc 排序方式：ASC、DESC
+     * @param type 排序方式
      * @return 模型对象
      */
-    public Model order(String field, String asc) {
-        query().order(fieldToUnderlineCase(field), asc);
+    public Model order(String field, OrderByType type) {
+        query().order(ModelUtil.fieldToUnderlineCase(field), type);
         return this;
     }
 
     public Model order(String field, boolean asc) {
-        order(field, asc ? "ASC" : "DESC");
+        query().order(field, asc);
         return this;
     }
 
     public Model order(String fields)
     {
-        if (ORMHelper.isEmpty(fields)) {
-            return this;
-        }
-        if (fields.contains(",")) {
-            return this.order(fields.split(","));
-        }
-        String[] arr = fields.trim().split(" ");
-        return arr.length == 2 ? order(arr[0], arr[1]) : order(arr[0], "ASC");
+        query().order(fields);
+        return this;
     }
 
     public Model order(List<String> fields) {
@@ -577,7 +573,7 @@ public class Model implements IModel {
                     return;
                 }
                 Object v = data.get(field.getName());
-                ret.put(fieldToUnderlineCase(field.getName()), ModelUtil.valueToSqlValue(v));
+                ret.put(ModelUtil.fieldToUnderlineCase(field.getName()), ModelUtil.valueToSqlValue(v));
             });
         }
         return ret;
@@ -1059,41 +1055,9 @@ public class Model implements IModel {
         return ModelUtil.fieldAlias(table, field);
     }
 
-    /**
-     * 字段转下划线格式
-     * @param field 属性名
-     * @return 结果
-     */
-    private static String fieldToUnderlineCase(String field) {
-        if (field.contains(".")) {
-            String[] arr = field.split("\\.");
-            return arr[0] + "." + toUnderlineCase(arr[1]);
-        } else {
-            return toUnderlineCase(field);
-        }
-    }
-
     private static String toUnderlineCase(String name) {
         return ModelUtil.toUnderlineCase(name);
     }
-
-    // 默认转换字段大小写
-    @JsonIgnore
-    @TableField(exist = false)
-    private static final WhereOptCallback whereOptCallback = (where, querySet, userData) -> {
-        // 子查询条件不处理
-        if (where.getChildren() != null) {
-            return;
-        }
-        Model model = (Model) userData;
-        String field = fieldToUnderlineCase(where.getField());
-        if (ComUtil.isNotEmpty(model.reservoir.withs)) {
-            if (!field.contains(".")) {
-                field = model. reservoir.meta.table() + "." + field;
-            }
-        }
-        where.setField(field);
-    };
 
     @Override
     public String toString() {

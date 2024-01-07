@@ -5,6 +5,7 @@
 
 package org.quickjava.orm.contain;
 
+import org.quickjava.orm.drive.DefaultDrive;
 import org.quickjava.orm.enums.Operator;
 import org.quickjava.orm.utils.SqlUtil;
 
@@ -15,6 +16,8 @@ public abstract class Where {
 
     private int logic = 1;
 
+    private String table = null;
+
     private String field = null;
 
     private Operator operator = null;
@@ -23,11 +26,23 @@ public abstract class Where {
 
     private List<Where> children = null;
 
-    public Where(int logic, String field, Operator operator, Object value) {
+    private DriveConfigure driveConfigure = DefaultDrive.CONFIGURE;
+
+    public Where(int logic, String table, String field, Operator operator, Object value, List<Where> children) {
         this.logic = logic;
-        this.setField(field);
-        this.setOperator(operator);
-        this.setValue(value);
+        this.table = table;
+        this.field = field;
+        this.operator = operator;
+        this.value = value;
+        this.children = children;
+    }
+
+    public Where(int logic, String table, String field, Operator operator, Object value) {
+        this(logic, table, field, operator, value, null);
+    }
+
+    public Where(int logic, String field, Operator operator, Object value) {
+        this(logic, null, field, operator, value, null);
     }
 
     public Where(int logic, List<Where> wheres) {
@@ -39,7 +54,7 @@ public abstract class Where {
         return logic;
     }
 
-    public String getLogicStr() {
+    public String getLogicSql() {
         // 如果字段带有logic就返回空字符串
         if (this.field != null && this.operator == Operator.RAW) {
             String fieldClear = this.field.toUpperCase().trim();
@@ -50,8 +65,27 @@ public abstract class Where {
         return logic == 1 ? LOGIC_AND : LOGIC_OR;
     }
 
+    public String getTable() {
+        return table;
+    }
+
+    public void setTable(String table) {
+        this.table = table;
+    }
+
     public String getField() {
         return field;
+    }
+
+    public String getFieldSql() {
+        String fieldSql = field;
+        if (driveConfigure.columnLeft != null) {
+            fieldSql = driveConfigure.columnLeft + fieldSql;
+        }
+        if (driveConfigure.columnRight != null) {
+            fieldSql = fieldSql + driveConfigure.columnRight;
+        }
+        return table == null ? fieldSql : SqlUtil.tableColumn(table, fieldSql);
     }
 
     public void setField(String field) {
@@ -84,7 +118,11 @@ public abstract class Where {
         OpMap.put("IS NOT NULL", "IS NOT NULL");
     }
 
-    public String getOperator() {
+    public Operator getOperator() {
+        return operator;
+    }
+
+    public String getOperatorSql() {
         return OpMap.getOrDefault(operator.name(), "=");
     }
 
@@ -92,7 +130,7 @@ public abstract class Where {
         this.operator = operator;
     }
 
-    public Object getValue(DriveConfigure config) {
+    public Object getValueSql(DriveConfigure config) {
         return ValueConv.getConv(config).conv(value);
     }
 
@@ -106,14 +144,15 @@ public abstract class Where {
 
     @Override
     public String toString() {
-        return getLogicStr() + " " + field + " " + operator + " " + value;
+        return getLogicSql() + " " + field + " " + operator + " " + value;
     }
 
     public String toSql(DriveConfigure cfg) {
+        this.driveConfigure = cfg;
         // 嵌套查询
-        if (children != null) {
+        if (children != null && !children.isEmpty()) {
             List<String> sqlList = children.stream().map(it -> it.toSql(cfg)).collect(Collectors.toList());
-            return getLogicStr() + " (" + cutFirstLogic(SqlUtil.collJoin(" ", sqlList)) + ")";
+            return getLogicSql() + " (" + cutFirstLogic(SqlUtil.collJoin(" ", sqlList)) + ")";
         }
         ValueConv valueConv = ValueConv.getConv(cfg);
         // 输出
@@ -121,10 +160,10 @@ public abstract class Where {
             case RAW: return field;
             case IS_NULL:
             case IS_NOT_NULL:
-                return getLogicStr() + " " + getField() + " " + getOperator();
+                return getLogicSql() + " " + getFieldSql() + " " + getOperatorSql();
             case IN:
             case NOT_IN:
-                return getLogicStr() + " " + getField() + " " + getOperator() + " (" + getValue(cfg) + ")";
+                return getLogicSql() + " " + getFieldSql() + " " + getOperatorSql() + " (" + getValueSql(cfg) + ")";
             case BETWEEN:
                 Object[] arr = new Object[]{null, null};
                 if (value.getClass().isArray()) {
@@ -135,9 +174,9 @@ public abstract class Where {
                 } else if (value instanceof String) {
                     arr = ((String) value).split(",");
                 }
-                return getLogicStr() + " " + getField() + " BETWEEN " + valueConv.conv(arr[0]) + " AND " + valueConv.conv(arr[1]);
+                return getLogicSql() + " " + getFieldSql() + " BETWEEN " + valueConv.conv(arr[0]) + " AND " + valueConv.conv(arr[1]);
         }
-        return getLogicStr() + " " + getField() + " " + getOperator() + " " + getValue(cfg);
+        return getLogicSql() + " " + getFieldSql() + " " + getOperatorSql() + " " + getValueSql(cfg);
     }
 
     public static String collectSql(List<Where> wheres, DriveConfigure config) {

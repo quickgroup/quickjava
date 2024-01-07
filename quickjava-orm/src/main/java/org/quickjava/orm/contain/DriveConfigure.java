@@ -16,37 +16,22 @@ package org.quickjava.orm.contain;
  */
 public class DriveConfigure {
 
-    public String fieldL = "";
-
-    public String fieldR = "";
+    /**
+     * 字段前后拼接字符串，mysql是`
+     */
+    public String columnLeft = null;
+    public String columnRight = null;
 
     /**
-     * 字符串数据左边连接符
+     * 字符串值前后拼接字符串
      */
-    public String strL = "\"";
+    public String valueStrLeft = "\"";
+    public String valueStrRight = "\"";
 
-    /**
-     * 字符串数据右边连接符
-     */
-    public String strR = "\"";
-
-    public DriveConfigure() {
-    }
-
-    public DriveConfigure(String fieldL, String fieldR, String strL, String strR) {
-        this.fieldL = fieldL;
-        this.fieldR = fieldR;
-        this.strL = strL;
-        this.strR = strR;
-    }
-
-    @Override
-    public String toString() {
-        return "DriveConfigure{" +
-                "fieldL='" + fieldL + '\'' +
-                ", fieldR='" + fieldR + '\'' +
-                ", strL='" + strL + '\'' +
-                ", strR='" + strR + '\'' +
-                '}';
+    public DriveConfigure(String columnLeft, String columnRight, String valueStrLeft, String valueStrRight) {
+        this.columnLeft = columnLeft;
+        this.columnRight = columnRight;
+        this.valueStrLeft = valueStrLeft;
+        this.valueStrRight = valueStrRight;
     }
 }

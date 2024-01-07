@@ -40,6 +40,10 @@ public class SsoAppFavoriteModel extends BaseSimpleEntity
     @TableField(exist = false)
     private SsoApp app2;
 
+    // 关联应用信息
+    @TableField(exist = false)
+    private SsoApp testAppInfo;
+
     @TableField(exist = false)
     private SsoAppFavoriteModel sysAppFavorite;
 
@@ -97,6 +101,14 @@ public class SsoAppFavoriteModel extends BaseSimpleEntity
 
     public void setApp2(SsoApp app2) {
         this.app2 = app2;
+    }
+
+    public SsoApp getTestAppInfo() {
+        return testAppInfo;
+    }
+
+    public void setTestAppInfo(SsoApp testAppInfo) {
+        this.testAppInfo = testAppInfo;
     }
 
     public SsoAppFavoriteModel getSysAppFavorite() {

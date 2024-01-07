@@ -19,8 +19,8 @@ import org.quickjava.orm.contain.DriveConfigure;
 public class DefaultDrive extends Drive {
 
     // 默认驱动默认ORACLE风格，mysql、oracle、达梦均支持
-    private static final DriveConfigure CONFIGURE = new DriveConfigure(
-            "", "",
+    public static final DriveConfigure CONFIGURE = new DriveConfigure(
+            null, null,
             "'", "'"
     );
 
