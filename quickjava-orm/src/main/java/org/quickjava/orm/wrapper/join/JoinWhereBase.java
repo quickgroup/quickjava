@@ -8,7 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 // 根model绑定条件
-public class JoinConditionBase<Children extends JoinConditionBase<Children, Left>, Left extends Model> {
+public class JoinWhereBase<Children extends JoinWhereBase<Children, Left>, Left extends Model> {
 
     // 关联模型
     protected Class<Left> left;
@@ -25,25 +25,25 @@ public class JoinConditionBase<Children extends JoinConditionBase<Children, Left
     // 关联条件
     public final List<Item<?, ?>> items = new LinkedList<>();
 
-    public JoinConditionBase(Class<Left> left, String leftAlias, MFunction<?, ?> fieldFun, boolean loadLeftData) {
+    public JoinWhereBase(Class<Left> left, String leftAlias, MFunction<?, ?> fieldFun, boolean loadLeftData) {
         this.left = left;
         this.leftAlias = leftAlias;
         this.fieldFun = fieldFun;
         this.loadLeftData = loadLeftData;
     }
 
-    public JoinConditionBase(Class<Left> left, String leftAlias, MFunction<?, ?> fieldFun) {
+    public JoinWhereBase(Class<Left> left, String leftAlias, MFunction<?, ?> fieldFun) {
         this.left = left;
         this.leftAlias = leftAlias;
         this.fieldFun = fieldFun;
     }
 
-    public JoinConditionBase(Class<Left> left, MFunction<?, ?> fieldFun) {
+    public JoinWhereBase(Class<Left> left, MFunction<?, ?> fieldFun) {
         this.left = left;
         this.fieldFun = fieldFun;
     }
 
-    public JoinConditionBase(Class<Left> left) {
+    public JoinWhereBase(Class<Left> left) {
         this.left = left;
     }
 

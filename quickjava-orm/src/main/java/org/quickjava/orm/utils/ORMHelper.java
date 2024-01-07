@@ -99,7 +99,6 @@ public abstract class ORMHelper extends ComUtil {
     public static void resultTranshipmentWith(IModel iModel, Map<String, Object> data, String alias) {
         Model model = ((Model) iModel);
         ModelReservoir reservoir = ReflectUtil.getFieldValue(model, "reservoir");
-        System.out.println("reservoir.meta.fieldMap()=" + reservoir.meta.fieldMap());
         reservoir.meta.fieldMap().forEach((name, field) -> {
             if (field.isRelation() || Model.class.isAssignableFrom(field.getClazz())) {
                 return;

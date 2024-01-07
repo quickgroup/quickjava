@@ -17,5 +17,5 @@ import org.quickjava.orm.Model;
  * +-------------------------------------------------------------------
  */
 public interface JoinConditionClosure<Left extends Model, Right extends Model> {
-    void call(JoinCondition<Left, Right> condition);
+    void call(JoinWhere<Left, Right> condition);
 }
