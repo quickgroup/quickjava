@@ -8,42 +8,32 @@ import java.util.LinkedList;
 import java.util.List;
 
 // 根model绑定条件
-public class JoinWhereBase<Children extends JoinWhereBase<Children, Left>, Left extends Model> {
+public class JoinSpecifyBase<Children extends JoinSpecifyBase<Children, Left>, Left extends Model> {
 
     // 关联模型
     protected Class<Left> left;
 
-    // 关联模型的别名（查询时相同表区分
+    // 关联模型的别名（查询时相同表区分&对应父模型的属性名
     protected String leftAlias;
 
-    // 数据对应属性
-    private MFunction<?, ?> fieldFun;
-
-    // 加载左表数据
+    // 加载表数据
     protected boolean loadLeftData = true;
 
-    // 关联条件
-    public final List<Item<?, ?>> items = new LinkedList<>();
+    // join-on关联条件
+    public final List<Item<?, ?>> onList = new LinkedList<>();
 
-    public JoinWhereBase(Class<Left> left, String leftAlias, MFunction<?, ?> fieldFun, boolean loadLeftData) {
+    public JoinSpecifyBase(Class<Left> left, String leftAlias, boolean loadLeftData) {
         this.left = left;
         this.leftAlias = leftAlias;
-        this.fieldFun = fieldFun;
         this.loadLeftData = loadLeftData;
     }
 
-    public JoinWhereBase(Class<Left> left, String leftAlias, MFunction<?, ?> fieldFun) {
+    public JoinSpecifyBase(Class<Left> left, String leftAlias) {
         this.left = left;
         this.leftAlias = leftAlias;
-        this.fieldFun = fieldFun;
     }
 
-    public JoinWhereBase(Class<Left> left, MFunction<?, ?> fieldFun) {
-        this.left = left;
-        this.fieldFun = fieldFun;
-    }
-
-    public JoinWhereBase(Class<Left> left) {
+    public JoinSpecifyBase(Class<Left> left) {
         this.left = left;
     }
 
@@ -64,17 +54,17 @@ public class JoinWhereBase<Children extends JoinWhereBase<Children, Left>, Left 
     }
 
     protected <Right extends Model> Children add(ConditionType type, MFunction<Left, ?> lf, MFunction<Right, ?> rf) {
-        items.add(new Item<>(type, lf, rf));
+        onList.add(new Item<>(type, lf, rf));
         return chain();
     }
 
     protected Children add(ConditionType type, MFunction<Left, ?> lf, Object value) {
-        items.add(new Item<>(type, lf, value));
+        onList.add(new Item<>(type, lf, value));
         return chain();
     }
 
     protected <Right extends Model> Children add(ConditionType type, MFunction<Left, ?> lf, Class<Right> right, MFunction<Right, ?> rf) {
-        items.add(new Item<>(type, lf, right, rf));
+        onList.add(new Item<>(type, lf, right, rf));
         return chain();
     }
 
@@ -169,15 +159,6 @@ public class JoinWhereBase<Children extends JoinWhereBase<Children, Left>, Left 
         return chain();
     }
 
-    public MFunction<?, ?> getFieldFun() {
-        return fieldFun;
-    }
-
-    public Children setFieldFun(MFunction<?, ?> fieldFun) {
-        this.fieldFun = fieldFun;
-        return chain();
-    }
-
     public boolean isLoadLeftData() {
         return loadLeftData;
     }
@@ -187,7 +168,7 @@ public class JoinWhereBase<Children extends JoinWhereBase<Children, Left>, Left 
         return chain();
     }
 
-    public List<Item<?, ?>> getItems() {
-        return items;
+    public List<Item<?, ?>> getOnList() {
+        return onList;
     }
 }

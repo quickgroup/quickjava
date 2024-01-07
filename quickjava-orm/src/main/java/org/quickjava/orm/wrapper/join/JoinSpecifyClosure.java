@@ -9,13 +9,13 @@ import org.quickjava.orm.Model;
  * +-------------------------------------------------------------------
  * Author: Qlo1062
  * +-------------------------------------------------------------------
- * File: JoinConditionClosureLeft
+ * File: JoinConditionClosure
  * +-------------------------------------------------------------------
  * Date: 2024/1/7 0:42
  * +-------------------------------------------------------------------
  * License: Apache Licence 2.0
  * +-------------------------------------------------------------------
  */
-public interface JoinWhereLeftClosure<Left extends Model> {
-    void call(JoinWhereLeft<Left> condition);
+public interface JoinSpecifyClosure<Left extends Model, Right extends Model> {
+    void call(JoinSpecify<Left, Right> condition);
 }
