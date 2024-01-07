@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.quickjava.common.utils.TimeUtils;
 import org.quickjava.orm.contain.Pagination;
+import org.quickjava.orm.query.enums.OrderByType;
 import org.quickjava.orm.wrapper.ModelWrapper;
 import org.quickjava.spring.entity.SsoApp;
 import org.quickjava.spring.entity.SsoAppLatest;
@@ -45,17 +46,20 @@ public class TestModelJoin {
                 .eq(SsoAppFavoriteModel::getUserId, 1)
                 .neq(SsoAppFavoriteModel::getUserId, 0)
                 // 关联表查询字段
-                //      1. 自动识别第一个字段名为别名
+                //      1. 自动识别表名
                 .eq(SsoApp.class, SsoApp::getAppId, 1)
-                //      2. 指定父属性名为别名
+                //      2. 指定父属性名为表名
                 .eq(SsoAppFavoriteModel::getApp, SsoApp.class, SsoApp::getAppId, 1)
                 .eq(SsoAppFavoriteModel::getTestAppInfo, SsoApp.class, SsoApp::getAppId, 1)
-                //      3. 字符串别名
+                //      3. 字符串表名
                 .eq("aliasApp01", SsoApp::getAppId, 1)
                 .eq("app3", SsoApp::getAppId, 1)
 
                 // TODO::排序字段
-                .order(SsoAppFavoriteModel::getCreateTime)
+                .order(SsoAppFavoriteModel::getCreateTime, true)
+                .order(SsoApp.class, SsoApp::getAppId)
+                .order(SsoApp.class, SsoApp::getAppId, true)
+                .order(SsoApp.class, SsoApp::getAppId, OrderByType.DESC)
 
                 // 分页查询
                 .pagination();

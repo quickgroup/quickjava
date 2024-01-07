@@ -393,8 +393,8 @@ public class Model implements IModel {
         return this;
     }
 
-    public Model order(String field, boolean asc) {
-        query().order(field, asc);
+    public Model order(String field, boolean desc) {
+        query().order(field, desc);
         return this;
     }
 

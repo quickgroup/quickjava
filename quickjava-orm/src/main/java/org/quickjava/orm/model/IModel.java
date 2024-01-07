@@ -1,7 +1,5 @@
 package org.quickjava.orm.model;
 
-import org.quickjava.orm.model.enums.RelationType;
-
 /*
  * Copyright (c) 2020~2023 http://www.quickjava.org All rights reserved.
  * +-------------------------------------------------------------------

@@ -11,6 +11,7 @@ import org.quickjava.orm.query.enums.Operator;
 import org.quickjava.orm.model.contain.ModelFieldMeta;
 import org.quickjava.orm.model.contain.ModelMeta;
 import org.quickjava.orm.model.ModelUtil;
+import org.quickjava.orm.query.enums.OrderByType;
 import org.quickjava.orm.utils.SqlUtil;
 import org.quickjava.orm.wrapper.join.JoinSpecifyBase;
 import org.quickjava.orm.wrapper.enums.JoinType;
@@ -24,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper<Children, M, R>, M extends Model, R extends MFunction<M, ?>>
-        implements ModelJoinWrapper<Children, M, R>, Serializable {
+        implements Wrapper<Children>, ModelJoinWrapper<Children, M, R>, Serializable {
 
     protected M model;
 
@@ -34,32 +35,8 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         return model;
     }
 
-    private Children chain() {
-        return (Children) this;
-    }
-
     public Children eq(R function, Object val) {
         model().eq(findFieldName(function), val);
-        return chain();
-    }
-
-    @Override
-    public <Left extends Model> Children where(boolean condition, String leftAlias, Class<Left> left, String column, Operator operator, Object val) {
-        if (condition) {
-            // 如果指定在父实体上的属性
-            String table = leftAlias;
-            // 在主表上的属性名
-            if (table == null) {
-                ModelFieldMeta fieldMeta = getModelClazzFieldMap(getModelMeta(this.model.getClass())).get(left);
-                table = fieldMeta == null ? null : fieldMeta.getName();
-            }
-            // 表名
-            if (table == null) {
-                ModelMeta leftMeta = getModelMeta(left);
-                table = leftMeta == null ? null : leftMeta.table();
-            }
-            getQuerySet().where(table, column, operator, val);
-        }
         return chain();
     }
 
@@ -137,6 +114,12 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
 
     public Children orderByAsc(R function) {
         model().order(findFieldName(function), false);
+        return chain();
+    }
+
+    @Override
+    public Children order(String table, String field, OrderByType type) {
+        getQuerySet().order(table, field, type);
         return chain();
     }
 
@@ -280,7 +263,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     }
 
     private QuerySet getQuerySet() {
-        return ReflectUtil.invoke(this.model, "query");
+        return WrapperUtil.getQuerySet(this.model);
     }
 
     /**
@@ -359,17 +342,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     }
 
     private static ModelMeta getModelMeta(Class<?> clazz) {
-        if (Model.class.isAssignableFrom(clazz)) {
-            if (!ModelUtil.metaExist(clazz)) {
-                try {
-                    clazz = ModelUtil.getModelClass(clazz);
-                    clazz.newInstance();
-                } catch (InstantiationException | IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-        return ModelUtil.getMeta(clazz);
+        return WrapperUtil.getModelMeta(clazz);
     }
 
     private void loadModelAccurateFields(QuerySet querySet, ModelMeta meta, String table) {
@@ -383,13 +356,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     }
 
     private Map<Class<?>, ModelFieldMeta> getModelClazzFieldMap(ModelMeta meta) {
-        Map<Class<?>, ModelFieldMeta> fieldMetaClazzMap = new LinkedHashMap<>();
-        for (Field field : meta.getClazz().getDeclaredFields()) {
-            if (!fieldMetaClazzMap.containsKey(field.getType())) {
-                fieldMetaClazzMap.put(field.getType(), new ModelFieldMeta(field));
-            }
-        }
-        return fieldMetaClazzMap;
+        return WrapperUtil.getModelClazzFieldMap(meta);
     }
 
     private Map<String, ModelFieldMeta> getModelNameFieldMap(ModelMeta meta) {

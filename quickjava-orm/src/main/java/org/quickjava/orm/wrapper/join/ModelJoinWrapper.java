@@ -2,7 +2,10 @@ package org.quickjava.orm.wrapper.join;
 
 import org.quickjava.orm.model.Model;
 import org.quickjava.orm.query.enums.Operator;
+import org.quickjava.orm.query.enums.OrderByType;
 import org.quickjava.orm.wrapper.MFunction;
+import org.quickjava.orm.wrapper.Wrapper;
+import org.quickjava.orm.wrapper.WrapperUtil;
 import org.quickjava.orm.wrapper.enums.JoinType;
 
 import java.io.Serializable;
@@ -12,7 +15,7 @@ public interface ModelJoinWrapper<
             M extends Model,
             MF extends MFunction<M, ?>
         >
-        extends Serializable {
+        extends Wrapper<Children>, Serializable {
 
     /**
      * 与主表一个条件关联
@@ -99,7 +102,7 @@ public interface ModelJoinWrapper<
 
     Children join(JoinType type, JoinSpecifyBase<?, ?> condition);
 
-    //TODO::-------------------- join关联表的查询条件 START --------------------
+    //TODO::-------------------- 查询条件 START --------------------
 
     // 自动识别查询表名
     default <Left extends Model> Children eq(Class<Left> left, MFunction<Left, ?> lf, Object val) {
@@ -115,10 +118,42 @@ public interface ModelJoinWrapper<
         return where(true, table, lf.getName(), Operator.EQ, val);
     }
 
-    <Left extends Model> Children where(boolean condition, String leftAlias, Class<Left> left, String column, Operator operator, Object val);
+    default <Left extends Model> Children where(boolean condition, String table, Class<Left> left, String column, Operator operator, Object val) {
+        if (condition) {
+            // 懒加载
+            table = WrapperUtil.autoTable(table, this, left);
+            WrapperUtil.getQuerySet(this).where(table, column, operator, val);
+        }
+        return chain();
+    }
 
     Children where(boolean condition, String table, String column, Operator operator, Object val);
 
-    //TODO::-------------------- join的查询条件 END  --------------------
+    //TODO::-------------------- 查询条件 END  --------------------
+
+    //TODO::-------------------- 附加 START --------------------
+
+    default <Left> Children order(Class<Left> left, MFunction<Left, ?> lf, OrderByType type) {
+        String table = WrapperUtil.autoTable(null, this, left);
+        return order(table, lf.getName(), type);
+    }
+
+    default <Left> Children order(Class<Left> left, MFunction<Left, ?> lf, boolean desc) {
+        String table = WrapperUtil.autoTable(null, this, left);
+        return order(table, lf.getName(), desc);
+    }
+
+    default <Left> Children order(Class<Left> left, MFunction<Left, ?> lf) {
+        String table = WrapperUtil.autoTable(null, this, left);
+        return order(table, lf.getName(), OrderByType.ASC);
+    }
+
+    default Children order(String table, String field, boolean desc) {
+        return order(table, field, desc ? OrderByType.DESC : OrderByType.ASC);
+    }
+
+    Children order(String table, String field, OrderByType type);
+
+    //TODO::-------------------- 附加 END --------------------
 
 }

@@ -271,8 +271,8 @@ public class QuerySet {
         return this;
     }
 
-    public QuerySet order(String field, boolean asc) {
-        return order(field, asc ? OrderByType.ASC : OrderByType.DESC);
+    public QuerySet order(String field, boolean desc) {
+        return order(field, desc ? OrderByType.DESC : OrderByType.ASC);
     }
 
     public QuerySet order(String fields)
