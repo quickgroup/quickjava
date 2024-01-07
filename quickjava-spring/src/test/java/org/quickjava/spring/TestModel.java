@@ -8,15 +8,17 @@ package org.quickjava.spring;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.quickjava.common.utils.TimeUtils;
+import org.quickjava.orm.contain.DataMap;
+import org.quickjava.orm.example.Article;
+import org.quickjava.orm.model.Model;
+import org.quickjava.orm.model.callback.WhereClosure;
+import org.quickjava.orm.model.enums.RelationType;
 import org.quickjava.orm.query.QuerySet;
 import org.quickjava.orm.query.enums.OrderByType;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -70,6 +72,69 @@ public class TestModel {
         List<Map<String, Object>> rows = QuerySet.table("user").where("name", "xiaolong")
                 .order("create_time", OrderByType.DESC).select();
         System.out.println("SELECT.return=" + rows);
+    }
+
+    @Test
+    public void test2()
+    {
+        Object ret = new Model()
+                .eq("1", 1)
+                .neq("1", 1)
+                .gt("1", 1)
+                .gte("1", 1)
+                .lt("1", 1)
+                .lte("1", 1)
+                .in("1", 1)
+                .notIn("1", 1)
+                .isNull("1")
+                .isNotNull("1")
+                .between("1", 1, 2)
+                .find();
+
+        ret = new Model()
+                .where(query -> { })
+                .whereOr(query -> { })
+                .find();
+
+        ret = new Model().save();
+        ret = new Model().create(new LinkedHashMap<>());
+        ret = new Model().create(new DataMap());
+
+        ret = new Model().update();
+        ret = new Model().updateById();
+        ret = new Model().find();
+        ret = new Model().find(1);
+        ret = new Model().select();
+        ret = new Model().limit(1, 20).select();
+        ret = new Model().limit(1).select();
+        ret = new Model().page(1, 20).select();
+        ret = new Model().page(1).select();
+        ret = new Model().pagination(1, 20);
+        ret = new Model().pagination();
+        ret = new Model().order("1").find();
+        ret = new Model().order("1", OrderByType.DESC).find();
+        ret = new Model().order("1", false).find();
+        ret = new Model().order(new LinkedList<>()).find();
+        ret = new Model().order(new String[]{}).find();
+
+        ret = new Model().lock(true).find();
+        ret = new Model().distinct(true).fetchSql(true);
+
+        ret = new Model().pk();
+        ret = new Model().pkVal();
+
+        ret = new Model().group("a").find();
+        ret = new Model().having("a").find();
+        ret = new Model().union("a").find();
+        ret = new Model().union(new String[]{}).find();
+
+        ret = new Model().relation(Model.class, RelationType.OneToOne, "id", "appId").find();
+        ret = new Article().relation(Article.class, RelationType.OneToOne, "id", "appId").find();
+        ret = new Model().relation(Model.class.getName(), RelationType.OneToOne, "id", "appId");
+
+        new Model().delete();
+
+        System.out.println("test");
     }
 
 }
