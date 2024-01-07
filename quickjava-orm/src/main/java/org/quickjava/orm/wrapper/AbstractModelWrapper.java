@@ -98,6 +98,42 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         return chain();
     }
 
+    //TODO::--------------- 特性 ---------------
+    public Children group(R ... fields) {
+        for (R field : fields) {
+            getQuerySet().group(field.getName());
+        }
+        return chain();
+    }
+
+    public Children having(R ... fields) {
+        for (R field : fields) {
+            model().having(field.getName());
+        }
+        return chain();
+    }
+
+    public Children union(String sql) {
+        model().union(sql);
+        return chain();
+    }
+
+    public Children union(String[] sqlArr) {
+        model().union(sqlArr);
+        return chain();
+    }
+
+    public Children distinct(boolean distinct) {
+        model().distinct(distinct);
+        return chain();
+    }
+
+    public Children lock(boolean lock) {
+        model().lock(lock);
+        return chain();
+    }
+
+    //TODO::--------------- 排序 ---------------
     public Children order(R function, boolean desc) {
         model().order(findFieldName(function), desc);
         return chain();
@@ -140,43 +176,6 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
 
     public Children page(int page, int pageSize) {
         model().page(page, pageSize);
-        return chain();
-    }
-
-    public Children group(R ... fields) {
-        for (R field : fields) {
-            getQuerySet().group(field.getName());
-        }
-        return chain();
-    }
-
-    public Children having(String fields) {
-        model().having(fields);
-        return chain();
-    }
-
-    public Children union(String sql) {
-        model().union(sql);
-        return chain();
-    }
-
-    public Children union(String[] sqlArr) {
-        model().union(sqlArr);
-        return chain();
-    }
-
-    public Children distinct(boolean distinct) {
-        model().distinct(distinct);
-        return chain();
-    }
-
-    public Children lock(boolean lock) {
-        model().lock(lock);
-        return chain();
-    }
-
-    public Children with(R func) {
-        model().with(findFieldName(func));
         return chain();
     }
 

@@ -47,7 +47,7 @@ public class QueryReservoir {
     public Action action;
 
     @JsonIgnore
-    public List<String> fieldList;
+    public List<TableColumn> fieldList;
 
     @JsonIgnore
     public List<String[]> joinList;
@@ -68,7 +68,7 @@ public class QueryReservoir {
     public List<TableColumn> groupBy;
 
     @JsonIgnore
-    public String having;
+    public List<TableColumn> having;
 
     @JsonIgnore
     public Integer limitIndex;
@@ -128,12 +128,12 @@ public class QueryReservoir {
         this.action = action;
     }
 
-    public List<String> getFieldList() {
+    public List<TableColumn> getFieldList() {
         this.fieldList = QuerySetHelper.initList(this.fieldList);
         return fieldList;
     }
 
-    public void setFieldList(List<String> fieldList) {
+    public void setFieldList(List<TableColumn> fieldList) {
         this.fieldList = fieldList;
     }
 
@@ -208,11 +208,11 @@ public class QueryReservoir {
         this.groupBy = groupBy;
     }
 
-    public String getHaving() {
+    public List<TableColumn> getHaving() {
         return having;
     }
 
-    public void setHaving(String having) {
+    public void setHaving(List<TableColumn> having) {
         this.having = having;
     }
 
@@ -288,6 +288,7 @@ public class QueryReservoir {
      */
     public void pretreatment(DriveConfigure driveConfigure) {
         this.driveConfigure = driveConfigure;
+        this.joinFill();
     }
 
     public String getSql() {
@@ -296,6 +297,24 @@ public class QueryReservoir {
 
     public void setSql(String sql) {
         this.sql = sql;
+    }
+
+    public <D extends TableColumn> void fillTable(boolean condition, List<D> columns) {
+        if (condition) {
+            columns.forEach(orderBy -> {
+                orderBy.setTable(orderBy.getTable() == null ? getAlias() : orderBy.getTable());
+            });
+        }
+    }
+
+    public void joinFill() {
+        if (joinList == null) {
+            return;
+        }
+        fillTable(whereList != null, getWhereList());
+        fillTable(groupBy != null, getGroupBy());
+        fillTable(having != null, getHaving());
+        fillTable(orderByList != null, getOrderByList());
     }
 
     @Override

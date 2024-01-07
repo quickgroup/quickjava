@@ -146,35 +146,25 @@ public abstract class Drive {
         // WHERE
         if ((action == Action.SELECT || action == Action.UPDATE) && reservoir.whereList != null) {
             sqlList.add("WHERE");
-            // 自动填充表名
-            if (reservoir.joinList != null) {
-                reservoir.getWhereList().forEach(where -> {
-                    where.setTable(where.getTable() == null ? reservoir.getAlias() : where.getTable());
-                });
-            }
             sqlList.add(Where.cutFirstLogic(Where.collectSql(reservoir.getWhereList(), config)));
         }
 
         // GROUP BY
         if (action == Action.SELECT && reservoir.groupBy != null) {
-            sqlList.add(reservoir.groupBy);
+            sqlList.add("GROUP BY");
+            sqlList.add(SqlUtil.listJoin(reservoir.getGroupBy(), ", ", entry -> entry.toSql(config)).toString());
         }
 
         // HAVING
         if (action == Action.SELECT && reservoir.having != null) {
-            sqlList.add(reservoir.having);
+            sqlList.add("HAVING");
+            sqlList.add(SqlUtil.listJoin(reservoir.getHaving(), ", ", entry -> entry.toSql(config)).toString());
         }
 
         // ORDER BY
         if (action == Action.SELECT && reservoir.orderByList != null) {
             sqlList.add("ORDER BY");
-            if (reservoir.joinList != null) {
-                reservoir.getOrderByList().forEach(orderBy -> {
-                    orderBy.setTable(orderBy.getTable() == null ? reservoir.getAlias() : orderBy.getTable());
-                });
-            }
-            StringBuilder str = SqlUtil.listJoin(reservoir.getOrderByList(), ", ", entry -> entry.toSql(config));
-            sqlList.add(str.toString());
+            sqlList.add(SqlUtil.listJoin(reservoir.getOrderByList(), ", ", entry -> entry.toSql(config)).toString());
         }
 
         // Limit

@@ -57,6 +57,7 @@ public class QuerySet {
         return new QuerySet(table);
     }
 
+    //TODO::-------------------- 关联查询 --------------------
     public QuerySet join(String table, String condition) {
         return join(table, condition, "INNER");
     }
@@ -69,48 +70,36 @@ public class QuerySet {
 
     /**
      * 限定查询返回的数据字段
-     * @param field 字段
+     * @param columns 字段
      * @return 查询器
      */
-    public QuerySet field(String field)
+    public QuerySet field(String ... columns)
     {
-        if (ModelUtil.isEmpty(field)) {
+        if (ModelUtil.isEmpty(columns)) {
             return this;
         }
-        if (field.contains(",")) {
-            Arrays.stream(field.split(",")).forEach(this::field);
-        } else {
-//            this.fieldList.add(field.contains("\\.") ? field.split("\\.") : new String[]{field});
-            reservoir.getFieldList().add(field);
+        for (String column : columns) {
+            if (column.contains(",")) {
+                Arrays.stream(column.split(",")).forEach(this::field);
+            } else {
+                reservoir.getFieldList().add(parseColumn(column));
+            }
         }
         return this;
     }
 
     /**
      * 限定查询返回的数据字段
-     * @param fields 字段
+     * @param columns 字段
      * @return 查询器
      */
-    public QuerySet field(List<String> fields)
+    public QuerySet field(List<String> columns)
     {
-        fields.forEach(this::field);
+        columns.forEach(this::field);
         return this;
     }
 
-    /**
-     * 限定查询返回的数据字段
-     * 支持书写格式：table.field、table.field tableField、table.field table_field、field
-     * @param fields 字段
-     * @return 查询器
-     */
-    public QuerySet field(String[] fields) {
-        for (String item : fields) {
-            field(item);
-        }
-        return this;
-    }
-
-
+    //TODO::-------------------- 查询条件 --------------------
     public QuerySet where(String field, Object value)
     {
         return this.where(field, Operator.EQ, value);
@@ -227,29 +216,79 @@ public class QuerySet {
         return this;
     }
 
-    public QuerySet group(String fields)
+    //TODO::-------------------- 特性 --------------------
+    public QuerySet group(String ... columns)
     {
-        for (String field : fields.split(",")) {
-            group(new TableColumn(field.trim()));
+        for (String column : columns) {
+            if (column.contains(",")) {
+                Arrays.stream(column.split(",")).forEach(this::group);
+            } else {
+                group(parseColumn(column.trim()));
+            }
         }
         return this;
     }
 
-    public QuerySet group(TableColumn column)
-    {
-        reservoir.getGroupBy().add(column);
-        return this;
-    }
-
-    public QuerySet having(String fields)
-    {
-        if (ModelUtil.isEmpty(fields)) {
-            return this;
+    private TableColumn parseColumn(String column) {
+        column = column.trim();
+        if (column.contains(".")) {
+            String[] arr = column.split("\\.");
+            return new TableColumn(arr[0].trim(), arr[1].trim());
         }
-        reservoir.setHaving(fields);
+        return new TableColumn(column);
+    }
+
+    public QuerySet group(TableColumn ... columns)
+    {
+        for (TableColumn column : columns) {
+            reservoir.getGroupBy().add(column);
+        }
         return this;
     }
 
+    public QuerySet having(String fields) {
+        return having(fields.split(","));
+    }
+
+    public QuerySet having(String ... fields)
+    {
+        for (String field : fields) {
+            having(new TableColumn(field.trim()));
+        }
+        return this;
+    }
+
+    public QuerySet having(TableColumn ... columns)
+    {
+        for (TableColumn column : columns) {
+            reservoir.getHaving().add(column);
+        }
+        return this;
+    }
+
+    public QuerySet union(String sql) {
+        reservoir.getUnionList().add(sql);
+        return this;
+    }
+
+    public QuerySet union(String[] sqlArr) {
+        for (String s : sqlArr) {
+            union(s);
+        }
+        return this;
+    }
+
+    public QuerySet distinct(boolean distinct) {
+        reservoir.distinct = distinct;
+        return this;
+    }
+
+    public QuerySet lock(boolean lock) {
+        reservoir.lock = lock;
+        return this;
+    }
+
+    //TODO::-------------------- 排序 --------------------
     public QuerySet order(String table, String field, OrderByType type)
     {
         OrderBy orderBy = new OrderBy(table, field, type);
@@ -301,6 +340,7 @@ public class QuerySet {
         return this;
     }
 
+    //TODO::-------------------- 数量限制 --------------------
     public QuerySet limit(Integer index, Integer count)
     {
         reservoir.limitIndex = index;
@@ -316,45 +356,7 @@ public class QuerySet {
         return limit((page - 1) * size, size);
     }
 
-    public QuerySet union(String sql) {
-        reservoir.getUnionList().add(sql);
-        return this;
-    }
-
-    public QuerySet union(String[] sqlArr) {
-        for (String s : sqlArr) {
-            union(s);
-        }
-        return this;
-    }
-
-    public QuerySet distinct(boolean distinct) {
-        reservoir.distinct = distinct;
-        return this;
-    }
-
-    public QuerySet lock(boolean lock) {
-        reservoir.lock = lock;
-        return this;
-    }
-
-    //TODO::----------- 数据方法 -----------
-    public List<Map<String, Object>> select()
-    {
-        // 默认查询全部字段
-        if (reservoir.getFieldList().size() == 0)
-            field("*");
-        List<Map<String, Object>> resultSet = executeSql();
-        return SqlUtil.isEmpty(resultSet) ? new LinkedList<>() : resultSet;
-    }
-
-    public Map<String, Object> find()
-    {
-        limit(0, 1);
-        List<Map<String, Object>> resultSet = select();
-        return SqlUtil.isEmpty(resultSet) ? null : resultSet.get(0);
-    }
-
+    //TODO::-------------------- 数据 --------------------
     public QuerySet data(String field, Object value)
     {
         reservoir.getData().put(field, value);
@@ -370,6 +372,23 @@ public class QuerySet {
     public Map<String, Object> data()
     {
         return reservoir.dataList == null || reservoir.dataList.size() == 0 ? null : reservoir.getData();
+    }
+
+    //TODO::-------------------- 增删改查 --------------------
+    public List<Map<String, Object>> select()
+    {
+        // 默认查询全部字段
+        if (reservoir.getFieldList().size() == 0)
+            field("*");
+        List<Map<String, Object>> resultSet = executeSql();
+        return SqlUtil.isEmpty(resultSet) ? new LinkedList<>() : resultSet;
+    }
+
+    public Map<String, Object> find()
+    {
+        limit(0, 1);
+        List<Map<String, Object>> resultSet = select();
+        return SqlUtil.isEmpty(resultSet) ? null : resultSet.get(0);
     }
 
     public Integer update(Map<String, Object> data)
@@ -411,6 +430,7 @@ public class QuerySet {
         return result.intValue();
     }
 
+    //TODO::-------------------- 扩展方法 --------------------
     /**
      * 获取表全部字段
      * @return 字段列表
@@ -495,7 +515,7 @@ public class QuerySet {
     // 分页查询
     public Pagination<Map<String, Object>> pagination()
     {
-        List<String> cacheFiledList = new LinkedList<>(reservoir.getFieldList());
+        List<TableColumn> cacheFiledList = new LinkedList<>(reservoir.getFieldList());
         // 分页器开启直接打印sql
         reservoir.printSql = true;
         // 获取总数
