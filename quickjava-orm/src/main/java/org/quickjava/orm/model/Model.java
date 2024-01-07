@@ -11,6 +11,7 @@ import net.sf.cglib.proxy.MethodProxy;
 import org.quickjava.common.utils.ComUtil;
 import org.quickjava.common.utils.DatetimeUtil;
 import org.quickjava.common.utils.ReflectUtil;
+import org.quickjava.orm.enums.JoinType;
 import org.quickjava.orm.model.annotation.ModelName;
 import org.quickjava.orm.model.annotation.OneToMany;
 import org.quickjava.orm.model.annotation.OneToOne;
@@ -650,7 +651,7 @@ public class Model implements IModel {
                     CompareEnum.EQ,
                     reservoir.meta.table(), relation.localKey()
             );
-            query().join(meta.table() + " " + relationName, conditionSql, "LEFT");
+            query().join(meta.table() + " " + relationName, conditionSql, JoinType.LEFT);
         });
         // 装填字段
         query().field(fields);

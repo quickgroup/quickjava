@@ -48,6 +48,10 @@ public class JoinCondition extends TableColumn {
         this.rightValue = rightValue;
     }
 
+    public JoinCondition(String column) {
+        super(column);
+    }
+
     public int getLogic() {
         return logic;
     }
@@ -88,9 +92,22 @@ public class JoinCondition extends TableColumn {
         this.rightValue = rightValue;
     }
 
+    public String getRaw() {
+        return raw;
+    }
+
+    public JoinCondition setRaw(String raw) {
+        this.raw = raw;
+        return this;
+    }
+
     @Override
     public String toSql(DriveConfigure driveConfigure) {
         super.toSql(driveConfigure);
+        //
+        if (raw != null) {
+            return raw;
+        }
         // null
         if (compare == CompareEnum.IS_NULL || compare == CompareEnum.IS_NOT_NULL) {
             return getTable() + "." + ModelUtil.toUnderlineCase(getColumn()) + " " + compare.sql();

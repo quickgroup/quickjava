@@ -60,25 +60,22 @@ public class QuerySet {
 
     //TODO::-------------------- 关联查询 --------------------
     public QuerySet join(String table, String condition) {
-        return join(table, condition, "INNER");
+        return join(table, condition, JoinType.INNER);
     }
 
     public QuerySet leftJoin(String table, String condition) {
-        return join(table, condition, "LEFT");
+        return join(table, condition, JoinType.LEFT);
     }
 
     public QuerySet rightJoin(String table, String condition) {
-        return join(table, condition, "RIGHT");
+        return join(table, condition, JoinType.RIGHT);
     }
 
-    public QuerySet join(String table, String condition, String type)
-    {
-        reservoir.getJoinList().add(new String[]{table, condition, type});
-        return this;
+    public QuerySet join(String table, String condition, JoinType type) {
+        return join(table, new JoinCondition(null).setRaw(condition), type);
     }
 
-    public QuerySet join(String table, JoinCondition condition, JoinType type)
-    {
+    public QuerySet join(String table, JoinCondition condition, JoinType type) {
         reservoir.getJoinList().add(new Join(type, table).addCondition(condition));
         return this;
     }
@@ -562,11 +559,11 @@ public class QuerySet {
 
     //TODO::--------------- 统计方法 ---------------
     public Integer count() {
-        return count(new TableColumn(null).setColumnRaw("COUNT(*)"));
+        return count(new TableColumn(null).setRaw("COUNT(*)"));
     }
 
     public Integer count(String field) {
-        return count(new TableColumn(null).setColumnRaw("COUNT("+field+")"));
+        return count(new TableColumn(null).setRaw("COUNT("+field+")"));
     }
 
     public Integer count(TableColumn column)
@@ -589,10 +586,10 @@ public class QuerySet {
         // 恢复
         this.reservoir = reservoirOld;
 
-        if (resultSet == null) {
+        if (resultSet == null || resultSet.isEmpty()) {
             return 0;
         }
-        return Math.toIntExact((Long) resultSet.get(0).get(column.getColumnRaw()));
+        return Math.toIntExact((Long) resultSet.get(0).get(column.getRaw()));
     }
 
     //TODO::--------------- 事务操作方法 ---------------

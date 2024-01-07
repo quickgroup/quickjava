@@ -25,7 +25,8 @@ public class TableColumn {
 
     protected String columnAlias;
 
-    protected String columnRaw;
+    // 原生sql语句
+    protected String raw;
 
     protected DriveConfigure driveConfigure;
 
@@ -61,8 +62,8 @@ public class TableColumn {
     }
 
     public String getColumnSql() {
-        if (columnRaw != null) {
-            return getColumnRaw();
+        if (raw != null) {
+            return getRaw();
         }
         String columnSql = column;
         if (driveConfigure.columnLeft != null) {
@@ -90,17 +91,17 @@ public class TableColumn {
         this.columnAlias = columnAlias;
     }
 
-    public String getColumnRaw() {
-        return columnRaw;
+    public String getRaw() {
+        return raw;
     }
 
-    public TableColumn setColumnRaw(String columnRaw) {
-        this.columnRaw = columnRaw;
+    public TableColumn setRaw(String raw) {
+        this.raw = raw;
         return this;
     }
 
     public String toSql(DriveConfigure driveConfigure) {
         this.driveConfigure = driveConfigure;
-        return null;
+        return getColumnSql();
     }
 }

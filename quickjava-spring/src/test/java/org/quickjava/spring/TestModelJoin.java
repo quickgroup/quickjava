@@ -34,7 +34,7 @@ public class TestModelJoin {
                 .leftJoin(SsoApp.class, "app3", whereLeft -> whereLeft
                         .eq(SsoApp::getAppId, SsoAppFavoriteModel.class, SsoAppFavoriteModel::getAppId)
                         .eq(SsoApp::getOpen, 1)
-                        .isNotNull(SsoApp::getName)
+//                        .isNotNull(SsoApp::getName)
                 )
                 // 与主表一对一关联join，指定数据加载到主实体指定属性
                 .leftJoin(SsoApp.class, SsoApp::getAppId, SsoAppFavoriteModel::getAppId, SsoAppFavoriteModel::getApp2)

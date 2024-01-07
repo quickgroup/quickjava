@@ -108,9 +108,7 @@ public abstract class Drive {
 
         // JOIN
         if (reservoir.joinList != null) {
-            reservoir.joinList.forEach(arr -> {
-                sqlList.add(String.format("%s JOIN %s ON %s", arr[2], arr[0], arr[1]));
-            });
+            sqlList.add(SqlUtil.listJoin(reservoir.getJoinList(), " ", e -> e.toSql(config)));
         }
 
         // INSERT-DATA

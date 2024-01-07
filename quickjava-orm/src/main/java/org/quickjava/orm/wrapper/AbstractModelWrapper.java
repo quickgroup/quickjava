@@ -323,19 +323,19 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
                 // 一：值条件
                 onConditions.add(ModelUtil.joinConditionSql(
                         join.getLeftAlias(), it.getLeftFun().getName(),
-                        it.getType().name(),
+                        it.getType(),
                         String.valueOf(it.getRightValue())   // 后面下放到驱动进行转换
                 ));
             } else {
                 // 一：方法引用
                 onConditions.add(ModelUtil.joinConditionSql(
                         join.getLeftAlias(), it.getLeftFun().getName(),
-                        it.getType().name(),
+                        it.getType(),
                         rightAlias, it.getRightFun().getName()
                 ));
             }
         });
-        querySet.join(leftMeta.tableAlias(leftAlias), StrUtil.join(" AND ", onConditions), type.name());
+        querySet.join(leftMeta.tableAlias(leftAlias), StrUtil.join(" AND ", onConditions), type);
 
         return chain();
     }
