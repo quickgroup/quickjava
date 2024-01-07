@@ -16,7 +16,6 @@ import org.quickjava.orm.model.annotation.OneToMany;
 import org.quickjava.orm.model.annotation.OneToOne;
 import org.quickjava.orm.query.QueryReservoir;
 import org.quickjava.orm.query.QuerySet;
-import org.quickjava.orm.annotation.*;
 import org.quickjava.orm.query.callback.OrderByOptCallback;
 import org.quickjava.orm.model.callback.WhereClosure;
 import org.quickjava.orm.query.callback.WhereOptCallback;
@@ -340,7 +339,7 @@ public class Model implements IModel {
             return null;
         }
         // 装载数据
-        List<IModel> models = ORMHelper.resultTranshipment(this, getClass(), dataList);
+        List<IModel> models = ModelUtil.resultTranshipment(this, getClass(), dataList);
         return toD(models.get(0));
     }
 
@@ -359,7 +358,7 @@ public class Model implements IModel {
             return toD(new ModelListSql(querySetReservoir().sql));
         }
         // 装载
-        List<IModel> models = ORMHelper.resultTranshipment(this, getClass(), dataList);
+        List<IModel> models = ModelUtil.resultTranshipment(this, getClass(), dataList);
         return toD(models);
     }
 
@@ -393,7 +392,7 @@ public class Model implements IModel {
         Pagination<Map<String, Object>> pagination = query().pagination(page, pageSize);
         // 数据组装
         Pagination<IModel> pagination1 = new Pagination<>(pagination);
-        pagination1.rows = ORMHelper.resultTranshipment(this, getMClass(), pagination.rows);
+        pagination1.rows = ModelUtil.resultTranshipment(this, getMClass(), pagination.rows);
         return toD(pagination1);
     }
 

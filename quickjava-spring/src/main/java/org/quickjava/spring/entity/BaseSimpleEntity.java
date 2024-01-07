@@ -3,7 +3,7 @@ package org.quickjava.spring.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.quickjava.orm.Model;
+import org.quickjava.orm.model.Model;
 
 import java.io.Serializable;
 import java.util.HashMap;

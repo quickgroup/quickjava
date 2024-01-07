@@ -1,6 +1,6 @@
 package org.quickjava.orm.example;
 
-import org.quickjava.orm.Model;
+import org.quickjava.orm.model.Model;
 import org.quickjava.orm.model.annotation.OneToMany;
 import org.quickjava.orm.model.annotation.OneToOne;
 

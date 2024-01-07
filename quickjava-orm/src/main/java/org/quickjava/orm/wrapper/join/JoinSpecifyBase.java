@@ -1,6 +1,6 @@
 package org.quickjava.orm.wrapper.join;
 
-import org.quickjava.orm.Model;
+import org.quickjava.orm.model.Model;
 import org.quickjava.orm.wrapper.MFunction;
 import org.quickjava.orm.wrapper.enums.ConditionType;
 

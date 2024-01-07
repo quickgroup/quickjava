@@ -1,7 +1,7 @@
 package org.quickjava.orm.example;
 
 import com.baomidou.mybatisplus.annotation.TableId;
-import org.quickjava.orm.Model;
+import org.quickjava.orm.model.Model;
 import org.quickjava.orm.model.annotation.ModelField;
 import org.quickjava.orm.model.annotation.ModelId;
 import org.quickjava.orm.model.annotation.ModelName;

@@ -1,6 +1,6 @@
 package org.quickjava.orm.wrapper.join;
 
-import org.quickjava.orm.Model;
+import org.quickjava.orm.model.Model;
 
 /*
  * Copyright (c) 2020~2024 http://www.quickjava.org All rights reserved.

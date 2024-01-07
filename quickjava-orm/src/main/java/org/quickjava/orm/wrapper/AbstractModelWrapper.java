@@ -3,15 +3,14 @@ package org.quickjava.orm.wrapper;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
-import org.quickjava.orm.Model;
+import org.quickjava.orm.model.Model;
 import org.quickjava.orm.query.QueryReservoir;
 import org.quickjava.orm.query.QuerySet;
 import org.quickjava.orm.contain.*;
 import org.quickjava.orm.query.enums.Operator;
 import org.quickjava.orm.model.contain.ModelFieldMeta;
 import org.quickjava.orm.model.contain.ModelMeta;
-import org.quickjava.orm.utils.ModelUtil;
-import org.quickjava.orm.utils.ORMHelper;
+import org.quickjava.orm.model.ModelUtil;
 import org.quickjava.orm.utils.SqlUtil;
 import org.quickjava.orm.wrapper.join.JoinSpecifyBase;
 import org.quickjava.orm.wrapper.enums.JoinType;
@@ -241,7 +240,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         pagination.rows.forEach(data -> {
             // 主表
             M main = Model.newModel(mainMeta.getClazz());
-            ORMHelper.resultTranshipmentWith(main, data, mainMeta.table());
+            ModelUtil.resultTranshipmentWith(main, data, mainMeta.table());
             // 一对一的数据加载
             joinMap.forEach((alias, join) -> {
                 // 未加载数据 || 未设置加载对应属性名 || 在父实体不存在
@@ -257,7 +256,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
                 }
                 // 数据装载
                 Model left = Model.newModel(leftMeta.getClazz(), null, main);
-                ORMHelper.resultTranshipmentWith(left, data, alias);
+                ModelUtil.resultTranshipmentWith(left, data, alias);
                 ReflectUtil.setFieldValue(main, join.getLeftAlias(), left);
             });
             //

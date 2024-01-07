@@ -1,6 +1,6 @@
 package org.quickjava.orm.wrapper;
 
-import org.quickjava.orm.Model;
+import org.quickjava.orm.model.Model;
 
 public class ModelWrapper<M extends Model> extends AbstractModelWrapper<ModelWrapper<M>, M, MFunction<M, ?>> {
 

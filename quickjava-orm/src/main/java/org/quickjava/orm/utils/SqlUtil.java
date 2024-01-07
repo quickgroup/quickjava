@@ -1,5 +1,7 @@
 package org.quickjava.orm.utils;
 
+import org.quickjava.common.utils.ComUtil;
+import org.quickjava.orm.model.ModelUtil;
 import org.quickjava.orm.model.contain.ModelFieldMeta;
 import org.quickjava.orm.query.contain.TableColumnMeta;
 
@@ -21,7 +23,7 @@ import java.util.Map;
  * License: Apache Licence 2.0
  * +-------------------------------------------------------------------
  */
-public class SqlUtil extends ORMHelper {
+public class SqlUtil extends ComUtil {
 
     // 数据转义
     public static String escapeSql(String str) {

@@ -10,6 +10,7 @@ import org.quickjava.common.enums.DatetimeCurrType;
 import org.quickjava.common.enums.DatetimeRangeType;
 import org.quickjava.common.utils.DatetimeUtil;
 import org.quickjava.orm.ORMContext;
+import org.quickjava.orm.model.ModelUtil;
 import org.quickjava.orm.query.build.OrderBy;
 import org.quickjava.orm.query.build.Where;
 import org.quickjava.orm.query.build.WhereAnd;
@@ -23,7 +24,6 @@ import org.quickjava.orm.query.contain.Action;
 import org.quickjava.orm.query.contain.TableColumnMeta;
 import org.quickjava.orm.query.enums.Operator;
 import org.quickjava.orm.query.enums.OrderByType;
-import org.quickjava.orm.utils.ORMHelper;
 import org.quickjava.orm.utils.QueryException;
 import org.quickjava.orm.utils.SqlUtil;
 
@@ -77,7 +77,7 @@ public class QuerySet {
      */
     public QuerySet field(String field)
     {
-        if (ORMHelper.isEmpty(field)) {
+        if (ModelUtil.isEmpty(field)) {
             return this;
         }
         if (field.contains(",")) {
@@ -121,7 +121,7 @@ public class QuerySet {
 
     public QuerySet where(String field, Operator operator, Object value)
     {
-        if (ORMHelper.isEmpty(field)) {
+        if (ModelUtil.isEmpty(field)) {
             return this;
         }
         where(new WhereAnd(field, operator, value));
@@ -130,7 +130,7 @@ public class QuerySet {
 
     public QuerySet where(String table, String field, Operator operator, Object value)
     {
-        if (ORMHelper.isEmpty(field)) {
+        if (ModelUtil.isEmpty(field)) {
             return this;
         }
         where(new WhereAnd(table, field, operator, value));
@@ -232,7 +232,7 @@ public class QuerySet {
 
     public QuerySet group(String fields)
     {
-        if (ORMHelper.isEmpty(fields)) {
+        if (ModelUtil.isEmpty(fields)) {
             return this;
         }
         reservoir.setGroupBy(fields);
@@ -241,7 +241,7 @@ public class QuerySet {
 
     public QuerySet having(String fields)
     {
-        if (ORMHelper.isEmpty(fields)) {
+        if (ModelUtil.isEmpty(fields)) {
             return this;
         }
         reservoir.setHaving(fields);
@@ -277,7 +277,7 @@ public class QuerySet {
 
     public QuerySet order(String fields)
     {
-        if (ORMHelper.isEmpty(fields)) {
+        if (ModelUtil.isEmpty(fields)) {
             return this;
         }
         if (fields.contains(",")) {
@@ -426,7 +426,7 @@ public class QuerySet {
         }
         String sql = "SHOW FULL COLUMNS FROM " + table;
         List<Map<String, String>> columns = this.executeSql(sql);
-        if (ORMHelper.isEmpty(columns)) {
+        if (ModelUtil.isEmpty(columns)) {
             return new LinkedList<>();
         }
         List<TableColumnMeta> columns1 = new LinkedList<>();

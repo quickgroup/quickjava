@@ -5,7 +5,7 @@
 
 package org.quickjava.www.application.api.model;
 
-import org.quickjava.orm.Model;
+import org.quickjava.orm.model.Model;
 
 /**
  * @author Qlo1062-(QloPC-zs)
