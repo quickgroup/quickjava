@@ -143,8 +143,10 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         return chain();
     }
 
-    public Children group(String fields) {
-        model().group(fields);
+    public Children group(R ... fields) {
+        for (R field : fields) {
+            getQuerySet().group(field.getName());
+        }
         return chain();
     }
 

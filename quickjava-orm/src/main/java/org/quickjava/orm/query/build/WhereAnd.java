@@ -11,12 +11,12 @@ import java.util.List;
 
 public class WhereAnd extends Where {
 
-    public WhereAnd(String table, String field, Operator operator, Object value) {
-        super(1, table, field, operator, value);
+    public WhereAnd(String table, String column, Operator operator, Object value) {
+        super(1, table, column, operator, value);
     }
 
-    public WhereAnd(String field, Operator operator, Object value) {
-        super(1, field, operator, value);
+    public WhereAnd(String column, Operator operator, Object value) {
+        super(1, column, operator, value);
     }
 
     public WhereAnd(List<Where> wheres) {

@@ -269,7 +269,7 @@ public class ModelUtil extends SqlUtil {
     };
 
     public static OrderByOptCallback orderByOptCallback = (orderBy, userData) -> {
-        orderBy.setField(fieldToUnderlineCase(orderBy.getField()));
+        orderBy.setColumn(fieldToUnderlineCase(orderBy.getColumn()));
     };
 
     /**

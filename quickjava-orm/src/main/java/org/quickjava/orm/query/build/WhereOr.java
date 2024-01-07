@@ -11,8 +11,8 @@ import java.util.List;
 
 public class WhereOr extends Where {
 
-    public WhereOr(String field, Operator operator, Object value) {
-        super(2, field, operator, value);
+    public WhereOr(String column, Operator operator, Object value) {
+        super(2, column, operator, value);
     }
 
     public WhereOr(List<Where> wheres) {

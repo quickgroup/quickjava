@@ -11,10 +11,7 @@ import org.quickjava.common.enums.DatetimeRangeType;
 import org.quickjava.common.utils.DatetimeUtil;
 import org.quickjava.orm.ORMContext;
 import org.quickjava.orm.model.ModelUtil;
-import org.quickjava.orm.query.build.OrderBy;
-import org.quickjava.orm.query.build.Where;
-import org.quickjava.orm.query.build.WhereAnd;
-import org.quickjava.orm.query.build.WhereOr;
+import org.quickjava.orm.query.build.*;
 import org.quickjava.orm.query.callback.OrderByOptCallback;
 import org.quickjava.orm.model.callback.WhereClosure;
 import org.quickjava.orm.query.callback.WhereOptCallback;
@@ -232,10 +229,15 @@ public class QuerySet {
 
     public QuerySet group(String fields)
     {
-        if (ModelUtil.isEmpty(fields)) {
-            return this;
+        for (String field : fields.split(",")) {
+            group(new TableColumn(field.trim()));
         }
-        reservoir.setGroupBy(fields);
+        return this;
+    }
+
+    public QuerySet group(TableColumn column)
+    {
+        reservoir.getGroupBy().add(column);
         return this;
     }
 

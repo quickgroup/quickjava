@@ -13,13 +13,9 @@ import org.quickjava.orm.utils.SqlUtil;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public abstract class Where {
+public abstract class Where extends TableColumn {
 
     private int logic = 1;
-
-    private String table = null;
-
-    private String column = null;
 
     private Operator operator = null;
 
@@ -27,12 +23,9 @@ public abstract class Where {
 
     private List<Where> children = null;
 
-    private DriveConfigure driveConfigure = DefaultDrive.CONFIGURE;
-
     public Where(int logic, String table, String column, Operator operator, Object value, List<Where> children) {
+        super(table, column);
         this.logic = logic;
-        this.table = table;
-        this.column = column;
         this.operator = operator;
         this.value = value;
         this.children = children;
@@ -47,6 +40,7 @@ public abstract class Where {
     }
 
     public Where(int logic, List<Where> wheres) {
+        super(null);
         this.logic = logic;
         this.children = wheres;
     }
@@ -64,33 +58,6 @@ public abstract class Where {
             }
         }
         return logic == 1 ? LOGIC_AND : LOGIC_OR;
-    }
-
-    public String getTable() {
-        return table;
-    }
-
-    public void setTable(String table) {
-        this.table = table;
-    }
-
-    public String getColumn() {
-        return column;
-    }
-
-    public String getColumnSql() {
-        String fieldSql = column;
-        if (driveConfigure.columnLeft != null) {
-            fieldSql = driveConfigure.columnLeft + fieldSql;
-        }
-        if (driveConfigure.columnRight != null) {
-            fieldSql = fieldSql + driveConfigure.columnRight;
-        }
-        return table == null ? fieldSql : SqlUtil.tableColumn(table, fieldSql);
-    }
-
-    public void setColumn(String column) {
-        this.column = column;
     }
 
     public static final String LOGIC_OR = "OR";
