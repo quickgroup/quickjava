@@ -97,9 +97,9 @@ public abstract class Drive {
             if (isTrue(reservoir.distinct)) {
                 sqlList.add("DISTINCT");
             }
-            // field
-            checkEmpty(reservoir.fieldList, "Missing field");
-            sqlList.add(SqlUtil.collJoin(",", reservoir.fieldList));
+            // columns
+            checkEmpty(reservoir.columnList, "Missing column");
+            sqlList.add(SqlUtil.listJoin(reservoir.getColumnList(), ", ", e -> e.toSql(config)));
             sqlList.add("FROM");
         }
 
@@ -118,7 +118,7 @@ public abstract class Drive {
             checkEmpty(reservoir.dataList, "Missing insert data");
             checkEmpty(reservoir.dataList.get(0), "Missing update data");
             StringBuilder dataSql = new StringBuilder();
-            // field
+            // column
             SqlUtil.mapBracketsJoin(dataSql, reservoir.dataList.get(0));
             // values
             dataSql.append(" VALUES ");
@@ -152,19 +152,19 @@ public abstract class Drive {
         // GROUP BY
         if (action == Action.SELECT && reservoir.groupBy != null) {
             sqlList.add("GROUP BY");
-            sqlList.add(SqlUtil.listJoin(reservoir.getGroupBy(), ", ", entry -> entry.toSql(config)).toString());
+            sqlList.add(SqlUtil.listJoin(reservoir.getGroupBy(), ", ", e -> e.toSql(config)));
         }
 
         // HAVING
         if (action == Action.SELECT && reservoir.having != null) {
             sqlList.add("HAVING");
-            sqlList.add(SqlUtil.listJoin(reservoir.getHaving(), ", ", entry -> entry.toSql(config)).toString());
+            sqlList.add(SqlUtil.listJoin(reservoir.getHaving(), ", ", e -> e.toSql(config)));
         }
 
         // ORDER BY
         if (action == Action.SELECT && reservoir.orderByList != null) {
             sqlList.add("ORDER BY");
-            sqlList.add(SqlUtil.listJoin(reservoir.getOrderByList(), ", ", entry -> entry.toSql(config)).toString());
+            sqlList.add(SqlUtil.listJoin(reservoir.getOrderByList(), ", ", e -> e.toSql(config)));
         }
 
         // Limit
@@ -224,9 +224,9 @@ public abstract class Drive {
             }
             return (T) number;
 
-        } catch (SQLException sqlExc) {
-            sqlExc.printStackTrace();
-            throw new QueryException(sqlExc);
+        } catch (SQLException e) {
+            logger.error("executeSql error:{}", e.getMessage(), e);
+            throw new QueryException(e);
 
         } finally {
             long endTime = System.nanoTime();

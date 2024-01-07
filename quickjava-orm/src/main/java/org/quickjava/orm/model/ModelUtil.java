@@ -7,6 +7,7 @@ import org.quickjava.orm.model.contain.ModelMeta;
 import org.quickjava.orm.model.contain.Relation;
 import org.quickjava.orm.model.enums.ModelFieldFill;
 import org.quickjava.orm.model.enums.RelationType;
+import org.quickjava.orm.query.QuerySet;
 import org.quickjava.orm.query.build.Where;
 import org.quickjava.orm.query.callback.OrderByOptCallback;
 import org.quickjava.orm.query.callback.WhereOptCallback;
@@ -396,6 +397,19 @@ public class ModelUtil extends SqlUtil {
                         .collect(Collectors.toList());
                 ReflectUtil.setFieldValue(model, relationName, set);
             });
+        });
+    }
+
+    /**
+     * 加载模型的字段到查询器
+     */
+    public static void loadModelAccurateFields(QuerySet querySet, ModelMeta meta, String tableAlias) {
+        meta.getFieldList().forEach(i -> {
+            // 忽略：关联属性、不存在字段、模型字段
+            if (i.isRelation() || !i.isExist() || Model.class.isAssignableFrom(i.getClazz())) {
+                return;
+            }
+            querySet.field(SqlUtil.fieldAlias(tableAlias, i.name()));
         });
     }
 

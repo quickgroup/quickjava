@@ -23,7 +23,17 @@ public class TableColumn {
 
     protected String column;
 
+    protected String columnAlias;
+
+    protected String columnRaw;
+
     protected DriveConfigure driveConfigure;
+
+    public TableColumn(String table, String column, String columnAlias) {
+        this.table = table;
+        this.column = column;
+        this.columnAlias = columnAlias;
+    }
 
     public TableColumn(String table, String column) {
         this.table = table;
@@ -51,6 +61,9 @@ public class TableColumn {
     }
 
     public String getColumnSql() {
+        if (columnRaw != null) {
+            return getColumnRaw();
+        }
         String columnSql = column;
         if (driveConfigure.columnLeft != null) {
             columnSql = driveConfigure.columnLeft + columnSql;
@@ -58,7 +71,32 @@ public class TableColumn {
         if (driveConfigure.columnRight != null) {
             columnSql = columnSql + driveConfigure.columnRight;
         }
-        return table == null ? columnSql : SqlUtil.tableColumn(table, columnSql);
+        // 表名
+        if (table != null) {
+            columnSql = SqlUtil.tableColumn(table, columnSql);
+        }
+        // 别名
+        if (columnAlias != null) {
+            columnSql = columnSql + " AS " + columnAlias;
+        }
+        return columnSql;
+    }
+
+    public String getColumnAlias() {
+        return columnAlias;
+    }
+
+    public void setColumnAlias(String columnAlias) {
+        this.columnAlias = columnAlias;
+    }
+
+    public String getColumnRaw() {
+        return columnRaw;
+    }
+
+    public TableColumn setColumnRaw(String columnRaw) {
+        this.columnRaw = columnRaw;
+        return this;
     }
 
     public String toSql(DriveConfigure driveConfigure) {

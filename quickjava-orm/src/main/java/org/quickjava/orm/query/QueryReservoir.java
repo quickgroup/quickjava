@@ -47,7 +47,7 @@ public class QueryReservoir {
     public Action action;
 
     @JsonIgnore
-    public List<TableColumn> fieldList;
+    public List<TableColumn> columnList;
 
     @JsonIgnore
     public List<String[]> joinList;
@@ -128,13 +128,13 @@ public class QueryReservoir {
         this.action = action;
     }
 
-    public List<TableColumn> getFieldList() {
-        this.fieldList = QuerySetHelper.initList(this.fieldList);
-        return fieldList;
+    public List<TableColumn> getColumnList() {
+        this.columnList = QuerySetHelper.initList(this.columnList);
+        return columnList;
     }
 
-    public void setFieldList(List<TableColumn> fieldList) {
-        this.fieldList = fieldList;
+    public void setColumnList(List<TableColumn> columnList) {
+        this.columnList = columnList;
     }
 
     public List<String[]> getJoinList() {
@@ -311,10 +311,16 @@ public class QueryReservoir {
         if (joinList == null) {
             return;
         }
-        fillTable(whereList != null, getWhereList());
-        fillTable(groupBy != null, getGroupBy());
-        fillTable(having != null, getHaving());
-        fillTable(orderByList != null, getOrderByList());
+        if (columnList != null)
+            fillTable(true, getColumnList());
+        if (whereList != null)
+            fillTable(true, getWhereList());
+        if (groupBy != null)
+            fillTable(true, getGroupBy());
+        if (having != null)
+            fillTable(true, getHaving());
+        if (orderByList != null)
+            fillTable(true, getOrderByList());
     }
 
     @Override
@@ -322,7 +328,7 @@ public class QueryReservoir {
         return "QueryReservoir{" +
                 "table='" + table + '\'' +
                 ", action=" + action +
-                ", fieldList=" + fieldList +
+                ", columnList=" + columnList +
                 ", joinList=" + joinList +
                 ", unionList=" + unionList +
                 ", whereList=" + whereList +

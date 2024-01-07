@@ -62,6 +62,14 @@ public class QuerySet {
         return join(table, condition, "INNER");
     }
 
+    public QuerySet leftJoin(String table, String condition) {
+        return join(table, condition, "LEFT");
+    }
+
+    public QuerySet rightJoin(String table, String condition) {
+        return join(table, condition, "RIGHT");
+    }
+
     public QuerySet join(String table, String condition, String type)
     {
         reservoir.getJoinList().add(new String[]{table, condition, type});
@@ -82,7 +90,7 @@ public class QuerySet {
             if (column.contains(",")) {
                 Arrays.stream(column.split(",")).forEach(this::field);
             } else {
-                reservoir.getFieldList().add(parseColumn(column));
+                field(parseColumn(column));
             }
         }
         return this;
@@ -96,6 +104,12 @@ public class QuerySet {
     public QuerySet field(List<String> columns)
     {
         columns.forEach(this::field);
+        return this;
+    }
+
+    public QuerySet field(TableColumn column)
+    {
+        reservoir.getColumnList().add(column);
         return this;
     }
 
@@ -378,7 +392,7 @@ public class QuerySet {
     public List<Map<String, Object>> select()
     {
         // 默认查询全部字段
-        if (reservoir.getFieldList().size() == 0)
+        if (reservoir.getColumnList().size() == 0)
             field("*");
         List<Map<String, Object>> resultSet = executeSql();
         return SqlUtil.isEmpty(resultSet) ? new LinkedList<>() : resultSet;
@@ -471,7 +485,7 @@ public class QuerySet {
     public String buildSql()
     {
         reservoir.action = reservoir.action == null ? Action.SELECT : reservoir.action;
-        if (reservoir.getFieldList().size() == 0)
+        if (reservoir.getColumnList().size() == 0)
             field("*");
         return ORMContext.getDrive().pretreatment(this);
     }
@@ -515,15 +529,15 @@ public class QuerySet {
     // 分页查询
     public Pagination<Map<String, Object>> pagination()
     {
-        List<TableColumn> cacheFiledList = new LinkedList<>(reservoir.getFieldList());
+        List<TableColumn> cacheFiledList = new LinkedList<>(reservoir.getColumnList());
         // 分页器开启直接打印sql
         reservoir.printSql = true;
         // 获取总数
-        reservoir.getFieldList().clear();
+        reservoir.getColumnList().clear();
         Integer total = count();
         // 执行查询
-        reservoir.getFieldList().clear();
-        reservoir.getFieldList().addAll(cacheFiledList);
+        reservoir.getColumnList().clear();
+        reservoir.getColumnList().addAll(cacheFiledList);
         List<Map<String, Object>> rows = select();
         // 返回分页
         int page = reservoir.limitIndex / reservoir.limitSize + 1;
@@ -541,10 +555,14 @@ public class QuerySet {
 
     //TODO::--------------- 统计方法 ---------------
     public Integer count() {
-        return count("COUNT(*)");
+        return count(new TableColumn(null).setColumnRaw("COUNT(*)"));
     }
 
-    public Integer count(String field)
+    public Integer count(String field) {
+        return count(new TableColumn(null).setColumnRaw("COUNT("+field+")"));
+    }
+
+    public Integer count(TableColumn column)
     {
         QueryReservoir reservoirOld = this.reservoir;
         this.reservoir = new QueryReservoir();
@@ -558,7 +576,7 @@ public class QuerySet {
         this.reservoir.groupBy = reservoirOld.groupBy;
         this.reservoir.having = reservoirOld.having;
         this.reservoir.distinct = reservoirOld.distinct;
-        this.field(field);
+        this.field(column);
 
         List<Map<String, Object>> resultSet = executeSql();
         // 恢复
@@ -567,7 +585,7 @@ public class QuerySet {
         if (resultSet == null) {
             return 0;
         }
-        return Math.toIntExact((Long) resultSet.get(0).get(field));
+        return Math.toIntExact((Long) resultSet.get(0).get(column.getColumnRaw()));
     }
 
     //TODO::--------------- 事务操作方法 ---------------

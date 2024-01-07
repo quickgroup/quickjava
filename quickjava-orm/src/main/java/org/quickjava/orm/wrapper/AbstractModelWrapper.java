@@ -213,7 +213,6 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
 
     public Pagination<M> pagination(int page, int pageSize) {
         Pagination<Map<String, Object>> pagination = getQuerySet().pagination(page, pageSize);
-        System.out.println("pagination=" + pagination);
         if (joinMap == null || joinMap.isEmpty()) {
             return null;
         }
@@ -281,7 +280,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         QuerySet querySet = getQuerySet();
         QueryReservoir queryReservoir = (QueryReservoir) ReflectUtil.getFieldValue(querySet, "reservoir");
         // 主表字段
-        if (ObjectUtil.isEmpty(queryReservoir.fieldList)) {
+        if (ObjectUtil.isEmpty(queryReservoir.columnList)) {
             ModelMeta main = ModelUtil.getMeta(this.model.getClass());
             loadModelAccurateFields(querySet, main, main.table());
         }
@@ -347,26 +346,10 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     }
 
     private void loadModelAccurateFields(QuerySet querySet, ModelMeta meta, String table) {
-        meta.getFieldList().forEach(i -> {
-            // 忽略：关联属性、不存在字段、模型字段
-            if (i.isRelation() || !i.isExist() || Model.class.isAssignableFrom(i.getClazz())) {
-                return;
-            }
-            querySet.field(SqlUtil.fieldAlias(table, i.name()));
-        });
+        ModelUtil.loadModelAccurateFields(querySet, meta, table);
     }
 
     private Map<Class<?>, ModelFieldMeta> getModelClazzFieldMap(ModelMeta meta) {
         return WrapperUtil.getModelClazzFieldMap(meta);
-    }
-
-    private Map<String, ModelFieldMeta> getModelNameFieldMap(ModelMeta meta) {
-        Map<String, ModelFieldMeta> fieldMetaClazzMap = new LinkedHashMap<>();
-        for (Field field : meta.getClazz().getDeclaredFields()) {
-            if (!fieldMetaClazzMap.containsKey(field.getName())) {
-                fieldMetaClazzMap.put(field.getName(), new ModelFieldMeta(field));
-            }
-        }
-        return fieldMetaClazzMap;
     }
 }

@@ -3,6 +3,7 @@ package org.quickjava.orm.utils;
 import org.quickjava.common.utils.ComUtil;
 import org.quickjava.orm.model.ModelUtil;
 import org.quickjava.orm.model.contain.ModelFieldMeta;
+import org.quickjava.orm.query.build.TableColumn;
 import org.quickjava.orm.query.contain.TableColumnMeta;
 
 import java.util.LinkedHashMap;
@@ -119,14 +120,14 @@ public class SqlUtil extends ComUtil {
         mapJoin(str, ",", data, callback);
     }
 
-    public static <D> StringBuilder listJoin(List<D> items, String symbol, MapJoinDCallback<D> callback) {
+    public static <D> String listJoin(List<D> items, String symbol, MapJoinDCallback<D> callback) {
         StringBuilder str = new StringBuilder();
         for (int i = 0; i < items.size(); i++) {
             if (i > 0)
                 str.append(symbol);
             str.append(callback.call(items.get(i)));
         }
-        return str;
+        return str.toString();
     }
 
     public static MapJoinCallback mapJoinKeyCallback = Map.Entry::getKey;
@@ -138,7 +139,7 @@ public class SqlUtil extends ComUtil {
     }
 
     public interface MapJoinDCallback<D> {
-        Object call(D entry);
+        Object call(D e);
     }
 
     // 数据字段转驼峰
@@ -185,10 +186,10 @@ public class SqlUtil extends ComUtil {
     /**
      * 字段别名
      */
-    public static String fieldAlias(String table, String fieldName) {
+    public static TableColumn fieldAlias(String table, String fieldName) {
         String column = SqlUtil.toUnderlineCase(fieldName);
         String columnAlias = table + "__" + column;
-        return table + "." + column + " AS " + columnAlias;
+        return new TableColumn(table, column, columnAlias);
     }
 
 }

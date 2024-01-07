@@ -16,6 +16,7 @@ import org.quickjava.orm.model.annotation.OneToMany;
 import org.quickjava.orm.model.annotation.OneToOne;
 import org.quickjava.orm.query.QueryReservoir;
 import org.quickjava.orm.query.QuerySet;
+import org.quickjava.orm.query.build.TableColumn;
 import org.quickjava.orm.query.callback.OrderByOptCallback;
 import org.quickjava.orm.model.callback.WhereClosure;
 import org.quickjava.orm.query.callback.WhereOptCallback;
@@ -29,6 +30,7 @@ import org.quickjava.orm.model.contain.Relation;
 import org.quickjava.orm.model.out.ModelListSql;
 import org.quickjava.orm.model.out.ModelSql;
 import org.quickjava.orm.utils.*;
+import org.quickjava.orm.wrapper.enums.ConditionType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -635,30 +637,20 @@ public class Model implements IModel {
         // T1::字段声明
         List<String> fields = new LinkedList<>();
         // 本表字段声明
-         reservoir.meta.fieldMap().forEach((name, field) -> {
-            if (field.getRelationWay() != null || Model.class.isAssignableFrom(field.getClazz())) {
-                return;
-            }
-            name = toUnderlineCase(name);
-            fields.add(fieldAlias( reservoir.meta.table(), name));
-        });
+        ModelUtil.loadModelAccurateFields(query(), reservoir.meta, reservoir.meta.table());
 
         // 关联表
         relationMap.forEach((relationName, relation) -> {
             ModelMeta meta = ModelUtil.getMeta(relation.getClazz());
-            // 关联表字段声明
-            meta.fieldMap().forEach((name, field) -> {
-                if (field.getRelationWay() != null || Model.class.isAssignableFrom(field.getClazz())) {
-                    return;
-                }
-                name = toUnderlineCase(name);
-                fields.add(fieldAlias(relationName, name));
-            });
+            // 关联表字段
+            ModelUtil.loadModelAccurateFields(query(), meta, relationName);
             // 关联方式声明
-            query().join(meta.table() + " " + relationName, String.format("%s.%s = %s.%s",
-                            relationName, toUnderlineCase(relation.foreignKey()),
-                             reservoir.meta.table(), toUnderlineCase(relation.localKey())
-                    ), "LEFT");
+            String conditionSql = ModelUtil.joinConditionSql(
+                    relationName, relation.foreignKey(),
+                    ConditionType.EQ.name(),
+                    reservoir.meta.table(), relation.localKey()
+            );
+            query().join(meta.table() + " " + relationName, conditionSql, "LEFT");
         });
         // 装填字段
         query().field(fields);
@@ -1032,7 +1024,7 @@ public class Model implements IModel {
         return ModelUtil.getModelClass(clazz);
     }
 
-    private static String fieldAlias(String table, String field) {
+    private static TableColumn fieldAlias(String table, String field) {
         return ModelUtil.fieldAlias(table, field);
     }
 
