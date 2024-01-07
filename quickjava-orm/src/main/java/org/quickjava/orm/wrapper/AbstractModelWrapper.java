@@ -1,14 +1,13 @@
 package org.quickjava.orm.wrapper;
 
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
+import cn.hutool.core.util.StrUtil;
 import org.quickjava.orm.Model;
 import org.quickjava.orm.QueryReservoir;
 import org.quickjava.orm.QuerySet;
-import org.quickjava.orm.contain.DataMap;
-import org.quickjava.orm.contain.ModelFieldMeta;
-import org.quickjava.orm.contain.ModelMeta;
-import org.quickjava.orm.contain.Pagination;
+import org.quickjava.orm.contain.*;
 import org.quickjava.orm.utils.ModelUtil;
 import org.quickjava.orm.utils.ORMHelper;
 import org.quickjava.orm.utils.SqlUtil;
@@ -297,20 +296,31 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         joinMap.put(leftAlias, join);
 
         // 查询条件设置（支持多个
+        List<String> onConditions = new LinkedList<>();
         join.items.forEach(it -> {
             // 右条件是主表
             it.setRight(it.getRight() == null ? (Class<? extends Model>) mainMeta.getClazz() : it.getRight());
             // 模型元信息
             ModelMeta right = getModelMeta(it.getRight());
             String rightAlias = SqlUtil.isNotEmpty(it.getRightAlias()) ? it.getRightAlias() : right.table();
-            // 放到查询器
-            String conditionSql = ModelUtil.joinConditionSql(
-                    leftAlias, it.getLeftFun().getFieldName(),
-                    it.getType().name(),
-                    rightAlias, it.getRightFun().getFieldName()
-            );
-            querySet.join(left.tableAlias(leftAlias), conditionSql, type.name());
+            if (it.getRightValue() != null) {
+                // 一：值条件
+                onConditions.add(ModelUtil.joinConditionSql(
+                        leftAlias, it.getLeftFun().getFieldName(),
+                        it.getType().name(),
+                        String.valueOf(it.getRightValue())   // 后面下放到驱动进行转换
+                ));
+            } else {
+                // 一：方法引用
+                onConditions.add(ModelUtil.joinConditionSql(
+                        leftAlias, it.getLeftFun().getFieldName(),
+                        it.getType().name(),
+                        rightAlias, it.getRightFun().getFieldName()
+                ));
+            }
         });
+        querySet.join(left.tableAlias(leftAlias), StrUtil.join(" AND ", onConditions), type.name());
+
         return chain();
     }
 

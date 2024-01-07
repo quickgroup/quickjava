@@ -55,12 +55,21 @@ public class JoinWhereBase<Children extends JoinWhereBase<Children, Left>, Left 
         return add(ConditionType.EQ, lf, right, rf);
     }
 
+    protected Children eq(MFunction<Left, ?> lf, Object val) {
+        return add(ConditionType.EQ, lf, val);
+    }
+
     protected <Right extends Model> Children neq(MFunction<Left, ?> lf, Class<Right> right, MFunction<Right, ?> rf) {
         return add(ConditionType.NEQ, lf, right, rf);
     }
 
     protected <Right extends Model> Children add(ConditionType type, MFunction<Left, ?> lf, MFunction<Right, ?> rf) {
         items.add(new Item<>(type, lf, rf));
+        return chain();
+    }
+
+    protected Children add(ConditionType type, MFunction<Left, ?> lf, Object value) {
+        items.add(new Item<>(type, lf, value));
         return chain();
     }
 
@@ -89,10 +98,9 @@ public class JoinWhereBase<Children extends JoinWhereBase<Children, Left>, Left 
             this.rightFun = rightFun;
         }
 
-        public Item(ConditionType type, MFunction<L, ?> leftFun, Class<? extends Model> right, Object rightValue) {
+        public Item(ConditionType type, MFunction<L, ?> leftFun, Object rightValue) {
             this.type = type;
             this.leftFun = leftFun;
-            this.right = right;
             this.rightValue = rightValue;
         }
 

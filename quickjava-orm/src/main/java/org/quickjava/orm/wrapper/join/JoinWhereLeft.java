@@ -16,6 +16,10 @@ public class JoinWhereLeft<Left extends Model> extends JoinWhereBase<JoinWhereLe
         return super.eq(lf, right, rf);
     }
 
+    public JoinWhereLeft<Left> eq(MFunction<Left, ?> lf, Object val) {
+        return super.eq(lf, val);
+    }
+
     public <Right extends Model> JoinWhereLeft<Left> neq(MFunction<Left, ?> lf, Class<Right> right, MFunction<Right, ?> rf) {
         return super.neq(lf, right, rf);
     }
