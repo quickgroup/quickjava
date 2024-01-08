@@ -17,6 +17,8 @@ import org.quickjava.spring.entity.SsoAppFavoriteModel;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.List;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class TestModelJoin {
@@ -74,19 +76,11 @@ public class TestModelJoin {
     public void test2()
     {
         Long startTime = TimeUtils.getNanoTime();
-        Pagination<SsoAppFavoriteModel> pagination = new ModelWrapper<>(SsoAppFavoriteModel.class)
-                // 与主表一对一关联join
+        List<SsoAppFavoriteModel> favorites = new ModelWrapper<>(SsoAppFavoriteModel.class)
+                // 一对一关联
                 .leftJoin(SsoApp.class, SsoApp::getAppId, SsoAppFavoriteModel::getAppId, SsoAppFavoriteModel::getApp)
-                // 与主表一对一关联join，复合条件查询
-                .leftJoin(SsoApp.class, whereLeft -> whereLeft
-                        .eq(SsoApp::getAppId, SsoAppFavoriteModel.class, SsoAppFavoriteModel::getAppId)
-                        .eq(SsoApp::getOpen, 1))
-                // 与主表一对一关联join，指定数据加载到主实体指定属性
-                .leftJoin(SsoApp.class, SsoApp::getAppId, SsoAppFavoriteModel::getAppId, SsoAppFavoriteModel::getApp2)
-                // 关联其他表
-                .leftJoin(SsoAppLatest.class, SsoAppLatest::getAppId, SsoAppFavoriteModel::getAppId)
-                .pagination();
-        System.out.println("leftJoin return=" + pagination);
+                .select();
+        System.out.println("leftJoin return=" + favorites);
         System.out.println("耗时=" + TimeUtils.endNanoTime(startTime) + "ms");
     }
 
