@@ -57,7 +57,7 @@ import java.util.*;
 /**
  * 模型
  * */
-@JsonIgnoreProperties(value = {"*"}, ignoreUnknown = true)
+@JsonIgnoreProperties(value = {"reservoir"}, ignoreUnknown = true)
 public class Model implements IModel {
 
     @JsonIgnore
@@ -67,10 +67,6 @@ public class Model implements IModel {
     @JsonIgnore
     @TableField(exist = false)
     private final ModelReservoir reservoir = new ModelReservoir(this);
-
-    public ModelReservoir getReservoir() {
-        return reservoir;
-    }
 
     public Model() {
         initModel(this, getClass());
