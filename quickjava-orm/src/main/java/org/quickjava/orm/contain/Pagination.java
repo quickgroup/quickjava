@@ -19,7 +19,7 @@ import java.util.List;
  * License: Apache Licence 2.0
  * +-------------------------------------------------------------------
  */
-public class Pagination<T> {
+public class Pagination<T> implements IPagination<T> {
 
     public long page;
 
@@ -36,19 +36,19 @@ public class Pagination<T> {
 
     public List<T> rows;
 
-    public Pagination(Pagination<?> pagination) {
-        this.page = pagination.page;
-        this.pageSize = pagination.pageSize;
-        this.pages = pagination.pages;
-        this.total = pagination.total;
-        this.rows = new LinkedList<>();
+    public Pagination(IPagination<T> pagination) {
+        this.page = pagination.getPage();
+        this.pageSize = pagination.getPageSize();
+        this.pages = pagination.getPages();
+        this.total = pagination.getTotal();
+        this.rows = pagination.getRows();
     }
 
-    public Pagination(Pagination<?> pagination, List<T> rows) {
-        this.page = pagination.page;
-        this.pageSize = pagination.pageSize;
-        this.pages = pagination.pages;
-        this.total = pagination.total;
+    public Pagination(IPagination<?> pagination, List<T> rows) {
+        this.page = pagination.getPage();
+        this.pageSize = pagination.getPageSize();
+        this.pages = pagination.getPages();
+        this.total = pagination.getTotal();
         this.rows = rows;
     }
 

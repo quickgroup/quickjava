@@ -190,6 +190,7 @@ public class ModelFieldMeta {
 
     /**
      * 是关联属性
+     * @return 是关联属性
      */
     public boolean isRelation() {
         return getRelationWay() != null;
@@ -197,6 +198,7 @@ public class ModelFieldMeta {
 
     /**
      * 是否是数据库表字段
+     * @return 属性是否在表中存在
      */
     public boolean isExist() {
         if (modelField != null) {

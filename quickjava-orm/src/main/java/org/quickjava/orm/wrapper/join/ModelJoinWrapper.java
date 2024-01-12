@@ -104,6 +104,7 @@ public interface ModelJoinWrapper<
 
     /**
      * 对应sql的join默认行为为INNER JOIN
+     * @param  condition 关联条件
      * @return Children
      */
     default Children join(JoinSpecifyBase<?, ?> condition) {

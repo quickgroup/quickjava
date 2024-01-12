@@ -233,7 +233,7 @@ public abstract class Drive {
                 printSql = sql.length() < 2560 ? sql: sql.substring(0, 2560);
             }
             String msg = "SQL Execution " + ((double) (endTime - startTime)) / 1000000 + "ms: " + printSql;
-            System.out.println(msg);
+            logger.debug(msg);
 
             // 主动关闭连接
             if (quickConnection.autoCommit) {

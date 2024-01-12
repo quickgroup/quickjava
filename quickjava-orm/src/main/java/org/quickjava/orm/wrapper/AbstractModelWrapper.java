@@ -3,19 +3,23 @@ package org.quickjava.orm.wrapper;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
+import org.quickjava.orm.contain.DataMap;
+import org.quickjava.orm.contain.IPagination;
+import org.quickjava.orm.contain.Pagination;
+import org.quickjava.orm.enums.JoinType;
 import org.quickjava.orm.model.Model;
-import org.quickjava.orm.query.QueryReservoir;
-import org.quickjava.orm.query.QuerySet;
-import org.quickjava.orm.contain.*;
-import org.quickjava.orm.query.enums.Operator;
+import org.quickjava.orm.model.ModelUtil;
 import org.quickjava.orm.model.contain.ModelFieldMeta;
 import org.quickjava.orm.model.contain.ModelMeta;
-import org.quickjava.orm.model.ModelUtil;
+import org.quickjava.orm.query.QueryReservoir;
+import org.quickjava.orm.query.QuerySet;
+import org.quickjava.orm.query.enums.Operator;
 import org.quickjava.orm.query.enums.OrderByType;
 import org.quickjava.orm.utils.SqlUtil;
 import org.quickjava.orm.wrapper.join.JoinSpecifyBase;
-import org.quickjava.orm.enums.JoinType;
 import org.quickjava.orm.wrapper.join.ModelJoinWrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.LinkedHashMap;
@@ -25,6 +29,8 @@ import java.util.Map;
 
 public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper<Children, M, R>, M extends Model, R extends MFunction<M, ?>>
         implements Wrapper<Children>, ModelJoinWrapper<Children, M, R>, Serializable {
+
+    protected static final Logger logger = LoggerFactory.getLogger(AbstractModelWrapper.class);
 
     protected M model;
 
@@ -216,52 +222,64 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     }
 
     public M find() {
-        return model().find();
+        Map<String, Object> row = getQuerySet().find();
+        return loadDataItem(row, getModelMeta(this.model.getClass()));
     }
 
     public List<M> select() {
-        return model().select();
+        List<Map<String, Object>> rows = getQuerySet().select();
+        // 封装数据
+        List<M> models = queryAfter(rows, getModelMeta(this.model.getClass()));
+        logger.debug("Count:" + models.size());
+        return models;
     }
 
-    public Pagination<M> pagination(Long page, Long pageSize) {
-        Pagination<Map<String, Object>> pagination = getQuerySet().pagination(page, pageSize);
-        if (joinMap == null || joinMap.isEmpty()) {
-            return null;
-        }
-        ModelMeta mainMeta = getModelMeta(this.model.getClass());
-
-        // 装载主表和一对一关联表数据（暂只支持两层即主模型.子模型，后续在关系上支持多层级，在关系上指定父模型的属性名
+    private List<M> queryAfter(List<Map<String, Object>> rows, ModelMeta mainMeta) {
         List<M> models = new LinkedList<>();
-        pagination.rows.forEach(data -> {
-            // 主表
-            M main = Model.newModel(mainMeta.getClazz());
-            ModelUtil.resultTranshipmentWith(main, data, mainMeta.table());
-            // 一对一的数据加载
-            joinMap.forEach((alias, join) -> {
-                // 未加载数据 || 未设置加载对应属性名 || 在父实体不存在
-                if (!join.isLoadLeftData() || ModelUtil.isEmpty(join.getLeftAlias()) || !ReflectUtil.hasField(mainMeta.getClazz(), join.getLeftAlias())) {
-                    return;
-                }
-                // 关联模型元数据
-                ModelMeta leftMeta = getModelMeta(join.getLeft());
-                // 是和主模型关联的条件
-                JoinSpecifyBase.Item<?, ?> it = join.onList.get(0);
-                if (!it.getRight().equals(mainMeta.getClazz())) {
-                    return;
-                }
-                // 数据装载
-                Model left = Model.newModel(leftMeta.getClazz(), null, main);
-                ModelUtil.resultTranshipmentWith(left, data, alias);
-                ReflectUtil.setFieldValue(main, join.getLeftAlias(), left);
-            });
-            //
-            models.add(main);
-        });
+        // 主表和一对一数据
+        rows.forEach(data -> models.add(loadDataItem(data, mainMeta)));
         // 一对多
+        return models;
+    }
+
+    private M loadDataItem(Map<String, Object> data, ModelMeta mainMeta) {
+        // 主表
+        M main = Model.newModel(mainMeta.getClazz());
+        if (joinMap == null || joinMap.isEmpty()) {
+            ModelUtil.resultTranshipmentWithOne(main, data, null);
+            return main;
+        }
+        // 多表关联下加载
+        ModelUtil.resultTranshipmentWith(main, data, mainMeta.table());
+        // 一对一的数据加载
+        joinMap.forEach((alias, join) -> {
+            // 未加载数据 || 未设置加载对应属性名 || 在父实体不存在
+            if (!join.isLoadLeftData() || ModelUtil.isEmpty(join.getLeftAlias()) || !ReflectUtil.hasField(mainMeta.getClazz(), join.getLeftAlias())) {
+                return;
+            }
+            // 关联模型元数据
+            ModelMeta leftMeta = getModelMeta(join.getLeft());
+            // 是和主模型关联的条件
+            JoinSpecifyBase.Item<?, ?> it = join.onList.get(0);
+            if (!it.getRight().equals(mainMeta.getClazz())) {
+                return;
+            }
+            // 数据装载
+            Model left = Model.newModel(leftMeta.getClazz(), null, main);
+            ModelUtil.resultTranshipmentWith(left, data, alias);
+            ReflectUtil.setFieldValue(main, join.getLeftAlias(), left);
+        });
+        return main;
+    }
+
+    public IPagination<M> pagination(Long page, Long pageSize) {
+        Pagination<Map<String, Object>> pagination = getQuerySet().pagination(page, pageSize);
+        // 装载数据
+        List<M> models = queryAfter(pagination.rows, getModelMeta(this.model.getClass()));
         return new Pagination<>(pagination, models);
     }
 
-    public Pagination<M> pagination() {
+    public IPagination<M> pagination() {
         return pagination(1L, 20L);
     }
 

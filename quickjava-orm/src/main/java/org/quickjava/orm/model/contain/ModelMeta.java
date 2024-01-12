@@ -61,6 +61,7 @@ public class ModelMeta {
 
     /**
      * 表别名
+     * @param 表别名
      * @return 表名加别名的声明sql
      */
     public String tableAlias(String alias) {

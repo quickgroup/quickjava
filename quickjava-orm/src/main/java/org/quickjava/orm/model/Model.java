@@ -57,17 +57,20 @@ import java.util.*;
 /**
  * 模型
  * */
-@JsonIgnoreType
-@JsonIgnoreProperties(value = {"reservoir", "logger"}, ignoreUnknown = true)
+@JsonIgnoreProperties(value = {"*"}, ignoreUnknown = true)
 public class Model implements IModel {
+
+    @JsonIgnore
+    @TableField(exist = false)
+    private static final Logger logger = LoggerFactory.getLogger(Model.class);
 
     @JsonIgnore
     @TableField(exist = false)
     private final ModelReservoir reservoir = new ModelReservoir(this);
 
-    @JsonIgnore
-    @TableField(exist = false)
-    private static final Logger logger = LoggerFactory.getLogger(Model.class);
+    public ModelReservoir getReservoir() {
+        return reservoir;
+    }
 
     public Model() {
         initModel(this, getClass());
@@ -375,7 +378,7 @@ public class Model implements IModel {
         // 执行查询
         Pagination<Map<String, Object>> pagination = query().pagination(page, pageSize);
         // 数据组装
-        Pagination<IModel> pagination1 = new Pagination<>(pagination);
+        Pagination<IModel> pagination1 = new Pagination<>(pagination, new LinkedList<>());
         pagination1.rows = ModelUtil.resultTranshipment(this, getMClass(), pagination.rows);
         return toD(pagination1);
     }

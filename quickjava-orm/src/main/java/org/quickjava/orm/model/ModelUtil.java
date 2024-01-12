@@ -335,12 +335,21 @@ public class ModelUtil extends SqlUtil {
     public static void resultTranshipmentWith(IModel iModel, Map<String, Object> data, String alias) {
         Model model = ((Model) iModel);
         ModelReservoir reservoir = ReflectUtil.getFieldValue(model, "reservoir");
+        String tableName = alias == null ? reservoir.meta.table() : alias;
+        resultTranshipmentWithOne(iModel, data, tableName + "__");
+    }
+
+    /**
+     * 将data数据通过alias找到并装载到模型上
+     */
+    public static void resultTranshipmentWithOne(IModel iModel, Map<String, Object> data, String columnPrefix) {
+        Model model = ((Model) iModel);
+        ModelReservoir reservoir = ReflectUtil.getFieldValue(model, "reservoir");
         reservoir.meta.fieldMap().forEach((name, field) -> {
             if (field.isRelation() || Model.class.isAssignableFrom(field.getClazz())) {
                 return;
             }
-            String tableName = alias == null ? reservoir.meta.table() : alias;
-            String fieldName = tableName + "__" + toUnderlineCase(name);
+            String fieldName = columnPrefix == null || columnPrefix.isEmpty() ? toUnderlineCase(name) : columnPrefix + toUnderlineCase(name);
             model.data(name, data.get(fieldName));
         });
     }
