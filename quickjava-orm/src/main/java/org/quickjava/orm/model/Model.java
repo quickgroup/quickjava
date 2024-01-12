@@ -322,7 +322,7 @@ public class Model implements IModel {
         // 查询前：预载入字段准备
         queryBefore();
         // 执行查询
-        List<Map<String, Object>> dataList = query().limit(0, 1).select();
+        List<Map<String, Object>> dataList = query().limit(0L, 1L).select();
         // 编译sql
         if (querySetReservoir().fetchSql) {
             return toD(new ModelSql(query().buildSql()));
@@ -369,7 +369,7 @@ public class Model implements IModel {
     }
 
     //TODO::---------- 分页方法 ----------
-    public <D> Pagination<D> pagination(Integer page, Integer pageSize) {
+    public <D> Pagination<D> pagination(Long page, Long pageSize) {
         // 查询前处理：预载入
         queryBefore();
         // 执行查询
@@ -381,7 +381,7 @@ public class Model implements IModel {
     }
 
     public <D> Pagination<D> pagination() {
-        return pagination(1, 20);
+        return pagination(1L, 20L);
     }
 
     //TODO::---------- 操作方法：排序、聚合等 START ----------
@@ -419,13 +419,13 @@ public class Model implements IModel {
         return this;
     }
 
-    public Model limit(Integer index, Integer count) {
+    public Model limit(Long index, Long count) {
         query().limit(index, count);
         return this;
     }
 
-    public Model limit(Integer count) {
-        return limit(0, count);
+    public Model limit(Long count) {
+        return limit(0L, count);
     }
 
     /**
@@ -433,7 +433,7 @@ public class Model implements IModel {
      * @param page 页数
      * @return 模型对象
      */
-    public Model page(Integer page) {
+    public Model page(Long page) {
         query().page(page);
         return this;
     }
@@ -444,7 +444,7 @@ public class Model implements IModel {
      * @param size 页大小
      * @return 模型对象
      */
-    public Model page(Integer page, Integer size) {
+    public Model page(Long page, Long size) {
         query().page(page, size);
         return this;
     }

@@ -71,10 +71,10 @@ public class QueryReservoir {
     public List<TableColumn> having;
 
     @JsonIgnore
-    public Integer limitIndex;
+    public Long limitIndex;
 
     @JsonIgnore
-    public Integer limitSize;
+    public Long limitSize;
 
     @JsonIgnore
     public boolean distinct = false;
@@ -217,19 +217,19 @@ public class QueryReservoir {
         this.having = having;
     }
 
-    public Integer getLimitIndex() {
+    public Long getLimitIndex() {
         return limitIndex;
     }
 
-    public void setLimitIndex(Integer limitIndex) {
+    public void setLimitIndex(Long limitIndex) {
         this.limitIndex = limitIndex;
     }
 
-    public Integer getLimitSize() {
+    public Long getLimitSize() {
         return limitSize;
     }
 
-    public void setLimitSize(Integer limitSize) {
+    public void setLimitSize(Long limitSize) {
         this.limitSize = limitSize;
     }
 

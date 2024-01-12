@@ -365,18 +365,18 @@ public class QuerySet {
     }
 
     //TODO::-------------------- 数量限制 --------------------
-    public QuerySet limit(Integer index, Integer count)
+    public QuerySet limit(Long index, Long count)
     {
         reservoir.limitIndex = index;
         reservoir.limitSize = count;
         return this;
     }
 
-    public QuerySet page(Integer page) {
+    public QuerySet page(Long page) {
         return page(page, reservoir.limitSize);
     }
 
-    public QuerySet page(Integer page, Integer size) {
+    public QuerySet page(Long page, Long size) {
         return limit((page - 1) * size, size);
     }
 
@@ -410,7 +410,7 @@ public class QuerySet {
 
     public Map<String, Object> find()
     {
-        limit(0, 1);
+        limit(0L, 1L);
         List<Map<String, Object>> resultSet = select();
         return SqlUtil.isEmpty(resultSet) ? null : resultSet.get(0);
     }
@@ -550,17 +550,17 @@ public class QuerySet {
         reservoir.getColumnList().addAll(cacheFiledList);
         List<Map<String, Object>> rows = select();
         // 返回分页
-        int page = reservoir.limitIndex / reservoir.limitSize + 1;
+        Long page = reservoir.limitIndex / reservoir.limitSize + 1;
         return new Pagination<>(page, reservoir.limitSize, total, rows);
     }
 
-    public Pagination<Map<String, Object>> pagination(Integer page, Integer pageSize) {
+    public Pagination<Map<String, Object>> pagination(Long page, Long pageSize) {
         this.page(page, pageSize);
         return pagination();
     }
 
-    public Pagination<Map<String, Object>> pagination(Integer page) {
-        return this.pagination(page, 20);
+    public Pagination<Map<String, Object>> pagination(Long page) {
+        return this.pagination(page, 20L);
     }
 
     //TODO::--------------- 统计方法 ---------------

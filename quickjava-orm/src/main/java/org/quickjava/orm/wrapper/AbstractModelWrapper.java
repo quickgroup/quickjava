@@ -171,22 +171,22 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         return chain();
     }
 
-    public Children limit(int index, int count) {
+    public Children limit(Long index, Long count) {
         model().limit(index, count);
         return chain();
     }
 
-    public Children limit(int count) {
+    public Children limit(Long count) {
         model().limit(count);
         return chain();
     }
 
-    public Children page(int page) {
+    public Children page(Long page) {
         model().page(page);
         return chain();
     }
 
-    public Children page(int page, int pageSize) {
+    public Children page(Long page, Long pageSize) {
         model().page(page, pageSize);
         return chain();
     }
@@ -223,7 +223,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         return model().select();
     }
 
-    public Pagination<M> pagination(int page, int pageSize) {
+    public Pagination<M> pagination(Long page, Long pageSize) {
         Pagination<Map<String, Object>> pagination = getQuerySet().pagination(page, pageSize);
         if (joinMap == null || joinMap.isEmpty()) {
             return null;
@@ -262,7 +262,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     }
 
     public Pagination<M> pagination() {
-        return pagination(1, 20);
+        return pagination(1L, 20L);
     }
 
     @Override
