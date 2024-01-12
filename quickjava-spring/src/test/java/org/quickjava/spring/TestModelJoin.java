@@ -53,7 +53,7 @@ public class TestModelJoin {
                 //      1. 自动识别表名
                 .eq(SsoApp.class, SsoApp::getAppId, 1)
                 //      2. 指定父属性名为表名
-                .eq(SsoAppFavoriteModel::getApp, SsoApp.class, SsoApp::getAppId, 1)
+                .eq(SsoAppFavoriteModel::getApp, SsoApp::getAppId, 1)
                 .eq(SsoAppFavoriteModel::getTestAppInfo, SsoApp.class, SsoApp::getAppId, 1)
                 //      3. 字符串表名
                 .eq("aliasApp01", SsoApp::getAppId, 1)
