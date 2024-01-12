@@ -20,6 +20,7 @@ public interface ModelJoinWrapper<
     /**
      * 与主表一个条件关联
      * 默认根据类进行自动加载
+     * @return Children
      */
     default <Relation extends Model> Children leftJoin(Class<Relation> left, MFunction<Relation, ?> lf, MF rf) {
         return join(JoinType.LEFT, new JoinSpecify<Relation, M>(left, null).eq(lf, rf));
@@ -28,6 +29,7 @@ public interface ModelJoinWrapper<
     /**
      * 与主表一个条件关联[指定属性]
      * @param alias 数据加载到的主模型属性，就是关联数据在模型撒谎功能的那个属性
+     * @return Children
      */
     default <Relation extends Model> Children leftJoin(Class<Relation> left, MFunction<Relation, ?> lf, MF rf, MF alias) {
         return join(JoinType.LEFT, new JoinSpecify<Relation, M>(left, alias, null).eq(lf, rf));
@@ -36,6 +38,7 @@ public interface ModelJoinWrapper<
     /**
      * 与主表一个条件关联[指定属性]
      * @param alias 数据加载到的主模型属性，就是关联数据在模型撒谎功能的那个属性
+     * @return Children
      */
     default <Relation extends Model> Children leftJoin(Class<Relation> left, MFunction<Relation, ?> lf, MF rf, String alias) {
         return join(JoinType.LEFT, new JoinSpecify<Relation, M>(left, alias, null).eq(lf, rf));
@@ -43,6 +46,7 @@ public interface ModelJoinWrapper<
 
     /**
      * 两张子表一个条件关联
+     * @return Children
      */
     default <Left extends Model, Right extends Model> Children leftJoin(Class<Left> left, MFunction<Left, ?> lf,
                                                                         Class<Right> right, MFunction<Right, ?> rf) {
@@ -51,6 +55,7 @@ public interface ModelJoinWrapper<
 
     /**
      * 两张子表一个条件关联
+     * @return Children
      */
     default <Left extends Model, Right extends Model> Children leftJoin(Class<Left> left, MFunction<Left, ?> lf,
                                                                         Class<Right> right, MFunction<Right, ?> rf, MF fieldFun) {
@@ -59,6 +64,7 @@ public interface ModelJoinWrapper<
 
     /**
      * 两张子表多个条件关联
+     * @return Children
      */
     default <Left extends Model, Right extends Model> Children leftJoin(Class<Left> left, Class<Right> right, JoinSpecifyClosure<Left, Right> closure) {
         JoinSpecify<Left, Right> condition = new JoinSpecify<>(left, right);
@@ -68,6 +74,7 @@ public interface ModelJoinWrapper<
 
     /**
      * 两张子表多个条件关联
+     * @return Children
      */
     default <Left extends Model, Right extends Model> Children leftJoin(Class<Left> left, Class<Right> right, JoinSpecifyClosure<Left, Right> closure, MF alias) {
         JoinSpecify<Left, Right> condition = new JoinSpecify<>(left, right);
@@ -78,6 +85,7 @@ public interface ModelJoinWrapper<
 
     /**
      * 左表关联右多个表多个条件
+     * @return Children
      */
     default <Left extends Model> Children leftJoin(Class<Left> left, JoinSpecifyLeftClosure<Left> closure) {
         return leftJoin(left, null, closure);
@@ -85,6 +93,7 @@ public interface ModelJoinWrapper<
 
     /**
      * 左表关联右多个表多个条件
+     * @return Children
      */
     default <Left extends Model> Children leftJoin(Class<Left> left, String alias, JoinSpecifyLeftClosure<Left> closure) {
         JoinSpecifyLeft<Left> condition = new JoinSpecifyLeft<>(left);
@@ -95,6 +104,7 @@ public interface ModelJoinWrapper<
 
     /**
      * 对应sql的join默认行为为INNER JOIN
+     * @return Children
      */
     default Children join(JoinSpecifyBase<?, ?> condition) {
         return join(JoinType.INNER, condition);
@@ -128,6 +138,15 @@ public interface ModelJoinWrapper<
     }
 
     Children where(boolean condition, String table, String column, Operator operator, Object val);
+
+    default <Left> Children field(Class<Left> left, MFunction<Left, ?> ... lfs) {
+        for (MFunction<Left, ?> lf : lfs) {
+            field(left.getName(), lf.getName());
+        }
+        return chain();
+    }
+
+    Children field(String table, String column);
 
     //TODO::-------------------- 查询条件 END  --------------------
 

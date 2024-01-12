@@ -100,6 +100,12 @@ public class QuerySet {
         return this;
     }
 
+    public QuerySet field(String table, String column)
+    {
+        field(new TableColumn(table, column));
+        return this;
+    }
+
     /**
      * 限定查询返回的数据字段
      * @param columns 字段

@@ -74,6 +74,7 @@ public @interface ModelField {
     /**
      * 数据写入格式
      * - Date时生效
+     * @return 写入格式
      */
     String format() default "";
 

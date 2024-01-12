@@ -39,14 +39,6 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         return chain();
     }
 
-    @Override
-    public Children where(boolean condition, String table, String column, Operator operator, Object val) {
-        if (condition) {
-            getQuerySet().where(table, column, operator, val);
-        }
-        return chain();
-    }
-
     public Children neq(R function, Object val) {
         model().neq(findFieldName(function), val);
         return chain();
@@ -97,6 +89,27 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         return chain();
     }
 
+    @Override
+    public Children where(boolean condition, String table, String column, Operator operator, Object val) {
+        if (condition) {
+            getQuerySet().where(table, column, operator, val);
+        }
+        return chain();
+    }
+
+    public Children field(R ... fields) {
+        for (R field : fields) {
+            getQuerySet().field(field.getName());
+        }
+        return chain();
+    }
+
+    @Override
+    public Children field(String table, String column) {
+        getQuerySet().field(table, column);
+        return chain();
+    }
+
     //TODO::--------------- 特性 ---------------
     public Children group(R ... fields) {
         for (R field : fields) {
@@ -132,7 +145,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         return chain();
     }
 
-    //TODO::--------------- 排序 ---------------
+    //TODO::--------------- 排序和数量限制 ---------------
     public Children order(R function, boolean desc) {
         model().order(findFieldName(function), desc);
         return chain();
