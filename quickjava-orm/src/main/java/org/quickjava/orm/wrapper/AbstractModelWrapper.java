@@ -13,6 +13,7 @@ import org.quickjava.orm.model.contain.ModelFieldMeta;
 import org.quickjava.orm.model.contain.ModelMeta;
 import org.quickjava.orm.query.QueryReservoir;
 import org.quickjava.orm.query.QuerySet;
+import org.quickjava.orm.query.build.JoinCondition;
 import org.quickjava.orm.query.enums.Operator;
 import org.quickjava.orm.query.enums.OrderByType;
 import org.quickjava.orm.utils.SqlUtil;
@@ -272,14 +273,14 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         return main;
     }
 
-    public IPagination<M> pagination(Long page, Long pageSize) {
+    public Pagination<M> pagination(Long page, Long pageSize) {
         Pagination<Map<String, Object>> pagination = getQuerySet().pagination(page, pageSize);
         // 装载数据
         List<M> models = queryAfter(pagination.rows, getModelMeta(this.model.getClass()));
         return new Pagination<>(pagination, models);
     }
 
-    public IPagination<M> pagination() {
+    public Pagination<M> pagination() {
         return pagination(1L, 20L);
     }
 
@@ -343,30 +344,24 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         join.setLeftAlias(leftAlias);
 
         // 查询条件设置（支持多个
-        List<String> onConditions = new LinkedList<>();
+        List<JoinCondition> conditions = new LinkedList<>();
         join.onList.forEach(it -> {
             // 右条件是主表
             it.setRight(it.getRight() == null ? (Class<? extends Model>) mainMeta.getClazz() : it.getRight());
             // 模型元信息
             ModelMeta right = getModelMeta(it.getRight());
             String rightAlias = SqlUtil.isNotEmpty(it.getRightAlias()) ? it.getRightAlias() : right.table();
-            if (it.getRightValue() != null) {
-                // 一：值条件
-                onConditions.add(ModelUtil.joinConditionSql(
-                        join.getLeftAlias(), it.getLeftFun().getName(),
-                        it.getType(),
-                        String.valueOf(it.getRightValue())   // 后面下放到驱动进行转换
-                ));
-            } else {
-                // 一：方法引用
-                onConditions.add(ModelUtil.joinConditionSql(
-                        join.getLeftAlias(), it.getLeftFun().getName(),
-                        it.getType(),
-                        rightAlias, it.getRightFun().getName()
-                ));
-            }
+            // 一：方法引用
+            JoinCondition joinCondition = new JoinCondition(
+                    join.getLeftAlias(), it.getLeftFun().getName(),
+                    1, it.getType(),
+                    rightAlias, null
+            );
+            joinCondition.setRightColumn(it.getRightFun() == null ? null : it.getRightFun().getName());
+            joinCondition.setRightValue(it.getRightValue());
+            conditions.add(joinCondition);
         });
-        querySet.join(leftMeta.tableAlias(leftAlias), StrUtil.join(" AND ", onConditions), type);
+        querySet.join(leftMeta.tableAlias(leftAlias), conditions, type);
 
         return chain();
     }

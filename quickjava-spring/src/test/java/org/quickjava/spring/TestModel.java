@@ -105,11 +105,11 @@ public class TestModel {
         ret = new Model().find();
         ret = new Model().find(1);
         ret = new Model().select();
-        ret = new Model().limit(1, 20).select();
-        ret = new Model().limit(1).select();
-        ret = new Model().page(1, 20).select();
-        ret = new Model().page(1).select();
-        ret = new Model().pagination(1, 20);
+        ret = new Model().limit(1L, 20L).select();
+        ret = new Model().limit(1L).select();
+        ret = new Model().page(1L, 20L).select();
+        ret = new Model().page(1L).select();
+        ret = new Model().pagination(1L, 20L);
         ret = new Model().pagination();
         ret = new Model().order("1").find();
         ret = new Model().order("1", OrderByType.DESC).find();

@@ -11,6 +11,11 @@ spring:
     username: testdb
     password: AFZj3e4i7edxsmYy
 
+# 日志
+logging:
+  level:
+    org.quickjava.orm: DEBUG
+
 # 统一门户配置
 smsso:
   # 应用 id

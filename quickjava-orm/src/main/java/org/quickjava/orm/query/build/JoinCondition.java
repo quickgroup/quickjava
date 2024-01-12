@@ -37,14 +37,36 @@ public class JoinCondition extends TableColumn {
     // 值、原始sql
     protected Object rightValue;
 
-    public JoinCondition(String table, String column, String rightTable, String rightColumn) {
+    public JoinCondition(String table, String column, String columnAlias, int logic, CompareEnum compare, String rightTable, String rightColumn, Object rightValue) {
+        super(table, column, columnAlias);
+        this.logic = logic;
+        this.compare = compare;
+        this.rightTable = rightTable;
+        this.rightColumn = rightColumn;
+        this.rightValue = rightValue;
+    }
+
+    public JoinCondition(String table, String column, int logic, CompareEnum compare, String rightTable, String rightColumn) {
         super(table, column);
+        this.logic = logic;
+        this.compare = compare;
         this.rightTable = rightTable;
         this.rightColumn = rightColumn;
     }
 
-    public JoinCondition(String table, String column, Object rightValue) {
+    public JoinCondition(String table, String column, int logic, CompareEnum compare, Object rightValue) {
         super(table, column);
+        this.logic = logic;
+        this.compare = compare;
+        this.rightValue = rightValue;
+    }
+
+    public JoinCondition(String column, int logic, CompareEnum compare, String rightTable, String rightColumn, Object rightValue) {
+        super(column);
+        this.logic = logic;
+        this.compare = compare;
+        this.rightTable = rightTable;
+        this.rightColumn = rightColumn;
         this.rightValue = rightValue;
     }
 
@@ -104,7 +126,6 @@ public class JoinCondition extends TableColumn {
     @Override
     public String toSql(DriveConfigure driveConfigure) {
         super.toSql(driveConfigure);
-        //
         if (raw != null) {
             return raw;
         }
@@ -113,6 +134,9 @@ public class JoinCondition extends TableColumn {
             return getTable() + "." + ModelUtil.toUnderlineCase(getColumn()) + " " + compare.sql();
         } else if (compare == CompareEnum.IN || compare == CompareEnum.NOT_IN) {
             throw new QuickORMException("暂不支持");
+        }
+        if (getRightValue() != null) {
+            return ModelUtil.joinConditionSql(getTable(), getColumn(), compare, ValueConv.getConv(driveConfigure).conv(getRightValue()));
         }
         return ModelUtil.joinConditionSql(getTable(), getColumn(), compare, getRightTable(), getRightColumn());
     }

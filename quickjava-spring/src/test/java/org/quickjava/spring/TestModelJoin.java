@@ -36,7 +36,7 @@ public class TestModelJoin {
                 .leftJoin(SsoApp.class, "app3", whereLeft -> whereLeft
                         .eq(SsoApp::getAppId, SsoAppFavoriteModel.class, SsoAppFavoriteModel::getAppId)
                         .eq(SsoApp::getOpen, 1)
-//                        .isNotNull(SsoApp::getName)
+                        .isNotNull(SsoApp::getName)
                 )
                 // 与主表一对一关联join，指定数据加载到主实体指定属性
                 .leftJoin(SsoApp.class, SsoApp::getAppId, SsoAppFavoriteModel::getAppId, SsoAppFavoriteModel::getApp2)
@@ -53,7 +53,7 @@ public class TestModelJoin {
                 //      1. 自动识别表名
                 .eq(SsoApp.class, SsoApp::getAppId, 1)
                 //      2. 指定父属性名为表名
-                .eq(SsoAppFavoriteModel::getApp, SsoApp::getAppId, 1)
+                .eq(SsoAppFavoriteModel::getApp, SsoApp.class, SsoApp::getAppId, 1)
                 .eq(SsoAppFavoriteModel::getTestAppInfo, SsoApp.class, SsoApp::getAppId, 1)
                 //      3. 字符串表名
                 .eq("aliasApp01", SsoApp::getAppId, 1)

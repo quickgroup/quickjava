@@ -121,8 +121,8 @@ public interface ModelJoinWrapper<
     }
 
     // 使用在父实体的属性名做表名
-    default <Left extends Model> Children eq(MF mf, MFunction<Left, ?> lf, Object val) {
-        return where(true, mf.getName(), lf.getName(), Operator.EQ, val);
+    default <Left extends Model> Children eq(MF mf, Class<Left> left, MFunction<Left, ?> lf, Object val) {
+        return where(true, mf, left, lf, Operator.EQ, val);
     }
 
     default <Left extends Model> Children eq(String table, MFunction<Left, ?> lf, Object val) {
@@ -134,8 +134,8 @@ public interface ModelJoinWrapper<
         return where(true, left, lf, Operator.NEQ, val);
     }
 
-    default <Left extends Model> Children neq(MF mf, MFunction<Left, ?> lf, Object val) {
-        return where(true, mf.getName(), lf, Operator.NEQ, val);
+    default <Left extends Model> Children neq(MF mf, Class<Left> left, MFunction<Left, ?> lf, Object val) {
+        return where(true, mf, left, lf, Operator.NEQ, val);
     }
 
     default <Left extends Model> Children neq(String table, MFunction<Left, ?> lf, Object val) {
@@ -147,8 +147,8 @@ public interface ModelJoinWrapper<
         return where(true, left, lf, Operator.GT, val);
     }
 
-    default <Left extends Model> Children gt(MF mf, MFunction<Left, ?> lf, Object val) {
-        return where(true, mf.getName(), lf, Operator.GT, val);
+    default <Left extends Model> Children gt(MF mf, Class<Left> left, MFunction<Left, ?> lf, Object val) {
+        return where(true, mf, left, lf, Operator.GT, val);
     }
 
     default <Left extends Model> Children gt(String table, MFunction<Left, ?> lf, Object val) {
@@ -160,8 +160,8 @@ public interface ModelJoinWrapper<
         return where(true, left, lf, Operator.GTE, val);
     }
 
-    default <Left extends Model> Children gte(MF mf, MFunction<Left, ?> lf, Object val) {
-        return where(true, mf.getName(), lf, Operator.GTE, val);
+    default <Left extends Model> Children gte(MF mf, Class<Left> left, MFunction<Left, ?> lf, Object val) {
+        return where(true, mf, left, lf, Operator.GTE, val);
     }
 
     default <Left extends Model> Children gte(String left, MFunction<Left, ?> lf, Object val) {
@@ -173,8 +173,8 @@ public interface ModelJoinWrapper<
         return where(true, left, lf, Operator.LT, val);
     }
 
-    default <Left extends Model> Children lt(MF mf, MFunction<Left, ?> lf, Object val) {
-        return where(true, mf.getName(), lf, Operator.LT, val);
+    default <Left extends Model> Children lt(MF mf, Class<Left> left, MFunction<Left, ?> lf, Object val) {
+        return where(true, mf, left, lf, Operator.LT, val);
     }
 
     default <Left extends Model> Children lt(String left, MFunction<Left, ?> lf, Object val) {
@@ -186,19 +186,63 @@ public interface ModelJoinWrapper<
         return where(true, left, lf, Operator.LTE, val);
     }
 
+    default <Left extends Model> Children lte(MF mf, Class<Left> left, MFunction<Left, ?> lf, Object val) {
+        return where(true, mf, left, lf, Operator.LTE, val);
+    }
+
+    default <Left extends Model> Children lte(String left, MFunction<Left, ?> lf, Object val) {
+        return where(true, left, lf, Operator.LTE, val);
+    }
+
+    // in
     default <Left extends Model> Children in(Class<Left> left, MFunction<Left, ?> lf, Object ...args) {
         return where(true, left, lf, Operator.IN, args);
     }
 
+    default <Left extends Model> Children in(MF mf, Class<Left> left, MFunction<Left, ?> lf, Object ...args) {
+        return where(true, mf, left, lf, Operator.IN, args);
+    }
+
+    default <Left extends Model> Children in(String left, MFunction<Left, ?> lf, Object ...args) {
+        return where(true, left, lf, Operator.IN, args);
+    }
+
+    // not in
     default <Left extends Model> Children notIn(Class<Left> left, MFunction<Left, ?> lf, Object ...args) {
         return where(true, left, lf, Operator.IN, args);
     }
 
+    default <Left extends Model> Children notIn(MF mf, Class<Left> left, MFunction<Left, ?> lf, Object ...args) {
+        return where(true, mf, left, lf, Operator.IN, args);
+    }
+
+    default <Left extends Model> Children notIn(String left, MFunction<Left, ?> lf, Object ...args) {
+        return where(true, left, lf, Operator.IN, args);
+    }
+
+    // is null
     default <Left extends Model> Children isNull(Class<Left> left, MFunction<Left, ?> lf) {
         return where(true, left, lf, Operator.IS_NULL, null);
     }
 
+    default <Left extends Model> Children isNull(MF mf, Class<Left> left, MFunction<Left, ?> lf) {
+        return where(true, mf, left, lf, Operator.IS_NULL, null);
+    }
+
+    default <Left extends Model> Children isNull(String left, MFunction<Left, ?> lf) {
+        return where(true, left, lf, Operator.IS_NULL, null);
+    }
+
+    // is not null
     default public <Left extends Model> Children isNotNull(Class<Left> left, MFunction<Left, ?> lf) {
+        return where(true, left, lf, Operator.IS_NOT_NULL, null);
+    }
+
+    default public <Left extends Model> Children isNotNull(MF mf, Class<Left> left, MFunction<Left, ?> lf) {
+        return where(true, left, lf, Operator.IS_NOT_NULL, null);
+    }
+
+    default public <Left extends Model> Children isNotNull(String left, MFunction<Left, ?> lf) {
         return where(true, left, lf, Operator.IS_NOT_NULL, null);
     }
 
@@ -222,6 +266,10 @@ public interface ModelJoinWrapper<
 
     default <Left extends Model> Children where(boolean condition, String left, MFunction<Left, ?> lf, Operator operator, Object val) {
         return where(condition, left, lf.getName(), operator, val);
+    }
+
+    default <Left extends Model> Children where(boolean condition, MF mf, Class<Left> left, MFunction<Left, ?> lf, Operator operator, Object val) {
+        return where(condition, mf.getName(), left, lf.getName(), operator, val);
     }
 
     default <Left extends Model> Children where(boolean condition, MF left, MFunction<Left, ?> lf, Operator operator, Object val) {

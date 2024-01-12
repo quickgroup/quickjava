@@ -36,6 +36,19 @@ public class Join {
         this.table = table;
     }
 
+    public Join(JoinType type, String table, List<JoinCondition> conditions) {
+        this.type = type;
+        this.table = table;
+        this.conditions = conditions;
+    }
+
+    public Join(JoinType type, String table, JoinCondition condition) {
+        this.type = type;
+        this.table = table;
+        this.conditions = new LinkedList<>();
+        this.conditions.add(condition);
+    }
+
     public String getTable() {
         return table;
     }
