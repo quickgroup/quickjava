@@ -403,7 +403,7 @@ public class QuerySet {
     {
         // 默认查询全部字段
         if (reservoir.getColumnList().size() == 0)
-            field("*");
+            field(new TableColumn(null).setRaw("*"));
         List<Map<String, Object>> resultSet = executeSql();
         return SqlUtil.isEmpty(resultSet) ? new LinkedList<>() : resultSet;
     }
@@ -496,7 +496,7 @@ public class QuerySet {
     {
         reservoir.action = reservoir.action == null ? Action.SELECT : reservoir.action;
         if (reservoir.getColumnList().size() == 0)
-            field("*");
+            field(new TableColumn(null).setRaw("*"));
         return ORMContext.getDrive().pretreatment(this);
     }
 

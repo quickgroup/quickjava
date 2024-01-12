@@ -1,5 +1,7 @@
 package org.quickjava.orm.contain;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -24,6 +26,11 @@ public class Pagination<T> {
     public long pageSize;
 
     public long pages;
+
+    /**
+     * 分页数据id（大数据分页使用
+     * */
+    public long currentId;
 
     public long total;
 
@@ -52,6 +59,63 @@ public class Pagination<T> {
         this.rows = rows;
         long totalMax = page * pageSize;
         this.pages = (total + totalMax -1) / totalMax;;
+    }
+
+    public Pagination(Page<T> page) {
+        this.page = page.getCurrent();
+        this.pageSize = page.getSize();
+        this.total = page.getTotal();
+        this.rows = page.getRecords();
+        long totalMax = this.page * this.pageSize;
+        this.pages = (total + totalMax -1) / totalMax;
+    }
+
+    public long getPage() {
+        return page;
+    }
+
+    public void setPage(long page) {
+        this.page = page;
+    }
+
+    public long getPageSize() {
+        return pageSize;
+    }
+
+    public void setPageSize(long pageSize) {
+        this.pageSize = pageSize;
+    }
+
+    public long getPages() {
+        return pages;
+    }
+
+    public void setPages(long pages) {
+        this.pages = pages;
+    }
+
+    public long getCurrentId() {
+        return currentId;
+    }
+
+    public void setCurrentId(long currentId) {
+        this.currentId = currentId;
+    }
+
+    public long getTotal() {
+        return total;
+    }
+
+    public void setTotal(long total) {
+        this.total = total;
+    }
+
+    public List<T> getRows() {
+        return rows;
+    }
+
+    public void setRows(List<T> rows) {
+        this.rows = rows;
     }
 
     @Override
