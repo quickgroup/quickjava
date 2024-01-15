@@ -8,7 +8,6 @@ import org.quickjava.orm.query.contain.Action;
 import org.quickjava.orm.contain.DriveConfigure;
 import org.quickjava.orm.query.build.OrderBy;
 import org.quickjava.orm.query.build.Where;
-import org.quickjava.orm.utils.QuerySetHelper;
 
 import java.util.LinkedHashMap;
 import java.util.List;

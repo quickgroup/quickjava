@@ -1,6 +1,6 @@
 package org.quickjava.orm.query.contain;
 
-import org.quickjava.common.utils.ReflectUtil;
+import org.quickjava.orm.utils.ReflectUtil;
 
 import java.util.Map;
 

@@ -1,10 +1,11 @@
-package org.quickjava.orm.utils;
+package org.quickjava.orm.query;
 
 import org.quickjava.common.utils.BeanUtil;
 import org.quickjava.orm.query.Q;
 import org.quickjava.orm.query.QuerySet;
 import org.quickjava.orm.query.enums.Operator;
 import org.quickjava.orm.query.contain.TableMeta;
+import org.quickjava.orm.utils.SqlUtil;
 
 import java.util.*;
 

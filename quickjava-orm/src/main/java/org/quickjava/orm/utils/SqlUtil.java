@@ -1,7 +1,7 @@
 package org.quickjava.orm.utils;
 
 import org.quickjava.common.utils.ComUtil;
-import org.quickjava.orm.model.ModelUtil;
+import org.quickjava.orm.model.ModelHelper;
 import org.quickjava.orm.model.contain.ModelFieldMeta;
 import org.quickjava.orm.query.build.TableColumn;
 import org.quickjava.orm.query.contain.TableColumnMeta;
@@ -145,7 +145,7 @@ public class SqlUtil extends ComUtil {
     // 数据字段转驼峰
     public static Map<String, Object> dataFieldConv(Map<String, Object> data, Class<?> clazz) {
         Map<String, Object> ret = new LinkedHashMap<>();
-        Map<String, ModelFieldMeta> fieldMap = ModelUtil.getMeta(clazz).fieldMap();
+        Map<String, ModelFieldMeta> fieldMap = ModelHelper.getMeta(clazz).fieldMap();
         data.forEach((k, v) -> {
             if (fieldMap.containsKey(SqlUtil.toCamelCase(k))) {
                 ret.put(SqlUtil.toCamelCase(k), v);

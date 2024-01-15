@@ -1,9 +1,8 @@
-package org.quickjava.common.utils;
+package org.quickjava.orm.utils;
 
-import cn.hutool.core.convert.Convert;
+import org.quickjava.common.utils.SimpleCache;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 

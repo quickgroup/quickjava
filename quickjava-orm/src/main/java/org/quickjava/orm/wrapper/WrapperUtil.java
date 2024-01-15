@@ -1,10 +1,9 @@
 package org.quickjava.orm.wrapper;
 
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import org.quickjava.orm.model.IModel;
 import org.quickjava.orm.model.Model;
-import org.quickjava.orm.model.ModelUtil;
+import org.quickjava.orm.model.ModelHelper;
 import org.quickjava.orm.model.contain.ModelFieldMeta;
 import org.quickjava.orm.model.contain.ModelMeta;
 import org.quickjava.orm.query.QuerySet;
@@ -43,16 +42,16 @@ public class WrapperUtil {
 
     public static ModelMeta getModelMeta(Class<?> clazz) {
         if (Model.class.isAssignableFrom(clazz)) {
-            if (!ModelUtil.metaExist(clazz)) {
+            if (!ModelHelper.metaExist(clazz)) {
                 try {
-                    clazz = ModelUtil.getModelClass(clazz);
+                    clazz = ModelHelper.getModelClass(clazz);
                     clazz.newInstance();
                 } catch (InstantiationException | IllegalAccessException e) {
                     throw new RuntimeException(e);
                 }
             }
         }
-        return ModelUtil.getMeta(clazz);
+        return ModelHelper.getMeta(clazz);
     }
 
     public static Map<Class<?>, ModelFieldMeta> getModelClazzFieldMap(ModelMeta meta) {

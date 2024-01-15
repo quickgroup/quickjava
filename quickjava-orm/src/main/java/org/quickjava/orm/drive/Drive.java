@@ -5,7 +5,7 @@
 
 package org.quickjava.orm.drive;
 
-import org.quickjava.common.utils.ReflectUtil;
+import org.quickjava.orm.utils.ReflectUtil;
 import org.quickjava.orm.query.QueryReservoir;
 import org.quickjava.orm.query.QuerySet;
 import org.quickjava.orm.query.build.ValueConv;

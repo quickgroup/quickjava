@@ -4,13 +4,13 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonIgnoreType;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 import org.quickjava.common.utils.ComUtil;
 import org.quickjava.common.utils.DatetimeUtil;
-import org.quickjava.common.utils.ReflectUtil;
+import org.quickjava.orm.query.QuerySetHelper;
+import org.quickjava.orm.utils.ReflectUtil;
 import org.quickjava.orm.enums.JoinType;
 import org.quickjava.orm.model.annotation.ModelName;
 import org.quickjava.orm.model.annotation.OneToMany;
@@ -80,8 +80,8 @@ public class Model implements IModel {
             if (reservoir.querySet == null) {
                 reservoir.querySet = QuerySet.table(parseModelTableName(getClass()));
                 QueryReservoir queryReservoir = ReflectUtil.getFieldValue(reservoir.querySet, "reservoir");
-                queryReservoir.setCallback(WhereOptCallback.class, ModelUtil.whereOptCallback, this);
-                queryReservoir.setCallback(OrderByOptCallback.class, ModelUtil.orderByOptCallback, this);
+                queryReservoir.setCallback(WhereOptCallback.class, ModelHelper.whereOptCallback, this);
+                queryReservoir.setCallback(OrderByOptCallback.class, ModelHelper.orderByOptCallback, this);
             }
         }
         return reservoir.querySet;
@@ -115,7 +115,7 @@ public class Model implements IModel {
     public Model where(Map<String, Object> query) {
         // 处理字段名：标准字段名你：驼峰转下划线组成
         Map<String, Object> queryRet = new LinkedHashMap<>();
-        query.forEach((name, val) -> queryRet.put(ModelUtil.fieldToUnderlineCase(name), val));
+        query.forEach((name, val) -> queryRet.put(ModelHelper.fieldToUnderlineCase(name), val));
         // 调用querySet加载条件
         QuerySetHelper.loadQuery(query(), queryRet);
         return this;
@@ -195,9 +195,9 @@ public class Model implements IModel {
         reservoir.meta.fieldMap().forEach((name, field) -> {
             if (!reservoir.data.containsKey(name)) {
                 if (field.isInsertFill()) {
-                    data(name, ModelUtil.fill(field.getModelField().insertFill(), field.getModelField().insertFillTarget()));
+                    data(name, ModelHelper.fill(field.getModelField().insertFill(), field.getModelField().insertFillTarget()));
                 } else if (field.isUpdateFill()) {
-                    data(name, ModelUtil.fill(field.getModelField().updateFill(), field.getModelField().updateFillTarget()));
+                    data(name, ModelHelper.fill(field.getModelField().updateFill(), field.getModelField().updateFillTarget()));
                 }
             }
         });
@@ -208,7 +208,7 @@ public class Model implements IModel {
             return toD(new ModelSql(querySetReservoir().getSql()));
         // 回填主键
         data(pk(), pkVal);
-        return toD(ModelUtil.isProxyModel(this) ? this : newModel(getMClass(), data()));
+        return toD(ModelHelper.isProxyModel(this) ? this : newModel(getMClass(), data()));
     }
 
     /**
@@ -259,7 +259,7 @@ public class Model implements IModel {
          reservoir.meta.fieldMap().forEach((name, field) -> {
             if (!reservoir.data.containsKey(name)) {
                 if (field.isUpdateFill()) {
-                    data(name, ModelUtil.fill(field.getModelField().updateFill(), field.getModelField().updateFillTarget()));
+                    data(name, ModelHelper.fill(field.getModelField().updateFill(), field.getModelField().updateFillTarget()));
                 }
             }
         });
@@ -269,7 +269,7 @@ public class Model implements IModel {
         if (querySetReservoir().isFetchSql())
             return toD(new ModelSql(querySetReservoir().getSql()));
         // 返回模型
-        return toD(ModelUtil.isProxyModel(this) ? this : newModel(getMClass(), data()));
+        return toD(ModelHelper.isProxyModel(this) ? this : newModel(getMClass(), data()));
     }
 
     public <D extends IModel> D update(DataMap data) {
@@ -327,11 +327,11 @@ public class Model implements IModel {
             return toD(new ModelSql(query().buildSql()));
         }
         // 结果为空
-        if (ModelUtil.isEmpty(dataList)) {
+        if (ModelHelper.isEmpty(dataList)) {
             return null;
         }
         // 装载数据
-        List<IModel> models = ModelUtil.resultTranshipment(this, getClass(), dataList);
+        List<IModel> models = ModelHelper.resultTranshipment(this, getClass(), dataList);
         return toD(models.get(0));
     }
 
@@ -350,7 +350,7 @@ public class Model implements IModel {
             return toD(new ModelListSql(querySetReservoir().sql));
         }
         // 装载
-        List<IModel> models = ModelUtil.resultTranshipment(this, getClass(), dataList);
+        List<IModel> models = ModelHelper.resultTranshipment(this, getClass(), dataList);
         return toD(models);
     }
 
@@ -375,7 +375,7 @@ public class Model implements IModel {
         Pagination<Map<String, Object>> pagination = query().pagination(page, pageSize);
         // 数据组装
         Pagination<IModel> pagination1 = new Pagination<>(pagination, new LinkedList<>());
-        pagination1.rows = ModelUtil.resultTranshipment(this, getMClass(), pagination.rows);
+        pagination1.rows = ModelHelper.resultTranshipment(this, getMClass(), pagination.rows);
         return toD(pagination1);
     }
 
@@ -391,7 +391,7 @@ public class Model implements IModel {
      * @return 模型对象
      */
     public Model order(String field, OrderByType type) {
-        query().order(ModelUtil.fieldToUnderlineCase(field), type);
+        query().order(ModelHelper.fieldToUnderlineCase(field), type);
         return this;
     }
 
@@ -518,7 +518,7 @@ public class Model implements IModel {
     public Model data(String name, Object val)
     {
         // 数据保存
-        name = ModelUtil.toCamelCase(name);
+        name = ModelHelper.toCamelCase(name);
         ModelFieldMeta field =  reservoir.meta.fieldMap().get(name);
         // 非本表属性或关联属性不设置
         if (field == null || field.getRelationWay() != null) {
@@ -526,7 +526,7 @@ public class Model implements IModel {
         }
 
         reservoir.data.put(name, val);
-        ReflectUtil.setFieldValue(this, name, val);
+        ModelHelper.setFieldValue(this, name, val, field);
 
         // 被修改的字段
         reservoir.getModified().add(field);
@@ -566,7 +566,7 @@ public class Model implements IModel {
                     return;
                 }
                 Object v = data.get(field.getName());
-                ret.put(ModelUtil.fieldToUnderlineCase(field.getName()), ModelUtil.valueToSqlValue(v));
+                ret.put(ModelHelper.fieldToUnderlineCase(field.getName()), ModelHelper.valueToSqlValue(v));
             });
         }
         return ret;
@@ -637,15 +637,15 @@ public class Model implements IModel {
         // T1::字段声明
         List<String> fields = new LinkedList<>();
         // 本表字段声明
-        ModelUtil.loadModelAccurateFields(query(), reservoir.meta, reservoir.meta.table());
+        ModelHelper.loadModelAccurateFields(query(), reservoir.meta, reservoir.meta.table());
 
         // 关联表
         relationMap.forEach((relationName, relation) -> {
-            ModelMeta meta = ModelUtil.getMeta(relation.getClazz());
+            ModelMeta meta = ModelHelper.getMeta(relation.getClazz());
             // 关联表字段
-            ModelUtil.loadModelAccurateFields(query(), meta, relationName);
+            ModelHelper.loadModelAccurateFields(query(), meta, relationName);
             // 关联方式声明
-            String conditionSql = ModelUtil.joinConditionSql(
+            String conditionSql = ModelHelper.joinConditionSql(
                     relationName, relation.foreignKey(),
                     CompareEnum.EQ,
                     reservoir.meta.table(), relation.localKey()
@@ -703,14 +703,12 @@ public class Model implements IModel {
         enhancer.setCallback(modelProxyMethodInterceptor);
         D model = toD(enhancer.create());
         ModelReservoir reservoir = ReflectUtil.getFieldValue(model, "reservoir");
-        //
-//        ModelUtil.setFieldValue(model, "__table", parseModelTableName(clazz));
         // 加载数据
-        if (!ModelUtil.isEmpty(data)) {
+        if (!ModelHelper.isEmpty(data)) {
             ((Model) model).data((DataMap) data);
         }
         // 设置父类
-        if (!ModelUtil.isEmpty(parent)) {
+        if (!ModelHelper.isEmpty(parent)) {
             reservoir.parent = parent;
         }
         return model;
@@ -728,14 +726,14 @@ public class Model implements IModel {
              * */
             Class<?> clazz = getModelClass(o.getClass());
             String methodName = method.getName();
-            ModelMeta meta = ModelUtil.getMeta(clazz);
+            ModelMeta meta = ModelHelper.getMeta(clazz);
             // getter方法和关联方法
             if (meta.relationMap().containsKey(methodName)) {
                 return LoadingRelationGetter(clazz, o, method, objects);
             }
             // setter方法
             if (methodName.startsWith("set")) {
-                String fieldName = ModelUtil.toCamelCase(methodName.substring(3));
+                String fieldName = ModelHelper.toCamelCase(methodName.substring(3));
                 if (meta.fieldMap().containsKey(fieldName) && objects.length == 1 && method.getReturnType().equals(Void.TYPE)) {
                     Setter(clazz, o, method, objects[0], fieldName);
                 }
@@ -750,7 +748,7 @@ public class Model implements IModel {
      */
     private void loadingVegetarianModel()
     {
-        if (ModelUtil.isVegetarianModel(this) && reservoir.vegetarian) {
+        if (ModelHelper.isVegetarianModel(this) && reservoir.vegetarian) {
             // 收集字段数据
              reservoir.meta.fieldMap().forEach((name, field) -> {
                 Object val = ReflectUtil.getFieldValue(this, field.getField());
@@ -803,7 +801,7 @@ public class Model implements IModel {
      * @return 模型对象
      */
     public Model with(String fields) {
-        if (ModelUtil.isEmpty(fields)) {
+        if (ModelHelper.isEmpty(fields)) {
             return this;
         }
         List<String> withs = Arrays.asList(fields.split(","));
@@ -831,8 +829,8 @@ public class Model implements IModel {
         }
 
         // 已加载模型元组信息
-        if (ModelUtil.metaExist(clazz)) {
-            model.reservoir.meta = ModelUtil.getMeta(clazz);
+        if (ModelHelper.metaExist(clazz)) {
+            model.reservoir.meta = ModelHelper.getMeta(clazz);
             return;
         }
 
@@ -841,7 +839,7 @@ public class Model implements IModel {
         meta.setTable(parseModelTableName(clazz));
         meta.setClazz(clazz);
         meta.setFieldMap(new LinkedHashMap<>());
-        ModelUtil.setMeta(clazz, meta);
+        ModelHelper.setMeta(clazz, meta);
 
         // 全部方法、属性
         Class<?> getClazz = clazz;
@@ -915,7 +913,7 @@ public class Model implements IModel {
         }
         // 默认取模型名称转下划线
         if (tableName == null) {
-            tableName = ModelUtil.getModelAlias(clazz);
+            tableName = ModelHelper.getModelAlias(clazz);
         }
         return toUnderlineCase(tableName);
     }
@@ -942,7 +940,7 @@ public class Model implements IModel {
     {
         try {
             // 加载
-            ModelFieldMeta modelField = ModelUtil.getMeta(clazz).fieldMap().get(method.getName());
+            ModelFieldMeta modelField = ModelHelper.getMeta(clazz).fieldMap().get(method.getName());
             Field field = modelField.getField();
             if (Model.class.isAssignableFrom(o.getClass())) {
                 Model curr = (Model) o;
@@ -1021,15 +1019,15 @@ public class Model implements IModel {
     }
 
     private static Class<?> getModelClass(Class<?> clazz) {
-        return ModelUtil.getModelClass(clazz);
+        return ModelHelper.getModelClass(clazz);
     }
 
     private static TableColumn fieldAlias(String table, String field) {
-        return ModelUtil.fieldAlias(table, field);
+        return ModelHelper.fieldAlias(table, field);
     }
 
     private static String toUnderlineCase(String name) {
-        return ModelUtil.toUnderlineCase(name);
+        return ModelHelper.toUnderlineCase(name);
     }
 
     @Override

@@ -1,5 +1,7 @@
 package org.quickjava.common.utils;
 
+import cn.hutool.core.util.ReflectUtil;
+
 import java.lang.reflect.Field;
 import java.util.Map;
 
@@ -27,7 +29,7 @@ public class BeanUtil {
                 try {
                     String name = key.toString();
                     if (val instanceof Map) {
-                        Field field = ReflectUtil.findField(bean, name);
+                        Field field = ReflectUtil.getField(beanClass, name);
                         if (field != null) {
                             Object child = mapToBean((Map<?, ?>) val, field.getDeclaringClass(), isIgnoreError);
                             ReflectUtil.setFieldValue(bean, name, child);

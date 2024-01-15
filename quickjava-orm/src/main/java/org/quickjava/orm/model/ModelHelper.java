@@ -1,8 +1,14 @@
 package org.quickjava.orm.model;
 
 import net.sf.cglib.proxy.Enhancer;
+import org.apache.ibatis.reflection.MetaObject;
+import org.apache.ibatis.reflection.SystemMetaObject;
+import org.apache.ibatis.session.Configuration;
+import org.apache.ibatis.type.EnumTypeHandler;
+import org.apache.ibatis.type.TypeHandlerRegistry;
 import org.quickjava.common.utils.DatetimeUtil;
-import org.quickjava.common.utils.ReflectUtil;
+import org.quickjava.orm.model.contain.ModelFieldMeta;
+import org.quickjava.orm.utils.ReflectUtil;
 import org.quickjava.orm.model.contain.ModelMeta;
 import org.quickjava.orm.model.contain.Relation;
 import org.quickjava.orm.model.enums.ModelFieldFill;
@@ -36,9 +42,9 @@ import java.util.stream.Collectors;
  * License: Apache Licence 2.0
  * +-------------------------------------------------------------------
  */
-public class ModelUtil extends SqlUtil {
+public class ModelHelper extends SqlUtil {
 
-    private static final Logger logger = LoggerFactory.getLogger(ModelUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(ModelHelper.class);
 
     public static final Map<Class<?>, ModelMeta> modelCache = new LinkedHashMap<>();
 
@@ -92,38 +98,6 @@ public class ModelUtil extends SqlUtil {
         return name;
     }
 
-    public static void setFieldValue(Object o, String field, Object value) {
-        setFieldValue(o.getClass(), o, field, value);
-    }
-
-    private static void setFieldValue(Class<?> clazz, Object o, String field, Object value) {
-        try {
-            setFieldValue(o, clazz.getDeclaredField(field), value);
-        } catch (NoSuchFieldException e) {
-            if (clazz.getSuperclass() != null) {    // 向上找父类的属性
-                setFieldValue(clazz.getSuperclass(), o, field, value);
-            }
-        }
-    }
-
-    public static void setFieldValue(Object o, Field field, Object value)
-    {
-        try {
-            field.setAccessible(true);
-            // 实现对关联属性的数据赋值
-            if (Model.class.isAssignableFrom(field.getType())) {
-                if (value instanceof Map) {
-                    Model child = ReflectUtil.invoke(Model.class, "newProxyModel", (Map<String, Object>) value, (Model) o);
-                    field.set(o, child);
-                }
-            } else {
-                ReflectUtil.setFieldValue(o, field, value);
-            }
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-    }
-
     /**
      * 直接拷贝属性
      * @param src 来源对象
@@ -146,13 +120,13 @@ public class ModelUtil extends SqlUtil {
                         field.set(dst, data.get(field.getName()));
                         continue;
                     }
-                    String fieldName = ModelUtil.toCamelCase(field.getName());
+                    String fieldName = ModelHelper.toCamelCase(field.getName());
                     if (data.containsKey(fieldName)) {
                         field.setAccessible(true);
                         field.set(dst, data.get(fieldName));
                         continue;
                     }
-                    fieldName = ModelUtil.toUnderlineCase(field.getName());
+                    fieldName = ModelHelper.toUnderlineCase(field.getName());
                     if (data.containsKey(fieldName)) {
                         field.setAccessible(true);
                         field.set(dst, data.get(fieldName));
@@ -422,4 +396,15 @@ public class ModelUtil extends SqlUtil {
         });
     }
 
+    /**
+     * 设置值
+     */
+    public static void setFieldValue(Object obj, String fieldName, Object value, ModelFieldMeta fieldMeta) {
+        if (fieldMeta != null) {
+            MetaObject metaObject = SystemMetaObject.forObject(obj);
+            metaObject.setValue(fieldName, value);
+        } else {
+            ReflectUtil.setFieldValue(obj, fieldName, value);
+        }
+    }
 }

@@ -1,4 +1,4 @@
-package org.quickjava.common.utils;
+package org.quickjava.orm.utils;
 
 import cn.hutool.core.convert.Convert;
 
@@ -25,21 +25,21 @@ import java.text.SimpleDateFormat;
  */
 public class DbClassConv {
 
-    public static Object valueConv(Class<?> retClazz, Object value) {
+    public static Object valueConv(Class<?> clazz, Object value) {
         try {
-            if (retClazz == String.class) {
+            if (clazz == String.class) {
                 return convertResultSetToString(value);
-            } else if (retClazz == int.class || retClazz == Integer.class) {
+            } else if (clazz == int.class || clazz == Integer.class) {
                 return convertObjectToInt(value);
-            } else if (retClazz == long.class || retClazz == Long.class) {
+            } else if (clazz == long.class || clazz == Long.class) {
                 return convertObjectToLong(value);
-            } else if (retClazz == double.class || retClazz == Double.class) {
+            } else if (clazz == double.class || clazz == Double.class) {
                 return convertObjectToDouble(value);
             }
         } catch (Exception ignore) {
         }
 
-        return Convert.convert(retClazz, value);
+        return Convert.convert(clazz, value);
     }
 
     public static String convertResultSetToString(Object value) throws SQLException, IOException {

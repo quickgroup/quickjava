@@ -17,7 +17,7 @@ package org.quickjava.orm.query.build;
 
 import org.quickjava.orm.contain.DriveConfigure;
 import org.quickjava.orm.enums.CompareEnum;
-import org.quickjava.orm.model.ModelUtil;
+import org.quickjava.orm.model.ModelHelper;
 import org.quickjava.orm.utils.QuickORMException;
 
 /**
@@ -131,13 +131,13 @@ public class JoinCondition extends TableColumn {
         }
         // null
         if (compare == CompareEnum.IS_NULL || compare == CompareEnum.IS_NOT_NULL) {
-            return getTable() + "." + ModelUtil.toUnderlineCase(getColumn()) + " " + compare.sql();
+            return getTable() + "." + ModelHelper.toUnderlineCase(getColumn()) + " " + compare.sql();
         } else if (compare == CompareEnum.IN || compare == CompareEnum.NOT_IN) {
             throw new QuickORMException("暂不支持");
         }
         if (getRightValue() != null) {
-            return ModelUtil.joinConditionSql(getTable(), getColumn(), compare, ValueConv.getConv(driveConfigure).conv(getRightValue()));
+            return ModelHelper.joinConditionSql(getTable(), getColumn(), compare, ValueConv.getConv(driveConfigure).conv(getRightValue()));
         }
-        return ModelUtil.joinConditionSql(getTable(), getColumn(), compare, getRightTable(), getRightColumn());
+        return ModelHelper.joinConditionSql(getTable(), getColumn(), compare, getRightTable(), getRightColumn());
     }
 }

@@ -2,13 +2,11 @@ package org.quickjava.orm.wrapper;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
-import cn.hutool.core.util.StrUtil;
 import org.quickjava.orm.contain.DataMap;
-import org.quickjava.orm.contain.IPagination;
 import org.quickjava.orm.contain.Pagination;
 import org.quickjava.orm.enums.JoinType;
 import org.quickjava.orm.model.Model;
-import org.quickjava.orm.model.ModelUtil;
+import org.quickjava.orm.model.ModelHelper;
 import org.quickjava.orm.model.contain.ModelFieldMeta;
 import org.quickjava.orm.model.contain.ModelMeta;
 import org.quickjava.orm.query.QueryReservoir;
@@ -247,15 +245,15 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         // 主表
         M main = Model.newModel(mainMeta.getClazz());
         if (joinMap == null || joinMap.isEmpty()) {
-            ModelUtil.resultTranshipmentWithOne(main, data, null);
+            ModelHelper.resultTranshipmentWithOne(main, data, null);
             return main;
         }
         // 多表关联下加载
-        ModelUtil.resultTranshipmentWith(main, data, mainMeta.table());
+        ModelHelper.resultTranshipmentWith(main, data, mainMeta.table());
         // 一对一的数据加载
         joinMap.forEach((alias, join) -> {
             // 未加载数据 || 未设置加载对应属性名 || 在父实体不存在
-            if (!join.isLoadLeftData() || ModelUtil.isEmpty(join.getLeftAlias()) || !ReflectUtil.hasField(mainMeta.getClazz(), join.getLeftAlias())) {
+            if (!join.isLoadLeftData() || ModelHelper.isEmpty(join.getLeftAlias()) || !ReflectUtil.hasField(mainMeta.getClazz(), join.getLeftAlias())) {
                 return;
             }
             // 关联模型元数据
@@ -267,7 +265,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
             }
             // 数据装载
             Model left = Model.newModel(leftMeta.getClazz(), null, main);
-            ModelUtil.resultTranshipmentWith(left, data, alias);
+            ModelHelper.resultTranshipmentWith(left, data, alias);
             ReflectUtil.setFieldValue(main, join.getLeftAlias(), left);
         });
         return main;
@@ -312,7 +310,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         QueryReservoir queryReservoir = (QueryReservoir) ReflectUtil.getFieldValue(querySet, "reservoir");
         // 主表字段
         if (ObjectUtil.isEmpty(queryReservoir.columnList)) {
-            ModelMeta main = ModelUtil.getMeta(this.model.getClass());
+            ModelMeta main = ModelHelper.getMeta(this.model.getClass());
             loadModelAccurateFields(querySet, main, main.table());
         }
         // 关联表元信息
@@ -332,7 +330,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
             leftAlias = leftMeta.table();
         }
         // 声明左表数据字段
-        if (join.isLoadLeftData() && ModelUtil.isNotEmpty(leftAlias)) {
+        if (join.isLoadLeftData() && ModelHelper.isNotEmpty(leftAlias)) {
             loadModelAccurateFields(querySet, leftMeta, leftAlias);
         }
         // 缓存条件
@@ -371,7 +369,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     }
 
     private void loadModelAccurateFields(QuerySet querySet, ModelMeta meta, String table) {
-        ModelUtil.loadModelAccurateFields(querySet, meta, table);
+        ModelHelper.loadModelAccurateFields(querySet, meta, table);
     }
 
     private Map<Class<?>, ModelFieldMeta> getModelClazzFieldMap(ModelMeta meta) {
