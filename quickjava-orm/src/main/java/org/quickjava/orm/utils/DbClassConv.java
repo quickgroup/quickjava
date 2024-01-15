@@ -35,6 +35,8 @@ public class DbClassConv {
                 return convertObjectToLong(value);
             } else if (clazz == double.class || clazz == Double.class) {
                 return convertObjectToDouble(value);
+            } else if (clazz.isEnum()) {
+                return convertObjectToEnum(clazz, value);
             }
         } catch (Exception ignore) {
         }
@@ -133,6 +135,10 @@ public class DbClassConv {
 
         String strValue = value.toString().toLowerCase();
         return strValue.equals("true") || strValue.equals("1");
+    }
+
+    public static Object convertObjectToEnum(Class clazz, Object value) {
+        return Enum.valueOf(clazz, value.toString());
     }
 
 }

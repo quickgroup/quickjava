@@ -1,5 +1,6 @@
 package org.quickjava.orm.model;
 
+import com.baomidou.mybatisplus.core.toolkit.BeanUtils;
 import net.sf.cglib.proxy.Enhancer;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
@@ -400,11 +401,6 @@ public class ModelHelper extends SqlUtil {
      * 设置值
      */
     public static void setFieldValue(Object obj, String fieldName, Object value, ModelFieldMeta fieldMeta) {
-        if (fieldMeta != null) {
-            MetaObject metaObject = SystemMetaObject.forObject(obj);
-            metaObject.setValue(fieldName, value);
-        } else {
-            ReflectUtil.setFieldValue(obj, fieldName, value);
-        }
+        ReflectUtil.setFieldValue(obj, fieldName, value);
     }
 }
