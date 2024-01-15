@@ -401,6 +401,8 @@ public class ModelHelper extends SqlUtil {
      * 设置值
      */
     public static void setFieldValue(Object obj, String fieldName, Object value, ModelFieldMeta fieldMeta) {
+        // 使用mybatis的自定义类型转换器
+
         ReflectUtil.setFieldValue(obj, fieldName, value);
     }
 }
