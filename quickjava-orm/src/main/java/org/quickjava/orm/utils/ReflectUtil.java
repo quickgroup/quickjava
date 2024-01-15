@@ -119,6 +119,7 @@ public class ReflectUtil {
      * @param value 属性值
      */
     public static void setFieldValue(Object obj, String fieldName, Object value) {
+        setFieldValue(obj.getClass(), obj, fieldName, value);
     }
 
     private static void setFieldValue(Class<?> clazz, Object obj, String fieldName, Object value) {

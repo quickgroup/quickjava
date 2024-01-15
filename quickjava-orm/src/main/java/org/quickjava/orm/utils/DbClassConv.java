@@ -138,6 +138,9 @@ public class DbClassConv {
     }
 
     public static Object convertObjectToEnum(Class clazz, Object value) {
+        if (value == null) {
+            return null;
+        }
         return Enum.valueOf(clazz, value.toString());
     }
 
