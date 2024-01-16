@@ -120,7 +120,7 @@ public interface ModelJoinWrapper<
         return where(true, left, lf, Operator.EQ, val);
     }
 
-    // 使用在父实体的属性名做表名
+    // 使用在父实体的属性名做表别名
     default <Left extends Model> Children eq(MF mf, Class<Left> left, MFunction<Left, ?> lf, Object val) {
         return where(true, mf, left, lf, Operator.EQ, val);
     }
@@ -128,6 +128,7 @@ public interface ModelJoinWrapper<
     default <Left extends Model> Children eq(String table, MFunction<Left, ?> lf, Object val) {
         return where(true, table, lf.getName(), Operator.EQ, val);
     }
+
 
     // 不等于
     default <Left extends Model> Children neq(Class<Left> left, MFunction<Left, ?> lf, Object val) {
@@ -142,6 +143,7 @@ public interface ModelJoinWrapper<
         return where(true, table, lf, Operator.NEQ, val);
     }
 
+
     // 大于
     default <Left extends Model> Children gt(Class<Left> left, MFunction<Left, ?> lf, Object val) {
         return where(true, left, lf, Operator.GT, val);
@@ -154,6 +156,7 @@ public interface ModelJoinWrapper<
     default <Left extends Model> Children gt(String table, MFunction<Left, ?> lf, Object val) {
         return where(true, table, lf, Operator.GT, val);
     }
+
 
     // 大于等于
     default <Left extends Model> Children gte(Class<Left> left, MFunction<Left, ?> lf, Object val) {
@@ -168,6 +171,7 @@ public interface ModelJoinWrapper<
         return where(true, left, lf, Operator.GTE, val);
     }
 
+
     // 小于
     default <Left extends Model> Children lt(Class<Left> left, MFunction<Left, ?> lf, Object val) {
         return where(true, left, lf, Operator.LT, val);
@@ -180,6 +184,7 @@ public interface ModelJoinWrapper<
     default <Left extends Model> Children lt(String left, MFunction<Left, ?> lf, Object val) {
         return where(true, left, lf, Operator.LT, val);
     }
+
 
     // 小于等于
     default <Left extends Model> Children lte(Class<Left> left, MFunction<Left, ?> lf, Object val) {
@@ -194,6 +199,7 @@ public interface ModelJoinWrapper<
         return where(true, left, lf, Operator.LTE, val);
     }
 
+
     // in
     default <Left extends Model> Children in(Class<Left> left, MFunction<Left, ?> lf, Object ...args) {
         return where(true, left, lf, Operator.IN, args);
@@ -206,6 +212,7 @@ public interface ModelJoinWrapper<
     default <Left extends Model> Children in(String left, MFunction<Left, ?> lf, Object ...args) {
         return where(true, left, lf, Operator.IN, args);
     }
+
 
     // not in
     default <Left extends Model> Children notIn(Class<Left> left, MFunction<Left, ?> lf, Object ...args) {
@@ -220,6 +227,7 @@ public interface ModelJoinWrapper<
         return where(true, left, lf, Operator.IN, args);
     }
 
+
     // is null
     default <Left extends Model> Children isNull(Class<Left> left, MFunction<Left, ?> lf) {
         return where(true, left, lf, Operator.IS_NULL, null);
@@ -233,29 +241,37 @@ public interface ModelJoinWrapper<
         return where(true, left, lf, Operator.IS_NULL, null);
     }
 
+
     // is not null
     default public <Left extends Model> Children isNotNull(Class<Left> left, MFunction<Left, ?> lf) {
         return where(true, left, lf, Operator.IS_NOT_NULL, null);
     }
 
     default public <Left extends Model> Children isNotNull(MF mf, Class<Left> left, MFunction<Left, ?> lf) {
-        return where(true, left, lf, Operator.IS_NOT_NULL, null);
+        return where(true, mf, left, lf, Operator.IS_NOT_NULL, null);
     }
 
     default public <Left extends Model> Children isNotNull(String left, MFunction<Left, ?> lf) {
         return where(true, left, lf, Operator.IS_NOT_NULL, null);
     }
 
+
+    // between
     default <Left extends Model> Children between(Class<Left> left, MFunction<Left, ?> lf, Object v1, Object v2) {
         return where(true, left, lf, Operator.IS_NOT_NULL, new Object[]{v1, v2});
     }
 
+    default <Left extends Model> Children between(MF mf, Class<Left> left, MFunction<Left, ?> lf, Object v1, Object v2) {
+        return where(true, mf, left, lf, Operator.IS_NOT_NULL, new Object[]{v1, v2});
+    }
+
+    default <Left extends Model> Children between(String left, MFunction<Left, ?> lf, Object v1, Object v2) {
+        return where(true, left, lf, Operator.IS_NOT_NULL, new Object[]{v1, v2});
+    }
+
     default <Left extends Model> Children where(boolean condition, String table, Class<Left> left, String column, Operator operator, Object val) {
-        if (condition) {
-            // 懒加载
-            table = WrapperUtil.autoTable(table, this, left);
-            WrapperUtil.getQuerySet(this).where(table, column, operator, val);
-        }
+        table = WrapperUtil.autoTable(table, this, left);
+        WrapperUtil.getQuerySet(this).where(table, column, operator, val);
         return chain();
     }
 
@@ -264,29 +280,15 @@ public interface ModelJoinWrapper<
         return where(condition, table, lf.getName(), operator, val);
     }
 
-    default <Left extends Model> Children where(boolean condition, String left, MFunction<Left, ?> lf, Operator operator, Object val) {
-        return where(condition, left, lf.getName(), operator, val);
-    }
-
     default <Left extends Model> Children where(boolean condition, MF mf, Class<Left> left, MFunction<Left, ?> lf, Operator operator, Object val) {
         return where(condition, mf.getName(), left, lf.getName(), operator, val);
     }
 
-    default <Left extends Model> Children where(boolean condition, MF left, MFunction<Left, ?> lf, Operator operator, Object val) {
-        return where(condition, left.getName(), lf.getName(), operator, val);
+    default <Left extends Model> Children where(boolean condition, String left, MFunction<Left, ?> lf, Operator operator, Object val) {
+        return where(condition, left, lf.getName(), operator, val);
     }
 
     Children where(boolean condition, String table, String column, Operator operator, Object val);
-
-    default <Left> Children field(Class<Left> left, MFunction<Left, ?> ... lfs) {
-        for (MFunction<Left, ?> lf : lfs) {
-            String table = WrapperUtil.autoTable(null, this, left);
-            field(table, lf.getName());
-        }
-        return chain();
-    }
-
-    Children field(String table, String column);
 
     //TODO::-------------------- 查询条件 END  --------------------
 

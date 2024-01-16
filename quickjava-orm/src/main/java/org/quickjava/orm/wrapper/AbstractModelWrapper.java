@@ -102,6 +102,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         return chain();
     }
 
+    //TODO::-------------------- 字段  --------------------
     public Children field(R ... fields) {
         for (R field : fields) {
             getQuerySet().field(field.getName());
@@ -110,8 +111,11 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     }
 
     @Override
-    public Children field(String table, String column) {
-        getQuerySet().field(table, column);
+    public <TM extends Model> Children field(Class<TM> tm, MFunction<TM, ?> ... tfs) {
+        for (MFunction<TM, ?> lf : tfs) {
+            String table = WrapperUtil.autoTable(null, this, tm);
+            getQuerySet().field(table, lf.getName());
+        }
         return chain();
     }
 
@@ -176,22 +180,22 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         return chain();
     }
 
-    public Children limit(Long index, Long count) {
+    public Children limit(long index, long count) {
         model().limit(index, count);
         return chain();
     }
 
-    public Children limit(Long count) {
+    public Children limit(long count) {
         model().limit(count);
         return chain();
     }
 
-    public Children page(Long page) {
+    public Children page(long page) {
         model().page(page);
         return chain();
     }
 
-    public Children page(Long page, Long pageSize) {
+    public Children page(long page, long pageSize) {
         model().page(page, pageSize);
         return chain();
     }
@@ -271,7 +275,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         return main;
     }
 
-    public Pagination<M> pagination(Long page, Long pageSize) {
+    public Pagination<M> pagination(long page, long pageSize) {
         Pagination<Map<String, Object>> pagination = getQuerySet().pagination(page, pageSize);
         // 装载数据
         List<M> models = queryAfter(pagination.rows, getModelMeta(this.model.getClass()));
