@@ -20,6 +20,9 @@ public class TableMeta {
 
     private String comment;
 
+    public TableMeta() {
+    }
+
     public String getName() {
         return name;
     }

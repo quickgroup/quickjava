@@ -28,6 +28,9 @@ public class DriveConfigure {
     public String valueStrLeft = "\"";
     public String valueStrRight = "\"";
 
+    public DriveConfigure() {
+    }
+
     public DriveConfigure(String columnLeft, String columnRight, String valueStrLeft, String valueStrRight) {
         this.columnLeft = columnLeft;
         this.columnRight = columnRight;

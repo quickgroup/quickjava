@@ -31,6 +31,9 @@ public class ModelList<E extends Model> extends LinkedList<E> {
 
     protected LinkedList<DataMap> __data = new LinkedList<>();
 
+    public ModelList() {
+    }
+
     public ModelList<E> where(String field, Object val) {
         return this;
     }

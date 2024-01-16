@@ -22,6 +22,9 @@ public class ModelSql implements IModel {
 
     private String sql;
 
+    public ModelSql() {
+    }
+
     public ModelSql(String sql) {
         this.sql = sql;
     }

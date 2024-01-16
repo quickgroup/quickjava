@@ -36,6 +36,9 @@ public class Pagination<T> implements IPagination<T> {
 
     public List<T> rows;
 
+    public Pagination() {
+    }
+
     public Pagination(IPagination<T> pagination) {
         this.page = pagination.getPage();
         this.pageSize = pagination.getPageSize();
@@ -58,7 +61,7 @@ public class Pagination<T> implements IPagination<T> {
         this.total = total;
         this.rows = rows;
         long totalMax = page * pageSize;
-        this.pages = (total + totalMax -1) / totalMax;;
+        this.pages = totalMax <= 0 ? 0 : (total + totalMax -1) / totalMax;
     }
 
     public Pagination(Page<T> page) {
@@ -67,7 +70,7 @@ public class Pagination<T> implements IPagination<T> {
         this.total = page.getTotal();
         this.rows = page.getRecords();
         long totalMax = this.page * this.pageSize;
-        this.pages = (total + totalMax -1) / totalMax;
+        this.pages = totalMax <= 0 ? 0 : (total + totalMax -1) / totalMax;
     }
 
     public long getPage() {

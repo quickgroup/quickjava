@@ -21,6 +21,9 @@ import java.util.Map;
  */
 public class DataMap extends LinkedHashMap<String, Object> {
 
+    public DataMap() {
+    }
+
     public static DataMap one() {
         return new DataMap();
     }

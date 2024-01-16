@@ -23,6 +23,9 @@ public class ModelListSql extends LinkedList<IModel> implements IModel {
 
     private String sql;
 
+    public ModelListSql() {
+    }
+
     public ModelListSql(String sql) {
         this.sql = sql;
     }
