@@ -118,8 +118,8 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     @SafeVarargs
     public final <TM> Children field(Class<TM> tm, MFunction<TM, ?>... tfs) {
         String table = WrapperUtil.autoTable(null, this, tm);
-        for (MFunction<TM, ?> lf : tfs) {
-            getQuerySet().field(table, lf.getName());
+        for (MFunction<TM, ?> tf : tfs) {
+            getQuerySet().field(table, SqlUtil.toUnderlineCase(tf.getName()));
         }
         return chain();
     }
@@ -139,7 +139,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     public final <TM> Children group(Class<TM> tm, MFunction<TM, ?>... tfs) {
         String table = WrapperUtil.autoTable(null, this, tm);
         for (MFunction<TM, ?> tf : tfs) {
-            getQuerySet().group(table, tf.getName());
+            getQuerySet().group(table, SqlUtil.toUnderlineCase(tf.getName()));
         }
         return chain();
     }
@@ -158,7 +158,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     public final <TM> Children having(Class<TM> tm, MFunction<TM, ?>... tfs) {
         String table = WrapperUtil.autoTable(null, this, tm);
         for (MFunction<TM, ?> tf : tfs) {
-            getQuerySet().having(table, tf.getName());
+            getQuerySet().having(table, SqlUtil.toUnderlineCase(tf.getName()));
         }
         return chain();
     }
@@ -204,7 +204,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     // 关联表支持
     public <TM> Children order(Class<TM> tm, MFunction<TM, ?> tf, OrderByType type) {
         String table = WrapperUtil.autoTable(null, this, tm);
-        getQuerySet().order(table, tf.getName(), type);
+        getQuerySet().order(table, SqlUtil.toUnderlineCase(tf.getName()), type);
         return chain();
     }
 
