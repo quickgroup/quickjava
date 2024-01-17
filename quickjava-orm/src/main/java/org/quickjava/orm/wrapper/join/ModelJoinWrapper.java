@@ -294,27 +294,6 @@ public interface ModelJoinWrapper<
 
     //TODO::-------------------- 附加 START --------------------
 
-    default <Left> Children order(Class<Left> left, MFunction<Left, ?> lf, OrderByType type) {
-        String table = WrapperUtil.autoTable(null, this, left);
-        return order(table, lf.getName(), type);
-    }
-
-    default <Left> Children order(Class<Left> left, MFunction<Left, ?> lf, boolean desc) {
-        String table = WrapperUtil.autoTable(null, this, left);
-        return order(table, lf.getName(), desc);
-    }
-
-    default <Left> Children order(Class<Left> left, MFunction<Left, ?> lf) {
-        String table = WrapperUtil.autoTable(null, this, left);
-        return order(table, lf.getName(), OrderByType.ASC);
-    }
-
-    default Children order(String table, String field, boolean desc) {
-        return order(table, field, desc ? OrderByType.DESC : OrderByType.ASC);
-    }
-
-    Children order(String table, String field, OrderByType type);
-
     //TODO::-------------------- 附加 END --------------------
 
 }

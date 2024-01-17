@@ -65,6 +65,9 @@ public class TestModelJoin {
                 .order(SsoApp.class, SsoApp::getAppId, true)
                 .order(SsoApp.class, SsoApp::getAppId, OrderByType.DESC)
 
+                // TODO::asd
+                .field(SsoApp.class, SsoApp::getAppId, SsoApp::getName)
+
                 // 分页查询
                 .pagination();
 

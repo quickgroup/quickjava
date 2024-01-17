@@ -11,6 +11,7 @@ public class ModelWrapper<M extends Model> extends AbstractModelWrapper<ModelWra
     public ModelWrapper(Class<M> tClass) {
         try {
             this.model = tClass.newInstance();
+            this.modelClazz = tClass;
         } catch (InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }

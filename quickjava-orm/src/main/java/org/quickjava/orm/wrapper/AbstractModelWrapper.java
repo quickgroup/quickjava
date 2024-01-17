@@ -33,6 +33,8 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
 
     protected M model;
 
+    protected Class<M> modelClazz;
+
     protected Map<String, JoinSpecifyBase<?, ?>> joinMap;
 
     protected Model model() {
@@ -111,7 +113,8 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     }
 
     @Override
-    public <TM extends Model> Children field(Class<TM> tm, MFunction<TM, ?> ... tfs) {
+    @SafeVarargs
+    public final <TM> Children field(Class<TM> tm, MFunction<TM, ?>... tfs) {
         for (MFunction<TM, ?> lf : tfs) {
             String table = WrapperUtil.autoTable(null, this, tm);
             getQuerySet().field(table, lf.getName());
@@ -155,29 +158,26 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     }
 
     //TODO::--------------- 排序和数量限制 ---------------
-    public Children order(R function, boolean desc) {
-        model().order(findFieldName(function), desc);
+    public <TM> Children order(Class<TM> tm, MFunction<TM, ?> tf, OrderByType type) {
+        String table = WrapperUtil.autoTable(null, this, tm);
+        getQuerySet().order(table, tf.getName(), type);
         return chain();
     }
 
-    public Children order(R function) {
-        return this.order(function, false);
+    public Children order(R r, boolean desc) {
+        return order(this.modelClazz, r, desc ? OrderByType.DESC : OrderByType.ASC);
     }
 
-    public Children orderByDesc(R function) {
-        model().order(findFieldName(function), true);
-        return chain();
+    public Children order(R r) {
+        return order(r, false);
     }
 
-    public Children orderByAsc(R function) {
-        model().order(findFieldName(function), false);
-        return chain();
+    public Children orderByDesc(R r) {
+        return order(r, true);
     }
 
-    @Override
-    public Children order(String table, String field, OrderByType type) {
-        getQuerySet().order(table, field, type);
-        return chain();
+    public Children orderByAsc(R r) {
+        return order(r, false);
     }
 
     public Children limit(long index, long count) {

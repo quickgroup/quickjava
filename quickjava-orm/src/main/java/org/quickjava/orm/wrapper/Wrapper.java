@@ -1,6 +1,6 @@
 package org.quickjava.orm.wrapper;
 
-import org.quickjava.orm.model.Model;
+import org.quickjava.orm.query.enums.OrderByType;
 
 public interface Wrapper<Children> {
 
@@ -18,5 +18,18 @@ public interface Wrapper<Children> {
      * @return 查询器
      * @param <TM> 目标模型类
      */
-    <TM extends Model> Children field(Class<TM> tm, MFunction<TM, ?> ... tfs);
+    <TM> Children field(Class<TM> tm, MFunction<TM, ?>... tfs);
+
+    /**
+     * 指定类方法做排序列名
+     */
+    <TM> Children order(Class<TM> tm, MFunction<TM, ?> tf, OrderByType type);
+
+    default <Left> Children order(Class<Left> left, MFunction<Left, ?> lf, boolean desc) {
+        return order(left, lf, desc ? OrderByType.DESC : OrderByType.ASC);
+    }
+
+    default <Left> Children order(Class<Left> left, MFunction<Left, ?> lf) {
+        return order(left, lf, OrderByType.ASC);
+    }
 }
