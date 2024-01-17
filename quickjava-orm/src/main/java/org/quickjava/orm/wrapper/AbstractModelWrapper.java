@@ -123,14 +123,16 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     }
 
     //TODO::--------------- 特性 ---------------
-    public Children group(R ... fields) {
+    @SafeVarargs
+    public final Children group(R... fields) {
         for (R field : fields) {
             getQuerySet().group(field.getName());
         }
         return chain();
     }
 
-    public Children having(R ... fields) {
+    @SafeVarargs
+    public final Children having(R... fields) {
         for (R field : fields) {
             model().having(field.getName());
         }
