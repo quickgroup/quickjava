@@ -105,18 +105,20 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     }
 
     //TODO::-------------------- 字段  --------------------
-    public Children field(R ... fields) {
+    @SafeVarargs
+    public final Children field(R... fields) {
         for (R field : fields) {
             getQuerySet().field(field.getName());
         }
         return chain();
     }
 
+    // 关联表支持
     @Override
     @SafeVarargs
     public final <TM> Children field(Class<TM> tm, MFunction<TM, ?>... tfs) {
+        String table = WrapperUtil.autoTable(null, this, tm);
         for (MFunction<TM, ?> lf : tfs) {
-            String table = WrapperUtil.autoTable(null, this, tm);
             getQuerySet().field(table, lf.getName());
         }
         return chain();
@@ -131,10 +133,32 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         return chain();
     }
 
+    // 关联表支持
+    @Override
+    @SafeVarargs
+    public final <TM> Children group(Class<TM> tm, MFunction<TM, ?>... tfs) {
+        String table = WrapperUtil.autoTable(null, this, tm);
+        for (MFunction<TM, ?> tf : tfs) {
+            getQuerySet().group(table, tf.getName());
+        }
+        return chain();
+    }
+
     @SafeVarargs
     public final Children having(R... fields) {
         for (R field : fields) {
             model().having(field.getName());
+        }
+        return chain();
+    }
+
+    // 关联表支持
+    @Override
+    @SafeVarargs
+    public final <TM> Children having(Class<TM> tm, MFunction<TM, ?>... tfs) {
+        String table = WrapperUtil.autoTable(null, this, tm);
+        for (MFunction<TM, ?> tf : tfs) {
+            getQuerySet().having(table, tf.getName());
         }
         return chain();
     }
@@ -159,15 +183,10 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         return chain();
     }
 
-    //TODO::--------------- 排序和数量限制 ---------------
-    public <TM> Children order(Class<TM> tm, MFunction<TM, ?> tf, OrderByType type) {
-        String table = WrapperUtil.autoTable(null, this, tm);
-        getQuerySet().order(table, tf.getName(), type);
-        return chain();
-    }
-
+    //TODO::--------------- 排序和数量 ---------------
     public Children order(R r, boolean desc) {
-        return order(this.modelClazz, r, desc ? OrderByType.DESC : OrderByType.ASC);
+        getQuerySet().order(r.getName(), desc ? OrderByType.DESC : OrderByType.ASC);
+        return chain();
     }
 
     public Children order(R r) {
@@ -180,6 +199,13 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
 
     public Children orderByAsc(R r) {
         return order(r, false);
+    }
+
+    // 关联表支持
+    public <TM> Children order(Class<TM> tm, MFunction<TM, ?> tf, OrderByType type) {
+        String table = WrapperUtil.autoTable(null, this, tm);
+        getQuerySet().order(table, tf.getName(), type);
+        return chain();
     }
 
     public Children limit(long index, long count) {

@@ -114,7 +114,6 @@ public interface ModelJoinWrapper<
     Children join(JoinType type, JoinSpecifyBase<?, ?> condition);
 
     //TODO::-------------------- 查询条件 START --------------------
-
     // 自动识别查询表名
     default <Left extends Model> Children eq(Class<Left> left, MFunction<Left, ?> lf, Object val) {
         return where(true, left, lf, Operator.EQ, val);
@@ -291,9 +290,32 @@ public interface ModelJoinWrapper<
     Children where(boolean condition, String table, String column, Operator operator, Object val);
 
     //TODO::-------------------- 查询条件 END  --------------------
+    //TODO::-------------------- 特性 START --------------------
+    /**
+     * 声明字段
+     * @param tm 目标模型类
+     * @param tfs 目标模型字段
+     * @return 查询器
+     * @param <TM> 目标模型类
+     */
+    <TM> Children field(Class<TM> tm, MFunction<TM, ?>... tfs);
 
-    //TODO::-------------------- 附加 START --------------------
+    <TM> Children group(Class<TM> tm, MFunction<TM, ?>... tfs);
 
-    //TODO::-------------------- 附加 END --------------------
+    <TM> Children having(Class<TM> tm, MFunction<TM, ?>... tfs);
+
+    //TODO::-------------------- 特性 END --------------------
+    //TODO::-------------------- 排序和数量 START --------------------
+    <TM> Children order(Class<TM> tm, MFunction<TM, ?> tf, OrderByType type);
+
+    default <Left> Children order(Class<Left> left, MFunction<Left, ?> lf, boolean desc) {
+        return order(left, lf, desc ? OrderByType.DESC : OrderByType.ASC);
+    }
+
+    default <Left> Children order(Class<Left> left, MFunction<Left, ?> lf) {
+        return order(left, lf, OrderByType.ASC);
+    }
+
+    //TODO::-------------------- 排序和数量 END --------------------
 
 }

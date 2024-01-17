@@ -245,6 +245,16 @@ public class QuerySet {
         return this;
     }
 
+    // 解析字段
+    private TableColumn parseColumn(String column) {
+        column = column.trim();
+        if (column.contains(".")) {
+            String[] arr = column.split("\\.");
+            return new TableColumn(arr[0].trim(), arr[1].trim());
+        }
+        return new TableColumn(column);
+    }
+
     //TODO::-------------------- 特性 --------------------
     public QuerySet group(String ... columns)
     {
@@ -258,13 +268,8 @@ public class QuerySet {
         return this;
     }
 
-    private TableColumn parseColumn(String column) {
-        column = column.trim();
-        if (column.contains(".")) {
-            String[] arr = column.split("\\.");
-            return new TableColumn(arr[0].trim(), arr[1].trim());
-        }
-        return new TableColumn(column);
+    public QuerySet group(String table, String column) {
+        return group(new TableColumn(table, column));
     }
 
     public QuerySet group(TableColumn ... columns)
@@ -275,16 +280,20 @@ public class QuerySet {
         return this;
     }
 
-    public QuerySet having(String fields) {
-        return having(fields.split(","));
+    public QuerySet having(String columns) {
+        return having(columns.split(","));
     }
 
-    public QuerySet having(String ... fields)
+    public QuerySet having(String ... columns)
     {
-        for (String field : fields) {
-            having(new TableColumn(field.trim()));
+        for (String column : columns) {
+            having(new TableColumn(column.trim()));
         }
         return this;
+    }
+
+    public QuerySet having(String table, String column) {
+        return having(new TableColumn(table, column));
     }
 
     public QuerySet having(TableColumn ... columns)
@@ -345,25 +354,25 @@ public class QuerySet {
         return order(field, desc ? OrderByType.DESC : OrderByType.ASC);
     }
 
-    public QuerySet order(String fields)
+    public QuerySet order(String columns)
     {
-        if (ModelHelper.isEmpty(fields)) {
+        if (ModelHelper.isEmpty(columns)) {
             return this;
         }
-        if (fields.contains(",")) {
-            return this.order(fields.split(","));
+        if (columns.contains(",")) {
+            return this.order(columns.split(","));
         }
-        String[] arr = fields.trim().split(" ");
+        String[] arr = columns.trim().split(" ");
         return arr.length == 2 ? order(arr[0], OrderByType.getByName(arr[1])) : order(arr[0], OrderByType.ASC);
     }
 
-    public QuerySet order(List<String> fields) {
-        fields.forEach(this::order);
+    public QuerySet order(List<String> columns) {
+        columns.forEach(this::order);
         return this;
     }
 
-    public QuerySet order(String[] fields) {
-        for (String field : fields) {
+    public QuerySet order(String[] columns) {
+        for (String field : columns) {
             order(field);
         }
         return this;
