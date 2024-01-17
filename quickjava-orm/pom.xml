@@ -170,6 +170,18 @@
                     </execution>
                 </executions>
             </plugin>
+            <!--部署插件-->
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.7</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>${serverId}</serverId>
+                    <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                </configuration>
+            </plugin>
             <!-- Source -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -204,20 +216,6 @@
                     <docencoding>UTF-8</docencoding>
                 </configuration>
             </plugin>
-
-            <!--部署插件-->
-            <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.7</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <serverId>${serverId}</serverId>
-                    <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
-                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
-                </configuration>
-            </plugin>
-
         </plugins>
 
         <!-- 资源文件 -->
@@ -253,11 +251,11 @@
             <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
 
-        <!--        <repository>-->
-        <!--            <id>nexus-smkj</id>-->
-        <!--            <name>smkj</name>-->
-        <!--            <url>http://192.168.110.9:8081/repository/maven-releases/</url>-->
-        <!--        </repository>-->
+<!--        <repository>-->
+<!--            <id>nexus-smkj</id>-->
+<!--            <name>smkj</name>-->
+<!--            <url>http://192.168.110.9:8081/repository/maven-releases/</url>-->
+<!--        </repository>-->
     </distributionManagement>
 
     <!--以下部分内容不需要修改，直接复制咱贴即可-->

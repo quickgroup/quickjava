@@ -146,6 +146,27 @@
         </resources>
     </build>
 
+    <distributionManagement>
+        <snapshotRepository>
+            <!--这个id和settings.xml中servers.server.id要相同，因为上传jar需要登录才有权限-->
+            <id>${serverId}</id>
+            <name>OSS Snapshots Repository</name>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
+        </snapshotRepository>
+        <repository>
+            <!--这个id和settings.xml中servers.server.id要相同，因为上传jar需要登录才有权限-->
+            <id>${serverId}</id>
+            <name>OSS Staging Repository</name>
+            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+
+<!--        <repository>-->
+<!--            <id>nexus-smkj</id>-->
+<!--            <name>smkj</name>-->
+<!--            <url>http://192.168.110.9:8081/repository/maven-releases/</url>-->
+<!--        </repository>-->
+    </distributionManagement>
+
     <!--以下部分内容不需要修改，直接复制咱贴即可-->
     <licenses>
         <license>
@@ -160,20 +181,6 @@
         <developerConnection>https://github.com/quickgroup/quickjava.git</developerConnection>
         <url>https://github.com/quickgroup/quickjava</url>
     </scm>
-    <distributionManagement>
-        <snapshotRepository>
-            <!--这个id和settings.xml中servers.server.id要相同，因为上传jar需要登录才有权限-->
-            <id>${serverId}</id>
-            <name>OSS Snapshots Repository</name>
-            <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
-        </snapshotRepository>
-        <repository>
-            <!--这个id和settings.xml中servers.server.id要相同，因为上传jar需要登录才有权限-->
-            <id>${serverId}</id>
-            <name>OSS Staging Repository</name>
-            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
     <developers>
         <developer>
             <name>lo106258</name>
