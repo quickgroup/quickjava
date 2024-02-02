@@ -28,11 +28,17 @@ public enum Operator {
     LTE,
     ELT,
     LIKE,
+    LIKE_LEFT,
+    LIKE_RIGHT,
+    LIKE_LR,
+    NOT_LIKE,
+    NOT_LIKE_LR,
     IN,
     NOT_IN,
     IS_NULL,
     IS_NOT_NULL,
     BETWEEN,
+    NOT_BETWEEN,
     RAW,
     ;
 }

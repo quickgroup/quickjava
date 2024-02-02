@@ -1,8 +1,8 @@
 package org.quickjava.orm.contain;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 
-import java.util.LinkedList;
+import java.io.Serializable;
 import java.util.List;
 
 /*
@@ -19,7 +19,9 @@ import java.util.List;
  * License: Apache Licence 2.0
  * +-------------------------------------------------------------------
  */
-public class Pagination<T> implements IPagination<T> {
+public class Pagination<T> implements Serializable {
+
+    private static final long serialVersionUID = 240202L;
 
     public long page;
 
@@ -39,15 +41,7 @@ public class Pagination<T> implements IPagination<T> {
     public Pagination() {
     }
 
-    public Pagination(IPagination<T> pagination) {
-        this.page = pagination.getPage();
-        this.pageSize = pagination.getPageSize();
-        this.pages = pagination.getPages();
-        this.total = pagination.getTotal();
-        this.rows = pagination.getRows();
-    }
-
-    public Pagination(IPagination<?> pagination, List<T> rows) {
+    public Pagination(Pagination<?> pagination, List<T> rows) {
         this.page = pagination.getPage();
         this.pageSize = pagination.getPageSize();
         this.pages = pagination.getPages();
@@ -64,7 +58,7 @@ public class Pagination<T> implements IPagination<T> {
         this.pages = totalMax <= 0 ? 0 : (total + totalMax -1) / totalMax;
     }
 
-    public Pagination(Page<T> page) {
+    public Pagination(IPage<T> page) {
         this.page = page.getCurrent();
         this.pageSize = page.getSize();
         this.total = page.getTotal();

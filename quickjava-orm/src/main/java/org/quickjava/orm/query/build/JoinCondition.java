@@ -136,7 +136,7 @@ public class JoinCondition extends TableColumn {
             throw new QuickORMException("暂不支持");
         }
         if (getRightValue() != null) {
-            return ModelHelper.joinConditionSql(getTable(), getColumn(), compare, ValueConv.getConv(driveConfigure).conv(getRightValue()));
+            return ModelHelper.joinConditionSql(getTable(), getColumn(), compare, ValueConv.getConv(driveConfigure).convWrap(getRightValue()));
         }
         return ModelHelper.joinConditionSql(getTable(), getColumn(), compare, getRightTable(), getRightColumn());
     }

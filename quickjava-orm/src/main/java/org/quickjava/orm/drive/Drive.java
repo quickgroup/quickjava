@@ -121,7 +121,7 @@ public abstract class Drive {
             // values
             dataSql.append(" VALUES ");
             // 数据处理方法
-            SqlUtil.MapJoinCallback joinCallback = entry -> valueConv.conv(entry.getValue());
+            SqlUtil.MapJoinCallback joinCallback = entry -> valueConv.convWrap(entry.getValue());
             for (int i = 0; i < reservoir.dataList.size(); i++) {
                 if (i > 0)
                     dataSql.append(',');
@@ -136,7 +136,7 @@ public abstract class Drive {
             checkEmpty(reservoir.dataList.get(0), "Missing update data");
             StringBuilder dataSql = new StringBuilder();
             sqlList.add("SET");
-            SqlUtil.MapJoinCallback joinCallback = entry -> String.format("%s=%s", entry.getKey(), valueConv.conv(entry.getValue()));
+            SqlUtil.MapJoinCallback joinCallback = entry -> String.format("%s=%s", entry.getKey(), valueConv.convWrap(entry.getValue()));
             SqlUtil.mapJoin(dataSql, ", ", reservoir.dataList.get(0), joinCallback);
             sqlList.add(dataSql.toString());
         }

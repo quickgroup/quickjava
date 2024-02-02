@@ -6,7 +6,6 @@
 package org.quickjava.orm.query.build;
 
 import org.quickjava.orm.contain.DriveConfigure;
-import org.quickjava.orm.drive.DefaultDrive;
 import org.quickjava.orm.query.enums.Operator;
 import org.quickjava.orm.utils.SqlUtil;
 
@@ -76,7 +75,10 @@ public abstract class Where extends TableColumn {
         OpMap.put("LTE", "<=");
         OpMap.put("ELT", "<=");
         // 扩展
+        OpMap.put("BETWEEN", "BETWEEN");
+        OpMap.put("NOT_BETWEEN", "NOT BETWEEN");
         OpMap.put("LIKE", "LIKE");
+        OpMap.put("NOT_LIKE", "NOT LIKE");
         OpMap.put("IN", "IN");
         OpMap.put("NOT_IN", "NOT IN");
         OpMap.put("NOT IN", "NOT IN");
@@ -99,7 +101,11 @@ public abstract class Where extends TableColumn {
     }
 
     public Object getValueSql(DriveConfigure config) {
-        return ValueConv.getConv(config).conv(value);
+        return ValueConv.getConv(config).convWrap(value);
+    }
+
+    public Object getValue() {
+        return value;
     }
 
     public void setValue(Object value) {
@@ -122,10 +128,19 @@ public abstract class Where extends TableColumn {
             List<String> sqlList = children.stream().map(it -> it.toSql(cfg)).collect(Collectors.toList());
             return getLogicSql() + " (" + cutFirstLogic(SqlUtil.collJoin(" ", sqlList)) + ")";
         }
-        ValueConv valueConv = ValueConv.getConv(cfg);
+        ValueConv conv = ValueConv.getConv(cfg);
         // 输出
         switch (operator) {
-            case RAW: return column;
+            case RAW:
+                return column;
+            case LIKE_LEFT:
+                return getLogicSql() + " " + getColumnSql() + " LIKE " + conv.valueStringWrap("%" + conv.convValue(getValue()));
+            case LIKE_RIGHT:
+                return getLogicSql() + " " + getColumnSql() + " LIKE " + conv.valueStringWrap(conv.convValue(getValue()) + "%");
+            case LIKE_LR:
+                return getLogicSql() + " " + getColumnSql() + " LIKE " + conv.valueStringWrap("%" + conv.convValue(getValue()) + "%");
+            case NOT_LIKE_LR:
+                return getLogicSql() + " " + getColumnSql() + " NOT LIKE " + conv.valueStringWrap("%" + conv.convValue(getValue()) + "%");
             case IS_NULL:
             case IS_NOT_NULL:
                 return getLogicSql() + " " + getColumnSql() + " " + getOperatorSql();
@@ -133,6 +148,7 @@ public abstract class Where extends TableColumn {
             case NOT_IN:
                 return getLogicSql() + " " + getColumnSql() + " " + getOperatorSql() + " (" + getValueSql(cfg) + ")";
             case BETWEEN:
+            case NOT_BETWEEN:
                 Object[] arr = new Object[]{null, null};
                 if (value.getClass().isArray()) {
                     arr = (Object[]) value;
@@ -142,7 +158,7 @@ public abstract class Where extends TableColumn {
                 } else if (value instanceof String) {
                     arr = ((String) value).split(",");
                 }
-                return getLogicSql() + " " + getColumnSql() + " BETWEEN " + valueConv.conv(arr[0]) + " AND " + valueConv.conv(arr[1]);
+                return getLogicSql() + " " + getColumnSql() + " "+getOperatorSql()+" " + conv.convWrap(arr[0]) + " AND " + conv.convWrap(arr[1]);
         }
         return getLogicSql() + " " + getColumnSql() + " " + getOperatorSql() + " " + getValueSql(cfg);
     }

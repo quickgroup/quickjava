@@ -32,9 +32,17 @@ public class ValueConv {
         return valueConvCache.get(configure);
     }
 
-    public String conv(Object value) {
+    public String convWrap(Object value) {
+        String valStr = convValue(value);
+        if (isValueStringWrap(value)) {
+            return valueStringWrap(valStr);
+        }
+        return valStr;
+    }
+
+    public String convValue(Object value) {
         if (value == null) {
-            return "NULL";
+            return "";
         } else if (value instanceof Integer || value instanceof Long) {
             return String.valueOf(value);
         } else if (value instanceof Float) {
@@ -45,11 +53,30 @@ public class ValueConv {
             return SqlUtil.collJoin(",", ((Iterable<?>) value));
         } else if (value instanceof Date) {
             String valStr = convDate((Date) value);
-            return valueStringWrap(valStr);
+            return valStr;
         } else {
             String valueConv = Convert.convert(String.class, value);
             valueConv = SqlUtil.escapeSql(valueConv);
-            return valueStringWrap(valueConv);
+            return valueConv;
+        }
+    }
+
+    /**
+     * 字符串包含数据类型
+     */
+    public boolean isValueStringWrap(Object value) {
+        if (value == null) {
+            return false;
+        } else if (value instanceof Integer || value instanceof Long) {
+            return false;
+        } else if (value instanceof Float) {
+            return false;
+        } else if (value instanceof Double) {
+            return false;
+        } else if (value instanceof Iterable) {
+            return false;
+        } else {
+            return true;
         }
     }
 

@@ -41,59 +41,120 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         return model;
     }
 
-    public Children eq(R function, Object val) {
-        model().eq(findFieldName(function), val);
-        return chain();
+    public Children eq(R func, Object val) {
+        return eq(true, func, val);
     }
 
-    public Children neq(R function, Object val) {
-        model().neq(findFieldName(function), val);
-        return chain();
+    public Children eq(boolean condition, R func, Object val) {
+        return where(condition, null, findFieldName(func), Operator.EQ, val);
     }
 
-    public Children gt(R function, Object val) {
-        model().gt(findFieldName(function), val);
-        return chain();
+    public Children neq(R func, Object val) {
+        return neq(true, func, val);
+    }
+
+    public Children ne(R func, Object val) {
+        return neq(true, func, val);
+    }
+
+    public Children neq(boolean condition, R func, Object val) {
+        return where(condition, null, findFieldName(func), Operator.NEQ, val);
+    }
+
+    public Children gt(R func, Object val) {
+        return gt(true, func, val);
+    }
+
+    public Children gt(boolean condition, R func, Object val) {
+        return where(condition, null, findFieldName(func), Operator.GT, val);
     }
 
     public Children gte(R function, Object val) {
-        model().gte(findFieldName(function), val);
-        return chain();
+        return gte(true, function, val);
     }
 
-    public Children lt(R function, Object val) {
-        model().lt(findFieldName(function), val);
-        return chain();
+    public Children ge(R function, Object val) {
+        return gte(true, function, val);
     }
 
-    public Children lte(R function, Object val) {
-        model().lte(findFieldName(function), val);
-        return chain();
+    public Children gte(boolean condition, R func, Object val) {
+        return where(condition, null, findFieldName(func), Operator.GTE, val);
     }
 
-    public Children in(R function, Object ...args) {
-        model().in(findFieldName(function), args);
-        return chain();
+    public Children lt(R func, Object val) {
+        return lt(true, func, val);
     }
 
-    public Children notIn(R function, Object ...args) {
-        model().notIn(findFieldName(function), args);
-        return chain();
+    public Children lt(boolean condition, R function, Object val) {
+        return where(condition, null, findFieldName(function), Operator.LT, val);
     }
 
-    public Children isNull(R function) {
-        model().isNull(findFieldName(function));
-        return chain();
+    public Children lte(R func, Object val) {
+        return lte(true, func, val);
     }
 
-    public Children isNotNull(R function) {
-        model().isNotNull(findFieldName(function));
-        return chain();
+    public Children le(R func, Object val) {
+        return lte(true, func, val);
     }
 
-    public Children between(R function, Object v1, Object v2) {
-        model().between(findFieldName(function), v1, v2);
-        return chain();
+    public Children lte(boolean condition, R function, Object val) {
+        return where(condition, null, findFieldName(function), Operator.LTE, val);
+    }
+
+    public Children in(R func, Object ...args) {
+        return in(true, func, args);
+    }
+
+    public Children in(boolean condition, R func, Object ... args) {
+        return where(condition, null, findFieldName(func), Operator.IN, args);
+    }
+
+    public Children notIn(R func, Object ...args) {
+        return notIn(true, func, args);
+    }
+
+    public Children notIn(boolean condition, R function, Object ... args) {
+        return where(condition, null, findFieldName(function), Operator.NOT_IN, args);
+    }
+
+    public Children isNull(R func) {
+        return isNull(true, func);
+    }
+
+    public Children isNull(boolean condition, R func) {
+        return where(condition, null, findFieldName(func), Operator.IS_NULL, null);
+    }
+
+    public Children isNotNull(R func) {
+        return isNotNull(true, func);
+    }
+
+    public Children isNotNull(boolean condition, R func) {
+        return where(condition, null, findFieldName(func), Operator.IS_NOT_NULL, null);
+    }
+
+    public Children between(R func, Object v1, Object v2) {
+        return between(true, func, v1, v2);
+    }
+
+    public Children between(boolean condition, R func, Object v1, Object v2) {
+        return where(condition, null, findFieldName(func), Operator.BETWEEN, new Object[]{v1, v2});
+    }
+
+    public Children like(R func, Object val) {
+        return like(true, func, val);
+    }
+
+    public Children like(boolean condition, R function, Object val) {
+        return where(condition, null, findFieldName(function), Operator.LIKE_LR, val);
+    }
+
+    public Children notLike(R func, Object val) {
+        return like(true, func, val);
+    }
+
+    public Children notLike(boolean condition, R function, Object val) {
+        return where(condition, null, findFieldName(function), Operator.NOT_LIKE_LR, val);
     }
 
     @Override
