@@ -551,7 +551,7 @@ public class QuerySet {
 
     //TODO::--------------- 增强方法 ---------------
     // 分页查询
-    public Pagination<Map<String, Object>> pagination()
+    public IPagination<Map<String, Object>> pagination()
     {
         List<TableColumn> cacheFiledList = new LinkedList<>(reservoir.getColumnList());
         // 分页器开启直接打印sql
@@ -568,12 +568,12 @@ public class QuerySet {
         return new Pagination<>(page, reservoir.limitSize, total, rows);
     }
 
-    public Pagination<Map<String, Object>> pagination(Long page, Long pageSize) {
+    public IPagination<Map<String, Object>> pagination(Long page, Long pageSize) {
         this.page(page, pageSize);
         return pagination();
     }
 
-    public Pagination<Map<String, Object>> pagination(Long page) {
+    public IPagination<Map<String, Object>> pagination(Long page) {
         return this.pagination(page, 20L);
     }
 

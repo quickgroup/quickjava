@@ -9,7 +9,7 @@
     <artifactId>quickjava-orm</artifactId>
     <name>quickjava-orm</name>
     <!-- 发布后修改版本号 -->
-    <version>1.3.6</version>
+    <version>1.3.7</version>
     <packaging>jar</packaging>
     <description>
         QuickJava ORM Framework

@@ -3,6 +3,7 @@ package org.quickjava.orm.wrapper;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import org.quickjava.orm.contain.DataMap;
+import org.quickjava.orm.contain.IPagination;
 import org.quickjava.orm.contain.Pagination;
 import org.quickjava.orm.enums.JoinType;
 import org.quickjava.orm.model.Model;
@@ -364,14 +365,14 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         return main;
     }
 
-    public Pagination<M> pagination(long page, long pageSize) {
-        Pagination<Map<String, Object>> pagination = getQuerySet().pagination(page, pageSize);
+    public IPagination<M> pagination(long page, long pageSize) {
+        IPagination<Map<String, Object>> pagination = getQuerySet().pagination(page, pageSize);
         // 装载数据
-        List<M> models = queryAfter(pagination.rows, getModelMeta(this.model.getClass()));
+        List<M> models = queryAfter(pagination.getRows(), getModelMeta(this.model.getClass()));
         return new Pagination<>(pagination, models);
     }
 
-    public Pagination<M> pagination() {
+    public IPagination<M> pagination() {
         return pagination(1L, 20L);
     }
 

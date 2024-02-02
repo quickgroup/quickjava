@@ -368,18 +368,18 @@ public class Model implements IModel {
     }
 
     //TODO::---------- 分页方法 ----------
-    public <D> Pagination<D> pagination(Long page, Long pageSize) {
+    public <D> IPagination<D> pagination(Long page, Long pageSize) {
         // 查询前处理：预载入
         queryBefore();
         // 执行查询
-        Pagination<Map<String, Object>> pagination = query().pagination(page, pageSize);
+        IPagination<Map<String, Object>> pagination = query().pagination(page, pageSize);
         // 数据组装
-        Pagination<IModel> pagination1 = new Pagination<>(pagination, new LinkedList<>());
-        pagination1.rows = ModelHelper.resultTranshipment(this, getMClass(), pagination.rows);
+        IPagination<IModel> pagination1 = new Pagination<>(pagination, new LinkedList<>());
+        pagination1.setRows(ModelHelper.resultTranshipment(this, getMClass(), pagination.getRows()));
         return toD(pagination1);
     }
 
-    public <D> Pagination<D> pagination() {
+    public <D> IPagination<D> pagination() {
         return pagination(1L, 20L);
     }
 

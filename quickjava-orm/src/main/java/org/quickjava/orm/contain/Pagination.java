@@ -19,7 +19,7 @@ import java.util.List;
  * License: Apache Licence 2.0
  * +-------------------------------------------------------------------
  */
-public class Pagination<T> implements Serializable {
+public class Pagination<T> implements IPagination<T> {
 
     private static final long serialVersionUID = 240202L;
 
@@ -41,7 +41,7 @@ public class Pagination<T> implements Serializable {
     public Pagination() {
     }
 
-    public Pagination(Pagination<?> pagination, List<T> rows) {
+    public Pagination(IPagination<?> pagination, List<T> rows) {
         this.page = pagination.getPage();
         this.pageSize = pagination.getPageSize();
         this.pages = pagination.getPages();
@@ -58,13 +58,8 @@ public class Pagination<T> implements Serializable {
         this.pages = totalMax <= 0 ? 0 : (total + totalMax -1) / totalMax;
     }
 
-    public Pagination(IPage<T> page) {
-        this.page = page.getCurrent();
-        this.pageSize = page.getSize();
-        this.total = page.getTotal();
-        this.rows = page.getRecords();
-        long totalMax = this.page * this.pageSize;
-        this.pages = totalMax <= 0 ? 0 : (total + totalMax -1) / totalMax;
+    public static<T> IPagination<T> fromIPage(IPage<T> page) {
+        return new Pagination<>(page.getCurrent(), page.getSize(), page.getTotal(), page.getRecords());
     }
 
     public long getPage() {
