@@ -195,9 +195,7 @@ public class Model implements IModel {
         reservoir.meta.fieldMap().forEach((name, field) -> {
             if (!reservoir.data.containsKey(name)) {
                 if (field.isInsertFill()) {
-                    data(name, ModelHelper.fill(field.getModelField().insertFill(), field.getModelField().insertFillTarget()));
-                } else if (field.isUpdateFill()) {
-                    data(name, ModelHelper.fill(field.getModelField().updateFill(), field.getModelField().updateFillTarget()));
+                    data(name, field.insertFill());     // 新增时填充
                 }
             }
         });
@@ -259,7 +257,7 @@ public class Model implements IModel {
          reservoir.meta.fieldMap().forEach((name, field) -> {
             if (!reservoir.data.containsKey(name)) {
                 if (field.isUpdateFill()) {
-                    data(name, ModelHelper.fill(field.getModelField().updateFill(), field.getModelField().updateFillTarget()));
+                    data(name, field.updateFill());
                 }
             }
         });

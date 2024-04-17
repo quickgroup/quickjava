@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import org.quickjava.common.utils.ComUtil;
+import org.quickjava.orm.model.ModelHelper;
 import org.quickjava.orm.model.annotation.ModelField;
 import org.quickjava.orm.model.annotation.ModelId;
 import org.quickjava.orm.model.enums.ModelFieldFill;
@@ -170,6 +171,15 @@ public class ModelFieldMeta {
         return false;
     }
 
+    public Object insertFill() {
+        if (modelField != null && modelField.insertFill() != ModelFieldFill.NULL) {
+            return ModelHelper.fill(field, getModelField().insertFill(), getModelField().insertFillTarget());
+        } else if (tableField != null && (tableField.fill() == FieldFill.INSERT || tableField.fill() == FieldFill.INSERT_UPDATE)) {
+
+        }
+        return null;
+    }
+
     public boolean isUpdateFill() {
         if (modelField != null) {
             return modelField.updateFill() != ModelFieldFill.NULL;
@@ -177,6 +187,15 @@ public class ModelFieldMeta {
             return tableField.fill() == FieldFill.UPDATE || tableField.fill() == FieldFill.INSERT_UPDATE;
         }
         return false;
+    }
+
+    public Object updateFill() {
+        if (modelField != null && modelField.updateFill() != ModelFieldFill.NULL) {
+            return ModelHelper.fill(field, modelField.updateFill(), modelField.updateFillTarget());
+        } else if (tableField != null && (tableField.fill() == FieldFill.UPDATE || tableField.fill() == FieldFill.INSERT_UPDATE)) {
+
+        }
+        return null;
     }
 
     public boolean isSoftDelete() {

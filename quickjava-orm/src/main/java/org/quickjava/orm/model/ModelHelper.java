@@ -200,7 +200,7 @@ public class ModelHelper extends SqlUtil {
     }
 
     // 填充数据
-    public static Object fill(ModelFieldFill fill, String staticMethodStr) {
+    public static Object fill(Field field, ModelFieldFill fill, String staticMethodStr) {
         if (fill == ModelFieldFill.DATETIME) {
             return new Date();
         } else if (fill == ModelFieldFill.DATE) {
