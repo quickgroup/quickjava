@@ -273,7 +273,7 @@ public class ModelHelper extends SqlUtil {
      * */
     public static <D extends IModel> List<D> resultTranshipment(Model queryModel, Class<?> clazz, List<Map<String, Object>> dataList) {
         List<IModel> models = new LinkedList<>();
-        ModelReservoir reservoir = ReflectUtil.getFieldValue(queryModel, "reservoir");
+        ModelReservoir reservoir = getModelReservoir(queryModel);
         // 无预载入
         if (SqlUtil.isEmpty(reservoir.withs)) {
             dataList.forEach(data -> {
@@ -309,7 +309,7 @@ public class ModelHelper extends SqlUtil {
      */
     public static void resultTranshipmentWith(IModel iModel, Map<String, Object> data, String alias) {
         Model model = ((Model) iModel);
-        ModelReservoir reservoir = ReflectUtil.getFieldValue(model, "reservoir");
+        ModelReservoir reservoir = getModelReservoir(model);
         String tableName = alias == null ? reservoir.meta.table() : alias;
         resultTranshipmentWithOne(iModel, data, tableName + "__");
     }
@@ -319,7 +319,7 @@ public class ModelHelper extends SqlUtil {
      */
     public static void resultTranshipmentWithOne(IModel iModel, Map<String, Object> data, String columnPrefix) {
         Model model = ((Model) iModel);
-        ModelReservoir reservoir = ReflectUtil.getFieldValue(model, "reservoir");
+        ModelReservoir reservoir = getModelReservoir(model);
         reservoir.meta.fieldMap().forEach((name, field) -> {
             if (field.isRelation() || Model.class.isAssignableFrom(field.getClazz())) {
                 return;
@@ -331,7 +331,7 @@ public class ModelHelper extends SqlUtil {
 
     private static Map<String, Relation> getWithRelation(Model model, RelationType[] types) {
         Map<String, Relation> relationMap = new LinkedHashMap<>();
-        ModelReservoir reservoir = ReflectUtil.getFieldValue(model, "reservoir");
+        ModelReservoir reservoir = getModelReservoir(model);
         reservoir.meta.relationMap().forEach((name, relation) -> {
             if (SqlUtil.inArray(types, relation.getType())) {
                 relationMap.put(name, relation);

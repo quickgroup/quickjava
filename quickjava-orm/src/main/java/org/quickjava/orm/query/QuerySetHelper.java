@@ -5,6 +5,7 @@ import org.quickjava.orm.query.Q;
 import org.quickjava.orm.query.QuerySet;
 import org.quickjava.orm.query.enums.Operator;
 import org.quickjava.orm.query.contain.TableMeta;
+import org.quickjava.orm.utils.ReflectUtil;
 import org.quickjava.orm.utils.SqlUtil;
 
 import java.util.*;
@@ -26,6 +27,10 @@ public class QuerySetHelper {
     public static TableMeta setTableOri(String name, TableMeta tableOri) {
         tableOriMap.put(name, tableOri);
         return tableOri;
+    }
+
+    public static QueryReservoir getQueryReservoir(QuerySet querySet) {
+        return ReflectUtil.getFieldValue(querySet, "reservoir");
     }
 
     public static QuerySet loadQuery(QuerySet querySet, Map<String, Object> query)

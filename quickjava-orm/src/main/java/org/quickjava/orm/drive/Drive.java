@@ -5,6 +5,7 @@
 
 package org.quickjava.orm.drive;
 
+import org.quickjava.orm.query.QuerySetHelper;
 import org.quickjava.orm.utils.ReflectUtil;
 import org.quickjava.orm.query.QueryReservoir;
 import org.quickjava.orm.query.QuerySet;
@@ -83,7 +84,7 @@ public abstract class Drive {
 
         List<String> sqlList = new ArrayList<>();
         DriveConfigure config = getDriveConfigure();
-        QueryReservoir reservoir = getQueryReservoir(query);
+        QueryReservoir reservoir = QuerySetHelper.getQueryReservoir(query);
         reservoir.pretreatment(config);
         ValueConv valueConv = new ValueConv(config);
 
@@ -184,7 +185,7 @@ public abstract class Drive {
     }
 
     public <T> T executeSql(QuerySet query) {
-        return executeSql(getQueryReservoir(query).action, pretreatment(query));
+        return executeSql(QuerySetHelper.getQueryReservoir(query).action, pretreatment(query));
     }
 
     /**
@@ -240,11 +241,6 @@ public abstract class Drive {
                 quickConnection.close();
             }
         }
-    }
-
-    // 获取查询器的数据器
-    public static QueryReservoir getQueryReservoir(QuerySet query) {
-        return ReflectUtil.getFieldValue(query, "reservoir");
     }
 
     private static void checkNull(Object obj, String msg) {

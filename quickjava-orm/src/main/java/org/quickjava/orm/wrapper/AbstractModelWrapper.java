@@ -12,6 +12,7 @@ import org.quickjava.orm.model.contain.ModelFieldMeta;
 import org.quickjava.orm.model.contain.ModelMeta;
 import org.quickjava.orm.query.QueryReservoir;
 import org.quickjava.orm.query.QuerySet;
+import org.quickjava.orm.query.QuerySetHelper;
 import org.quickjava.orm.query.build.JoinCondition;
 import org.quickjava.orm.query.enums.Operator;
 import org.quickjava.orm.query.enums.OrderByType;
@@ -401,7 +402,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         // 查询器
         ModelMeta mainMeta = getModelMeta(this.model.getClass());
         QuerySet querySet = getQuerySet();
-        QueryReservoir queryReservoir = (QueryReservoir) ReflectUtil.getFieldValue(querySet, "reservoir");
+        QueryReservoir queryReservoir = QuerySetHelper.getQueryReservoir(querySet);
         // 主表字段
         if (ObjectUtil.isEmpty(queryReservoir.columnList)) {
             ModelMeta main = ModelHelper.getMeta(this.model.getClass());

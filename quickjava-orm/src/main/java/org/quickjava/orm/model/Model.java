@@ -79,7 +79,7 @@ public class Model implements IModel {
         synchronized (Model.class) {
             if (reservoir.querySet == null) {
                 reservoir.querySet = QuerySet.table(parseModelTableName(getClass()));
-                QueryReservoir queryReservoir = ReflectUtil.getFieldValue(reservoir.querySet, "reservoir");
+                QueryReservoir queryReservoir = QuerySetHelper.getQueryReservoir(reservoir.querySet);
                 queryReservoir.setCallback(WhereOptCallback.class, ModelHelper.whereOptCallback, this);
                 queryReservoir.setCallback(OrderByOptCallback.class, ModelHelper.orderByOptCallback, this);
             }
@@ -88,7 +88,7 @@ public class Model implements IModel {
     }
 
     private QueryReservoir querySetReservoir() {
-        return ReflectUtil.getFieldValue(query(), "reservoir");
+        return QuerySetHelper.getQueryReservoir(query());
     }
 
     //TODO:---------- 查询方法 ----------
@@ -700,7 +700,7 @@ public class Model implements IModel {
         enhancer.setSuperclass(getModelClass(clazz));
         enhancer.setCallback(modelProxyMethodInterceptor);
         D model = toD(enhancer.create());
-        ModelReservoir reservoir = ReflectUtil.getFieldValue(model, "reservoir");
+        ModelReservoir reservoir = ModelHelper.getModelReservoir(model);
         // 加载数据
         if (!ModelHelper.isEmpty(data)) {
             ((Model) model).data((DataMap) data);
