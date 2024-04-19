@@ -1,5 +1,7 @@
 package org.quickjava.orm.utils;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.IterUtil;
 import org.quickjava.common.utils.ComUtil;
 import org.quickjava.orm.model.ModelHelper;
 import org.quickjava.orm.model.contain.ModelFieldMeta;
@@ -190,6 +192,13 @@ public class SqlUtil extends ComUtil {
         String column = SqlUtil.toUnderlineCase(fieldName);
         String columnAlias = table + "__" + column;
         return new TableColumn(table, column, columnAlias);
+    }
+
+    /**
+     * 字符串连接
+     */
+    public static<T> String strJoin(CharSequence conjunction, Iterable<T> iterable) {
+        return CollUtil.join(iterable, conjunction);
     }
 
 }

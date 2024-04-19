@@ -636,33 +636,31 @@ public class Model implements IModel {
                 }
             }
         }
-        // 关联属性字段载入
+
+        // TODO::一对一关联查询
         Map<String, Relation> relationMap = getWithRelation(new RelationType[]{RelationType.OneToOne});
-        System.out.println("relationMap=" + relationMap);
-        if (relationMap.isEmpty()) {
-            return;
+        logger.debug("relationMap=" + relationMap);
+        if (!relationMap.isEmpty()) {
+            // T1::字段声明
+            List<String> fields = new LinkedList<>();
+            // 本表字段声明
+            ModelHelper.loadModelAccurateFields(query(), reservoir.meta, reservoir.meta.table());
+            // 关联表
+            relationMap.forEach((relationName, relation) -> {
+                ModelMeta meta = ModelHelper.getMeta(relation.getClazz());
+                // 关联表字段
+                ModelHelper.loadModelAccurateFields(query(), meta, relationName);
+                // 关联方式声明
+                String conditionSql = ModelHelper.joinConditionSql(
+                        relationName, relation.foreignKey(),
+                        CompareEnum.EQ,
+                        reservoir.meta.table(), relation.localKey()
+                );
+                query().join(meta.table() + " " + relationName, conditionSql, JoinType.LEFT);
+            });
+            // 装填字段
+            query().field(fields);
         }
-
-        // T1::字段声明
-        List<String> fields = new LinkedList<>();
-        // 本表字段声明
-        ModelHelper.loadModelAccurateFields(query(), reservoir.meta, reservoir.meta.table());
-
-        // 关联表
-        relationMap.forEach((relationName, relation) -> {
-            ModelMeta meta = ModelHelper.getMeta(relation.getClazz());
-            // 关联表字段
-            ModelHelper.loadModelAccurateFields(query(), meta, relationName);
-            // 关联方式声明
-            String conditionSql = ModelHelper.joinConditionSql(
-                    relationName, relation.foreignKey(),
-                    CompareEnum.EQ,
-                    reservoir.meta.table(), relation.localKey()
-            );
-            query().join(meta.table() + " " + relationName, conditionSql, JoinType.LEFT);
-        });
-        // 装填字段
-        query().field(fields);
     }
 
     /**
@@ -914,12 +912,19 @@ public class Model implements IModel {
                 continue;
             }
             ModelFieldMeta fieldMeta = new ModelFieldMeta(field);
+            boolean isModelChild = Model.class.isAssignableFrom(fieldMeta.getClazz());
+            boolean isModelChildList = List.class.isAssignableFrom(fieldMeta.getClazz());
+            if (isModelChildList) {
+                ParameterizedType listType = (ParameterizedType) field.getGenericType();
+                Class<?> listElementType = (Class<?>) listType.getActualTypeArguments()[0];
+                isModelChildList = Model.class.isAssignableFrom(listElementType);
+            }
             // 隐藏字段
-            if (!fieldMeta.isExist()) {
+            if (!isModelChild && !isModelChildList && !fieldMeta.isExist()) {
                 continue;
             }
 
-            // 关联属性的关联注解
+            // 属性上关联注解
             fieldMeta.setRelationWay(findRelationAno(field));
 
             // 有关联方法
@@ -928,7 +933,8 @@ public class Model implements IModel {
                 try {
                     method.invoke(model);
                     fieldMeta.setRelationWay(meta.relationMap().get(fieldMeta.getName()));
-                } catch (IllegalAccessException | InvocationTargetException ignore) {
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    logger.error("关联方法调用失败：{}", e.getMessage(), e);
                 }
             }
 
@@ -976,7 +982,7 @@ public class Model implements IModel {
             Model model = (Model) o;
             model.data(fieldName, arg);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Setter error", e);
             throw new RuntimeException(e);
         }
     }

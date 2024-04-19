@@ -357,10 +357,13 @@ public class ModelHelper extends SqlUtil {
 
         // 一对多查询条件准备
         withs.forEach(relationName -> {
+            Relation relation = relationMap.get(relationName);
+            if (relation.getType() != RelationType.OneToMany) {
+                return;
+            }
             if (!conditionMap.containsKey(relationName)) {
                 conditionMap.put(relationName, new LinkedList<>());
             }
-            Relation relation = relationMap.get(relationName);
             models.forEach(model -> {
                 Object localKeyValue = ReflectUtil.getFieldValue(model, relation.localKey());
                 if (!conditionMap.get(relationName).contains(localKeyValue)) {  // 避免相同关联数据重复查询

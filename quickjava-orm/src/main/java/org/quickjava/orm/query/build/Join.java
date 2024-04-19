@@ -1,8 +1,10 @@
 package org.quickjava.orm.query.build;
 
 import cn.hutool.core.util.StrUtil;
+import org.quickjava.common.utils.ComUtil;
 import org.quickjava.orm.contain.DriveConfigure;
 import org.quickjava.orm.enums.JoinType;
+import org.quickjava.orm.utils.SqlUtil;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -77,7 +79,7 @@ public class Join {
         this.driveConfigure = driveConfigure;
         List<String> conditionsStrList = new LinkedList<>();
         getConditions().forEach(it -> conditionsStrList.add(it.toSql(driveConfigure)));
-        String conditionsStr = StrUtil.join(" AND ", conditionsStrList);
+        String conditionsStr = SqlUtil.strJoin(" AND ", conditionsStrList);
         return String.format("%s JOIN %s ON %s", type.name(), table, conditionsStr);
     }
 }
