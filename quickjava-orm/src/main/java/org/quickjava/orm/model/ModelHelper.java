@@ -292,9 +292,11 @@ public class ModelHelper extends SqlUtil {
                 // 一对一关联表数据
                 reservoir.withs.forEach(relationName -> {
                     Relation relation = relationMap.get(relationName);
-                    Model relationModel = Model.newModel(relation.getClazz(), null, main);
-                    resultTranshipmentWith(relationModel, data, relationName);
-                    ReflectUtil.setFieldValue(main, relationName, relationModel);
+                    if (relation != null) {
+                        Model relationModel = Model.newModel(relation.getClazz(), null, main);
+                        resultTranshipmentWith(relationModel, data, relationName);
+                        ReflectUtil.setFieldValue(main, relationName, relationModel);
+                    }
                 });
                 models.add(main);
             });

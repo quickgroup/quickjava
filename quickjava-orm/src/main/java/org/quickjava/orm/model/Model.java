@@ -54,9 +54,10 @@ import java.util.*;
  * License: Apache Licence 2.0
  * +-------------------------------------------------------------------
  */
+
 /**
  * 模型
- * */
+ */
 @JsonIgnoreProperties(value = {"reservoir"}, ignoreUnknown = true)
 public class Model implements IModel {
 
@@ -73,7 +74,8 @@ public class Model implements IModel {
     }
 
     @JsonIgnore
-    protected void __initialize() {}
+    protected void __initialize() {
+    }
 
     private synchronized QuerySet query() {
         synchronized (Model.class) {
@@ -126,14 +128,12 @@ public class Model implements IModel {
         return this;
     }
 
-    public Model where(WhereClosure callback)
-    {
+    public Model where(WhereClosure callback) {
         query().where(callback);
         return this;
     }
 
-    public Model whereOr(WhereClosure callback)
-    {
+    public Model whereOr(WhereClosure callback) {
         query().whereOr(callback);
         return this;
     }
@@ -162,11 +162,11 @@ public class Model implements IModel {
         return where(field, Operator.LTE, val);
     }
 
-    public Model in(String field, Object ...args) {
+    public Model in(String field, Object... args) {
         return where(field, Operator.IN, args);
     }
 
-    public Model notIn(String field, Object ...args) {
+    public Model notIn(String field, Object... args) {
         return where(field, Operator.IN, args);
     }
 
@@ -186,11 +186,11 @@ public class Model implements IModel {
 
     /**
      * 新增
-     * @return D
+     *
      * @param <D> D
+     * @return D
      */
-    public <D extends IModel> D insert()
-    {
+    public <D extends IModel> D insert() {
         // 默认填充数据
         reservoir.meta.fieldMap().forEach((name, field) -> {
             if (!reservoir.data.containsKey(name)) {
@@ -211,9 +211,10 @@ public class Model implements IModel {
 
     /**
      * 使用数据集新增
+     *
      * @param data 数据集
+     * @param <D>  D
      * @return 模型对象
-     * @param <D> D
      */
     public <D extends IModel> D insert(DataMap data) {
         return insert((Map<String, Object>) data);
@@ -226,10 +227,10 @@ public class Model implements IModel {
 
     /**
      * 删除
+     *
      * @return 1
      */
-    public int delete()
-    {
+    public int delete() {
         // 软删除字段
         for (ModelFieldMeta field : reservoir.meta.fieldMap().values()) {
             if (field.isSoftDelete()) {
@@ -248,13 +249,13 @@ public class Model implements IModel {
 
     /**
      * 更新
-     * @return 模型对象
+     *
      * @param <D> D
+     * @return 模型对象
      */
-    public <D extends IModel> D update()
-    {
+    public <D extends IModel> D update() {
         // 默认填充数据
-         reservoir.meta.fieldMap().forEach((name, field) -> {
+        reservoir.meta.fieldMap().forEach((name, field) -> {
             if (!reservoir.data.containsKey(name)) {
                 if (field.isUpdateFill()) {
                     data(name, field.updateFill());
@@ -279,8 +280,7 @@ public class Model implements IModel {
         return update();
     }
 
-    public <D extends IModel> D updateById()
-    {
+    public <D extends IModel> D updateById() {
         String pk = pk();
         where(pk, data(pk));
 //        reservoir.data.remove(pk);  // 不去更新主键
@@ -290,8 +290,9 @@ public class Model implements IModel {
     /**
      * 保存数据
      * - 自动判断主键是否为null，为null执行新增，否则进行更新
-     * @return 模型对象
+     *
      * @param <D> D
+     * @return 模型对象
      */
     public <D extends IModel> D save() {
         String pk = pk();
@@ -311,11 +312,11 @@ public class Model implements IModel {
 
     /**
      * 查询一条数据
-     * @return 模型对象
+     *
      * @param <D> 模型类
+     * @return 模型对象
      */
-    public <D extends IModel> D find()
-    {
+    public <D extends IModel> D find() {
         // 查询前：预载入字段准备
         queryBefore();
         // 执行查询
@@ -354,9 +355,10 @@ public class Model implements IModel {
 
     /**
      * 获取指定字段的数据
+     *
      * @param field 字段名
+     * @param <D>   数据代理类
      * @return 字段数据
-     * @param <D> 数据代理类
      */
     public <D> D value(String field) {
         // 指定字段
@@ -382,10 +384,12 @@ public class Model implements IModel {
     }
 
     //TODO::---------- 操作方法：排序、聚合等 START ----------
+
     /**
      * 排序
+     *
      * @param field 字段
-     * @param type 排序方式
+     * @param type  排序方式
      * @return 模型对象
      */
     public Model order(String field, OrderByType type) {
@@ -398,8 +402,7 @@ public class Model implements IModel {
         return this;
     }
 
-    public Model order(String fields)
-    {
+    public Model order(String fields) {
         query().order(fields);
         return this;
     }
@@ -427,6 +430,7 @@ public class Model implements IModel {
 
     /**
      * 分页
+     *
      * @param page 页数
      * @return 模型对象
      */
@@ -437,6 +441,7 @@ public class Model implements IModel {
 
     /**
      * 分页
+     *
      * @param page 页数
      * @param size 页大小
      * @return 模型对象
@@ -484,8 +489,10 @@ public class Model implements IModel {
     //TODO::---------- 操作方法：排序、聚合等 END ----------
 
     //TODO::---------- 数据方法 START ----------
+
     /**
      * 实体通过map装载数据
+     *
      * @param data 数据集
      * @return 模型对象
      */
@@ -500,6 +507,7 @@ public class Model implements IModel {
 
     /**
      * 获取data中的数据
+     *
      * @param field 属性名
      * @return 属性值
      */
@@ -509,15 +517,15 @@ public class Model implements IModel {
 
     /**
      * 装载数据
+     *
      * @param name 属性名
-     * @param val 属性值
+     * @param val  属性值
      * @return 模型对象
      */
-    public Model data(String name, Object val)
-    {
+    public Model data(String name, Object val) {
         // 数据保存
         name = ModelHelper.toCamelCase(name);
-        ModelFieldMeta field =  reservoir.meta.fieldMap().get(name);
+        ModelFieldMeta field = reservoir.meta.fieldMap().get(name);
         // 非本表属性或关联属性不设置
         if (field == null || field.getRelationWay() != null) {
             return this;
@@ -533,6 +541,7 @@ public class Model implements IModel {
 
     /**
      * 获取data全部数据
+     *
      * @return 模型数据
      */
     public DataMap data() {
@@ -541,7 +550,7 @@ public class Model implements IModel {
     }
 
     public String pk() {
-        return  reservoir.meta.getPkName();
+        return reservoir.meta.getPkName();
 //        return ModelUtil.toCamelCase(query().pk());
     }
 
@@ -552,10 +561,10 @@ public class Model implements IModel {
     /**
      * 手机执行sql的数据
      * - insert、update的数据
+     *
      * @return 数据集
      */
-    private DataMap sqlData()
-    {
+    private DataMap sqlData() {
         DataMap data = data();
         DataMap ret = DataMap.one();
         if (reservoir.modified != null) {
@@ -572,13 +581,14 @@ public class Model implements IModel {
     //TODO::---------- 数据方法 END ----------
 
     //TODO::---------- 静态操作方法 START ----------
+
     /**
      * 通过 Map 创建对象
+     *
      * @param data 数据集
      * @return 模型对象
      */
-    public Model create(Map<String, Object> data)
-    {
+    public Model create(Map<String, Object> data) {
         Model model = newModel(getMClass(), data);
         model.insert();
         return model;
@@ -586,6 +596,7 @@ public class Model implements IModel {
 
     /**
      * 通过 DataMap 创建对象
+     *
      * @param data 数据集
      * @return 模型对象
      */
@@ -595,11 +606,11 @@ public class Model implements IModel {
 
     /**
      * 批量创建
+     *
      * @param dataList 数据列表
      * @return 对象数量
      */
-    public Integer bulkCreate(List<DataMap> dataList)
-    {
+    public Integer bulkCreate(List<DataMap> dataList) {
         dataList.forEach(data -> {
             Model model = newModel(this.getMClass());
             model.save(data);
@@ -609,12 +620,12 @@ public class Model implements IModel {
     //TODO::---------- 静态操作方法 END ----------
 
     //TODO::---------- 模型控制方法 ----------
+
     /**
      * 查询前处理预载入
      * T1：一对一的字段声明
-     * */
-    private void queryBefore()
-    {
+     */
+    private void queryBefore() {
         // 软删除字段
         for (ModelFieldMeta field : reservoir.meta.fieldMap().values()) {
             if (field.isSoftDelete()) {
@@ -656,6 +667,7 @@ public class Model implements IModel {
 
     /**
      * 获取预载入的属性名对应模型类
+     *
      * @param types 关联类型
      * @return 关联属性集合
      */
@@ -663,9 +675,9 @@ public class Model implements IModel {
         Map<String, Relation> relationMap = new LinkedHashMap<>();
         if (reservoir.withs != null) {
             reservoir.withs.forEach(name -> {
-                Relation relation =  reservoir.meta.relationMap().get(name);
+                Relation relation = reservoir.meta.relationMap().get(name);
                 if (relation != null && SqlUtil.inArray(types, relation.getType())) {
-                    relationMap.put(name,  reservoir.meta.relationMap().get(name));
+                    relationMap.put(name, reservoir.meta.relationMap().get(name));
                 }
             });
         }
@@ -677,24 +689,23 @@ public class Model implements IModel {
     }
 
     //TODO::---------- 模型实例化----------
-    public static<D extends IModel> D newModel(Class<?> clazz) {
+    public static <D extends IModel> D newModel(Class<?> clazz) {
         return newModel(clazz, null, null);
     }
 
-    public static<D extends IModel> D newModel(Object entity) {
+    public static <D extends IModel> D newModel(Object entity) {
         return newModel(entity.getClass(), null, null);
     }
 
-    private static<D extends IModel> D newModel(Class<?> clazz, Map<String, Object> data) {
+    private static <D extends IModel> D newModel(Class<?> clazz, Map<String, Object> data) {
         return newModel(clazz, data, null);
     }
 
-    private static<D extends IModel> D newModel(Class<?> clazz, Model parent) {
+    private static <D extends IModel> D newModel(Class<?> clazz, Model parent) {
         return newModel(clazz, null, parent);
     }
 
-    public static<D extends IModel> D newModel(Class<?> clazz, Map<String, Object> data, IModel parent)
-    {
+    public static <D extends IModel> D newModel(Class<?> clazz, Map<String, Object> data, IModel parent) {
         // 创建代理类信息
         Enhancer enhancer = new Enhancer();
         enhancer.setSuperclass(getModelClass(clazz));
@@ -714,7 +725,7 @@ public class Model implements IModel {
 
     @JsonIgnore
     @TableField(exist = false)
-    private static final MethodInterceptor modelProxyMethodInterceptor = new MethodInterceptor () {
+    private static final MethodInterceptor modelProxyMethodInterceptor = new MethodInterceptor() {
         @Override
         public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
             /*
@@ -744,11 +755,10 @@ public class Model implements IModel {
      * 如果当前对象素模型（不是代理模型）
      * - 素模型：在 insert、update 时收集数据，包含null（因为java无法表明该属性是否被修改）
      */
-    private void loadingVegetarianModel()
-    {
+    private void loadingVegetarianModel() {
         if (ModelHelper.isVegetarianModel(this) && reservoir.vegetarian) {
             // 收集字段数据
-             reservoir.meta.fieldMap().forEach((name, field) -> {
+            reservoir.meta.fieldMap().forEach((name, field) -> {
                 Object val = ReflectUtil.getFieldValue(this, field.getField());
                 data(field.getName(), val);
             });
@@ -764,7 +774,7 @@ public class Model implements IModel {
             throw new RuntimeException("关联属性名称错误：" + fieldName);
         }
         // 缓存关联关系
-        if (! reservoir.meta.relationMap().containsKey(fieldName)) {
+        if (!reservoir.meta.relationMap().containsKey(fieldName)) {
             reservoir.meta.relationMap().put(fieldName, new Relation(clazz, type, localKey, foreignKey));
         }
         // 返回查询模型
@@ -800,8 +810,7 @@ public class Model implements IModel {
      * 向上获取调用关联方法的调用方法名称（关联方法名称）
      * 从3开始
      */
-    private String getRelationMethodName(int upperPos)
-    {
+    private String getRelationMethodName(int upperPos) {
         try {
             Class<?> modelClass = Model.class;
             // +2避开本方法和getStackTrace
@@ -825,17 +834,30 @@ public class Model implements IModel {
 
     /**
      * 预载入方法
+     *
      * @param fields 需要预载入的属性名称
      * @return 模型对象
      */
+    public Model with(String... fields) {
+        if (ModelHelper.isEmpty(fields)) {
+            return this;
+        }
+        List<String> withs = Arrays.asList(fields);
+        ComUtil.trimList(withs);
+        withs.forEach(name -> {
+            if (!reservoir.meta.relationMap().containsKey(name)) {
+                throw new RuntimeException("不存在关联注入：" + name);
+            }
+        });
+        reservoir.getWiths().addAll(withs);
+        return this;
+    }
+
     public Model with(String fields) {
         if (ModelHelper.isEmpty(fields)) {
             return this;
         }
-        List<String> withs = Arrays.asList(fields.split(","));
-        ComUtil.trimList(withs);
-        reservoir.getWiths().addAll(withs);
-        return this;
+        return this.with(fields.split(","));
     }
 
     private static boolean isModel(Class<?> clazz) {
@@ -847,8 +869,7 @@ public class Model implements IModel {
     }
 
     // 缓存字段和方法
-    private static void initModel(Model model, Class<?> clazz)
-    {
+    private static void initModel(Model model, Class<?> clazz) {
         if (!Model.class.isAssignableFrom(clazz)) {
             return;
         }
@@ -856,10 +877,12 @@ public class Model implements IModel {
             clazz = clazz.getSuperclass();
         }
 
-        // 已加载模型元组信息
-        if (ModelHelper.metaExist(clazz)) {
-            model.reservoir.meta = ModelHelper.getMeta(clazz);
-            return;
+        synchronized (Model.class) {
+            // 已加载模型元组信息
+            if (ModelHelper.metaExist(clazz)) {
+                model.reservoir.meta = ModelHelper.getMeta(clazz);
+                return;
+            }
         }
 
         // 初始化模型信息
@@ -873,7 +896,7 @@ public class Model implements IModel {
         Class<?> getClazz = clazz;
         List<Field> fieldList = new ArrayList<>();
         Map<String, Method> methodMap = new LinkedHashMap<>();
-        while (getClazz != null){
+        while (getClazz != null) {
             // 属性
             fieldList.addAll(new ArrayList<>(Arrays.asList(getClazz.getDeclaredFields())));
             // 方法
@@ -916,8 +939,7 @@ public class Model implements IModel {
         model.__initialize();
     }
 
-    private static Object findRelationAno(Field field)
-    {
+    private static Object findRelationAno(Field field) {
         if (field.getDeclaredAnnotation(OneToOne.class) != null) {
             return field.getDeclaredAnnotation(OneToOne.class);
         } else if (field.getDeclaredAnnotation(OneToMany.class) != null) {
@@ -926,8 +948,7 @@ public class Model implements IModel {
         return null;
     }
 
-    private static String parseModelTableName(Class<?> clazz)
-    {
+    private static String parseModelTableName(Class<?> clazz) {
         clazz = getModelClass(clazz);
         String tableName = null;
         // 获取mybatis-plus的tableName注解
@@ -949,9 +970,8 @@ public class Model implements IModel {
     /**
      * 模型setter数据处理
      * - 保存修改的数据
-     * */
-    private static void Setter(Class<?> clazz, Object o, Method method, Object arg, String fieldName)
-    {
+     */
+    private static void Setter(Class<?> clazz, Object o, Method method, Object arg, String fieldName) {
         try {
             Model model = (Model) o;
             model.data(fieldName, arg);
@@ -963,9 +983,8 @@ public class Model implements IModel {
 
     /**
      * getter懒加载数据
-     * */
-    private static Object LoadingRelationGetter(Class<?> clazz, Object o, Method method, Object ...objects)
-    {
+     */
+    private static Object LoadingRelationGetter(Class<?> clazz, Object o, Method method, Object... objects) {
         try {
             // 加载
             ModelFieldMeta modelField = ModelHelper.getMeta(clazz).fieldMap().get(method.getName());
@@ -1061,7 +1080,7 @@ public class Model implements IModel {
     @Override
     public String toString() {
         Map<String, Object> dataMap = new LinkedHashMap<>(data());
-         reservoir.meta.relationMap().forEach((name, relation) -> dataMap.put(name, ReflectUtil.getFieldValue(this, name)));
+        reservoir.meta.relationMap().forEach((name, relation) -> dataMap.put(name, ReflectUtil.getFieldValue(this, name)));
         return getMClass().getSimpleName() + dataMap;
     }
 }
