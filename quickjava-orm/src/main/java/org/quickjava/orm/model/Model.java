@@ -759,7 +759,10 @@ public class Model implements IModel {
     /*
      * 关联方法
      * */
-    public <D extends IModel> D relation(String fieldName, Class<?> clazz, RelationType type, String localKey, String foreignKey) {
+    protected <D extends IModel> D relation(String fieldName, Class<?> clazz, RelationType type, String localKey, String foreignKey) {
+        if (fieldName == null || fieldName.contains("CGLIB$")) {
+            throw new RuntimeException("关联属性名称错误：" + fieldName);
+        }
         // 缓存关联关系
         if (! reservoir.meta.relationMap().containsKey(fieldName)) {
             reservoir.meta.relationMap().put(fieldName, new Relation(clazz, type, localKey, foreignKey));
@@ -768,29 +771,56 @@ public class Model implements IModel {
         return toD(newModel(clazz, this));
     }
 
-    public <D extends Model> D relation(Class<?> clazz, RelationType type, String localKey, String foreignKey) {
-        String fieldName = Thread.currentThread().getStackTrace()[1].getMethodName();
+    protected <D extends Model> D relation(Class<?> clazz, RelationType type, String localKey, String foreignKey) {
+        String fieldName = getRelationMethodName(1);
         return relation(fieldName, clazz, type, localKey, foreignKey);
     }
 
-    public <D extends Model> D relation(String clazzName, RelationType type, String localKey, String foreignKey) {
+    protected <D extends Model> D relation(String clazzName, RelationType type, String localKey, String foreignKey) {
         try {
             Class<?> clazz = getClass().getClassLoader().loadClass(clazzName);
-            String fieldName = Thread.currentThread().getStackTrace()[2].getMethodName();
+            String fieldName = getRelationMethodName(1);
             return relation(fieldName, clazz, type, localKey, foreignKey);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    public <D extends Model> D hasOne(Class<?> clazz, String localKey, String foreignKey) {
-        String fieldName = Thread.currentThread().getStackTrace()[2].getMethodName();
+    protected <D extends Model> D hasOne(Class<?> clazz, String localKey, String foreignKey) {
+        String fieldName = getRelationMethodName(1);
         return relation(fieldName, clazz, RelationType.OneToOne, localKey, foreignKey);
     }
 
-    public <D extends Model> D hasMany(Class<?> clazz, String localKey, String foreignKey) {
-        String fieldName = Thread.currentThread().getStackTrace()[2].getMethodName();
+    protected <D extends Model> D hasMany(Class<?> clazz, String localKey, String foreignKey) {
+        String fieldName = getRelationMethodName(1);
         return relation(fieldName, clazz, RelationType.OneToMany, localKey, foreignKey);
+    }
+
+    /**
+     * 向上获取调用关联方法的调用方法名称（关联方法名称）
+     * 从3开始
+     */
+    private String getRelationMethodName(int upperPos)
+    {
+        try {
+            Class<?> modelClass = Model.class;
+            // +2避开本方法和getStackTrace
+            upperPos += 2;
+            // getStackTrace,getRelationMethodName,本model调用方法, 调用者方法
+            StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+            for (int i = upperPos; i < stackTrace.length; i++) {
+                StackTraceElement element = stackTrace[i];
+                String className = element.getClassName();
+                if (modelClass.getName().equals(className)) {     // 避开model方法
+                } else if (element.getMethodName().startsWith("CGLIB$")) {      // 避开代理类初始化调用
+                } else if (modelClass.isAssignableFrom(Class.forName(className))) {   // 必须是子类调用
+                    return element.getMethodName();
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return null;
     }
 
     /**
