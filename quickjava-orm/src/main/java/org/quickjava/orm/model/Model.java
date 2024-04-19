@@ -820,7 +820,7 @@ public class Model implements IModel {
                 String className = element.getClassName();
                 if (modelClass.getName().equals(className)) {     // 避开model方法
                 } else if (element.getMethodName().startsWith("CGLIB$")) {      // 避开代理类初始化调用
-                } else if (modelClass.isAssignableFrom(Class.forName(className))) {   // 必须是子类调用
+                } else if (modelClass.isAssignableFrom(Class.forName(className))) {   // 必须是子类内部方法调用
                     return element.getMethodName();
                 }
             }
@@ -919,25 +919,26 @@ public class Model implements IModel {
                 Class<?> listElementType = (Class<?>) listType.getActualTypeArguments()[0];
                 isModelChildList = Model.class.isAssignableFrom(listElementType);
             }
-            // 隐藏字段
-            if (!isModelChild && !isModelChildList && !fieldMeta.isExist()) {
-                continue;
-            }
-
-            // 属性上关联注解
-            fieldMeta.setRelationWay(findRelationAno(field));
-
-            // 有关联方法
-            Method method = methodMap.get(fieldMeta.getName());
-            if (method != null && Model.class.isAssignableFrom(method.getReturnType())) {
-                try {
-                    method.invoke(model);
-                    fieldMeta.setRelationWay(meta.relationMap().get(fieldMeta.getName()));
-                } catch (IllegalAccessException | InvocationTargetException e) {
-                    logger.error("关联方法调用失败：{}", e.getMessage(), e);
+            // 可能的关联属性
+            if (isModelChild || isModelChildList) {
+                // 属性上关联注解
+                fieldMeta.setRelationWay(findRelationAno(field));
+                // 有关联方法
+                Method method = methodMap.get(fieldMeta.getName());
+                if (method != null && Model.class.isAssignableFrom(method.getReturnType())) {
+                    try {
+                        method.invoke(model);
+                        fieldMeta.setRelationWay(meta.relationMap().get(fieldMeta.getName()));
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        logger.error("关联方法调用失败：{}", e.getMessage(), e);
+                    }
                 }
             }
 
+            // 隐藏字段
+            if (!fieldMeta.isExist()) {
+                continue;
+            }
             meta.fieldMap().put(field.getName(), fieldMeta);
         }
 
