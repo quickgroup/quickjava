@@ -15,6 +15,7 @@ package org.quickjava.orm;
  * +-------------------------------------------------------------------
  */
 
+import org.quickjava.orm.loader.SpringLoader;
 import org.quickjava.orm.utils.ReflectUtil;
 import org.quickjava.orm.model.callback.ModelListener;
 import org.quickjava.orm.contain.DatabaseConfig;
@@ -43,8 +44,8 @@ public class ORMContext {
         DatabaseConfig config;
         synchronized (Drive.class) {
             // 检测spring
-            if (SpringAutoConfiguration.instance != null) {
-                config = SpringAutoConfiguration.instance.getConfig();
+            if (SpringLoader.instance != null) {
+                config = SpringLoader.instance.getConfig();
             } else {
                 config = getQuickJavaConfig();
             }

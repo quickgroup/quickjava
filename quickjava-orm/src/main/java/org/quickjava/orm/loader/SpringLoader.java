@@ -1,4 +1,4 @@
-package org.quickjava.orm.drive;
+package org.quickjava.orm.loader;
 
 import org.quickjava.orm.contain.DatabaseConfig;
 import org.springframework.beans.factory.InitializingBean;
@@ -11,27 +11,13 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-/*
- * Copyright (c) 2020~2023 http://www.quickjava.org All rights reserved.
- * +-------------------------------------------------------------------
- * Organization: QuickJava
- * +-------------------------------------------------------------------
- * Author: Qlo1062
- * +-------------------------------------------------------------------
- * File: SpringAutoConfiguration
- * +-------------------------------------------------------------------
- * Date: 2023-4-28 15:39
- * +-------------------------------------------------------------------
- * License: Apache Licence 2.0
- * +-------------------------------------------------------------------
- */
 @Configuration
 @ConditionalOnSingleCandidate(DataSource.class)
-public class SpringAutoConfiguration implements InitializingBean {
+public class SpringLoader implements InitializingBean {
 
     private static ApplicationContext applicationContext;
 
-    public static SpringAutoConfiguration instance;
+    public static SpringLoader instance;
 
     @Autowired
     private DataSource druidDataSource;
@@ -40,7 +26,7 @@ public class SpringAutoConfiguration implements InitializingBean {
 
     private DatabaseConfig dbConfig;
 
-    public SpringAutoConfiguration(ApplicationContext applicationContext) {
+    public SpringLoader(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
         this.instance = this;
     }
@@ -59,7 +45,7 @@ public class SpringAutoConfiguration implements InitializingBean {
     }
 
     public DatabaseConfig.DBType getConnectionType() {
-        synchronized (SpringAutoConfiguration.class) {
+        synchronized (SpringLoader.class) {
             if (dbType == null) {
                 try {
                     Connection connection = getDataSource().getConnection();

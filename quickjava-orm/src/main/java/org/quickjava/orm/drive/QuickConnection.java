@@ -1,5 +1,6 @@
 package org.quickjava.orm.drive;
 
+import org.quickjava.orm.loader.SpringLoader;
 import org.quickjava.orm.contain.DatabaseConfig;
 import org.quickjava.orm.utils.QueryException;
 import org.quickjava.orm.utils.QuickORMException;
@@ -44,7 +45,7 @@ public class QuickConnection {
         // Spring 框架中使用
         else if (config.subject == DatabaseConfig.DBSubject.SPRING) {
             try {
-                this.connection = SpringAutoConfiguration.instance.getDataSource().getConnection();
+                this.connection = SpringLoader.instance.getDataSource().getConnection();
             } catch (SQLException e) {
                 throw new QueryException("获取连接失败");
             }

@@ -9,6 +9,7 @@ import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 import org.quickjava.common.utils.ComUtil;
 import org.quickjava.common.utils.DatetimeUtil;
+import org.quickjava.orm.model.annotation.ModelField;
 import org.quickjava.orm.query.QuerySetHelper;
 import org.quickjava.orm.utils.ReflectUtil;
 import org.quickjava.orm.enums.JoinType;
@@ -63,10 +64,12 @@ public class Model implements IModel {
 
     @JsonIgnore
     @TableField(exist = false)
+    @ModelField(exist = false)
     private static final Logger logger = LoggerFactory.getLogger(Model.class);
 
     @JsonIgnore
     @TableField(exist = false)
+    @ModelField(exist = false)
     private final ModelReservoir reservoir = new ModelReservoir(this);
 
     public Model() {
