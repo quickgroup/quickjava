@@ -9,6 +9,7 @@ import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 import org.quickjava.common.utils.ComUtil;
 import org.quickjava.common.utils.DatetimeUtil;
+import org.quickjava.orm.ORMContext;
 import org.quickjava.orm.model.annotation.ModelField;
 import org.quickjava.orm.query.QuerySetHelper;
 import org.quickjava.orm.utils.ReflectUtil;
@@ -67,13 +68,16 @@ public class Model implements IModel {
     @ModelField(exist = false)
     private static final Logger logger = LoggerFactory.getLogger(Model.class);
 
+    /**
+     * 模型对象数据储存器
+     */
     @JsonIgnore
     @TableField(exist = false)
     @ModelField(exist = false)
     private final ModelReservoir reservoir = new ModelReservoir(this);
 
     public Model() {
-        initModel(this, getClass());
+        initModel(this, getMClass());
     }
 
     @JsonIgnore
@@ -707,8 +711,13 @@ public class Model implements IModel {
     }
 
     public static <D extends IModel> D newModel(Class<?> clazz, Map<String, Object> data, IModel parent) {
+        // 从当前环境重新获取clazz
+        clazz = ORMContext.loadClass(clazz);
         // 创建代理类信息
         Enhancer enhancer = new Enhancer();
+//        enhancer.setClassLoader(Model.class.getClassLoader());
+//        enhancer.setClassLoader(Thread.currentThread().getContextClassLoader());
+        enhancer.setClassLoader(ORMContext.getClassLoader());
         enhancer.setSuperclass(getModelClass(clazz));
         enhancer.setCallback(modelProxyMethodInterceptor);
         D model = toD(enhancer.create());
@@ -721,6 +730,8 @@ public class Model implements IModel {
         if (!ModelHelper.isEmpty(parent)) {
             reservoir.parent = parent;
         }
+//        System.out.println("clazz getClassLoader=" + clazz.getClassLoader());
+//        System.out.println("model getClassLoader=" + model.getClass().getClassLoader());
         return model;
     }
 
@@ -778,7 +789,7 @@ public class Model implements IModel {
         if (!reservoir.meta.relationMap().containsKey(fieldName)) {
             reservoir.meta.relationMap().put(fieldName, new Relation(clazz, type, localKey, foreignKey));
         }
-        // 返回查询模型
+        // 返回被关联的模型对象，实现嵌套查询条件
         return toD(newModel(clazz, this));
     }
 
@@ -821,8 +832,10 @@ public class Model implements IModel {
             for (int i = upperPos; i < stackTrace.length; i++) {
                 StackTraceElement element = stackTrace[i];
                 String className = element.getClassName();
+                Class<?> clazz = Class.forName(className);
                 if (modelClass.getName().equals(className)) {     // 避开model方法
                 } else if (element.getMethodName().startsWith("CGLIB$")) {      // 避开代理类初始化调用
+                } else if (Enhancer.isEnhanced(clazz)) {      // 避开代理类初始化调用
                 } else if (modelClass.isAssignableFrom(Class.forName(className))) {   // 必须是子类内部方法调用
                     return element.getMethodName();
                 }
@@ -885,7 +898,6 @@ public class Model implements IModel {
                 return;
             }
         }
-
         // 初始化模型信息
         ModelMeta meta = model.reservoir.meta = new ModelMeta();
         meta.setTable(parseModelTableName(clazz));
@@ -896,12 +908,46 @@ public class Model implements IModel {
         // 全部方法、属性
         Class<?> getClazz = clazz;
         List<Field> fieldList = new ArrayList<>();
+        while (getClazz != null) {
+            // 属性
+            fieldList.addAll(new ArrayList<>(Arrays.asList(getClazz.getDeclaredFields())));
+            // 父类
+            getClazz = getClazz.getSuperclass();
+        }
+        // 加载字段
+        for (Field field : fieldList) {
+            // 排除静态字段
+            if (Modifier.isStatic(field.getModifiers())) {
+                continue;
+            }
+            ModelFieldMeta fieldMeta = new ModelFieldMeta(field);
+            // 隐藏字段
+            if (!fieldMeta.isExist()) {
+                continue;
+            }
+            meta.fieldMap().put(field.getName(), fieldMeta);
+        }
+    }
+
+    /**
+     * 初始化关联关系
+     */
+    private static void initRelation(IModel model)
+    {
+        ModelMeta meta = ModelHelper.getModelReservoir(model).meta;
+
+        // 全部方法、属性
+        Class<?> getClazz = model.getClass();
+        List<Field> fieldList = new LinkedList<>();
         Map<String, Method> methodMap = new LinkedHashMap<>();
         while (getClazz != null) {
             // 属性
             fieldList.addAll(new ArrayList<>(Arrays.asList(getClazz.getDeclaredFields())));
             // 方法
             for (Method method : getClazz.getDeclaredMethods()) {
+                if (method.getDeclaringClass().equals(Model.class)) {
+                    continue;
+                }
                 if (!methodMap.containsKey(method.getName())) { // 子类覆写的方法不允许重复添加
                     methodMap.put(method.getName(), method);
                 }
@@ -918,9 +964,13 @@ public class Model implements IModel {
             boolean isModelChild = Model.class.isAssignableFrom(fieldMeta.getClazz());
             boolean isModelChildList = List.class.isAssignableFrom(fieldMeta.getClazz());
             if (isModelChildList) {
-                ParameterizedType listType = (ParameterizedType) field.getGenericType();
-                Class<?> listElementType = (Class<?>) listType.getActualTypeArguments()[0];
-                isModelChildList = Model.class.isAssignableFrom(listElementType);
+                try {
+                    ParameterizedType listType = (ParameterizedType) field.getGenericType();
+                    Class<?> listElementType = (Class<?>) listType.getActualTypeArguments()[0];
+                    isModelChildList = Model.class.isAssignableFrom(listElementType);
+                } catch (Exception e) {
+                    isModelChildList = false;
+                }
             }
             // 可能的关联属性
             if (isModelChild || isModelChildList) {
@@ -930,23 +980,18 @@ public class Model implements IModel {
                 Method method = methodMap.get(fieldMeta.getName());
                 if (method != null && Model.class.isAssignableFrom(method.getReturnType())) {
                     try {
+//                        System.out.println("getReturnType=" + method.getReturnType().getClassLoader());
+//                        System.out.println("Model=" + new Model().getClass().getClassLoader());
                         method.invoke(model);
                         fieldMeta.setRelationWay(meta.relationMap().get(fieldMeta.getName()));
-                    } catch (IllegalAccessException | InvocationTargetException e) {
+                    } catch (InvocationTargetException e) {
+                        logger.error("关联方法调用失败：{}", e.getTargetException().getMessage(), e.getTargetException());
+                    } catch (IllegalAccessException e) {
                         logger.error("关联方法调用失败：{}", e.getMessage(), e);
                     }
                 }
             }
-
-            // 隐藏字段
-            if (!fieldMeta.isExist()) {
-                continue;
-            }
-            meta.fieldMap().put(field.getName(), fieldMeta);
         }
-
-        // 模型初始化方法回调
-        model.__initialize();
     }
 
     private static Object findRelationAno(Field field) {
@@ -1072,7 +1117,7 @@ public class Model implements IModel {
     }
 
     private Class<?> getMClass() {
-        return Enhancer.isEnhanced(getClass()) ? getClass().getSuperclass() : getClass();
+        return ModelHelper.getModelClass(getClass());
     }
 
     private static Class<?> getModelClass(Class<?> clazz) {

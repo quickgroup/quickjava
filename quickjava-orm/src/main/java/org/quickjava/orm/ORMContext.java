@@ -32,12 +32,31 @@ import java.util.Map;
  */
 public class ORMContext {
 
+//    private static ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+    private static ClassLoader classLoader = ORMContext.class.getClassLoader();
+
     public static Map<DatabaseConfig.DBType, Class<? extends Drive>> driveMap = new LinkedHashMap<>();
 
     static {
         driveMap.put(DatabaseConfig.DBType.MYSQL, Mysql.class);
         driveMap.put(DatabaseConfig.DBType.ORACLE, Oracle.class);
         driveMap.put(DatabaseConfig.DBType.DEFAULT, DefaultDrive.class);
+    }
+
+    public static ClassLoader getClassLoader() {
+        return classLoader;
+    }
+
+    public static void setClassLoader(ClassLoader classLoader) {
+        ORMContext.classLoader = classLoader;
+    }
+
+    public static<D> Class<D> loadClass(Class<D> clazz) {
+        try {
+            return (Class<D>) getClassLoader().loadClass(clazz.getName());
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static Drive getDrive() {

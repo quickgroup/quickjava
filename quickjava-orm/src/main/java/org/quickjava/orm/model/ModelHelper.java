@@ -1,15 +1,10 @@
 package org.quickjava.orm.model;
 
-import com.baomidou.mybatisplus.core.toolkit.BeanUtils;
 import net.sf.cglib.proxy.Enhancer;
-import org.apache.ibatis.reflection.MetaObject;
-import org.apache.ibatis.reflection.SystemMetaObject;
-import org.apache.ibatis.session.Configuration;
-import org.apache.ibatis.type.EnumTypeHandler;
-import org.apache.ibatis.type.TypeHandlerRegistry;
 import org.quickjava.common.utils.DatetimeUtil;
+import org.quickjava.orm.ORMContext;
+import org.quickjava.orm.enums.CompareEnum;
 import org.quickjava.orm.model.contain.ModelFieldMeta;
-import org.quickjava.orm.utils.ReflectUtil;
 import org.quickjava.orm.model.contain.ModelMeta;
 import org.quickjava.orm.model.contain.Relation;
 import org.quickjava.orm.model.enums.ModelFieldFill;
@@ -18,14 +13,14 @@ import org.quickjava.orm.query.QuerySet;
 import org.quickjava.orm.query.callback.OrderByOptCallback;
 import org.quickjava.orm.query.callback.WhereOptCallback;
 import org.quickjava.orm.query.enums.Operator;
+import org.quickjava.orm.utils.ReflectUtil;
 import org.quickjava.orm.utils.SqlUtil;
-import org.quickjava.orm.enums.CompareEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
+import java.lang.reflect.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -47,18 +42,20 @@ public class ModelHelper extends SqlUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(ModelHelper.class);
 
-    public static final Map<Class<?>, ModelMeta> modelCache = new LinkedHashMap<>();
+    public static final ConcurrentHashMap<String, ModelMeta> modelCache = new ConcurrentHashMap<>();
 
     public static ModelMeta getMeta(Class<?> clazz) {
-        return modelCache.get(clazz);
+        return modelCache.get(clazz.getName());
     }
 
     public static boolean metaExist(Class<?> clazz) {
-        return modelCache.containsKey(clazz);
+        return modelCache.containsKey(clazz.getName());
     }
 
     public static void setMeta(Class<?> clazz, ModelMeta meta) {
-        modelCache.put(clazz, meta);
+        if (modelCache.putIfAbsent(clazz.getName(), meta) != null) {
+            throw new IllegalArgumentException("Key '" + clazz.getName() + "' already exists in the map.");
+        }
     }
 
     public static boolean isProxyModel(Class<?> clazz) {
@@ -79,7 +76,14 @@ public class ModelHelper extends SqlUtil {
 
     public static Class<? extends Model> getModelClass(Class<?> clazz) {
         if (!Enhancer.isEnhanced(clazz)) {
-            return Model.class.isAssignableFrom(clazz) ? (Class<? extends Model>) clazz : null;
+            Class<? extends Model> retClazz = Model.class.isAssignableFrom(clazz) ? (Class<? extends Model>) clazz : null;
+            // 转为当前classLoader的类
+//            try {
+//                retClazz = (Class<? extends Model>) ORMContext.getClassLoader().loadClass(retClazz.getName());
+//            } catch (ClassNotFoundException e) {
+//                throw new RuntimeException(e);
+//            }
+            return retClazz;
         }
         return getModelClass(clazz.getSuperclass());
     }
@@ -292,7 +296,7 @@ public class ModelHelper extends SqlUtil {
                 // 一对一关联表数据
                 reservoir.withs.forEach(relationName -> {
                     Relation relation = relationMap.get(relationName);
-                    if (relation != null) {
+                    if (relation != null && relation.getType() == RelationType.OneToOne) {
                         Model relationModel = Model.newModel(relation.getClazz(), null, main);
                         resultTranshipmentWith(relationModel, data, relationName);
                         ReflectUtil.setFieldValue(main, relationName, relationModel);
@@ -384,7 +388,7 @@ public class ModelHelper extends SqlUtil {
                 Object localKeyVal = ReflectUtil.getFieldValue(model, relation.localKey());
                 List<Model> set = rows.stream().filter(row -> localKeyVal.equals(ReflectUtil.getFieldValue(row, relation.foreignKey())))
                         .collect(Collectors.toList());
-                ReflectUtil.setFieldValue(model, relationName, set);
+                ReflectUtil.setFieldValue(model, relationName, new LinkedList<>(set));
             });
         });
     }
