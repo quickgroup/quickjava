@@ -2,7 +2,6 @@ package org.quickjava.orm.model;
 
 import net.sf.cglib.proxy.Enhancer;
 import org.quickjava.common.utils.DatetimeUtil;
-import org.quickjava.orm.ORMContext;
 import org.quickjava.orm.enums.CompareEnum;
 import org.quickjava.orm.model.contain.ModelFieldMeta;
 import org.quickjava.orm.model.contain.ModelMeta;
@@ -18,7 +17,8 @@ import org.quickjava.orm.utils.SqlUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
@@ -77,12 +77,6 @@ public class ModelHelper extends SqlUtil {
     public static Class<? extends Model> getModelClass(Class<?> clazz) {
         if (!Enhancer.isEnhanced(clazz)) {
             Class<? extends Model> retClazz = Model.class.isAssignableFrom(clazz) ? (Class<? extends Model>) clazz : null;
-            // 转为当前classLoader的类
-//            try {
-//                retClazz = (Class<? extends Model>) ORMContext.getClassLoader().loadClass(retClazz.getName());
-//            } catch (ClassNotFoundException e) {
-//                throw new RuntimeException(e);
-//            }
             return retClazz;
         }
         return getModelClass(clazz.getSuperclass());

@@ -53,6 +53,9 @@ public class ORMContext {
 
     public static<D> Class<D> loadClass(Class<D> clazz) {
         try {
+            if (classLoader.equals(clazz.getClassLoader())) {
+                return clazz;
+            }
             return (Class<D>) getClassLoader().loadClass(clazz.getName());
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
