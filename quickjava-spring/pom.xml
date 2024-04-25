@@ -26,7 +26,7 @@
         <dependency>
             <groupId>org.quickjava.core</groupId>
             <artifactId>quickjava-orm</artifactId>
-            <version>1.3.4</version>
+            <version>1.3.10</version>
         </dependency>
 
         <dependency>

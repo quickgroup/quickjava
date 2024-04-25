@@ -8,6 +8,7 @@ package org.quickjava.spring;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.quickjava.common.utils.TimeUtils;
+import org.quickjava.orm.contain.IPagination;
 import org.quickjava.orm.contain.Pagination;
 import org.quickjava.orm.query.enums.OrderByType;
 import org.quickjava.orm.wrapper.ModelWrapper;
@@ -27,7 +28,7 @@ public class TestModelJoin {
     public void test1()
     {
         Long startTime = TimeUtils.getNanoTime();
-        Pagination<SsoAppFavoriteModel> pagination = new ModelWrapper<>(SsoAppFavoriteModel.class)
+        IPagination<SsoAppFavoriteModel> pagination = new ModelWrapper<>(SsoAppFavoriteModel.class)
                 // TODO::关联表
                 // 与主表一对一关联join
                 .leftJoin(SsoApp.class, SsoApp::getAppId, SsoAppFavoriteModel::getAppId, SsoAppFavoriteModel::getApp)
@@ -44,6 +45,9 @@ public class TestModelJoin {
                 .leftJoin(SsoAppLatest.class, SsoAppLatest::getAppId, SsoAppFavoriteModel::getAppId)
                 // 关联其他表
                 .leftJoin(SsoAppLatest.class, SsoAppLatest::getAppId, SsoAppFavoriteModel::getAppId, SsoAppFavoriteModel::getTestAppInfo)
+                // 通过中间表关联
+//                .leftJoin(SsoApp.class, SsoApp::getAppId, SsoAppFavoriteModel::getAppId)
+//                .leftJoin(SsoAppLatest.class, SsoAppLatest::getAppId, SsoApp::getAppId, SsoAppFavoriteModel::getTestAppInfo)
 
                 // TODO::查询条件
                 // 主表查询条件
