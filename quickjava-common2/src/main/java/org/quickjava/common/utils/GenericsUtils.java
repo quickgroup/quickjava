@@ -31,7 +31,7 @@ public class GenericsUtils {
 
     /**
      * 通过反射,获得定义Class时声明的父类的范型参数的类型
-     * @param clazz 类
+     * @param clazz 类，用this.getClass()获取
      * @param index 返回某下标的类型
      * @return 返回泛型实际类型
      */

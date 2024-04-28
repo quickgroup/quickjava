@@ -1,7 +1,10 @@
 package org.quickjava.orm.wrapper;
 
+import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
+import org.quickjava.common.utils.ComUtil;
+import org.quickjava.common.utils.GenericsUtils;
 import org.quickjava.orm.contain.DataMap;
 import org.quickjava.orm.contain.IPagination;
 import org.quickjava.orm.contain.Pagination;
@@ -23,10 +26,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.*;
 
 public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper<Children, M, R>, M extends Model, R extends MFunction<M, ?>>
         implements Wrapper<Children>, ModelJoinWrapper<Children, M, R>, Serializable {
@@ -38,6 +40,9 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     protected Class<M> modelClazz;
 
     protected Map<String, JoinSpecifyBase<?, ?>> joinMap;
+
+    public AbstractModelWrapper() {
+    }
 
     protected Model model() {
         return model;
@@ -157,6 +162,10 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
 
     public Children notLike(boolean condition, R function, Object val) {
         return where(condition, null, findFieldName(function), Operator.NOT_LIKE_LR, val);
+    }
+
+    public Children where(R func, Object val) {
+        return where(true, null, findFieldName(func), Operator.EQ, val);
     }
 
     @Override
@@ -377,6 +386,29 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         return pagination(1L, 20L);
     }
 
+    public Children data(String name, Object val) {
+        model().data(name, val);
+        return chain();
+    }
+
+    @SafeVarargs
+    public final Children with(R... fields) {
+        for (R field : fields) {
+            model().with(field.getName());
+        }
+        return chain();
+    }
+
+    public Children with(String... fields) {
+        model().with(fields);
+        return chain();
+    }
+
+    public Children with(String fields) {
+        model().with(fields);
+        return chain();
+    }
+
     @Override
     public String toString() {
         return model().toString();
@@ -387,7 +419,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     }
 
     private QuerySet getQuerySet() {
-        return WrapperUtil.getQuerySet(this.model);
+        return WrapperUtil.getQuerySet(this.model());
     }
 
     /**

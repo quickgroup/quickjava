@@ -116,7 +116,7 @@ public class SpringLoader implements InitializingBean {
             try {
                 Class<?> clazz = Class.forName(m.getClassMetadata().getClassName());
                 if (Model.class.isAssignableFrom(clazz)) {
-                    logger.debug("Load model entity: {}", clazz.getName());
+//                    logger.debug("Load model entity: {}", clazz.getName());
                     Model model = (Model) clazz.newInstance();
                     models.add(model);
                 }
@@ -127,6 +127,7 @@ public class SpringLoader implements InitializingBean {
             }
             return false;
         });
+        logger.debug("Load completed {} models.", models.size());
         // 扫描指定包
         scanner2.findCandidateComponents(typeAliasesPackage);
         // 初始化关联关系

@@ -106,6 +106,7 @@ public abstract class Drive {
 
         // 主表名称
         sqlList.add(reservoir.tableSql());
+        checkEmpty(reservoir.tableSql(), "table is empty");
 
         // JOIN
         if (reservoir.joinList != null) {
@@ -198,6 +199,7 @@ public abstract class Drive {
     public <T> T executeSql(Action action, String sql)
     {
         long startTime = System.nanoTime();
+        boolean isError = false;
         Object number = null;
         QuickConnection quickConnection = getQuickConnection();
 
@@ -224,7 +226,8 @@ public abstract class Drive {
             return (T) number;
 
         } catch (SQLException e) {
-            logger.error("executeSql error:{}", e.getMessage(), e);
+            isError = true;
+            logger.error("SQL execution error:{}", e.getMessage(), e);
             throw new QueryException(e);
 
         } finally {
@@ -233,8 +236,12 @@ public abstract class Drive {
             if (action == Action.INSERT) {
                 printSql = sql.length() < 2560 ? sql: sql.substring(0, 2560);
             }
-            String msg = "SQL Execution " + ((double) (endTime - startTime)) / 1000000 + "ms: " + printSql;
-            logger.debug(msg);
+            String msg = "SQL execution " + ((double) (endTime - startTime)) / 1000000 + "ms: " + printSql;
+            if (isError) {
+                logger.error(msg);
+            } else {
+                logger.debug(msg);
+            }
 
             // 主动关闭连接
             if (quickConnection.autoCommit) {
@@ -260,6 +267,11 @@ public abstract class Drive {
         } else if (Map.class.isAssignableFrom(obj.getClass())) {
             Map<?, ?> map = (Map<?, ?>) obj;
             if (map.isEmpty()) {
+                throw new QuickORMException(msg);
+            }
+        } else if (String.class.isAssignableFrom(obj.getClass())) {
+            String str = (String) obj;
+            if (str.isEmpty()) {
                 throw new QuickORMException(msg);
             }
         }
