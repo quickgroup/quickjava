@@ -1,10 +1,7 @@
 package org.quickjava.orm.wrapper;
 
-import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
-import org.quickjava.common.utils.ComUtil;
-import org.quickjava.common.utils.GenericsUtils;
 import org.quickjava.orm.contain.DataMap;
 import org.quickjava.orm.contain.IPagination;
 import org.quickjava.orm.contain.Pagination;
@@ -26,8 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.*;
 
 public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper<Children, M, R>, M extends Model, R extends MFunction<M, ?>>
@@ -53,7 +48,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     }
 
     public Children eq(boolean condition, R func, Object val) {
-        return where(condition, null, findFieldName(func), Operator.EQ, val);
+        return where(condition, null, parseFieldName(func), Operator.EQ, val);
     }
 
     public Children neq(R func, Object val) {
@@ -65,7 +60,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     }
 
     public Children neq(boolean condition, R func, Object val) {
-        return where(condition, null, findFieldName(func), Operator.NEQ, val);
+        return where(condition, null, parseFieldName(func), Operator.NEQ, val);
     }
 
     public Children gt(R func, Object val) {
@@ -73,7 +68,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     }
 
     public Children gt(boolean condition, R func, Object val) {
-        return where(condition, null, findFieldName(func), Operator.GT, val);
+        return where(condition, null, parseFieldName(func), Operator.GT, val);
     }
 
     public Children gte(R function, Object val) {
@@ -85,7 +80,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     }
 
     public Children gte(boolean condition, R func, Object val) {
-        return where(condition, null, findFieldName(func), Operator.GTE, val);
+        return where(condition, null, parseFieldName(func), Operator.GTE, val);
     }
 
     public Children lt(R func, Object val) {
@@ -93,7 +88,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     }
 
     public Children lt(boolean condition, R function, Object val) {
-        return where(condition, null, findFieldName(function), Operator.LT, val);
+        return where(condition, null, parseFieldName(function), Operator.LT, val);
     }
 
     public Children lte(R func, Object val) {
@@ -105,7 +100,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     }
 
     public Children lte(boolean condition, R function, Object val) {
-        return where(condition, null, findFieldName(function), Operator.LTE, val);
+        return where(condition, null, parseFieldName(function), Operator.LTE, val);
     }
 
     public Children in(R func, Object ...args) {
@@ -113,7 +108,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     }
 
     public Children in(boolean condition, R func, Object ... args) {
-        return where(condition, null, findFieldName(func), Operator.IN, args);
+        return where(condition, null, parseFieldName(func), Operator.IN, args);
     }
 
     public Children notIn(R func, Object ...args) {
@@ -121,7 +116,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     }
 
     public Children notIn(boolean condition, R function, Object ... args) {
-        return where(condition, null, findFieldName(function), Operator.NOT_IN, args);
+        return where(condition, null, parseFieldName(function), Operator.NOT_IN, args);
     }
 
     public Children isNull(R func) {
@@ -129,7 +124,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     }
 
     public Children isNull(boolean condition, R func) {
-        return where(condition, null, findFieldName(func), Operator.IS_NULL, null);
+        return where(condition, null, parseFieldName(func), Operator.IS_NULL, null);
     }
 
     public Children isNotNull(R func) {
@@ -137,7 +132,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     }
 
     public Children isNotNull(boolean condition, R func) {
-        return where(condition, null, findFieldName(func), Operator.IS_NOT_NULL, null);
+        return where(condition, null, parseFieldName(func), Operator.IS_NOT_NULL, null);
     }
 
     public Children between(R func, Object v1, Object v2) {
@@ -145,7 +140,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     }
 
     public Children between(boolean condition, R func, Object v1, Object v2) {
-        return where(condition, null, findFieldName(func), Operator.BETWEEN, new Object[]{v1, v2});
+        return where(condition, null, parseFieldName(func), Operator.BETWEEN, new Object[]{v1, v2});
     }
 
     public Children like(R func, Object val) {
@@ -153,7 +148,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     }
 
     public Children like(boolean condition, R function, Object val) {
-        return where(condition, null, findFieldName(function), Operator.LIKE_LR, val);
+        return where(condition, null, parseFieldName(function), Operator.LIKE_LR, val);
     }
 
     public Children notLike(R func, Object val) {
@@ -161,17 +156,29 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     }
 
     public Children notLike(boolean condition, R function, Object val) {
-        return where(condition, null, findFieldName(function), Operator.NOT_LIKE_LR, val);
+        return where(condition, null, parseFieldName(function), Operator.NOT_LIKE_LR, val);
     }
 
     public Children where(R func, Object val) {
-        return where(true, null, findFieldName(func), Operator.EQ, val);
+        return where(true, null, parseFieldName(func), Operator.EQ, val);
+    }
+
+    public Children where(R func, Operator operator, Object val) {
+        return where(true, null, parseFieldName(func), operator, val);
     }
 
     @Override
     public Children where(boolean condition, String table, String column, Operator operator, Object val) {
         if (condition) {
             getQuerySet().where(table, column, operator, val);
+        }
+        return chain();
+    }
+
+    @Override
+    public Children whereOr(boolean condition, String table, String column, Operator operator, Object val) {
+        if (condition) {
+            getQuerySet().whereOr(table, column, operator, val);
         }
         return chain();
     }
@@ -414,7 +421,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         return model().toString();
     }
 
-    private String findFieldName(MFunction<?, ?> function) {
+    private String parseFieldName(MFunction<?, ?> function) {
         return function.getName();
     }
 

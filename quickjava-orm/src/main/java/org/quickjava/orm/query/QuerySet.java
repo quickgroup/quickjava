@@ -152,6 +152,15 @@ public class QuerySet {
         return this;
     }
 
+    public QuerySet whereOr(String table, String field, Operator operator, Object value)
+    {
+        if (ModelHelper.isEmpty(field)) {
+            return this;
+        }
+        where(new WhereOr(table, field, operator, value));
+        return this;
+    }
+
     /**
      * 高级sql语句查询
      * @param sql SQL语句

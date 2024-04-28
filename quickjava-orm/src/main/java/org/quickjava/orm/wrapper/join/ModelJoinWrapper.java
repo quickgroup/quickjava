@@ -287,8 +287,6 @@ public interface ModelJoinWrapper<
         return where(condition, left, lf.getName(), operator, val);
     }
 
-    Children where(boolean condition, String table, String column, Operator operator, Object val);
-
     //TODO::-------------------- 查询条件 END  --------------------
     //TODO::-------------------- 特性 START --------------------
     /**
