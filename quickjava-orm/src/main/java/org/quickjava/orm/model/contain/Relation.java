@@ -1,5 +1,6 @@
 package org.quickjava.orm.model.contain;
 
+import org.quickjava.orm.model.IModel;
 import org.quickjava.orm.model.enums.RelationType;
 
 /*
@@ -18,6 +19,9 @@ import org.quickjava.orm.model.enums.RelationType;
  */
 public class Relation {
 
+    // 模型条件
+    private IModel model;
+
     // 关联表类
     private Class<?> clazz;
 
@@ -33,7 +37,8 @@ public class Relation {
     public Relation() {
     }
 
-    public Relation(Class<?> clazz, RelationType type, String localKey, String foreignKey) {
+    public Relation(IModel model, Class<?> clazz, RelationType type, String localKey, String foreignKey) {
+        this.model = model;
         this.clazz = clazz;
         this.type = type;
         this.localKey = localKey;

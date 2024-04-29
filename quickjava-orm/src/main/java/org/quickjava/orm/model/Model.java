@@ -785,12 +785,15 @@ public class Model implements IModel {
         if (fieldName == null || fieldName.contains("CGLIB$")) {
             throw new RuntimeException("关联属性名称错误：" + fieldName);
         }
+        // 关联模型进行条件存储
+        Model queryModel = newModel(clazz, this);
+        queryModel.where(foreignKey, Operator.EQ, fieldAlias(this.pk(), localKey));
         // 缓存关联关系
         if (!reservoir.meta.relationMap().containsKey(fieldName)) {
-            reservoir.meta.relationMap().put(fieldName, new Relation(clazz, type, localKey, foreignKey));
+            reservoir.meta.relationMap().put(fieldName, new Relation(queryModel, clazz, type, localKey, foreignKey));
         }
         // 返回被关联的模型对象，实现嵌套查询条件
-        return toD(newModel(clazz, this));
+        return toD(queryModel);
     }
 
     protected <D extends Model> D relation(Class<?> clazz, RelationType type, String localKey, String foreignKey) {
@@ -982,6 +985,7 @@ public class Model implements IModel {
                     try {
 //                        System.out.println("getReturnType=" + method.getReturnType().getClassLoader());
 //                        System.out.println("Model=" + new Model().getClass().getClassLoader());
+                        method.setAccessible(true);
                         method.invoke(model);
                         fieldMeta.setRelationWay(meta.relationMap().get(fieldMeta.getName()));
                     } catch (InvocationTargetException e) {

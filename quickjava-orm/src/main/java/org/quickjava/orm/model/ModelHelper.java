@@ -280,26 +280,35 @@ public class ModelHelper extends SqlUtil {
                 models.add(main);
             });
         } else {
-            Map<String, Relation> relationMap = getWithRelation(queryModel, new RelationType[]{RelationType.OneToOne, RelationType.OneToMany});
-            // 主表数据、一对一数据
-            dataList.forEach(data -> {
-                // 主表
-                D main = Model.newModel(clazz);
-                // 主表数据
-                resultTranshipmentWith(main, data, null);
-                // 一对一关联表数据
-                reservoir.withs.forEach(relationName -> {
-                    Relation relation = relationMap.get(relationName);
-                    if (relation != null && relation.getType() == RelationType.OneToOne) {
-                        Model relationModel = Model.newModel(relation.getClazz(), null, main);
-                        resultTranshipmentWith(relationModel, data, relationName);
-                        ReflectUtil.setFieldValue(main, relationName, relationModel);
-                    }
+            // 主表数据、一对一
+            Map<String, Relation> relationOneToOne = getWithRelation(queryModel, RelationType.OneToOne);
+            if (!relationOneToOne.isEmpty()) {
+                // 主表数据、一对一数据
+                dataList.forEach(data -> {
+                    // 主表数据
+                    D main = Model.newModel(clazz);
+                    resultTranshipmentWith(main, data, null);
+                    // 一对一关联表数据
+                    reservoir.withs.forEach(relationName -> {
+                        Relation relation = relationOneToOne.get(relationName);
+                        if (relation != null && relation.getType() == RelationType.OneToOne) {
+                            Model relationModel = Model.newModel(relation.getClazz(), null, main);
+                            resultTranshipmentWith(relationModel, data, relationName);
+                            ReflectUtil.setFieldValue(main, relationName, relationModel);
+                        }
+                    });
+                    models.add(main);
                 });
-                models.add(main);
-            });
+            } else {
+                dataList.forEach(data -> {
+                    D main = Model.newModel(clazz);
+                    ((Model) main).data(data);
+                    models.add(main);
+                });
+            }
             // 一对多
-            resultTranshipmentMany(reservoir.withs, relationMap, models);
+            Map<String, Relation> relationOneToMany = getWithRelation(queryModel, RelationType.OneToMany);
+            resultTranshipmentMany(reservoir.withs, relationOneToMany, models);
         }
         return (List<D>) models;
     }
@@ -329,7 +338,7 @@ public class ModelHelper extends SqlUtil {
         });
     }
 
-    private static Map<String, Relation> getWithRelation(Model model, RelationType[] types) {
+    private static Map<String, Relation> getWithRelation(Model model, RelationType ...types) {
         Map<String, Relation> relationMap = new LinkedHashMap<>();
         ModelReservoir reservoir = getModelReservoir(model);
         reservoir.meta.relationMap().forEach((name, relation) -> {
@@ -350,7 +359,7 @@ public class ModelHelper extends SqlUtil {
         if (models.size() > 500) {
             logger.warn("QuickJava-ORM：The current query has too much data and may cause the service to crash. models.size=" + models.size());
         }
-        // 数据关联条件：关联属性名=关联id
+        // 数据关联条件：关联属性名=关联id；后续支持多关联条件载入
         Map<String, List<Object>> conditionMap = new LinkedHashMap<>();
 
         // 一对多查询条件准备

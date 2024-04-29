@@ -332,16 +332,11 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     }
 
     public M find() {
-        Map<String, Object> row = getQuerySet().find();
-        return loadDataItem(row, getModelMeta(this.model.getClass()));
+        return model().find();
     }
 
     public List<M> select() {
-        List<Map<String, Object>> rows = getQuerySet().select();
-        // 封装数据
-        List<M> models = queryAfter(rows, getModelMeta(this.model.getClass()));
-        logger.debug("Count:" + models.size());
-        return models;
+        return model().select();
     }
 
     private List<M> queryAfter(List<Map<String, Object>> rows, ModelMeta mainMeta) {
