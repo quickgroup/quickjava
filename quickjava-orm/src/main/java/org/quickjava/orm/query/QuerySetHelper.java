@@ -1,17 +1,15 @@
 package org.quickjava.orm.query;
 
 import org.quickjava.common.utils.BeanUtil;
-import org.quickjava.orm.query.Q;
-import org.quickjava.orm.query.QuerySet;
-import org.quickjava.orm.query.enums.Operator;
 import org.quickjava.orm.query.contain.TableMeta;
+import org.quickjava.orm.query.enums.Operator;
 import org.quickjava.orm.utils.ReflectUtil;
 import org.quickjava.orm.utils.SqlUtil;
 
 import java.util.*;
 
 // 用户querySet的增强和助手方法
-public class QuerySetHelper {
+public class QuerySetHelper extends SqlUtil {
 
     // 表信息缓存
     private static Map<String, TableMeta> tableOriMap = new LinkedHashMap<>();

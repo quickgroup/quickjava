@@ -144,7 +144,7 @@ public abstract class Drive {
         }
 
         // WHERE
-        if ((action == Action.SELECT || action == Action.UPDATE) && reservoir.whereList != null) {
+        if (reservoir.whereList != null) {
             sqlList.add("WHERE");
             sqlList.add(Where.cutFirstLogic(Where.collectSql(reservoir.getWhereList(), config)));
         }

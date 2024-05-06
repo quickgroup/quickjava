@@ -256,7 +256,7 @@ public class Model implements IModel {
             }
         }
         // 真实删除默认条件
-        if (QuerySetHelper.getQueryReservoir(query()).whereList.isEmpty() && pk() != null) {
+        if (ModelHelper.isEmpty(QuerySetHelper.getQueryReservoir(query()).whereList) && pk() != null) {
             where(pk(), pkVal());
         }
         // 真实删除

@@ -469,7 +469,7 @@ public class QuerySet {
 
     public Integer delete()
     {
-        if (reservoir.whereList == null) {
+        if (QuerySetHelper.isEmpty(reservoir.whereList)) {
             throw new QueryException("不允许空条件的删除执行");
         }
         reservoir.action = Action.DELETE;
