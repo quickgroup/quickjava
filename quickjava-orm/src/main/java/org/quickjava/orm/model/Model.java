@@ -255,6 +255,10 @@ public class Model implements IModel {
                 return 1;
             }
         }
+        // 真实删除默认条件
+        if (QuerySetHelper.getQueryReservoir(query()).whereList.isEmpty() && pk() != null) {
+            where(pk(), pkVal());
+        }
         // 真实删除
         return query().delete();
     }
