@@ -197,22 +197,27 @@ public class Model implements IModel {
      * @param <D> D
      * @return D
      */
-    public <D extends IModel> D insert() {
+    public <D extends IModel> D insert()
+    {
         // 默认填充数据
         reservoir.meta.fieldMap().forEach((name, field) -> {
             if (!reservoir.data.containsKey(name)) {
-                if (field.isInsertFill()) {
+                if (field.hasInsertFill()) {
                     data(name, field.insertFill());     // 新增时填充
                 }
             }
         });
+        // 雪花id
+
         // 执行
         Long pkVal = query().insert(this.sqlData());
         // 编译sql
         if (querySetReservoir().isFetchSql())
             return toD(new ModelSql(querySetReservoir().getSql()));
         // 回填主键
-        data(pk(), pkVal);
+        if (pkVal != null) {
+            data(pk(), pkVal);
+        }
         return toD(ModelHelper.isProxyModel(this) ? this : newModel(getMClass(), data()));
     }
 
@@ -264,7 +269,7 @@ public class Model implements IModel {
         // 默认填充数据
         reservoir.meta.fieldMap().forEach((name, field) -> {
             if (!reservoir.data.containsKey(name)) {
-                if (field.isUpdateFill()) {
+                if (field.hasUpdateFill()) {
                     data(name, field.updateFill());
                 }
             }

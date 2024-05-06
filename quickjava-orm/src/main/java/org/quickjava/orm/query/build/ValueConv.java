@@ -42,7 +42,8 @@ public class ValueConv {
 
     public String convValue(Object value) {
         if (value == null) {
-            return "";
+            // return "";   // UPDATE SET name=, age=1  有问腿，name应该是NULL
+            return "NULL";
         } else if (value instanceof Integer || value instanceof Long) {
             return String.valueOf(value);
         } else if (value instanceof Float) {

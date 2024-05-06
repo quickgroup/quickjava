@@ -162,7 +162,7 @@ public class ModelFieldMeta {
         this.tableField = tableField;
     }
 
-    public boolean isInsertFill() {
+    public boolean hasInsertFill() {
         if (modelField != null) {
             return modelField.insertFill() != ModelFieldFill.NULL;
         } else if (tableField != null) {
@@ -180,7 +180,7 @@ public class ModelFieldMeta {
         return null;
     }
 
-    public boolean isUpdateFill() {
+    public boolean hasUpdateFill() {
         if (modelField != null) {
             return modelField.updateFill() != ModelFieldFill.NULL;
         } else if (tableField != null) {
@@ -226,6 +226,15 @@ public class ModelFieldMeta {
             return tableField.exist();
         }
         return true;
+    }
+
+    /**
+     * 自实现id
+     * @return
+     */
+    public boolean hasId() {
+        TableId tableIdAno = field.getAnnotation(TableId.class);
+        return false;
     }
 
     @Override
