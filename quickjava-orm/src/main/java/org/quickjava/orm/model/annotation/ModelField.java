@@ -65,13 +65,6 @@ public @interface ModelField {
     String updateFillTarget() default "";
 
     /**
-     * 更新时填充（插入时不填充）
-     * 与 {@link ModelField#insertFill()}类似
-     * @return 填充数据
-     */
-    ModelFieldFill updateFillOnly() default ModelFieldFill.NULL;
-
-    /**
      * 数据写入格式
      * - Date时生效
      * @return 写入格式

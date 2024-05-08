@@ -1,7 +1,5 @@
 package org.quickjava.orm.model;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import net.sf.cglib.proxy.Enhancer;
@@ -64,16 +62,12 @@ import java.util.*;
 public class Model implements IModel {
 
     @JsonIgnore
-    @TableField(exist = false)
-    @ModelField(exist = false)
     private static final Logger logger = LoggerFactory.getLogger(Model.class);
 
     /**
      * 模型对象数据储存器
      */
     @JsonIgnore
-    @TableField(exist = false)
-    @ModelField(exist = false)
     private final ModelReservoir reservoir = new ModelReservoir(this);
 
     public Model() {
