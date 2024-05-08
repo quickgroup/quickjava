@@ -34,7 +34,7 @@
         <module>quickjava-web</module>
         <module>quickjava-orm</module>
         <module>quickjava-www</module>
-        <module>quickjava-spring</module>
+        <module>quickjava-orm-spring-boot-starter</module>
     </modules>
 
     <build>
