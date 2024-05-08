@@ -16,6 +16,7 @@ package org.quickjava.orm.model;/*
 import org.quickjava.orm.model.contain.IdType;
 import org.quickjava.orm.model.enums.ModelFieldFill;
 
+import java.lang.annotation.Annotation;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -27,15 +28,15 @@ public class ModelAnoHelper {
     /**
      * 主键id、属性注解
      */
-    public static Map<Class<?>, TableNameInfo> tableNameAnoMap = new LinkedHashMap<>();
-    public static Map<Class<?>, TableIdInfo> tableIdAnoMap = new LinkedHashMap<>();
-    public static Map<Class<?>, TableFieldInfo> tableFieldAnoMap = new LinkedHashMap<>();
+    public static Map<Class<? extends Annotation>, TableNameInfo> tableNameAnoMap = new LinkedHashMap<>();
+    public static Map<Class<? extends Annotation>, TableIdInfo> tableIdAnoMap = new LinkedHashMap<>();
+    public static Map<Class<? extends Annotation>, TableFieldInfo> tableFieldAnoMap = new LinkedHashMap<>();
 
     public static interface TableNameInfo {
-        String name(Class<?> ano);
-        String schema(Class<?> ano);
-        String resultMap(Class<?> ano);
-        String[] excludeProperty(Class<?> ano);
+        String value(Object ano);
+        String schema(Object ano);
+        String resultMap(Object ano);
+        String[] excludeProperty(Object ano);
     }
 
     public static interface TableIdInfo {

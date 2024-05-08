@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.lang.reflect.Field;
 import java.util.*;
@@ -739,7 +740,6 @@ public class Model implements IModel {
     }
 
     @JsonIgnore
-    @TableField(exist = false)
     private static final MethodInterceptor modelProxyMethodInterceptor = new MethodInterceptor() {
         @Override
         public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
@@ -1010,14 +1010,19 @@ public class Model implements IModel {
         return null;
     }
 
-    private static String parseModelTableName(Class<?> clazz) {
+    private static String parseModelTableName(Class<?> clazz)
+    {
         clazz = getModelClass(clazz);
         String tableName = null;
-        // 获取mybatis-plus的tableName注解
-        TableName tableNameAnno = clazz.getAnnotation(TableName.class);
-        if (tableNameAnno != null && !"".equals(tableNameAnno.value())) {
-            tableName = tableNameAnno.value();
+        // 获取支持的三方属性注解
+        Class<?> finalClazz = clazz;
+        for (Map.Entry<Class<? extends Annotation>, ModelAnoHelper.TableNameInfo> entry : ModelAnoHelper.tableNameAnoMap.entrySet()) {
+            Object nameAnno = finalClazz.getAnnotation(entry.getKey());
+            if (nameAnno != null && tableName == null) {
+                tableName = entry.getValue().value(nameAnno);
+            }
         }
+        // orm框架注解
         ModelName ModelNameAnno = clazz.getAnnotation(ModelName.class);
         if (ModelNameAnno != null && !"".equals(ModelNameAnno.value())) {
             tableName = ModelNameAnno.value();
