@@ -54,7 +54,7 @@ public class ModelHelper extends SqlUtil {
 
     public static void setMeta(Class<?> clazz, ModelMeta meta) {
         if (modelCache.putIfAbsent(clazz.getName(), meta) != null) {
-//            throw new IllegalArgumentException("Key '" + clazz.getName() + "' already exists in the map.");
+            logger.warn("Key '" + clazz.getName() + "' already exists in the map.");
         }
     }
 
