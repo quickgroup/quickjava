@@ -600,9 +600,7 @@ public class Model implements IModel {
      * @return 模型对象
      */
     public Model create(Map<String, Object> data) {
-        Model model = newModel(getMClass(), data);
-        model.insert();
-        return model;
+        return create(getMClass(), data);
     }
 
     /**
@@ -614,6 +612,24 @@ public class Model implements IModel {
     public Model create(DataMap data) {
         return create((Map<String, Object>) data);
     }
+
+    public static<T extends Model> T create(Class<? extends Model> modelClass, Map<String, Object> data) {
+        T model = newModel(modelClass, data);
+        model.insert();
+        return model;
+    }
+
+//    public static<T extends Model> T batchCreate(Class<? extends Model> modelClass, List<Map<String, Object>> dataList) {
+//        T model = newModel(modelClass, dataList.get(0));
+////        model.insert();
+//        return model;
+//    }
+//
+//    public static<T extends Model> T batchCreate(Class<? extends Model> modelClass, List<Model> modelList) {
+//        T model = newModel(modelClass, modelList.get(0));
+////        model.insert();
+//        return model;
+//    }
 
     /**
      * 批量创建
@@ -1128,11 +1144,11 @@ public class Model implements IModel {
         }
     }
 
-    private Class<?> getMClass() {
+    private Class<? extends Model> getMClass() {
         return ModelHelper.getModelClass(getClass());
     }
 
-    private static Class<?> getModelClass(Class<?> clazz) {
+    private static Class<? extends Model> getModelClass(Class<?> clazz) {
         return ModelHelper.getModelClass(clazz);
     }
 
