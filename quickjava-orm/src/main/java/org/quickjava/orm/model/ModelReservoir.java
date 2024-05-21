@@ -72,6 +72,7 @@ public class ModelReservoir {
     public boolean vegetarian = true;
 
     public ModelReservoir(Model model) {
+        Model.initModel(model, ModelHelper.getModelClass(model));
         this.model = model;
     }
 

@@ -1,4 +1,4 @@
-package org.quickjava.orm.example;
+package org.quickjava.spring.domain;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import org.quickjava.orm.model.Model;

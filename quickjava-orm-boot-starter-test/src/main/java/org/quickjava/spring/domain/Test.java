@@ -1,4 +1,4 @@
-package org.quickjava.orm.example;
+package org.quickjava.spring.domain;
 
 import org.quickjava.orm.query.QuerySet;
 

@@ -71,14 +71,6 @@ public class Model implements IModel {
     @JsonIgnore
     private final ModelReservoir reservoir = new ModelReservoir(this);
 
-    public Model() {
-        initModel(this, getMClass());
-    }
-
-    @JsonIgnore
-    protected void __initialize() {
-    }
-
     protected synchronized QuerySet query() {
         synchronized (Model.class) {
             if (reservoir.querySet == null) {
@@ -949,7 +941,7 @@ public class Model implements IModel {
     }
 
     // 缓存字段和方法
-    private static void initModel(Model model, Class<?> clazz) {
+    protected static void initModel(Model model, Class<?> clazz) {
         if (!Model.class.isAssignableFrom(clazz)) {
             return;
         }
