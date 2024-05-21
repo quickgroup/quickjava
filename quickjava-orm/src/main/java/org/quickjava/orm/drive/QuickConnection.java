@@ -1,7 +1,7 @@
 package org.quickjava.orm.drive;
 
-import org.quickjava.orm.loader.SpringLoader;
-import org.quickjava.orm.contain.DatabaseConfig;
+import org.quickjava.orm.ORMContext;
+import org.quickjava.orm.contain.DatabaseMeta;
 import org.quickjava.orm.utils.QueryException;
 import org.quickjava.orm.utils.QuickORMException;
 
@@ -13,15 +13,15 @@ import java.util.Map;
 
 public class QuickConnection {
 
-    private DatabaseConfig config;
+    private DatabaseMeta databaseMeta;
 
     private Connection connection;
 
     public boolean autoCommit;
 
-    public QuickConnection(DatabaseConfig config) {
-        this.config = config;
-        this.autoCommit = config.autoCommit;
+    public QuickConnection(DatabaseMeta databaseMeta) {
+        this.databaseMeta = databaseMeta;
+        this.autoCommit = databaseMeta.autoCommit;
     }
 
     /**
@@ -30,27 +30,12 @@ public class QuickConnection {
      */
     public QuickConnection connect()
     {
-        // 根据配置连接 or QuickJava框架中使用
-        if (config.subject == DatabaseConfig.DBSubject.CONFIG || config.subject == DatabaseConfig.DBSubject.QUICKJAVA) {
-            try {
-                Class.forName(config.driver);
-                this.connection = DriverManager.getConnection(config.url, config.username, config.password);
-            }  catch (ClassNotFoundException e) {
-                throw new QueryException(e.toString());
-            } catch (SQLException e) {
-                throw new QueryException("数据库连接失败：" + config.url + "=>" + e.getMessage());
-            }
+        try {
+            this.databaseMeta = ORMContext.getDatabaseMeta();
+            this.connection = ORMContext.getContextPort().getConnection();
+        } catch (Exception e) {
+            throw new QueryException(e);
         }
-
-        // Spring 框架中使用
-        else if (config.subject == DatabaseConfig.DBSubject.SPRING) {
-            try {
-                this.connection = SpringLoader.instance.getDataSource().getConnection();
-            } catch (SQLException e) {
-                throw new QueryException("获取连接失败");
-            }
-        }
-
         return this;
     }
 
@@ -99,7 +84,7 @@ public class QuickConnection {
                 connection.close();
                 connection = null;
             } catch (SQLException e) {
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
         }
     }

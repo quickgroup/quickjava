@@ -3,65 +3,130 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-    <!-- 框架信息 -->
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.quickjava.core</groupId>
-    <artifactId>quickjava-orm</artifactId>
-    <name>quickjava-orm</name>
-    <!-- 发布后修改版本号 -->
-    <version>2.0.1</version>
-    <packaging>jar</packaging>
+    <artifactId>quickjava-orm-boot-starter-test</artifactId>
+    <version>1.0.1</version>
+    <name>quickjava-orm-boot-starter-test</name>
     <description>
-        QuickJava ORM Framework
-    </description>
-    <url>http://www.quickjava.org/</url>
 
-    <!-- 配置 -->
+    </description>
+
+    <packaging>jar</packaging>
+
     <properties>
         <java.version>1.8</java.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
-
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-        <projectUrl>https://github.com/quickgroup/quickjava.git</projectUrl>
-        <serverId>ossrh</serverId>
     </properties>
 
-    <!-- 依赖包 -->
     <dependencies>
 
+        <!-- 引入ORM -->
         <dependency>
             <groupId>org.quickjava.core</groupId>
-            <artifactId>quickjava-common2</artifactId>
-            <version>1.2.8</version>
+            <artifactId>quickjava-orm-boot-starter</artifactId>
+            <version>1.0.1</version>
         </dependency>
 
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-            <version>2.13.4</version>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.31</version>
+        </dependency>
+
+        <!-- springboot -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>2.7.14</version>
+        </dependency>
+
+        <!-- Druid -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid-spring-boot-starter</artifactId>
+            <version>1.2.16</version>
+        </dependency>
+
+        <!-- Other dependencies -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <version>2.7.14</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- orm移入 -->
+        <!--        <dependency>-->
+        <!--            <groupId>org.springframework.boot</groupId>-->
+        <!--            <artifactId>spring-boot-starter-web</artifactId>-->
+        <!--            <version>2.7.12</version>-->
+        <!--            <exclusions>-->
+        <!--                <exclusion>-->
+        <!--                    <groupId>org.yaml</groupId>-->
+        <!--                    <artifactId>snakeyaml</artifactId>-->
+        <!--                </exclusion>-->
+        <!--                <exclusion>-->
+        <!--                    <groupId>org.springframework</groupId>-->
+        <!--                    <artifactId>spring-web</artifactId>-->
+        <!--                </exclusion>-->
+        <!--                <exclusion>-->
+        <!--                    <groupId>org.apache.tomcat.embed</groupId>-->
+        <!--                    <artifactId>tomcat-embed-core</artifactId>-->
+        <!--                </exclusion>-->
+        <!--            </exclusions>-->
+        <!--        </dependency>-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
+            <version>2.7.18</version>
             <exclusions>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-web</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-autoconfigure</artifactId>
+                </exclusion>
                 <exclusion>
                     <groupId>org.yaml</groupId>
                     <artifactId>snakeyaml</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-classic</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
 
         <dependency>
-            <groupId>cglib</groupId>
-            <artifactId>cglib</artifactId>
-            <version>2.2.2</version>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+            <version>3.4.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-autoconfigure</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-classic</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
-
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.7.36</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+            <version>2.5.15</version>
         </dependency>
 
     </dependencies>
@@ -183,12 +248,11 @@
             <name>OSS Staging Repository</name>
             <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
-
-<!--        <repository>-->
-<!--            <id>nexus-smkj</id>-->
-<!--            <name>smkj</name>-->
-<!--            <url>http://192.168.110.9:8081/repository/maven-releases/</url>-->
-<!--        </repository>-->
+        <!--        <repository>-->
+        <!--            <id>nexus-smkj</id>-->
+        <!--            <name>smkj</name>-->
+        <!--            <url>http://192.168.110.9:8081/repository/maven-releases/</url>-->
+        <!--        </repository>-->
     </distributionManagement>
 
     <!--以下部分内容不需要修改，直接复制咱贴即可-->
@@ -213,7 +277,6 @@
             <organizationUrl>http://www.quickjava.org</organizationUrl>
         </developer>
     </developers>
-
     <repositories>
         <repository>
             <id>aliyun</id>

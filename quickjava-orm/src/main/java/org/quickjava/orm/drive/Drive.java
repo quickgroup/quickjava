@@ -6,7 +6,6 @@
 package org.quickjava.orm.drive;
 
 import org.quickjava.orm.query.QuerySetHelper;
-import org.quickjava.orm.utils.ReflectUtil;
 import org.quickjava.orm.query.QueryReservoir;
 import org.quickjava.orm.query.QuerySet;
 import org.quickjava.orm.query.build.ValueConv;
@@ -33,7 +32,7 @@ public abstract class Drive {
 
     protected static final Logger logger = LoggerFactory.getLogger(Drive.class);
 
-    private DatabaseConfig config = null;
+    private DatabaseMeta config = null;
 
     // 开启事务后将连接放到线程缓存中
     private static final ThreadLocal<QuickConnection> __THREAD_CONNECTION = new ThreadLocal<>();

@@ -17,21 +17,19 @@ import java.sql.SQLException;
  * License: Apache Licence 2.0
  * +-------------------------------------------------------------------
  */
-public class DatabaseConfig {
+public class DatabaseMeta {
 
-    // 连接方式
-    public DBSubject subject = DBSubject.CONFIG;
+    // 连接处理框架
+    public String subject = null;
 
     // 数据库类型
-    public DBType type = null;
+    public DBType type = DBType.MYSQL;
 
-    public String url = null;		//数据库地址
+    // 连接语句
+    public String url = null;
 
-    public String database = null;		//数据库
-
-    public String username = null;		//数据库用户名
-
-    public String password = null;		//数据库密码
+    // 数据库名称
+    public String database = null;
 
     // jdbc驱动
     public String driver = "com.mysql.jdbc.Driver";
@@ -47,26 +45,17 @@ public class DatabaseConfig {
         DEFAULT,
     }
 
-    public enum DBSubject {
-        CONFIG,
-        QUICKJAVA,
-        SPRING,
-    }
-
-    public DatabaseConfig(DBSubject subject, String url, String username, String password) {
+    public DatabaseMeta(String subject, String url) {
         this.subject = subject;
-        this.url = url;
-        this.username = username;
-        this.password = password;
-        parseTypeFromUrl(url);
+        parseDBTypeFromUrl(url);
     }
 
-    public DatabaseConfig(DBSubject subject, DBType dbType) {
+    public DatabaseMeta(String subject, DBType dbType) {
         this.subject = subject;
         this.type = dbType;
     }
 
-    private void parseTypeFromUrl(String url)
+    private void parseDBTypeFromUrl(String url)
     {
         if (url.toLowerCase().contains("mysql://")) {
             this.type = DBType.MYSQL;
@@ -108,7 +97,6 @@ public class DatabaseConfig {
                 ", type=" + type +
                 ", url='" + url + '\'' +
                 ", database='" + database + '\'' +
-                ", username='" + username + '\'' +
                 ", driver='" + driver + '\'' +
                 ", autoCommit=" + autoCommit +
                 ", underscoreToCamelCase=" + underscoreToCamelCase +

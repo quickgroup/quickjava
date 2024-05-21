@@ -15,10 +15,10 @@ package org.quickjava.orm;
  * +-------------------------------------------------------------------
  */
 
-import org.quickjava.orm.loader.SpringLoader;
+import org.quickjava.orm.loader.ORMContextPort;
 import org.quickjava.orm.utils.ReflectUtil;
 import org.quickjava.orm.model.callback.ModelListener;
-import org.quickjava.orm.contain.DatabaseConfig;
+import org.quickjava.orm.contain.DatabaseMeta;
 import org.quickjava.orm.drive.*;
 import org.quickjava.orm.model.Model;
 
@@ -35,20 +35,25 @@ public class ORMContext {
 //    private static ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
     private static ClassLoader classLoader = ORMContext.class.getClassLoader();
 
-    public static Map<DatabaseConfig.DBType, Class<? extends Drive>> driveMap = new LinkedHashMap<>();
+    private static ORMContextPort contextPort = null;
+
+    public static Map<DatabaseMeta.DBType, Class<? extends Drive>> driveMap = new LinkedHashMap<>();
 
     static {
-        driveMap.put(DatabaseConfig.DBType.MYSQL, Mysql.class);
-        driveMap.put(DatabaseConfig.DBType.ORACLE, Oracle.class);
-        driveMap.put(DatabaseConfig.DBType.DEFAULT, DefaultDrive.class);
+        driveMap.put(DatabaseMeta.DBType.MYSQL, Mysql.class);
+        driveMap.put(DatabaseMeta.DBType.ORACLE, Oracle.class);
+        driveMap.put(DatabaseMeta.DBType.DEFAULT, DefaultDrive.class);
+    }
+
+    /**
+     * 设置不同环境的类加载器
+     */
+    public static void setClassLoader(ClassLoader classLoader) {
+        ORMContext.classLoader = classLoader;
     }
 
     public static ClassLoader getClassLoader() {
         return classLoader;
-    }
-
-    public static void setClassLoader(ClassLoader classLoader) {
-        ORMContext.classLoader = classLoader;
     }
 
     public static<D> Class<D> loadClass(Class<D> clazz) {
@@ -62,59 +67,41 @@ public class ORMContext {
         }
     }
 
-    public static Drive getDrive() {
-        DatabaseConfig config;
+    public static void setContextPort(ORMContextPort ormContextPort) {
+        ORMContext.contextPort = ormContextPort;
+    }
+
+    public static ORMContextPort getContextPort() {
+        return ORMContext.contextPort;
+    }
+
+    public static DatabaseMeta getDatabaseMeta() {
+        DatabaseMeta meta;
         synchronized (Drive.class) {
-            // 检测spring
-            if (SpringLoader.instance != null) {
-                config = SpringLoader.instance.getConfig();
-            } else {
-                config = getQuickJavaConfig();
-            }
+            meta = contextPort.getDatabaseMeta();
         }
-        return getDrive(config);
+        return meta;
     }
 
     /**
-     * 获取当前环境数据库驱动
-     * @param config 链接配置
-     * @return 驱动连接
+     * 获取驱动器类
      */
-    public static Drive getDrive(DatabaseConfig config)
+    public static Drive getDrive() {
+        return getDrive(getDatabaseMeta());
+    }
+
+    /**
+     * 获取驱动器类
+     */
+    public static Drive getDrive(DatabaseMeta meta)
     {
         // 加载驱动操作类
         try {
-            Drive drive = driveMap.get(config.type).newInstance();
-            ReflectUtil.setFieldValueDirect(drive, "config", config);
+            Drive drive = driveMap.get(meta.type).newInstance();
+            ReflectUtil.setFieldValueDirect(drive, "config", meta);
             return drive;
         } catch (InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    // 默认配置
-    private static DatabaseConfig defaultConfig = new DatabaseConfig(DatabaseConfig.DBSubject.CONFIG, DatabaseConfig.DBType.DEFAULT);
-
-    /**
-     * FIXME::从QuickJava读取数据库配置
-     * @return 链接配置
-     * */
-    public static DatabaseConfig getQuickJavaConfig()
-    {
-        try {
-            Class<?> kernelClazz = ORMContext.class.getClassLoader().loadClass("org.quickjava.framework.Kernel");
-            Object configMap = ReflectUtil.getFieldValue(kernelClazz, "config");
-            Object databaseMap = ReflectUtil.invoke(configMap, "get", "database");
-            DatabaseConfig config1 = new DatabaseConfig(
-                    DatabaseConfig.DBSubject.QUICKJAVA,
-                    ReflectUtil.invoke(databaseMap, "getString", "url"),
-                    ReflectUtil.invoke(databaseMap, "getString", "username"),
-                    ReflectUtil.invoke(databaseMap, "getString", "password")
-            );
-            config1.subject = DatabaseConfig.DBSubject.QUICKJAVA;
-            return config1;
-        } catch (Throwable th) {
-            return defaultConfig;
         }
     }
 

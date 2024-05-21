@@ -1,9 +1,10 @@
-package org.quickjava.orm.loader;
+package org.quickjava.spring.loader;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import org.quickjava.orm.ORMContext;
-import org.quickjava.orm.contain.DatabaseConfig;
+import org.quickjava.orm.contain.DatabaseMeta;
+import org.quickjava.orm.loader.ORMContextPort;
 import org.quickjava.orm.model.IModel;
 import org.quickjava.orm.model.Model;
 import org.slf4j.Logger;
@@ -14,6 +15,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandi
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.SpringVersion;
 import org.springframework.core.env.Environment;
 
 import javax.sql.DataSource;
@@ -25,7 +27,7 @@ import java.util.List;
 
 @Configuration
 @ConditionalOnSingleCandidate(DataSource.class)
-public class SpringLoader implements InitializingBean {
+public class SpringLoader implements InitializingBean, ORMContextPort {
 
     private static final Logger logger = LoggerFactory.getLogger(SpringLoader.class);
 
@@ -40,12 +42,13 @@ public class SpringLoader implements InitializingBean {
     @Autowired
     private Environment environment;
 
+    // 数据源
     @Autowired
     private DataSource druidDataSource;
 
-    private DatabaseConfig.DBType dbType;
+    private DatabaseMeta.DBType dbType;
 
-    private DatabaseConfig dbConfig;
+    private DatabaseMeta dbConfig;
 
     public SpringLoader(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
@@ -60,22 +63,20 @@ public class SpringLoader implements InitializingBean {
     public void afterPropertiesSet() throws Exception {
         // appClassLoader
         ORMContext.setClassLoader(Model.class.getClassLoader());
+        // 配置数据库来源
+        ORMContext.setContextPort(this);
         // 加载模型
         this.loadModel();
         // 更换classLoader
         ORMContext.setClassLoader(applicationContext.getClassLoader());
     }
 
-    public DataSource getDataSource() {
-        return druidDataSource;
-    }
-
-    public DatabaseConfig.DBType getConnectionType() {
+    public DatabaseMeta.DBType getConnectionType() {
         synchronized (SpringLoader.class) {
             if (dbType == null) {
                 try {
-                    Connection connection = getDataSource().getConnection();
-                    dbType = DatabaseConfig.parseTypeFromConnection(connection);
+                    Connection connection = druidDataSource.getConnection();
+                    dbType = DatabaseMeta.parseTypeFromConnection(connection);
                     connection.close();
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
@@ -85,15 +86,16 @@ public class SpringLoader implements InitializingBean {
         return dbType;
     }
 
-    public DatabaseConfig getConfig() {
+    public DatabaseMeta getDatabaseMeta() {
         if (dbConfig == null) {
-            dbConfig = new DatabaseConfig(DatabaseConfig.DBSubject.SPRING, getConnectionType());
+            dbConfig = new DatabaseMeta("SpringBoot " + SpringVersion.getVersion(), getConnectionType());
         }
         return dbConfig;
     }
 
-    public Environment getEnvironment() {
-        return environment;
+    @Override
+    public Connection getConnection() throws SQLException {
+        return druidDataSource.getConnection();
     }
 
     private void loadModel() {

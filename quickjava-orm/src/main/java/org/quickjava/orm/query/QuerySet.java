@@ -50,7 +50,7 @@ public class QuerySet {
         reservoir.setTable(table);
     }
 
-    public QuerySet(DatabaseConfig config) {
+    public QuerySet(DatabaseMeta config) {
     }
 
     public static QuerySet table(String table)
