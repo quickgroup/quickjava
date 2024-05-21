@@ -13,16 +13,15 @@ package org.quickjava.orm.model.contain;/*
  * +-------------------------------------------------------------------
  */
 
-public enum IdType {
+public enum ModelIdType {
     AUTO(0),
     NONE(1),
-    INPUT(2),
-    ASSIGN_ID(3),
-    ASSIGN_UUID(4);
+    INPUT(2)
+    ;
 
     private final int key;
 
-    private IdType(int key) {
+    private ModelIdType(int key) {
         this.key = key;
     }
 

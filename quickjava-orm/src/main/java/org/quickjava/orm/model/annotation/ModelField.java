@@ -27,7 +27,7 @@ public @interface ModelField {
      * 字段名称
      * @return 字段名称
      * */
-    String name() default "";
+    String value() default "";
 
     /**
      * @return 字段是否存在

@@ -13,7 +13,7 @@ package org.quickjava.orm.model;/*
  * +-------------------------------------------------------------------
  */
 
-import org.quickjava.orm.model.contain.IdType;
+import org.quickjava.orm.model.contain.ModelIdType;
 import org.quickjava.orm.model.enums.ModelFieldFill;
 
 import java.lang.annotation.Annotation;
@@ -41,7 +41,7 @@ public class ModelAnoHelper {
 
     public static interface TableIdInfo {
         String value(Class<?> ano);
-        IdType type(Class<?> ano);
+        ModelIdType type(Class<?> ano);
     }
 
     public static interface TableFieldInfo {

@@ -16,6 +16,7 @@ package org.quickjava.orm;
  */
 
 import org.quickjava.orm.loader.ORMContextPort;
+import org.quickjava.orm.model.callback.ModelFieldStrut;
 import org.quickjava.orm.utils.ReflectUtil;
 import org.quickjava.orm.model.callback.ModelListener;
 import org.quickjava.orm.contain.DatabaseMeta;
@@ -32,12 +33,16 @@ import java.util.Map;
  */
 public class ORMContext {
 
-//    private static ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
     private static ClassLoader classLoader = ORMContext.class.getClassLoader();
+//    private static ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
     private static ORMContextPort contextPort = null;
 
-    public static Map<DatabaseMeta.DBType, Class<? extends Drive>> driveMap = new LinkedHashMap<>();
+    private static List<ModelListener> modelListenerList = new LinkedList<>();
+
+    private static ModelFieldStrut modelFieldStrut = null;
+
+    private static final Map<DatabaseMeta.DBType, Class<? extends Drive>> driveMap = new LinkedHashMap<>();
 
     static {
         driveMap.put(DatabaseMeta.DBType.MYSQL, Mysql.class);
@@ -75,6 +80,14 @@ public class ORMContext {
         return ORMContext.contextPort;
     }
 
+    public static ModelFieldStrut getModelFieldStrut() {
+        return modelFieldStrut;
+    }
+
+    public static void setModelFieldStrut(ModelFieldStrut modelFieldStrut) {
+        ORMContext.modelFieldStrut = modelFieldStrut;
+    }
+
     public static DatabaseMeta getDatabaseMeta() {
         DatabaseMeta meta;
         synchronized (Drive.class) {
@@ -105,33 +118,31 @@ public class ORMContext {
         }
     }
 
-    private static final List<ModelListener> MODEL_CALLBACKS = new LinkedList<>();
-
     public static final ModelListener MODEL_CALLBACK = new ModelListener() {
         @Override
         public void insert(Model model) {
-            for (ModelListener callback : MODEL_CALLBACKS) {
+            for (ModelListener callback : modelListenerList) {
                 callback.insert(model);
             }
         }
 
         @Override
         public void delete(Model model) {
-            for (ModelListener callback : MODEL_CALLBACKS) {
+            for (ModelListener callback : modelListenerList) {
                 callback.delete(model);
             }
         }
 
         @Override
         public void update(Model model) {
-            for (ModelListener callback : MODEL_CALLBACKS) {
+            for (ModelListener callback : modelListenerList) {
                 callback.update(model);
             }
         }
 
         @Override
         public void select(Model model) {
-            for (ModelListener callback : MODEL_CALLBACKS) {
+            for (ModelListener callback : modelListenerList) {
                 callback.select(model);
             }
         }
@@ -139,13 +150,13 @@ public class ORMContext {
 
     //模型回调
     public static void modelListener(ModelListener callback) {
-        if (!MODEL_CALLBACKS.contains(callback)) {
-            MODEL_CALLBACKS.add(callback);
+        if (!modelListenerList.contains(callback)) {
+            modelListenerList.add(callback);
         }
     }
 
     public static void modelUnListener(ModelListener callback) {
-        MODEL_CALLBACKS.remove(callback);
+        modelListenerList.remove(callback);
     }
 
 }

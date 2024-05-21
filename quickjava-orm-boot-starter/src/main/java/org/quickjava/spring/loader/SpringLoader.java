@@ -59,12 +59,22 @@ public class SpringLoader implements InitializingBean, ORMContextPort {
         return applicationContext;
     }
 
+    public static  <T> T getBean(Class<T> var1) {
+        try {
+            return applicationContext.getBean(var1);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     @Override
     public void afterPropertiesSet() throws Exception {
         // appClassLoader
         ORMContext.setClassLoader(Model.class.getClassLoader());
         // 配置数据库来源
         ORMContext.setContextPort(this);
+        // mybatis-plus字段支持
+        MyBatisPlusConfigure.init();
         // 加载模型
         this.loadModel();
         // 更换classLoader

@@ -1,10 +1,7 @@
 package org.quickjava.orm.model.contain;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
 import org.quickjava.common.utils.ComUtil;
+import org.quickjava.orm.ORMContext;
 import org.quickjava.orm.model.ModelHelper;
 import org.quickjava.orm.model.annotation.ModelField;
 import org.quickjava.orm.model.annotation.ModelId;
@@ -35,11 +32,6 @@ public class ModelFieldMeta {
     private ModelField modelField;
     private ModelId modelId;
 
-    // mybatis-plus注解
-    private TableField tableField;
-    private TableId tableId;
-    private TableLogic tableLogic;
-
     public ModelFieldMeta() {
     }
 
@@ -49,9 +41,6 @@ public class ModelFieldMeta {
         this.field = field;
         this.modelField = field.getAnnotation(ModelField.class);
         this.modelId = field.getAnnotation(ModelId.class);
-        this.tableField = field.getAnnotation(TableField.class);
-        this.tableId = field.getAnnotation(TableId.class);
-        this.tableLogic = field.getAnnotation(TableLogic.class);
     }
 
     public ModelFieldMeta(Field field, Object relationWay, Method setter, Method getter) {
@@ -63,11 +52,24 @@ public class ModelFieldMeta {
 
     public String getName() {
         if (modelField != null) {
-            return "".equals(modelField.name()) ? name:  modelField.name();
-        } else if (tableField != null) {
-            return "".equals(tableField.value()) ? name:  tableField.value();
+            return isEmpty(modelField.value()) ? name:  modelField.value();
+        }
+        // 三方支持
+        if (ORMContext.getModelFieldStrut() != null) {
+            name = ORMContext.getModelFieldStrut().getTableFieldName(this);
+            if (isNotEmpty(name)) {
+                return name;
+            }
         }
         return name;
+    }
+
+    private boolean isEmpty(String str) {
+        return str == null || str.isEmpty();
+    }
+
+    private boolean isNotEmpty(String str) {
+        return str == null || str.isEmpty();
     }
 
     public String name() {
@@ -146,27 +148,13 @@ public class ModelFieldMeta {
         this.modelId = modelId;
     }
 
-    public TableId getTableId() {
-        return tableId;
-    }
-
-    public void setTableId(TableId tableId) {
-        this.tableId = tableId;
-    }
-
-    public TableField getTableField() {
-        return tableField;
-    }
-
-    public void setTableField(TableField tableField) {
-        this.tableField = tableField;
-    }
-
     public boolean hasInsertFill() {
         if (modelField != null) {
             return modelField.insertFill() != ModelFieldFill.NULL;
-        } else if (tableField != null) {
-            return tableField.fill() == FieldFill.INSERT || tableField.fill() == FieldFill.INSERT_UPDATE;
+        }
+        // 三方支持
+        if (ORMContext.getModelFieldStrut() != null) {
+            return ORMContext.getModelFieldStrut().hasInsertFull(this);
         }
         return false;
     }
@@ -174,8 +162,10 @@ public class ModelFieldMeta {
     public Object insertFill() {
         if (modelField != null && modelField.insertFill() != ModelFieldFill.NULL) {
             return ModelHelper.fill(field, getModelField().insertFill(), getModelField().insertFillTarget());
-        } else if (tableField != null && (tableField.fill() == FieldFill.INSERT || tableField.fill() == FieldFill.INSERT_UPDATE)) {
-
+        }
+        // 三方支持
+        if (ORMContext.getModelFieldStrut() != null) {
+            return ORMContext.getModelFieldStrut().getInsertFullValue(this);
         }
         return null;
     }
@@ -183,8 +173,10 @@ public class ModelFieldMeta {
     public boolean hasUpdateFill() {
         if (modelField != null) {
             return modelField.updateFill() != ModelFieldFill.NULL;
-        } else if (tableField != null) {
-            return tableField.fill() == FieldFill.UPDATE || tableField.fill() == FieldFill.INSERT_UPDATE;
+        }
+        // 三方支持
+        if (ORMContext.getModelFieldStrut() != null) {
+            return ORMContext.getModelFieldStrut().hasUpdateFull(this);
         }
         return false;
     }
@@ -192,8 +184,10 @@ public class ModelFieldMeta {
     public Object updateFill() {
         if (modelField != null && modelField.updateFill() != ModelFieldFill.NULL) {
             return ModelHelper.fill(field, modelField.updateFill(), modelField.updateFillTarget());
-        } else if (tableField != null && (tableField.fill() == FieldFill.UPDATE || tableField.fill() == FieldFill.INSERT_UPDATE)) {
-
+        }
+        // 三方支持
+        if (ORMContext.getModelFieldStrut() != null) {
+            return ORMContext.getModelFieldStrut().getUpdateFullValue(this);
         }
         return null;
     }
@@ -201,8 +195,10 @@ public class ModelFieldMeta {
     public boolean isSoftDelete() {
         if (modelField != null) {
             return modelField.softDelete();
-        } else if (tableLogic != null) {
-            return true;
+        }
+        // 三方支持
+        if (ORMContext.getModelFieldStrut() != null) {
+            return ORMContext.getModelFieldStrut().isTableLogic(this);
         }
         return false;
     }
@@ -222,19 +218,12 @@ public class ModelFieldMeta {
     public boolean isExist() {
         if (modelField != null) {
             return modelField.exist();
-        } else if (tableField != null) {
-            return tableField.exist();
+        }
+        // 三方支持
+        if (ORMContext.getModelFieldStrut() != null) {
+            return ORMContext.getModelFieldStrut().tableFieldExist(this);
         }
         return true;
-    }
-
-    /**
-     * 自实现id
-     * @return
-     */
-    public boolean hasId() {
-        TableId tableIdAno = field.getAnnotation(TableId.class);
-        return false;
     }
 
     @Override
@@ -249,8 +238,6 @@ public class ModelFieldMeta {
                 ", method=" + method +
                 ", modelField=" + modelField +
                 ", modelId=" + modelId +
-                ", tableId=" + tableId +
-                ", tableField=" + tableField +
                 '}';
     }
 }
