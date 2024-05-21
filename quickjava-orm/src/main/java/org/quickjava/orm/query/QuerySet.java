@@ -438,19 +438,17 @@ public class QuerySet {
         return SqlUtil.isEmpty(resultSet) ? null : resultSet.get(0);
     }
 
-    public Integer update(Map<String, Object> data)
+    public Long update(Map<String, Object> data)
     {
         reservoir.action = Action.UPDATE;
         this.data(data);
-        executeSql();
-        return null;
+        return executeSql();
     }
 
-    public Integer update()
+    public Long update()
     {
         reservoir.action = Action.UPDATE;
-        executeSql();
-        return 1;
+        return executeSql();
     }
 
     public Long insert(Map<String, Object> data)
@@ -460,21 +458,20 @@ public class QuerySet {
         return executeSql();
     }
 
-    public Integer insertAll(List<DataMap> dataList)
+    public Long insertAll(List<DataMap> dataList)
     {
         reservoir.action = Action.INSERT;
         reservoir.getDataList().addAll(dataList);
         return executeSql();
     }
 
-    public Integer delete()
+    public Long delete()
     {
         if (QuerySetHelper.isEmpty(reservoir.whereList)) {
             throw new QueryException("不允许空条件的删除执行");
         }
         reservoir.action = Action.DELETE;
-        Long result = executeSql();
-        return result.intValue();
+        return executeSql();
     }
 
     //TODO::-------------------- 扩展方法 --------------------

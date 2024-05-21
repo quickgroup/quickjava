@@ -79,7 +79,7 @@ public class Model implements IModel {
     protected void __initialize() {
     }
 
-    private synchronized QuerySet query() {
+    protected synchronized QuerySet query() {
         synchronized (Model.class) {
             if (reservoir.querySet == null) {
                 reservoir.querySet = QuerySet.table(parseModelTableName(getClass()));
@@ -194,16 +194,7 @@ public class Model implements IModel {
      */
     public <D extends IModel> D insert()
     {
-        // 默认填充数据
-        reservoir.meta.fieldMap().forEach((name, field) -> {
-            if (!reservoir.data.containsKey(name)) {
-                if (field.hasInsertFill()) {
-                    data(name, field.insertFill());     // 新增时填充
-                }
-            }
-        });
-        // 雪花id
-
+        insertBefore();
         // 执行
         Long pkVal = query().insert(this.sqlData());
         // 编译sql
@@ -211,9 +202,22 @@ public class Model implements IModel {
             return toD(new ModelSql(querySetReservoir().getSql()));
         // 回填主键
         if (pkVal != null) {
-            data(pk(), pkVal);
+            setData(pk(), pkVal);
         }
         return toD(ModelHelper.isProxyModel(this) ? this : newModel(getMClass(), data()));
+    }
+
+    protected void insertBefore() {
+        // 默认填充数据
+        reservoir.meta.fieldMap().forEach((name, field) -> {
+            if (!reservoir.data.containsKey(name)) {
+                if (field.hasInsertFill()) {
+                    setData(name, field.insertFill());     // 新增时填充
+                }
+            }
+        });
+        // 雪花id
+
     }
 
     /**
@@ -237,17 +241,17 @@ public class Model implements IModel {
      *
      * @return 1
      */
-    public int delete() {
+    public Long delete() {
         // 软删除字段
         for (ModelFieldMeta field : reservoir.meta.fieldMap().values()) {
             if (field.isSoftDelete()) {
                 if (Date.class.isAssignableFrom(field.getField().getType())) {
-                    data(field.getName(), DatetimeUtil.now());      // 字符串去填充的数据
+                    setData(field.getName(), DatetimeUtil.now());      // 字符串去填充的数据
                     save();
                 } else {
                     throw new QuickORMException("不支持的软删除字段");
                 }
-                return 1;
+                return 1L;
             }
         }
         // 真实删除默认条件
@@ -269,7 +273,7 @@ public class Model implements IModel {
         reservoir.meta.fieldMap().forEach((name, field) -> {
             if (!reservoir.data.containsKey(name)) {
                 if (field.hasUpdateFill()) {
-                    data(name, field.updateFill());
+                    setData(name, field.updateFill());
                 }
             }
         });
@@ -345,11 +349,17 @@ public class Model implements IModel {
         return toD(models.get(0));
     }
 
+    /**
+     * 查询一条数据
+     */
     public <D extends IModel> D find(Serializable id) {
         query().where(query().pk(), id);
         return find();
     }
 
+    /**
+     * 查询多条数据
+     */
     public <D extends IModel> List<D> select() {
         // 查询前处理：预载入
         queryBefore();
@@ -534,20 +544,30 @@ public class Model implements IModel {
      * @return 模型对象
      */
     public Model data(String name, Object val) {
+        // 设置值
+        ModelFieldMeta field = setData(name, val);
+        if (field == null || field.getRelationWay() != null) {
+            return this;
+        }
+        // 被修改的字段
+        reservoir.getModified().add(field);
+        return this;
+    }
+
+    // 设置值（内部方法）
+    protected ModelFieldMeta setData(String name, Object val) {
         // 数据保存
         name = ModelHelper.toCamelCase(name);
         ModelFieldMeta field = reservoir.meta.fieldMap().get(name);
         // 非本表属性或关联属性不设置
         if (field == null || field.getRelationWay() != null) {
-            return this;
+            return null;
         }
-
+        // 缓存值
         reservoir.data.put(name, val);
+        // 对象属性值
         ModelHelper.setFieldValue(this, name, val, field);
-
-        // 被修改的字段
-        reservoir.getModified().add(field);
-        return this;
+        return field;
     }
 
     /**
@@ -591,7 +611,7 @@ public class Model implements IModel {
     }
     //TODO::---------- 数据方法 END ----------
 
-    //TODO::---------- 静态操作方法 START ----------
+    //TODO::---------- 静态方法、批量方法 START ----------
 
     /**
      * 通过 Map 创建对象
@@ -613,23 +633,47 @@ public class Model implements IModel {
         return create((Map<String, Object>) data);
     }
 
-    public static<T extends Model> T create(Class<? extends Model> modelClass, Map<String, Object> data) {
-        T model = newModel(modelClass, data);
+    public static<T extends Model> T create(Class<? extends Model> clazz, Map<String, Object> data) {
+        T model = newModel(clazz, data);
         model.insert();
         return model;
     }
 
-//    public static<T extends Model> T batchCreate(Class<? extends Model> modelClass, List<Map<String, Object>> dataList) {
-//        T model = newModel(modelClass, dataList.get(0));
-////        model.insert();
-//        return model;
-//    }
-//
-//    public static<T extends Model> T batchCreate(Class<? extends Model> modelClass, List<Model> modelList) {
-//        T model = newModel(modelClass, modelList.get(0));
-////        model.insert();
-//        return model;
-//    }
+    public static<MC extends Model> List<MC> batchCreateWithMap(Class<MC> clazz, List<Map<String, Object>> dataList) {
+        if (dataList == null || dataList.isEmpty()) {
+            return new LinkedList<>();
+        }
+        List<MC> models = new LinkedList<>();
+        List<DataMap> modelDataList = new LinkedList<>();
+        dataList.forEach(data -> {
+            MC model = newModel(clazz);
+            model.data(data);
+            model.insertBefore();
+            modelDataList.add(model.data());
+            models.add(model);
+        });
+        Long insertId = models.get(0).query().insertAll(modelDataList);
+        // 回写自增id
+        if (insertId != null) {
+            String pkName = models.get(0).pk();
+            for (MC model : models) {
+                model.setData(pkName, insertId++);
+            }
+        }
+        return models;
+    }
+
+    public static<MC extends Model> Long batchCreate(List<MC> modelList) {
+        if (modelList == null || modelList.isEmpty()) {
+            return 0L;
+        }
+        List<DataMap> modelDataList = new LinkedList<>();
+        for (Model model : modelList) {
+            model.insertBefore();
+            modelDataList.add(model.data());
+        }
+        return modelList.get(0).query().insertAll(modelDataList);
+    }
 
     /**
      * 批量创建
@@ -1100,7 +1144,7 @@ public class Model implements IModel {
                         // 设置全部关联属性为空，避免多重查询
                         Object localValue = ReflectUtil.getFieldValue(curr.getMClass(), curr, relation.localKey());
                         Object fieldValue = relationModel.where(relation.foreignKey(), localValue).find();  // 查询结果
-                        curr.data(fieldName, fieldValue);
+                        curr.setData(fieldName, fieldValue);
                         return fieldValue;
                     } else if (relation.getType() == RelationType.OneToMany) {
                         if (field.getGenericType() instanceof ParameterizedType) {
@@ -1109,7 +1153,7 @@ public class Model implements IModel {
                             Model relationModel = newModel(genericClazz, curr);
                             Object localValue = ReflectUtil.getFieldValue(curr.getMClass(), curr, relation.localKey());
                             Object fieldValue = relationModel.where(relation.foreignKey(), localValue).select();  // 查询结果
-                            curr.data(fieldName, fieldValue);
+                            curr.setData(fieldName, fieldValue);
                             return fieldValue;
                         }
                     }
@@ -1121,7 +1165,7 @@ public class Model implements IModel {
                     // 设置全部关联属性为空，避免多重查询
                     Object localValue = ReflectUtil.getFieldValue(curr.getMClass(), curr, one.localKey());
                     Object fieldValue = relationModel.where(one.foreignKey(), localValue).find();  // 查询结果
-                    curr.data(fieldName, fieldValue);
+                    curr.setData(fieldName, fieldValue);
                     return fieldValue;
                 } else if (isCollection(fieldType) && OneToMany.class.isAssignableFrom(modelField.getRelationWay().getClass())) {
                     OneToMany many = (OneToMany) modelField.getRelationWay();
@@ -1131,7 +1175,7 @@ public class Model implements IModel {
                         Model relationModel = newModel(genericClazz, curr);
                         Object localValue = ReflectUtil.getFieldValue(curr.getMClass(), curr, many.localKey());
                         Object fieldValue = relationModel.where(many.foreignKey(), localValue).select();  // 查询结果
-                        curr.data(fieldName, fieldValue);   // 保存查询到的数据
+                        curr.setData(fieldName, fieldValue);   // 保存查询到的数据
                         return fieldValue;
                     }
                 }

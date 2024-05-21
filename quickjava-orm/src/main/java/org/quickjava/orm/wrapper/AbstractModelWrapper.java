@@ -315,7 +315,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         return model().insert(data);
     }
 
-    public int delete() {
+    public Long delete() {
         return model().delete();
     }
 

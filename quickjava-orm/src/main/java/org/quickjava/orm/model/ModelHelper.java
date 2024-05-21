@@ -324,7 +324,7 @@ public class ModelHelper extends SqlUtil {
     }
 
     /**
-     * 将data数据通过alias找到并装载到模型上
+     * 将data数据通过alias找到并装载到模型上 [查询场景]
      */
     public static void resultTranshipmentWithOne(IModel iModel, Map<String, Object> data, String columnPrefix) {
         Model model = ((Model) iModel);
@@ -334,7 +334,7 @@ public class ModelHelper extends SqlUtil {
                 return;
             }
             String fieldName = columnPrefix == null || columnPrefix.isEmpty() ? toUnderlineCase(name) : columnPrefix + toUnderlineCase(name);
-            model.data(name, data.get(fieldName));
+            model.setData(name, data.get(fieldName));
         });
     }
 
