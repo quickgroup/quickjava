@@ -17,7 +17,6 @@ public enum Operator {
      * 大于等于
      */
     GTE,
-    EGT,
     /**
      * 小于
      */
@@ -26,7 +25,6 @@ public enum Operator {
      * 小于等于
      */
     LTE,
-    ELT,
     LIKE,
     LIKE_LEFT,
     LIKE_RIGHT,

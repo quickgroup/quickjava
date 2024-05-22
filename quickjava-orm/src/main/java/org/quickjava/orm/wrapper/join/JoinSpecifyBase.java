@@ -20,6 +20,9 @@ public class JoinSpecifyBase<Children extends JoinSpecifyBase<Children, Left>, L
     // 加载left表数据到right模型属性上
     protected String loadDataField = null;
 
+    // 加载left表数据列（限定返回数据列）
+    protected List<String> fields = null;
+
     // join-on关联条件
     public final List<Item<?, ?>> onList = new LinkedList<>();
 

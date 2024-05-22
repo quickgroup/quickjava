@@ -6,6 +6,7 @@ import org.quickjava.orm.contain.DataMap;
 import org.quickjava.orm.contain.IPagination;
 import org.quickjava.orm.contain.Pagination;
 import org.quickjava.orm.enums.JoinType;
+import org.quickjava.orm.enums.LogicType;
 import org.quickjava.orm.model.Model;
 import org.quickjava.orm.model.ModelHelper;
 import org.quickjava.orm.model.ModelReservoir;
@@ -27,7 +28,7 @@ import java.io.Serializable;
 import java.util.*;
 
 public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper<Children, M, R>, M extends Model, R extends MFunction<M, ?>>
-        implements Wrapper<Children>, ModelJoinWrapper<Children, M, R>, Serializable {
+        implements AbstractWrapperWhere<Children, M, R>, ModelJoinWrapper<Children, M, R>, Serializable {
 
     protected static final Logger logger = LoggerFactory.getLogger(AbstractModelWrapper.class);
 
@@ -44,151 +45,27 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         return model;
     }
 
-    public Children eq(R func, Object val) {
-        return eq(true, func, val);
-    }
-
-    public Children eq(boolean condition, R func, Object val) {
-        return where(condition, null, parseFieldName(func), Operator.EQ, val);
-    }
-
-    public Children neq(R func, Object val) {
-        return neq(true, func, val);
-    }
-
-    public Children ne(R func, Object val) {
-        return neq(true, func, val);
-    }
-
-    public Children neq(boolean condition, R func, Object val) {
-        return where(condition, null, parseFieldName(func), Operator.NEQ, val);
-    }
-
-    public Children gt(R func, Object val) {
-        return gt(true, func, val);
-    }
-
-    public Children gt(boolean condition, R func, Object val) {
-        return where(condition, null, parseFieldName(func), Operator.GT, val);
-    }
-
-    public Children gte(R function, Object val) {
-        return gte(true, function, val);
-    }
-
-    public Children ge(R function, Object val) {
-        return gte(true, function, val);
-    }
-
-    public Children gte(boolean condition, R func, Object val) {
-        return where(condition, null, parseFieldName(func), Operator.GTE, val);
-    }
-
-    public Children lt(R func, Object val) {
-        return lt(true, func, val);
-    }
-
-    public Children lt(boolean condition, R function, Object val) {
-        return where(condition, null, parseFieldName(function), Operator.LT, val);
-    }
-
-    public Children lte(R func, Object val) {
-        return lte(true, func, val);
-    }
-
-    public Children le(R func, Object val) {
-        return lte(true, func, val);
-    }
-
-    public Children lte(boolean condition, R function, Object val) {
-        return where(condition, null, parseFieldName(function), Operator.LTE, val);
-    }
-
-    public Children in(R func, Object ...args) {
-        return in(true, func, args);
-    }
-
-    public Children in(boolean condition, R func, Object ... args) {
-        return where(condition, null, parseFieldName(func), Operator.IN, args);
-    }
-
-    public Children notIn(R func, Object ...args) {
-        return notIn(true, func, args);
-    }
-
-    public Children notIn(boolean condition, R function, Object ... args) {
-        return where(condition, null, parseFieldName(function), Operator.NOT_IN, args);
-    }
-
-    public Children isNull(R func) {
-        return isNull(true, func);
-    }
-
-    public Children isNull(boolean condition, R func) {
-        return where(condition, null, parseFieldName(func), Operator.IS_NULL, null);
-    }
-
-    public Children isNotNull(R func) {
-        return isNotNull(true, func);
-    }
-
-    public Children isNotNull(boolean condition, R func) {
-        return where(condition, null, parseFieldName(func), Operator.IS_NOT_NULL, null);
-    }
-
-    public Children between(R func, Object v1, Object v2) {
-        return between(true, func, v1, v2);
-    }
-
-    public Children between(boolean condition, R func, Object v1, Object v2) {
-        return where(condition, null, parseFieldName(func), Operator.BETWEEN, new Object[]{v1, v2});
-    }
-
-    public Children like(R func, Object val) {
-        return like(true, func, val);
-    }
-
-    public Children like(boolean condition, R function, Object val) {
-        return where(condition, null, parseFieldName(function), Operator.LIKE_LR, val);
-    }
-
-    public Children notLike(R func, Object val) {
-        return like(true, func, val);
-    }
-
-    public Children notLike(boolean condition, R function, Object val) {
-        return where(condition, null, parseFieldName(function), Operator.NOT_LIKE_LR, val);
-    }
-
-    public Children where(R func, Object val) {
-        return where(true, null, parseFieldName(func), Operator.EQ, val);
-    }
-
-    public Children where(R func, Operator operator, Object val) {
-        return where(true, null, parseFieldName(func), operator, val);
-    }
-
+    //TODO::-------------------- 查询条件  --------------------
     @Override
-    public Children where(boolean condition, String table, String column, Operator operator, Object val) {
+    public Children where(LogicType logic, boolean condition, String table, String column, Operator operator, Object val) {
         if (condition) {
-            getQuerySet().where(table, column, operator, val);
+            if (logic == LogicType.AND) {
+                querySet().where(table, column, operator, val);
+            } else {
+                querySet().whereOr(table, column, operator, val);
+            }
         }
         return chain();
     }
 
-    @Override
-    public Children whereOr(boolean condition, String table, String column, Operator operator, Object val) {
-        if (condition) {
-            getQuerySet().whereOr(table, column, operator, val);
-        }
-        return chain();
-    }
-
-    //TODO::-------------------- 字段  --------------------
+    //TODO::-------------------- 查询字段  --------------------
+    /**
+     * 限定返回数据列
+     */
     @SafeVarargs
     public final Children field(R... fields) {
         for (R field : fields) {
-            getQuerySet().field(field.getName());
+            querySet().field(field.getName());
         }
         return chain();
     }
@@ -199,7 +76,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     public final <TM> Children field(Class<TM> tm, MFunction<TM, ?>... tfs) {
         String table = WrapperUtil.autoTable(null, this, tm);
         for (MFunction<TM, ?> tf : tfs) {
-            getQuerySet().field(table, SqlUtil.toUnderlineCase(tf.getName()));
+            querySet().field(table, SqlUtil.toUnderlineCase(tf.getName()));
         }
         return chain();
     }
@@ -208,7 +85,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     @SafeVarargs
     public final Children group(R... fields) {
         for (R field : fields) {
-            getQuerySet().group(field.getName());
+            querySet().group(field.getName());
         }
         return chain();
     }
@@ -219,7 +96,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     public final <TM> Children group(Class<TM> tm, MFunction<TM, ?>... tfs) {
         String table = WrapperUtil.autoTable(null, this, tm);
         for (MFunction<TM, ?> tf : tfs) {
-            getQuerySet().group(table, SqlUtil.toUnderlineCase(tf.getName()));
+            querySet().group(table, SqlUtil.toUnderlineCase(tf.getName()));
         }
         return chain();
     }
@@ -238,7 +115,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     public final <TM> Children having(Class<TM> tm, MFunction<TM, ?>... tfs) {
         String table = WrapperUtil.autoTable(null, this, tm);
         for (MFunction<TM, ?> tf : tfs) {
-            getQuerySet().having(table, SqlUtil.toUnderlineCase(tf.getName()));
+            querySet().having(table, SqlUtil.toUnderlineCase(tf.getName()));
         }
         return chain();
     }
@@ -265,7 +142,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
 
     //TODO::--------------- 排序和数量 ---------------
     public Children order(R r, boolean desc) {
-        getQuerySet().order(r.getName(), desc ? OrderByType.DESC : OrderByType.ASC);
+        querySet().order(r.getName(), desc ? OrderByType.DESC : OrderByType.ASC);
         return chain();
     }
 
@@ -284,7 +161,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     // 关联表支持
     public <TM> Children order(Class<TM> tm, MFunction<TM, ?> tf, OrderByType type) {
         String table = WrapperUtil.autoTable(null, this, tm);
-        getQuerySet().order(table, SqlUtil.toUnderlineCase(tf.getName()), type);
+        querySet().order(table, SqlUtil.toUnderlineCase(tf.getName()), type);
         return chain();
     }
 
@@ -339,14 +216,14 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     //TODO:---------- 查询执行方法 ----------
     public M find() {
         queryBefore();
-        Map<String, Object> data = getQuerySet().find();
+        Map<String, Object> data = querySet().find();
         M row = loadDataItem(data, getModelMeta(modelClazz));
         return row;
     }
 
     public List<M> select() {
         queryBefore();
-        List<Map<String, Object>> dataList = getQuerySet().select();
+        List<Map<String, Object>> dataList = querySet().select();
         List<M> rows = queryAfter(dataList, getModelMeta(modelClazz));
         return rows;
     }
@@ -400,7 +277,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     }
 
     public IPagination<M> pagination(long page, long pageSize) {
-        IPagination<Map<String, Object>> pagination = getQuerySet().pagination(page, pageSize);
+        IPagination<Map<String, Object>> pagination = querySet().pagination(page, pageSize);
         // 装载数据
         List<M> models = queryAfter(pagination.getRows(), getModelMeta(this.model.getClass()));
         return new Pagination<>(pagination, models);
@@ -442,7 +319,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         return function.getName();
     }
 
-    private QuerySet getQuerySet() {
+    private QuerySet querySet() {
         return WrapperUtil.getQuerySet(this.model());
     }
 
@@ -457,7 +334,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         }
         // 查询器
         ModelMeta mainMeta = getModelMeta(this.model.getClass());
-        QuerySet querySet = getQuerySet();
+        QuerySet querySet = querySet();
         QueryReservoir queryReservoir = QuerySetHelper.getQueryReservoir(querySet);
         // 主表字段
         if (ObjectUtil.isEmpty(queryReservoir.columnList)) {
