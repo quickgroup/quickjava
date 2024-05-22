@@ -102,8 +102,8 @@ public class ModelMeta {
                 return field.getName();
             }
             // 三方支持
-            if (ORMContext.getModelFieldStrut() != null) {
-                return ORMContext.getModelFieldStrut().tableIdName(field);
+            if (ORMContext.getModelStrut() != null) {
+                return ORMContext.getModelStrut().tableIdName(field);
             }
         }
         return null;

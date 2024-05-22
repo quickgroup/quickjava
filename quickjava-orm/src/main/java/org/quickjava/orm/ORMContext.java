@@ -16,7 +16,7 @@ package org.quickjava.orm;
  */
 
 import org.quickjava.orm.loader.ORMContextPort;
-import org.quickjava.orm.model.callback.ModelFieldStrut;
+import org.quickjava.orm.model.callback.ModelStrut;
 import org.quickjava.orm.utils.ReflectUtil;
 import org.quickjava.orm.model.callback.ModelListener;
 import org.quickjava.orm.contain.DatabaseMeta;
@@ -40,7 +40,7 @@ public class ORMContext {
 
     private static List<ModelListener> modelListenerList = new LinkedList<>();
 
-    private static ModelFieldStrut modelFieldStrut = null;
+    private static ModelStrut modelStrut = null;
 
     private static final Map<DatabaseMeta.DBType, Class<? extends Drive>> driveMap = new LinkedHashMap<>();
 
@@ -80,12 +80,12 @@ public class ORMContext {
         return ORMContext.contextPort;
     }
 
-    public static ModelFieldStrut getModelFieldStrut() {
-        return modelFieldStrut;
+    public static ModelStrut getModelStrut() {
+        return modelStrut;
     }
 
-    public static void setModelFieldStrut(ModelFieldStrut modelFieldStrut) {
-        ORMContext.modelFieldStrut = modelFieldStrut;
+    public static void setModelStrut(ModelStrut modelStrut) {
+        ORMContext.modelStrut = modelStrut;
     }
 
     public static DatabaseMeta getDatabaseMeta() {

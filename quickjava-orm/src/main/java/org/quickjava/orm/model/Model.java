@@ -71,7 +71,7 @@ public class Model implements IModel {
     @JsonIgnore
     private final ModelReservoir reservoir = new ModelReservoir(this);
 
-    protected synchronized QuerySet query() {
+    private synchronized QuerySet query() {
         synchronized (Model.class) {
             if (reservoir.querySet == null) {
                 reservoir.querySet = QuerySet.table(parseModelTableName(getClass()));
@@ -174,6 +174,12 @@ public class Model implements IModel {
 
     public Model between(String field, Object val1, Object val2) {
         return where(field, Operator.BETWEEN, new Object[]{val1, val2});
+    }
+
+    //TODO::---------- 查询方法二 ----------
+    public Model field(String ... fields) {
+        query().field(fields);
+        return this;
     }
 
     //TODO::---------- 操作方法-增删改查 ----------
@@ -644,7 +650,8 @@ public class Model implements IModel {
             modelDataList.add(model.data());
             models.add(model);
         });
-        Long insertId = models.get(0).query().insertAll(modelDataList);
+        QuerySet querySet = ModelHelper.getModelQuery(models.get(0));
+        Long insertId = querySet.insertAll(modelDataList);
         // 回写自增id
         if (insertId != null) {
             String pkName = models.get(0).pk();
@@ -655,16 +662,17 @@ public class Model implements IModel {
         return models;
     }
 
-    public static<MC extends Model> Long batchCreate(List<MC> modelList) {
-        if (modelList == null || modelList.isEmpty()) {
+    public static<MC extends Model> Long batchCreate(List<MC> models) {
+        if (models == null || models.isEmpty()) {
             return 0L;
         }
         List<DataMap> modelDataList = new LinkedList<>();
-        for (Model model : modelList) {
+        for (Model model : models) {
             model.insertBefore();
             modelDataList.add(model.data());
         }
-        return modelList.get(0).query().insertAll(modelDataList);
+        QuerySet querySet = ModelHelper.getModelQuery(models.get(0));
+        return querySet.insertAll(modelDataList);
     }
 
     /**
@@ -981,6 +989,10 @@ public class Model implements IModel {
             ModelFieldMeta fieldMeta = new ModelFieldMeta(field);
             // 隐藏字段
             if (!fieldMeta.isExist()) {
+                continue;
+            }
+            // 没有getter和setter方法
+            if (!ReflectUtil.hasGetter(clazz, field.getName()) || !ReflectUtil.hasSetter(clazz, field.getName())) {
                 continue;
             }
             meta.fieldMap().put(field.getName(), fieldMeta);

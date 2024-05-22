@@ -5,6 +5,7 @@ import org.quickjava.orm.query.QuerySet;
 import org.quickjava.orm.contain.DataMap;
 import org.quickjava.orm.model.contain.ModelFieldMeta;
 import org.quickjava.orm.model.contain.ModelMeta;
+import org.quickjava.orm.utils.ReflectUtil;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -72,6 +73,7 @@ public class ModelReservoir {
     public boolean vegetarian = true;
 
     public ModelReservoir(Model model) {
+        ReflectUtil.setFieldValue(model,  "reservoir", this);
         Model.initModel(model, ModelHelper.getModelClass(model));
         this.model = model;
     }

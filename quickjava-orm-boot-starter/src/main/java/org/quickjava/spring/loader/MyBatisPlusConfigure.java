@@ -18,15 +18,12 @@ import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import org.quickjava.orm.ORMContext;
 import org.quickjava.orm.model.ModelFieldHelper;
-import org.quickjava.orm.model.callback.ModelFieldStrut;
+import org.quickjava.orm.model.callback.ModelStrut;
 import org.quickjava.orm.model.contain.ModelIdType;
 import org.quickjava.orm.model.contain.ModelFieldMeta;
+import org.quickjava.orm.model.contain.ModelMeta;
 
 import java.io.Serializable;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.Date;
 
 public class MyBatisPlusConfigure {
 
@@ -38,7 +35,16 @@ public class MyBatisPlusConfigure {
     }
 
     protected static void init() {
-        ORMContext.setModelFieldStrut(new ModelFieldStrut() {
+        ORMContext.setModelStrut(new ModelStrut() {
+
+            @Override
+            public String getTableName(ModelMeta modelMeta) {
+                TableName tableName = modelMeta.getClazz().getAnnotation(TableName.class);
+                if (tableName != null) {
+                    return tableName.value();
+                }
+                return null;
+            }
 
             @Override
             public boolean isTableId(ModelFieldMeta fieldMeta) {
@@ -87,14 +93,17 @@ public class MyBatisPlusConfigure {
             }
 
             @Override
-            public boolean isTableField(ModelFieldMeta fieldMeta) {
+            public Boolean isTableField(ModelFieldMeta fieldMeta) {
                 TableId tableId = fieldMeta.getField().getAnnotation(TableId.class);
                 TableField tableField = fieldMeta.getField().getAnnotation(TableField.class);
-                return tableId != null || (tableField != null && tableField.exist());
+                if (tableId == null && tableField == null) {
+                    return null;
+                }
+                return tableId != null || tableField.exist();
             }
 
             @Override
-            public boolean tableFieldExist(ModelFieldMeta fieldMeta) {
+            public Boolean tableFieldExist(ModelFieldMeta fieldMeta) {
                 return isTableField(fieldMeta);
             }
 
@@ -112,12 +121,12 @@ public class MyBatisPlusConfigure {
             }
 
             @Override
-            public boolean hasInsertFull(ModelFieldMeta fieldMeta) {
+            public Boolean hasInsertFull(ModelFieldMeta fieldMeta) {
                 TableField tableField = fieldMeta.getField().getAnnotation(TableField.class);
-                if (tableField != null) {
-                    return tableField.fill() == FieldFill.INSERT || tableField.fill() == FieldFill.INSERT_UPDATE;
+                if (tableField == null) {
+                    return null;
                 }
-                return false;
+                return tableField.fill() == FieldFill.INSERT || tableField.fill() == FieldFill.INSERT_UPDATE;
             }
 
             @Override
@@ -136,12 +145,12 @@ public class MyBatisPlusConfigure {
             }
 
             @Override
-            public boolean hasUpdateFull(ModelFieldMeta fieldMeta) {
+            public Boolean hasUpdateFull(ModelFieldMeta fieldMeta) {
                 TableField tableField = fieldMeta.getField().getAnnotation(TableField.class);
-                if (tableField != null) {
-                    return tableField.fill() == FieldFill.UPDATE || tableField.fill() == FieldFill.INSERT_UPDATE;
+                if (tableField == null) {
+                    return null;
                 }
-                return false;
+                return tableField.fill() == FieldFill.UPDATE || tableField.fill() == FieldFill.INSERT_UPDATE;
             }
 
             @Override
@@ -160,8 +169,11 @@ public class MyBatisPlusConfigure {
             }
 
             @Override
-            public boolean isTableLogic(ModelFieldMeta fieldMeta) {
+            public Boolean isTableLogic(ModelFieldMeta fieldMeta) {
                 TableLogic tableLogic = fieldMeta.getField().getAnnotation(TableLogic.class);
+                if (tableLogic == null) {
+                    return null;
+                }
                 return tableLogic != null;
             }
         });

@@ -5,6 +5,7 @@ import org.quickjava.orm.ORMContext;
 import org.quickjava.orm.model.ModelHelper;
 import org.quickjava.orm.model.annotation.ModelField;
 import org.quickjava.orm.model.annotation.ModelId;
+import org.quickjava.orm.model.callback.ModelStrut;
 import org.quickjava.orm.model.enums.ModelFieldFill;
 
 import java.lang.reflect.Field;
@@ -51,17 +52,18 @@ public class ModelFieldMeta {
     }
 
     public String getName() {
+        String alias = this.name;
         if (modelField != null) {
-            return isEmpty(modelField.value()) ? name:  modelField.value();
+            return isEmpty(modelField.value()) ? alias:  modelField.value();
         }
         // 三方支持
-        if (ORMContext.getModelFieldStrut() != null) {
-            name = ORMContext.getModelFieldStrut().getTableFieldName(this);
-            if (isNotEmpty(name)) {
-                return name;
+        if (ORMContext.getModelStrut() != null) {
+            alias = ORMContext.getModelStrut().getTableFieldName(this);
+            if (isNotEmpty(alias)) {
+                return alias;
             }
         }
-        return name;
+        return this.name;
     }
 
     private boolean isEmpty(String str) {
@@ -69,7 +71,7 @@ public class ModelFieldMeta {
     }
 
     private boolean isNotEmpty(String str) {
-        return str == null || str.isEmpty();
+        return !isEmpty(str);
     }
 
     public String name() {
@@ -153,8 +155,11 @@ public class ModelFieldMeta {
             return modelField.insertFill() != ModelFieldFill.NULL;
         }
         // 三方支持
-        if (ORMContext.getModelFieldStrut() != null) {
-            return ORMContext.getModelFieldStrut().hasInsertFull(this);
+        if (modelStrut() != null) {
+            Boolean ret = modelStrut().hasInsertFull(this);
+            if (ret != null) {
+                return ret;
+            }
         }
         return false;
     }
@@ -164,8 +169,11 @@ public class ModelFieldMeta {
             return ModelHelper.fill(field, getModelField().insertFill(), getModelField().insertFillTarget());
         }
         // 三方支持
-        if (ORMContext.getModelFieldStrut() != null) {
-            return ORMContext.getModelFieldStrut().getInsertFullValue(this);
+        if (modelStrut() != null) {
+            Boolean ret = modelStrut().hasInsertFull(this);
+            if (ret != null) {
+                return modelStrut().getInsertFullValue(this);
+            }
         }
         return null;
     }
@@ -175,8 +183,8 @@ public class ModelFieldMeta {
             return modelField.updateFill() != ModelFieldFill.NULL;
         }
         // 三方支持
-        if (ORMContext.getModelFieldStrut() != null) {
-            return ORMContext.getModelFieldStrut().hasUpdateFull(this);
+        if (ORMContext.getModelStrut() != null) {
+            return ORMContext.getModelStrut().hasUpdateFull(this);
         }
         return false;
     }
@@ -186,8 +194,11 @@ public class ModelFieldMeta {
             return ModelHelper.fill(field, modelField.updateFill(), modelField.updateFillTarget());
         }
         // 三方支持
-        if (ORMContext.getModelFieldStrut() != null) {
-            return ORMContext.getModelFieldStrut().getUpdateFullValue(this);
+        if (modelStrut() != null) {
+            Boolean ret = modelStrut().hasUpdateFull(this);
+            if (ret != null) {
+                return modelStrut().getUpdateFullValue(this);
+            }
         }
         return null;
     }
@@ -197,8 +208,8 @@ public class ModelFieldMeta {
             return modelField.softDelete();
         }
         // 三方支持
-        if (ORMContext.getModelFieldStrut() != null) {
-            return ORMContext.getModelFieldStrut().isTableLogic(this);
+        if (modelStrut() != null) {
+            return modelStrut().isTableLogic(this);
         }
         return false;
     }
@@ -220,10 +231,17 @@ public class ModelFieldMeta {
             return modelField.exist();
         }
         // 三方支持
-        if (ORMContext.getModelFieldStrut() != null) {
-            return ORMContext.getModelFieldStrut().tableFieldExist(this);
+        if (ORMContext.getModelStrut() != null) {
+            Boolean ret = ORMContext.getModelStrut().tableFieldExist(this);
+            if (ret != null) {
+                return ret;
+            }
         }
         return true;
+    }
+
+    public ModelStrut modelStrut() {
+        return ORMContext.getModelStrut();
     }
 
     @Override

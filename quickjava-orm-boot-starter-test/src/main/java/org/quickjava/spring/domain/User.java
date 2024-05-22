@@ -1,6 +1,7 @@
 package org.quickjava.spring.domain;
 
 import org.quickjava.orm.model.Model;
+import org.quickjava.orm.model.annotation.ModelField;
 import org.quickjava.orm.model.annotation.OneToMany;
 import org.quickjava.orm.model.annotation.OneToOne;
 
@@ -32,9 +33,11 @@ public class User extends Model {
 
     private String avatar;
 
+    @ModelField(exist = false)
     @OneToOne(foreignKey = "userId", localKey = "id")
     private Article article;
 
+    @ModelField(exist = false)
     @OneToMany(foreignKey = "userId", localKey = "id")
     private List<Article> articles;
 

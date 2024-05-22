@@ -37,8 +37,6 @@ public class Article extends Model {
 
     private String content;
 
-    private String contentType;
-
     private Long categoryId;
 
     // 一对一关联
@@ -47,12 +45,15 @@ public class Article extends Model {
     private User user2;
 
     // 一对多关联
+    @ModelField(exist = false)
     private List<User> users;
 
     // 一对多：评论回复表
+    @ModelField(exist = false)
     private List<Comment> comments;
 
     // 一对多：评论回复表
+    @ModelField(exist = false)
     private List<ArticleTag> tags;
 
     @ModelField(insertFill = ModelFieldFill.DATETIME)
@@ -114,14 +115,6 @@ public class Article extends Model {
 
     public void setContent(String content) {
         this.content = content;
-    }
-
-    public String getContentType() {
-        return contentType;
-    }
-
-    public void setContentType(String contentType) {
-        this.contentType = contentType;
     }
 
     public User getUser() {

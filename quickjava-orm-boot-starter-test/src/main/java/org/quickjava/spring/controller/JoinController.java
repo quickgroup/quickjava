@@ -13,8 +13,11 @@ public class JoinController {
     @RequestMapping({"/111"})
     public Object i111() {
         Article row = new ModelWrapper<Article>(Article.class)
-                .like(Article::getTitle, "admin")
-                .leftJoin(User.class, User::getId, Article::getUserId)
+                .like(Article::getUserId, 1)
+                // 关联user表并把user表数据加载到Article.user属性上
+                .leftJoin(User.class, User::getId, Article::getUserId, Article::getUser)
+                // 关联user表（别名user2） 并把user表数据加载到Article.user属性上
+                .leftJoin(User.class, "user2", User::getId, Article::getUserId, Article::getUser)
                 .find();
         return row;
     }

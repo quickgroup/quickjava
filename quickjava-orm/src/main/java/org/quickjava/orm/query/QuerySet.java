@@ -424,9 +424,7 @@ public class QuerySet {
     //TODO::-------------------- 增删改查 --------------------
     public List<Map<String, Object>> select()
     {
-        // 默认查询全部字段
-        if (reservoir.getColumnList().size() == 0)
-            field(new TableColumn(null).setRaw("*"));
+        queryBefore();
         List<Map<String, Object>> resultSet = executeSql();
         return SqlUtil.isEmpty(resultSet) ? new LinkedList<>() : resultSet;
     }
@@ -436,6 +434,15 @@ public class QuerySet {
         limit(0L, 1L);
         List<Map<String, Object>> resultSet = select();
         return SqlUtil.isEmpty(resultSet) ? null : resultSet.get(0);
+    }
+
+    /**
+     * 查询前准备
+     */
+    private void queryBefore() {
+        // 默认查询全部字段
+        if (reservoir.columnList == null  || reservoir.getColumnList().isEmpty())
+            field(new TableColumn(null).setRaw("*"));
     }
 
     public Long update(Map<String, Object> data)
@@ -515,8 +522,9 @@ public class QuerySet {
     public String buildSql()
     {
         reservoir.action = reservoir.action == null ? Action.SELECT : reservoir.action;
-        if (reservoir.getColumnList().size() == 0)
-            field(new TableColumn(null).setRaw("*"));
+        if (Action.SELECT == reservoir.action) {
+            queryBefore();
+        }
         return ORMContext.getDrive().pretreatment(this);
     }
 

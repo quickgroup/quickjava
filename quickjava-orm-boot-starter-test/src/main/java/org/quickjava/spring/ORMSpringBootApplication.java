@@ -19,11 +19,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  */
 @EnableSpringUtil
 @SpringBootApplication
-public class SpringApplication {
+public class ORMSpringBootApplication {
 
     public static void main(String[] args) {
-        org.springframework.boot.SpringApplication.run(SpringApplication.class, args);
-        System.out.println("### ClientTest 启动成功 ###");
+        org.springframework.boot.SpringApplication.run(ORMSpringBootApplication.class, args);
+        System.out.println("### ORMSpringBoot-Test 启动成功 ###");
     }
 
 }

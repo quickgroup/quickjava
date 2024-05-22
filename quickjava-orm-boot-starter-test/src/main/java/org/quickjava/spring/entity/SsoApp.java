@@ -11,7 +11,7 @@ import java.util.Date;
  * 应用管理对象 sso_app
  *
  * @author origin
- * @date 2023-10-10
+ * //@date 2023-10-10
  */
 public class SsoApp extends BaseSimpleEntity
 {

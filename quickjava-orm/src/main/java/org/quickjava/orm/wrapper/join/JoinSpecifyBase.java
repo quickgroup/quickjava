@@ -16,17 +16,11 @@ public class JoinSpecifyBase<Children extends JoinSpecifyBase<Children, Left>, L
     // 关联模型的别名（查询表别名和在父实体的属性名
     protected String leftAlias;
 
-    // 加载表数据
-    protected boolean loadLeftData = true;
+    // 加载left表数据到right模型属性上
+    protected String loadDataField = null;
 
     // join-on关联条件
     public final List<Item<?, ?>> onList = new LinkedList<>();
-
-    public JoinSpecifyBase(Class<Left> left, String leftAlias, boolean loadLeftData) {
-        this.left = left;
-        this.leftAlias = leftAlias;
-        this.loadLeftData = loadLeftData;
-    }
 
     public JoinSpecifyBase(Class<Left> left, String leftAlias) {
         this.left = left;
@@ -179,12 +173,13 @@ public class JoinSpecifyBase<Children extends JoinSpecifyBase<Children, Left>, L
         return chain();
     }
 
-    public boolean isLoadLeftData() {
-        return loadLeftData;
+    public boolean isLoadData() {
+        return loadDataField != null;
     }
 
-    public Children setLoadLeftData(boolean loadLeftData) {
-        this.loadLeftData = loadLeftData;
+    // 加载数据到主表
+    public<Right extends Model> Children loadData(MFunction<Right, ?> rightField) {
+        this.loadDataField = rightField.getName();
         return chain();
     }
 

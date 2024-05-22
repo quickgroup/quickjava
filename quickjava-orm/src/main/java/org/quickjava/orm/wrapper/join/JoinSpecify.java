@@ -11,19 +11,32 @@ public class JoinSpecify<Left extends Model, Right extends Model> extends JoinSp
 
     protected Class<Right> right;
 
+    protected String rightAlias;
+
+    public JoinSpecify(Class<Left> left, String leftAlias) {
+        super(left, leftAlias);
+    }
+
+    public JoinSpecify(Class<Left> left) {
+        super(left);
+    }
+
     public JoinSpecify(Class<Left> left, Class<Right> right) {
         super(left);
         this.right = right;
+        this.rightAlias = null;
     }
 
-    public JoinSpecify(Class<Left> left, String leftAlias, Class<Right> right) {
-        super(left, leftAlias);
+    public JoinSpecify<Left, Right> setRight(Class<Right> right) {
         this.right = right;
+        this.rightAlias = null;
+        return this;
     }
 
-    public JoinSpecify(Class<Left> left, MFunction<?, ?> leftAlias, Class<Right> right) {
-        super(left, leftAlias.getName());
+    public JoinSpecify<Left, Right> setRight(Class<Right> right, String rightAlias) {
         this.right = right;
+        this.rightAlias = rightAlias;
+        return this;
     }
 
     public JoinSpecify<Left, Right> eq(MFunction<Left, ?> lf, MFunction<Right, ?> rf) {

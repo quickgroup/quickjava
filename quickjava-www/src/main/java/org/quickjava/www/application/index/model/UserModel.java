@@ -1,6 +1,6 @@
 package org.quickjava.www.application.index.model;
 
-import org.quickjava.orm.model.Model;
+import org.quickjava.orm.Model;
 
 /**
  * @author Qlo1062-(QloPC-zs)

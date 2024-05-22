@@ -2,6 +2,7 @@ package org.quickjava.orm.utils;
 
 import org.quickjava.common.utils.SimpleCache;
 
+import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -264,6 +265,28 @@ public class ReflectUtil {
         } catch (Exception ignored) {
         }
         return value;
+    }
+
+    // 检查是否有getter方法
+    public static boolean hasGetter(Class<?> clazz, String propertyName) {
+        try {
+            PropertyDescriptor pd = new PropertyDescriptor(propertyName, clazz);
+            Method getter = pd.getReadMethod();
+            return getter != null;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    // 检查是否有setter方法
+    public static boolean hasSetter(Class<?> clazz, String propertyName) {
+        try {
+            PropertyDescriptor pd = new PropertyDescriptor(propertyName, clazz);
+            Method setter = pd.getWriteMethod();
+            return setter != null;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
 }

@@ -264,6 +264,10 @@ public class ModelHelper extends SqlUtil {
         return ReflectUtil.getFieldValue(iModel, "reservoir");
     }
 
+    public static QuerySet getModelQuery(IModel iModel) {
+        return ReflectUtil.invoke(iModel, "query");
+    }
+
     /**
      * 查询后处理预载入
      * - 组装一对一数据
@@ -401,7 +405,7 @@ public class ModelHelper extends SqlUtil {
      */
     public static void loadModelAccurateFields(QuerySet querySet, ModelMeta meta, String tableAlias) {
         meta.getFieldList().forEach(i -> {
-            // 忽略：关联属性、不存在字段、模型字段
+            // 忽略：关联属性、不存在字段、模型对象属性
             if (i.isRelation() || !i.isExist() || Model.class.isAssignableFrom(i.getClazz())) {
                 return;
             }
