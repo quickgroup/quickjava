@@ -16,7 +16,7 @@ package org.quickjava.orm.query.build;
  */
 
 import org.quickjava.orm.contain.DriveConfigure;
-import org.quickjava.orm.enums.CompareEnum;
+import org.quickjava.orm.enums.CompareType;
 import org.quickjava.orm.model.ModelHelper;
 import org.quickjava.orm.utils.QuickORMException;
 
@@ -28,7 +28,7 @@ public class JoinCondition extends TableColumn {
     // 1=AND、2=OR
     protected int logic = 1;
 
-    protected CompareEnum compare;
+    protected CompareType compare;
 
     protected String rightTable;
 
@@ -37,7 +37,7 @@ public class JoinCondition extends TableColumn {
     // 值、原始sql
     protected Object rightValue;
 
-    public JoinCondition(String table, String column, String columnAlias, int logic, CompareEnum compare, String rightTable, String rightColumn, Object rightValue) {
+    public JoinCondition(String table, String column, String columnAlias, int logic, CompareType compare, String rightTable, String rightColumn, Object rightValue) {
         super(table, column, columnAlias);
         this.logic = logic;
         this.compare = compare;
@@ -46,7 +46,7 @@ public class JoinCondition extends TableColumn {
         this.rightValue = rightValue;
     }
 
-    public JoinCondition(String table, String column, int logic, CompareEnum compare, String rightTable, String rightColumn) {
+    public JoinCondition(String table, String column, int logic, CompareType compare, String rightTable, String rightColumn) {
         super(table, column);
         this.logic = logic;
         this.compare = compare;
@@ -54,14 +54,14 @@ public class JoinCondition extends TableColumn {
         this.rightColumn = rightColumn;
     }
 
-    public JoinCondition(String table, String column, int logic, CompareEnum compare, Object rightValue) {
+    public JoinCondition(String table, String column, int logic, CompareType compare, Object rightValue) {
         super(table, column);
         this.logic = logic;
         this.compare = compare;
         this.rightValue = rightValue;
     }
 
-    public JoinCondition(String column, int logic, CompareEnum compare, String rightTable, String rightColumn, Object rightValue) {
+    public JoinCondition(String column, int logic, CompareType compare, String rightTable, String rightColumn, Object rightValue) {
         super(column);
         this.logic = logic;
         this.compare = compare;
@@ -82,11 +82,11 @@ public class JoinCondition extends TableColumn {
         this.logic = logic;
     }
 
-    public CompareEnum getCompare() {
+    public CompareType getCompare() {
         return compare;
     }
 
-    public void setCompare(CompareEnum compare) {
+    public void setCompare(CompareType compare) {
         this.compare = compare;
     }
 
@@ -130,9 +130,9 @@ public class JoinCondition extends TableColumn {
             return raw;
         }
         // null
-        if (compare == CompareEnum.IS_NULL || compare == CompareEnum.IS_NOT_NULL) {
+        if (compare == CompareType.IS_NULL || compare == CompareType.IS_NOT_NULL) {
             return getTable() + "." + ModelHelper.toUnderlineCase(getColumn()) + " " + compare.sql();
-        } else if (compare == CompareEnum.IN || compare == CompareEnum.NOT_IN) {
+        } else if (compare == CompareType.IN || compare == CompareType.NOT_IN) {
             throw new QuickORMException("暂不支持");
         }
         if (getRightValue() != null) {

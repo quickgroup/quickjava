@@ -2,7 +2,7 @@ package org.quickjava.orm.model;
 
 import net.sf.cglib.proxy.Enhancer;
 import org.quickjava.common.utils.DatetimeUtil;
-import org.quickjava.orm.enums.CompareEnum;
+import org.quickjava.orm.enums.CompareType;
 import org.quickjava.orm.model.contain.ModelFieldMeta;
 import org.quickjava.orm.model.contain.ModelMeta;
 import org.quickjava.orm.model.contain.Relation;
@@ -215,7 +215,7 @@ public class ModelHelper extends SqlUtil {
         return null;
     }
 
-    public static String joinConditionSql(String left, String leftField, CompareEnum type,
+    public static String joinConditionSql(String left, String leftField, CompareType type,
                                           String right, String rightField) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(left).append(".").append(toUnderlineCase(leftField));
@@ -224,7 +224,7 @@ public class ModelHelper extends SqlUtil {
         return stringBuilder.toString();
     }
 
-    public static String joinConditionSql(String left, String leftField, CompareEnum type,
+    public static String joinConditionSql(String left, String leftField, CompareType type,
                                           String rightValue) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(left).append(".").append(toUnderlineCase(leftField));

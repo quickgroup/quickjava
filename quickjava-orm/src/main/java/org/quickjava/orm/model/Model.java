@@ -8,7 +8,6 @@ import net.sf.cglib.proxy.MethodProxy;
 import org.quickjava.common.utils.ComUtil;
 import org.quickjava.common.utils.DatetimeUtil;
 import org.quickjava.orm.ORMContext;
-import org.quickjava.orm.model.annotation.ModelField;
 import org.quickjava.orm.query.QuerySetHelper;
 import org.quickjava.orm.utils.ReflectUtil;
 import org.quickjava.orm.enums.JoinType;
@@ -31,7 +30,7 @@ import org.quickjava.orm.model.contain.Relation;
 import org.quickjava.orm.model.out.ModelListSql;
 import org.quickjava.orm.model.out.ModelSql;
 import org.quickjava.orm.utils.*;
-import org.quickjava.orm.enums.CompareEnum;
+import org.quickjava.orm.enums.CompareType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -724,7 +723,7 @@ public class Model implements IModel {
                 // 关联方式声明
                 String conditionSql = ModelHelper.joinConditionSql(
                         relationName, relation.foreignKey(),
-                        CompareEnum.EQ,
+                        CompareType.EQ,
                         reservoir.meta.table(), relation.localKey()
                 );
                 query().join(meta.table() + " " + relationName, conditionSql, JoinType.LEFT);

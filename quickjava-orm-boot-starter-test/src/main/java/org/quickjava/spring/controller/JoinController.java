@@ -22,7 +22,8 @@ public class JoinController {
                 .leftJoin(User.class, condition -> {
                     condition.eq(User::getId, Article::getUserId)
                             .eq(User::getStatus, "normal")
-                            .neq(User::getStatus, "waitverify");
+                            .neq(User::getStatus, "waitverify")
+                            .raw(" AND 1=1");
                 }, Article::getUser)
                 .find();
         return row;

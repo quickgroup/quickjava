@@ -15,7 +15,7 @@ package org.quickjava.orm.enums;
  * +-------------------------------------------------------------------
  */
 // Where.OPMap
-public enum CompareEnum {
+public enum CompareType {
     /** 等于 */
     EQ("="),
     /** 不等于 */
@@ -41,7 +41,7 @@ public enum CompareEnum {
 
     private final String sql;
 
-    CompareEnum(String sql) {
+    CompareType(String sql) {
         this.sql = sql;
     }
 

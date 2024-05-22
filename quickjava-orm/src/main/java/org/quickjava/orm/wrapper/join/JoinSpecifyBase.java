@@ -1,8 +1,9 @@
 package org.quickjava.orm.wrapper.join;
 
+import org.quickjava.orm.enums.LogicType;
 import org.quickjava.orm.model.Model;
 import org.quickjava.orm.wrapper.MFunction;
-import org.quickjava.orm.enums.CompareEnum;
+import org.quickjava.orm.enums.CompareType;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -36,58 +37,66 @@ public class JoinSpecifyBase<Children extends JoinSpecifyBase<Children, Left>, L
     }
 
     protected <Right extends Model> Children eq(MFunction<Left, ?> lf, Class<Right> right, MFunction<Right, ?> rf) {
-        return add(CompareEnum.EQ, lf, right, rf);
+        return where(CompareType.EQ, lf, right, rf);
     }
 
     public Children eq(MFunction<Left, ?> lf, Object val) {
-        return add(CompareEnum.EQ, lf, val);
+        return where(CompareType.EQ, lf, val);
     }
 
     protected <Right extends Model> Children neq(MFunction<Left, ?> lf, Class<Right> right, MFunction<Right, ?> rf) {
-        return add(CompareEnum.NEQ, lf, right, rf);
+        return where(CompareType.NEQ, lf, right, rf);
     }
 
     public Children neq(MFunction<Left, ?> lf, Object val) {
-        return add(CompareEnum.NEQ, lf, val);
+        return where(CompareType.NEQ, lf, val);
     }
 
     public Children in(MFunction<Left, ?> lf, Object val) {
-        return add(CompareEnum.IN, lf, val);
+        return where(CompareType.IN, lf, val);
     }
 
     public Children notIn(MFunction<Left, ?> lf, Object val) {
-        return add(CompareEnum.NOT_IN, lf, val);
+        return where(CompareType.NOT_IN, lf, val);
     }
 
     public Children isNull(MFunction<Left, ?> lf) {
-        return add(CompareEnum.IS_NULL, lf, null);
+        return where(CompareType.IS_NULL, lf, null);
     }
 
     public Children isNotNull(MFunction<Left, ?> lf) {
-        return add(CompareEnum.IS_NOT_NULL, lf, null);
+        return where(CompareType.IS_NOT_NULL, lf, null);
     }
 
     public Children between(MFunction<Left, ?> lf, Object val) {
-        return add(CompareEnum.BETWEEN, lf, val);
+        return where(CompareType.BETWEEN, lf, val);
     }
 
-    protected <Right extends Model> Children add(CompareEnum type, MFunction<Left, ?> lf, MFunction<Right, ?> rf) {
+    protected <Right extends Model> Children where(CompareType type, MFunction<Left, ?> lf, MFunction<Right, ?> rf) {
         onList.add(new Item<>(type, lf, rf));
         return chain();
     }
 
-    protected Children add(CompareEnum type, MFunction<Left, ?> lf, Object value) {
+    protected Children where(CompareType type, MFunction<Left, ?> lf, Object value) {
         onList.add(new Item<>(type, lf, value));
         return chain();
     }
 
-    protected <Right extends Model> Children add(CompareEnum type, MFunction<Left, ?> lf, Class<Right> right, MFunction<Right, ?> rf) {
+    public Children raw(String sql) {
+        onList.add(new Item<>(CompareType.RAW, null, sql));
+        return chain();
+    }
+
+    protected <Right extends Model> Children where(CompareType type, MFunction<Left, ?> lf, Class<Right> right, MFunction<Right, ?> rf) {
         onList.add(new Item<>(type, lf, right, rf));
         return chain();
     }
 
     public static class Item<L extends Model, R extends Model> {
-        private final CompareEnum type;
+        // 逻辑类型
+        private LogicType logic = LogicType.AND;
+        // 条件运算符
+        private final CompareType type;
         // 左表别名
         private final MFunction<L, ?> leftFun;
         // 右表别名
@@ -99,26 +108,34 @@ public class JoinSpecifyBase<Children extends JoinSpecifyBase<Children, Left>, L
         // 右表条件数据
         private Object rightValue;
 
-        public Item(CompareEnum type, MFunction<L, ?> leftFun, Class<? extends Model> right, MFunction<R, ?> rightFun) {
+        public Item(LogicType logic, CompareType type, MFunction<L, ?> leftFun, Class<? extends Model> right, MFunction<R, ?> rightFun) {
+            this.logic = logic;
             this.type = type;
             this.leftFun = leftFun;
             this.right = right;
             this.rightFun = rightFun;
         }
 
-        public Item(CompareEnum type, MFunction<L, ?> leftFun, Object rightValue) {
+        public Item(CompareType type, MFunction<L, ?> leftFun, Class<? extends Model> right, MFunction<R, ?> rightFun) {
+            this.type = type;
+            this.leftFun = leftFun;
+            this.right = right;
+            this.rightFun = rightFun;
+        }
+
+        public Item(CompareType type, MFunction<L, ?> leftFun, Object rightValue) {
             this.type = type;
             this.leftFun = leftFun;
             this.rightValue = rightValue;
         }
 
-        public Item(CompareEnum type, MFunction<L, ?> leftFun, MFunction<R, ?> rightFun) {
+        public Item(CompareType type, MFunction<L, ?> leftFun, MFunction<R, ?> rightFun) {
             this.type = type;
             this.leftFun = leftFun;
             this.rightFun = rightFun;
         }
 
-        public CompareEnum getType() {
+        public CompareType getType() {
             return type;
         }
 
