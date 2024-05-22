@@ -394,7 +394,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
             // 数据装载
             Model left = Model.newModel(leftMeta.getClazz(), null, main);
             ModelHelper.resultTranshipmentWith(left, data, alias);
-            ReflectUtil.setFieldValue(main, join.getLeftAlias(), left);
+            ReflectUtil.setFieldValue(main, join.getLoadDataField(), left);
         });
         return main;
     }

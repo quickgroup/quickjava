@@ -39,7 +39,7 @@ public class JoinSpecifyBase<Children extends JoinSpecifyBase<Children, Left>, L
         return add(CompareEnum.EQ, lf, right, rf);
     }
 
-    protected Children eq(MFunction<Left, ?> lf, Object val) {
+    public Children eq(MFunction<Left, ?> lf, Object val) {
         return add(CompareEnum.EQ, lf, val);
     }
 
@@ -47,23 +47,27 @@ public class JoinSpecifyBase<Children extends JoinSpecifyBase<Children, Left>, L
         return add(CompareEnum.NEQ, lf, right, rf);
     }
 
-    protected Children in(MFunction<Left, ?> lf, Object val) {
+    public Children neq(MFunction<Left, ?> lf, Object val) {
+        return add(CompareEnum.NEQ, lf, val);
+    }
+
+    public Children in(MFunction<Left, ?> lf, Object val) {
         return add(CompareEnum.IN, lf, val);
     }
 
-    protected Children notIn(MFunction<Left, ?> lf, Object val) {
+    public Children notIn(MFunction<Left, ?> lf, Object val) {
         return add(CompareEnum.NOT_IN, lf, val);
     }
 
-    protected Children isNull(MFunction<Left, ?> lf) {
+    public Children isNull(MFunction<Left, ?> lf) {
         return add(CompareEnum.IS_NULL, lf, null);
     }
 
-    protected Children isNotNull(MFunction<Left, ?> lf) {
+    public Children isNotNull(MFunction<Left, ?> lf) {
         return add(CompareEnum.IS_NOT_NULL, lf, null);
     }
 
-    protected Children between(MFunction<Left, ?> lf, Object val) {
+    public Children between(MFunction<Left, ?> lf, Object val) {
         return add(CompareEnum.BETWEEN, lf, val);
     }
 
@@ -178,9 +182,13 @@ public class JoinSpecifyBase<Children extends JoinSpecifyBase<Children, Left>, L
     }
 
     // 加载数据到主表
-    public<Right extends Model> Children loadData(MFunction<Right, ?> rightField) {
+    public<Right extends Model> Children setLoadData(MFunction<Right, ?> rightField) {
         this.loadDataField = rightField.getName();
         return chain();
+    }
+
+    public String getLoadDataField() {
+        return loadDataField;
     }
 
     public List<Item<?, ?>> getOnList() {

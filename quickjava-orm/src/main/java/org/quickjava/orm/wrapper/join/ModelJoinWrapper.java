@@ -31,7 +31,7 @@ public interface ModelJoinWrapper<
      * @param rightField 关联数据写入到right表属性
      */
     default <Relation extends Model> Children leftJoin(Class<Relation> left, MFunction<Relation, ?> lf, MF rf, MF rightField) {
-        return join(JoinType.LEFT, new JoinSpecify<Relation, M>(left).loadData(rightField).eq(lf, rf));
+        return join(JoinType.LEFT, new JoinSpecify<Relation, M>(left).setLoadData(rightField).eq(lf, rf));
     }
 
     /**
@@ -44,7 +44,7 @@ public interface ModelJoinWrapper<
     }
 
     default <Relation extends Model> Children leftJoin(Class<Relation> left, String leftAlias, MFunction<Relation, ?> lf, MF rf, MF rightField) {
-        return join(JoinType.LEFT, new JoinSpecify<Relation, M>(left, leftAlias).loadData(rightField).eq(lf, rf));
+        return join(JoinType.LEFT, new JoinSpecify<Relation, M>(left, leftAlias).setLoadData(rightField).eq(lf, rf));
     }
 
     /**
@@ -68,6 +68,21 @@ public interface ModelJoinWrapper<
     default <Left extends Model, Right extends Model> Children leftJoin(Class<Left> left, String leftAlias, MFunction<Left, ?> lf,
                                                                         Class<Right> right, String rightAlias, MFunction<Right, ?> rf) {
         return join(JoinType.LEFT, new JoinSpecify<Left, Right>(left, leftAlias).setRight(right, rightAlias).eq(lf, rf));
+    }
+
+    /**
+     * 与主表多条件关联
+     */
+    default <Left extends Model> Children leftJoin(Class<Left> left, JoinSpecifyClosure<Left, M> closure) {
+        JoinSpecify<Left, M> condition = new JoinSpecify<Left, M>(left);
+        closure.call(condition);
+        return join(JoinType.LEFT, condition);
+    }
+
+    default <Left extends Model> Children leftJoin(Class<Left> left, JoinSpecifyClosure<Left, M> closure, MF rightField) {
+        JoinSpecify<Left, M> condition = new JoinSpecify<Left, M>(left).setLoadData(rightField);
+        closure.call(condition);
+        return join(JoinType.LEFT, condition);
     }
 
     /**

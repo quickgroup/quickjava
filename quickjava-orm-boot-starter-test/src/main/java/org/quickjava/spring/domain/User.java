@@ -33,6 +33,8 @@ public class User extends Model {
 
     private String avatar;
 
+    private String status;
+
     @ModelField(exist = false)
     @OneToOne(foreignKey = "userId", localKey = "id")
     private Article article;
@@ -87,6 +89,14 @@ public class User extends Model {
 
     public void setAvatar(String avatar) {
         this.avatar = avatar;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public Article getArticle() {

@@ -29,12 +29,16 @@ public class JoinSpecify<Left extends Model, Right extends Model> extends JoinSp
 
     public JoinSpecify<Left, Right> setRight(Class<Right> right) {
         this.right = right;
-        this.rightAlias = null;
         return this;
     }
 
     public JoinSpecify<Left, Right> setRight(Class<Right> right, String rightAlias) {
         this.right = right;
+        this.rightAlias = rightAlias;
+        return this;
+    }
+
+    public JoinSpecify<Left, Right> setRightAlias(String rightAlias) {
         this.rightAlias = rightAlias;
         return this;
     }

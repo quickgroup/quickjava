@@ -61,3 +61,66 @@
 12:29:12.683 [main] INFO  o.a.c.h.Http11NioProtocol - [log,173] - Starting ProtocolHandler ["http-nio-20120"]
 12:29:12.697 [main] INFO  o.q.s.ORMSpringBootApplication - [logStarted,61] - Started ORMSpringBootApplication in 1.672 seconds (JVM running for 2.238)
 12:29:14.918 [http-nio-20120-exec-1] INFO  o.a.c.c.C.[.[.[/] - [log,173] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+15:18:46.117 [SpringApplicationShutdownHook] INFO  c.a.d.p.DruidDataSource - [close,2138] - {dataSource-1} closing ...
+15:18:46.118 [SpringApplicationShutdownHook] INFO  c.a.d.p.DruidDataSource - [close,2211] - {dataSource-1} closed
+15:18:48.854 [main] INFO  o.q.s.ORMSpringBootApplication - [logStarting,55] - Starting ORMSpringBootApplication using Java 1.8.0_291 on DESKTOP-6BAV2RA with PID 24900 (E:\Long_File\gits\quickjava\quickjava\quickjava-orm-boot-starter-test\target\classes started by QloPC-TBK in E:\Long_File\gits\quickjava\quickjava)
+15:18:48.857 [main] INFO  o.q.s.ORMSpringBootApplication - [logStartupProfileInfo,680] - No active profile set, falling back to 1 default profile: "default"
+15:18:49.471 [main] INFO  o.a.c.h.Http11NioProtocol - [log,173] - Initializing ProtocolHandler ["http-nio-20120"]
+15:18:49.472 [main] INFO  o.a.c.c.StandardService - [log,173] - Starting service [Tomcat]
+15:18:49.472 [main] INFO  o.a.c.c.StandardEngine - [log,173] - Starting Servlet engine: [Apache Tomcat/9.0.78]
+15:18:49.556 [main] INFO  o.a.c.c.C.[.[.[/] - [log,173] - Initializing Spring embedded WebApplicationContext
+15:18:49.741 [main] INFO  c.a.d.s.b.a.DruidDataSourceAutoConfigure - [dataSource,55] - Init DruidDataSource
+15:18:49.825 [main] INFO  c.a.d.p.DruidDataSource - [init,996] - {dataSource-1} inited
+15:18:50.266 [main] INFO  o.a.c.h.Http11NioProtocol - [log,173] - Starting ProtocolHandler ["http-nio-20120"]
+15:18:50.282 [main] INFO  o.q.s.ORMSpringBootApplication - [logStarted,61] - Started ORMSpringBootApplication in 1.688 seconds (JVM running for 2.304)
+15:18:59.237 [SpringApplicationShutdownHook] INFO  c.a.d.p.DruidDataSource - [close,2138] - {dataSource-1} closing ...
+15:18:59.239 [SpringApplicationShutdownHook] INFO  c.a.d.p.DruidDataSource - [close,2211] - {dataSource-1} closed
+15:19:02.064 [main] INFO  o.q.s.ORMSpringBootApplication - [logStarting,55] - Starting ORMSpringBootApplication using Java 1.8.0_291 on DESKTOP-6BAV2RA with PID 10464 (E:\Long_File\gits\quickjava\quickjava\quickjava-orm-boot-starter-test\target\classes started by QloPC-TBK in E:\Long_File\gits\quickjava\quickjava)
+15:19:02.066 [main] INFO  o.q.s.ORMSpringBootApplication - [logStartupProfileInfo,680] - No active profile set, falling back to 1 default profile: "default"
+15:19:02.717 [main] INFO  o.a.c.h.Http11NioProtocol - [log,173] - Initializing ProtocolHandler ["http-nio-20120"]
+15:19:02.718 [main] INFO  o.a.c.c.StandardService - [log,173] - Starting service [Tomcat]
+15:19:02.719 [main] INFO  o.a.c.c.StandardEngine - [log,173] - Starting Servlet engine: [Apache Tomcat/9.0.78]
+15:19:02.805 [main] INFO  o.a.c.c.C.[.[.[/] - [log,173] - Initializing Spring embedded WebApplicationContext
+15:19:03.023 [main] INFO  c.a.d.s.b.a.DruidDataSourceAutoConfigure - [dataSource,55] - Init DruidDataSource
+15:19:03.115 [main] INFO  c.a.d.p.DruidDataSource - [init,996] - {dataSource-1} inited
+15:19:03.585 [main] INFO  o.a.c.h.Http11NioProtocol - [log,173] - Starting ProtocolHandler ["http-nio-20120"]
+15:19:03.602 [main] INFO  o.q.s.ORMSpringBootApplication - [logStarted,61] - Started ORMSpringBootApplication in 1.787 seconds (JVM running for 2.362)
+15:19:10.199 [http-nio-20120-exec-1] INFO  o.a.c.c.C.[.[.[/] - [log,173] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+15:20:45.589 [SpringApplicationShutdownHook] INFO  c.a.d.p.DruidDataSource - [close,2138] - {dataSource-1} closing ...
+15:20:45.593 [SpringApplicationShutdownHook] INFO  c.a.d.p.DruidDataSource - [close,2211] - {dataSource-1} closed
+15:20:48.475 [main] INFO  o.q.s.ORMSpringBootApplication - [logStarting,55] - Starting ORMSpringBootApplication using Java 1.8.0_291 on DESKTOP-6BAV2RA with PID 27612 (E:\Long_File\gits\quickjava\quickjava\quickjava-orm-boot-starter-test\target\classes started by QloPC-TBK in E:\Long_File\gits\quickjava\quickjava)
+15:20:48.477 [main] INFO  o.q.s.ORMSpringBootApplication - [logStartupProfileInfo,680] - No active profile set, falling back to 1 default profile: "default"
+15:20:49.087 [main] INFO  o.a.c.h.Http11NioProtocol - [log,173] - Initializing ProtocolHandler ["http-nio-20120"]
+15:20:49.088 [main] INFO  o.a.c.c.StandardService - [log,173] - Starting service [Tomcat]
+15:20:49.088 [main] INFO  o.a.c.c.StandardEngine - [log,173] - Starting Servlet engine: [Apache Tomcat/9.0.78]
+15:20:49.167 [main] INFO  o.a.c.c.C.[.[.[/] - [log,173] - Initializing Spring embedded WebApplicationContext
+15:20:49.352 [main] INFO  c.a.d.s.b.a.DruidDataSourceAutoConfigure - [dataSource,55] - Init DruidDataSource
+15:20:49.436 [main] INFO  c.a.d.p.DruidDataSource - [init,996] - {dataSource-1} inited
+15:20:49.880 [main] INFO  o.a.c.h.Http11NioProtocol - [log,173] - Starting ProtocolHandler ["http-nio-20120"]
+15:20:49.895 [main] INFO  o.q.s.ORMSpringBootApplication - [logStarted,61] - Started ORMSpringBootApplication in 1.66 seconds (JVM running for 2.229)
+15:20:55.367 [http-nio-20120-exec-1] INFO  o.a.c.c.C.[.[.[/] - [log,173] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+15:31:09.696 [SpringApplicationShutdownHook] INFO  c.a.d.p.DruidDataSource - [close,2138] - {dataSource-1} closing ...
+15:31:09.698 [SpringApplicationShutdownHook] INFO  c.a.d.p.DruidDataSource - [close,2211] - {dataSource-1} closed
+15:31:12.935 [main] INFO  o.q.s.ORMSpringBootApplication - [logStarting,55] - Starting ORMSpringBootApplication using Java 1.8.0_291 on DESKTOP-6BAV2RA with PID 27376 (E:\Long_File\gits\quickjava\quickjava\quickjava-orm-boot-starter-test\target\classes started by QloPC-TBK in E:\Long_File\gits\quickjava\quickjava)
+15:31:12.938 [main] INFO  o.q.s.ORMSpringBootApplication - [logStartupProfileInfo,680] - No active profile set, falling back to 1 default profile: "default"
+15:31:13.565 [main] INFO  o.a.c.h.Http11NioProtocol - [log,173] - Initializing ProtocolHandler ["http-nio-20120"]
+15:31:13.566 [main] INFO  o.a.c.c.StandardService - [log,173] - Starting service [Tomcat]
+15:31:13.566 [main] INFO  o.a.c.c.StandardEngine - [log,173] - Starting Servlet engine: [Apache Tomcat/9.0.78]
+15:31:13.649 [main] INFO  o.a.c.c.C.[.[.[/] - [log,173] - Initializing Spring embedded WebApplicationContext
+15:31:13.834 [main] INFO  c.a.d.s.b.a.DruidDataSourceAutoConfigure - [dataSource,55] - Init DruidDataSource
+15:31:13.919 [main] INFO  c.a.d.p.DruidDataSource - [init,996] - {dataSource-1} inited
+15:31:14.360 [main] INFO  o.a.c.h.Http11NioProtocol - [log,173] - Starting ProtocolHandler ["http-nio-20120"]
+15:31:14.377 [main] INFO  o.q.s.ORMSpringBootApplication - [logStarted,61] - Started ORMSpringBootApplication in 1.71 seconds (JVM running for 2.299)
+15:33:28.244 [SpringApplicationShutdownHook] INFO  c.a.d.p.DruidDataSource - [close,2138] - {dataSource-1} closing ...
+15:33:28.244 [SpringApplicationShutdownHook] INFO  c.a.d.p.DruidDataSource - [close,2211] - {dataSource-1} closed
+15:33:31.522 [main] INFO  o.q.s.ORMSpringBootApplication - [logStarting,55] - Starting ORMSpringBootApplication using Java 1.8.0_291 on DESKTOP-6BAV2RA with PID 26688 (E:\Long_File\gits\quickjava\quickjava\quickjava-orm-boot-starter-test\target\classes started by QloPC-TBK in E:\Long_File\gits\quickjava\quickjava)
+15:33:31.524 [main] INFO  o.q.s.ORMSpringBootApplication - [logStartupProfileInfo,680] - No active profile set, falling back to 1 default profile: "default"
+15:33:32.192 [main] INFO  o.a.c.h.Http11NioProtocol - [log,173] - Initializing ProtocolHandler ["http-nio-20120"]
+15:33:32.193 [main] INFO  o.a.c.c.StandardService - [log,173] - Starting service [Tomcat]
+15:33:32.193 [main] INFO  o.a.c.c.StandardEngine - [log,173] - Starting Servlet engine: [Apache Tomcat/9.0.78]
+15:33:32.272 [main] INFO  o.a.c.c.C.[.[.[/] - [log,173] - Initializing Spring embedded WebApplicationContext
+15:33:32.460 [main] INFO  c.a.d.s.b.a.DruidDataSourceAutoConfigure - [dataSource,55] - Init DruidDataSource
+15:33:32.542 [main] INFO  c.a.d.p.DruidDataSource - [init,996] - {dataSource-1} inited
+15:33:32.990 [main] INFO  o.a.c.h.Http11NioProtocol - [log,173] - Starting ProtocolHandler ["http-nio-20120"]
+15:33:33.004 [main] INFO  o.q.s.ORMSpringBootApplication - [logStarted,61] - Started ORMSpringBootApplication in 1.737 seconds (JVM running for 2.357)
+15:35:18.807 [http-nio-20120-exec-1] INFO  o.a.c.c.C.[.[.[/] - [log,173] - Initializing Spring DispatcherServlet 'dispatcherServlet'
