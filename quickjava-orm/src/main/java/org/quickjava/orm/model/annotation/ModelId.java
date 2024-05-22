@@ -1,6 +1,6 @@
 package org.quickjava.orm.model.annotation;
 
-import com.baomidou.mybatisplus.annotation.IdType;
+import org.quickjava.orm.model.contain.ModelIdType;
 
 import java.lang.annotation.*;
 
@@ -33,5 +33,5 @@ public @interface ModelId {
      * 主键类型
      * @return 主键类型
      * */
-    IdType type() default IdType.NONE;
+    ModelIdType type() default ModelIdType.NONE;
 }

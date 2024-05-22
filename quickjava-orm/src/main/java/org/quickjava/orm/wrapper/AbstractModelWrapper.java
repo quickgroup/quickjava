@@ -470,7 +470,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         joinMap.put(leftAlias, join);
         join.setLeftAlias(leftAlias);
 
-        // 查询条件设置（支持多个
+        // join条件（支持多个
         List<JoinCondition> conditions = new LinkedList<>();
         join.onList.forEach(it -> {
             // 右条件是主表

@@ -14,7 +14,12 @@ public interface ModelFieldStrut {
 
     ModelIdType tableIdType(ModelFieldMeta fieldMeta);
 
-    Serializable tableIdValue(ModelFieldMeta fieldMeta);
+    String tableIdName(ModelFieldMeta fieldMeta);
+
+    /**
+     * 主键id值（自实现）
+     */
+    Serializable tableIdFillValue(ModelFieldMeta fieldMeta);
 
     boolean isTableField(ModelFieldMeta fieldMeta);
 

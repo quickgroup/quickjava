@@ -1,5 +1,7 @@
 package org.quickjava.orm.model.contain;
 
+import org.quickjava.orm.ORMContext;
+
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -98,8 +100,10 @@ public class ModelMeta {
         for (ModelFieldMeta field : fieldMap.values()) {
             if (field.getModelId() != null) {
                 return field.getName();
-            } else if (field.getTableId() != null) {
-                return field.getName();
+            }
+            // 三方支持
+            if (ORMContext.getModelFieldStrut() != null) {
+                return ORMContext.getModelFieldStrut().tableIdName(field);
             }
         }
         return null;

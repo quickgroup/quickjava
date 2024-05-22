@@ -59,8 +59,31 @@ public class MyBatisPlusConfigure {
             }
 
             @Override
-            public Serializable tableIdValue(ModelFieldMeta fieldMeta) {
-                return IdWorker.getId();
+            public String tableIdName(ModelFieldMeta fieldMeta) {
+                TableId tableId = getTableId(fieldMeta);
+                if (tableId != null) {
+                    return tableId.value();
+                }
+                return null;
+            }
+
+            @Override
+            public Serializable tableIdFillValue(ModelFieldMeta fieldMeta) {
+                TableId tableId = getTableId(fieldMeta);
+                if (tableId.type() == IdType.NONE) {
+                    return ModelIdType.NONE;
+                } else if (tableId.type() == IdType.AUTO) {
+                    return ModelIdType.AUTO;
+                } else if (tableId.type() == IdType.INPUT) {
+                    return ModelIdType.INPUT;
+                } else if (tableId.type() == IdType.ASSIGN_ID) {
+                    return IdWorker.getId();
+                } else if (tableId.type() == IdType.ID_WORKER) {
+                    return IdWorker.getId();
+                } else if (tableId.type() == IdType.ID_WORKER_STR) {
+                    return IdWorker.getIdStr();
+                }
+                return null;
             }
 
             @Override

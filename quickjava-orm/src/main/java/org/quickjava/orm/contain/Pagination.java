@@ -1,8 +1,5 @@
 package org.quickjava.orm.contain;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-
-import java.io.Serializable;
 import java.util.List;
 
 /*
@@ -56,10 +53,6 @@ public class Pagination<T> implements IPagination<T> {
         this.rows = rows;
         long totalMax = page * pageSize;
         this.pages = totalMax <= 0 ? 0 : (total + totalMax -1) / totalMax;
-    }
-
-    public static<T> IPagination<T> fromIPage(IPage<T> page) {
-        return new Pagination<>(page.getCurrent(), page.getSize(), page.getTotal(), page.getRecords());
     }
 
     public long getPage() {
