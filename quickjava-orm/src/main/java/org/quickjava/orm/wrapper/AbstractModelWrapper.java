@@ -16,6 +16,7 @@ import org.quickjava.orm.query.QueryReservoir;
 import org.quickjava.orm.query.QuerySet;
 import org.quickjava.orm.query.QuerySetHelper;
 import org.quickjava.orm.query.build.JoinCondition;
+import org.quickjava.orm.query.build.Where;
 import org.quickjava.orm.query.enums.Operator;
 import org.quickjava.orm.query.enums.OrderByType;
 import org.quickjava.orm.utils.SqlUtil;
@@ -28,7 +29,7 @@ import java.io.Serializable;
 import java.util.*;
 
 public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper<Children, M, R>, M extends Model, R extends MFunction<M, ?>>
-        implements AbstractWrapperWhere<Children, M, R>, ModelJoinWrapper<Children, M, R>, Serializable {
+        implements AbstractWhere<Children, M, R>, ModelJoinWrapper<Children, M, R>, Serializable {
 
     protected static final Logger logger = LoggerFactory.getLogger(AbstractModelWrapper.class);
 
@@ -47,14 +48,8 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
 
     //TODO::-------------------- 查询条件  --------------------
     @Override
-    public Children where(LogicType logic, boolean condition, String table, String column, Operator operator, Object val) {
-        if (condition) {
-            if (logic == LogicType.AND) {
-                querySet().where(table, column, operator, val);
-            } else {
-                querySet().whereOr(table, column, operator, val);
-            }
-        }
+    public Children where(Where where) {
+        querySet().where(where);
         return chain();
     }
 

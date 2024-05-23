@@ -2,14 +2,28 @@ package org.quickjava.orm.wrapper;
 
 import org.quickjava.orm.enums.LogicType;
 import org.quickjava.orm.model.Model;
+import org.quickjava.orm.query.build.Where;
+import org.quickjava.orm.query.build.WhereAnd;
+import org.quickjava.orm.query.build.WhereOr;
 import org.quickjava.orm.query.enums.Operator;
 
 /**
  * 基础条件定义
  */
-public interface AbstractWrapperWhere<Children, M extends Model, Func extends MFunction<M, ?>> extends Wrapper<Children> {
+public interface AbstractWhere<Children, M extends Model, Func extends MFunction<M, ?>> extends Wrapper<Children> {
 
-    Children where(LogicType logic, boolean condition, String table, String column, Operator operator, Object val);
+    Children where(Where where);
+
+    default Children where(LogicType logic, boolean condition, String table, String column, Operator operator, Object value) {
+        if (condition) {
+            if (logic == LogicType.AND) {
+                where(new WhereAnd(table, column, operator, value));
+            } else {
+                where(new WhereOr(table, column, operator, value));
+            }
+        }
+        return chain();
+    }
 
     /**
      * 指定表查询条件

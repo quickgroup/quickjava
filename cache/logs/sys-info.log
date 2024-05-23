@@ -136,3 +136,4 @@
 15:44:55.890 [main] INFO  c.a.d.p.DruidDataSource - [init,996] - {dataSource-1} inited
 15:44:56.317 [main] INFO  o.a.c.h.Http11NioProtocol - [log,173] - Starting ProtocolHandler ["http-nio-20120"]
 15:44:56.332 [main] INFO  o.q.s.ORMSpringBootApplication - [logStarted,61] - Started ORMSpringBootApplication in 1.667 seconds (JVM running for 2.237)
+17:36:50.854 [http-nio-20120-exec-1] INFO  o.a.c.c.C.[.[.[/] - [log,173] - Initializing Spring DispatcherServlet 'dispatcherServlet'
