@@ -9,7 +9,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.quickjava.common.utils.TimeUtils;
 import org.quickjava.orm.contain.IPagination;
-import org.quickjava.orm.contain.Pagination;
 import org.quickjava.orm.query.enums.OrderByType;
 import org.quickjava.orm.wrapper.ModelWrapper;
 import org.quickjava.spring.entity.SsoApp;
@@ -31,8 +30,13 @@ public class TestModelJoin {
         IPagination<SsoAppFavoriteModel> pagination = new ModelWrapper<>(SsoAppFavoriteModel.class)
                 // TODO::关联表
                 // 与主表一对一关联join
-                .leftJoin(SsoApp.class, SsoApp::getAppId, SsoAppFavoriteModel::getAppId, SsoAppFavoriteModel::getApp)
-                .leftJoin(SsoApp.class, SsoApp::getAppId, SsoAppFavoriteModel::getAppId, "aliasApp01")
+                .leftJoin(SsoApp.class, SsoAppFavoriteModel::getApp, SsoApp::getAppId, SsoAppFavoriteModel::getAppId)
+//                .leftJoin(SsoApp.class, "app", SsoApp::getAppId, SsoAppFavoriteModel::getAppId)   // 等价上面调用
+                // 与主表一对一关联join，并加载数据
+                .leftJoin2(SsoApp.class, SsoAppFavoriteModel::getApp, SsoApp::getAppId, SsoAppFavoriteModel::getAppId, SsoAppFavoriteModel::getApp)
+//                .leftJoin2(SsoApp.class, "app", SsoApp::getAppId, SsoAppFavoriteModel::getAppId, SsoAppFavoriteModel::getApp)   // 等价上面调用
+                // 与主表一对一关联join，字符串别名
+                .leftJoin(SsoApp.class, "aliasApp01", SsoApp::getAppId, SsoAppFavoriteModel::getAppId)
                 // 与主表一对一关联join，复合条件查询
                 .leftJoin(SsoApp.class, "app3", whereLeft -> whereLeft
                         .eq(SsoApp::getAppId, SsoAppFavoriteModel.class, SsoAppFavoriteModel::getAppId)
@@ -40,11 +44,13 @@ public class TestModelJoin {
                         .isNotNull(SsoApp::getName)
                 )
                 // 与主表一对一关联join，指定数据加载到主实体指定属性
-                .leftJoin(SsoApp.class, SsoApp::getAppId, SsoAppFavoriteModel::getAppId, SsoAppFavoriteModel::getApp2)
+                .leftJoin2(SsoApp.class, SsoAppFavoriteModel::getApp2, SsoApp::getAppId, SsoAppFavoriteModel::getAppId, SsoAppFavoriteModel::getApp2)
                 // 关联其他表
                 .leftJoin(SsoAppLatest.class, SsoAppLatest::getAppId, SsoAppFavoriteModel::getAppId)
                 // 关联其他表
-                .leftJoin(SsoAppLatest.class, SsoAppLatest::getAppId, SsoAppFavoriteModel::getAppId, SsoAppFavoriteModel::getTestAppInfo)
+                .leftJoin(SsoAppLatest.class, SsoAppFavoriteModel::getTestAppInfo, SsoAppLatest::getAppId, SsoAppFavoriteModel::getAppId)
+//                .leftJoin(SsoAppLatest.class, "testAppInfo", SsoAppLatest::getAppId, SsoAppFavoriteModel::getAppId)       // 等价上面
+
                 // 通过中间表关联
 //                .leftJoin(SsoApp.class, SsoApp::getAppId, SsoAppFavoriteModel::getAppId)
 //                .leftJoin(SsoAppLatest.class, SsoAppLatest::getAppId, SsoApp::getAppId, SsoAppFavoriteModel::getTestAppInfo)
@@ -57,12 +63,13 @@ public class TestModelJoin {
                 //      1. 自动识别表名
                 .eq(SsoApp.class, SsoApp::getAppId, 1)
                 //      2. 指定父属性名为表名
-                .eq(SsoAppFavoriteModel::getApp, SsoApp.class, SsoApp::getAppId, 1)
-                .eq(SsoAppFavoriteModel::getTestAppInfo, SsoApp.class, SsoApp::getAppId, 1)
+                .eq(SsoApp.class, SsoAppFavoriteModel::getApp, SsoApp::getAppId, 1)
+//                .eq(SsoApp.class, "app", SsoApp::getAppId, 1)     // 等价上面调用
+                .eq(SsoApp.class, SsoAppFavoriteModel::getTestAppInfo, SsoApp::getAppId, 1)
+//                .eq(SsoApp.class, "testAppInfo", SsoApp::getAppId, 1)     // 等价上面调用
                 //      3. 字符串表名
-                .eq("aliasApp01", SsoApp::getAppId, 1)
-                .eq("app3", SsoApp::getAppId, 1)
-
+                .eq(SsoApp.class, "aliasApp01", SsoApp::getAppId, 1)
+                .eq(SsoApp.class, "app3", SsoApp::getAppId, 1)
                 // TODO::排序字段
                 .order(SsoAppFavoriteModel::getCreateTime, true)
                 .order(SsoApp.class, SsoApp::getAppId)
@@ -85,7 +92,9 @@ public class TestModelJoin {
         Long startTime = TimeUtils.getNanoTime();
         List<SsoAppFavoriteModel> favorites = new ModelWrapper<>(SsoAppFavoriteModel.class)
                 // 一对一关联
-                .leftJoin(SsoApp.class, SsoApp::getAppId, SsoAppFavoriteModel::getAppId, SsoAppFavoriteModel::getApp)
+                .leftJoin(SsoApp.class, SsoAppFavoriteModel::getApp, SsoApp::getAppId, SsoAppFavoriteModel::getAppId)
+                // 一对一关联 并把关联表数据加载到app属性上
+                .leftJoin2(SsoApp.class, SsoAppFavoriteModel::getApp, SsoApp::getAppId, SsoAppFavoriteModel::getAppId, SsoAppFavoriteModel::getApp)
                 .select();
         System.out.println("leftJoin return=" + favorites);
         System.out.println("耗时=" + TimeUtils.endNanoTime(startTime) + "ms");

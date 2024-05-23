@@ -16,10 +16,17 @@ public interface ModelJoinWrapper<
         extends AbstractWhere<Children, M, MC>, Serializable {
 
     /**
-     * 与主表一个条件关联
+     * 与主表关联
      */
     default <Relation extends Model> Children leftJoin(Class<Relation> left, MFunction<Relation, ?> lc, MC rf) {
         return join(JoinType.LEFT, new JoinSpecify<Relation, M>(left).eq(lc, rf));
+    }
+
+    /**
+     * 与主表关联，并加载数据
+     */
+    default <Relation extends Model> Children leftJoin2(Class<Relation> left, MFunction<Relation, ?> lc, MC rf, MC dataField) {
+        return join(JoinType.LEFT, new JoinSpecify<Relation, M>(left).eq(lc, rf).setLoadData(dataField));
     }
 
     /**
@@ -31,19 +38,23 @@ public interface ModelJoinWrapper<
         return leftJoin(left, alias.getName(), lc, rf);
     }
 
+    /**
+     * 与主表一个条件关，并加载数据
+     * @param left 关联表cLass
+     * @param alias 关联表别名
+     * @param lc 关联表字段名
+     * @param rf 右表字段名
+     * @param dataField 关联数据写入到right表属性
+     */
+    default <Relation extends Model> Children leftJoin2(Class<Relation> left, MC alias, MFunction<Relation, ?> lc, MC rf, MC dataField) {
+        return leftJoin2(left, alias.getName(), lc, rf, dataField);
+    }
+
     default <Relation extends Model> Children leftJoin(Class<Relation> left, String alias, MFunction<Relation, ?> lc, MC rf) {
         return join(JoinType.LEFT, new JoinSpecify<Relation, M>(left, alias).eq(lc, rf));
     }
 
-    /**
-     * 与主表一个条件关联[指定属性]
-     * @param dataField 关联数据写入到right表属性
-     */
-    default <Relation extends Model> Children leftJoinData(Class<Relation> left, MC alias, MFunction<Relation, ?> lc, MC rf, MC dataField) {
-        return leftJoinData(left, alias.getName(), lc, rf, dataField);
-    }
-
-    default <Relation extends Model> Children leftJoinData(Class<Relation> left, String alias, MFunction<Relation, ?> lc, MC rf, MC dataField) {
+    default <Relation extends Model> Children leftJoin2(Class<Relation> left, String alias, MFunction<Relation, ?> lc, MC rf, MC dataField) {
         return join(JoinType.LEFT, new JoinSpecify<Relation, M>(left, alias).setLoadData(dataField).eq(lc, rf));
     }
 

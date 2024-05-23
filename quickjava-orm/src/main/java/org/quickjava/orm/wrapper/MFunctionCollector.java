@@ -1,15 +1,14 @@
 package org.quickjava.orm.wrapper;
 
-import org.quickjava.orm.enums.LogicType;
 import org.quickjava.orm.model.Model;
-import org.quickjava.orm.model.ModelHelper;
 import org.quickjava.orm.query.QuerySetHelper;
 import org.quickjava.orm.query.build.Where;
-import org.quickjava.orm.query.build.WhereAnd;
-import org.quickjava.orm.query.enums.Operator;
 
 import java.util.List;
 
+/**
+ * 游离model方法调用
+ */
 public class MFunctionCollector<M extends Model, MC extends MFunction<M, ?>>
         implements AbstractWhere<MFunctionCollector<M, MC>, M, MC> {
 
