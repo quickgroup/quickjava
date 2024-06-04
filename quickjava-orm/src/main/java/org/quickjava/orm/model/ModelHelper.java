@@ -235,8 +235,12 @@ public class ModelHelper extends SqlUtil {
 
     // 回调处理方法
     public static WhereOptCallback whereOptCallback = (where, querySet, userData) -> {
-        // 子查询条件不处理
+        // 子查询条件跳过
         if (where.getChildren() != null && !where.getChildren().isEmpty()) {
+            return;
+        }
+        // 原始语句跳过
+        if (where.getOperator() == Operator.RAW) {
             return;
         }
         where.setColumn(fieldToUnderlineCase(where.getColumn()));
