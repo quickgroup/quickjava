@@ -369,7 +369,7 @@ public class ModelHelper extends SqlUtil {
         // 一对多查询条件准备
         withs.forEach(relationName -> {
             Relation relation = relationMap.get(relationName);
-            if (relation.getType() != RelationType.OneToMany) {
+            if (relation == null || relation.getType() != RelationType.OneToMany) {
                 return;
             }
             if (!conditionMap.containsKey(relationName)) {
