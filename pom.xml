@@ -35,7 +35,6 @@
         <module>quickjava-orm</module>
         <module>quickjava-www</module>
         <module>quickjava-orm-boot-starter</module>
-        <module>quickjava-orm-boot-starter-test</module>
     </modules>
 
     <build>

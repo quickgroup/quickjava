@@ -1,18 +1,16 @@
-package org.quickjava.spring.entity;
+package org.quickjava.spring.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.util.Date;
 
 /**
- * 应用收藏
+ * 应用使用记录
  */
-@TableName("sso_app_favorite")
-public class SsoAppFavoriteModel extends BaseSimpleEntity
+public class SysAppLatest extends BaseSimpleEntity
 {
 
     @TableId
@@ -32,25 +30,10 @@ public class SsoAppFavoriteModel extends BaseSimpleEntity
     @TableField(fill = FieldFill.INSERT)
     private Date createTime;
 
-    // 关联应用信息
-    @TableField(exist = false)
-    private SsoApp app;
-
-    // 关联应用信息
-    @TableField(exist = false)
-    private SsoApp app2;
-
-    // 关联应用信息
-    @TableField(exist = false)
-    private SsoApp testAppInfo;
-
-    @TableField(exist = false)
-    private SsoAppFavoriteModel sysAppFavorite;
-
-    public SsoAppFavoriteModel() {
+    public SysAppLatest() {
     }
 
-    public SsoAppFavoriteModel(Long userId, Long appId) {
+    public SysAppLatest(Long userId, Long appId) {
         this.userId = userId;
         this.appId = appId;
     }
@@ -85,37 +68,5 @@ public class SsoAppFavoriteModel extends BaseSimpleEntity
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
-    }
-
-    public SsoApp getApp() {
-        return app;
-    }
-
-    public void setApp(SsoApp app) {
-        this.app = app;
-    }
-
-    public SsoApp getApp2() {
-        return app2;
-    }
-
-    public void setApp2(SsoApp app2) {
-        this.app2 = app2;
-    }
-
-    public SsoApp getTestAppInfo() {
-        return testAppInfo;
-    }
-
-    public void setTestAppInfo(SsoApp testAppInfo) {
-        this.testAppInfo = testAppInfo;
-    }
-
-    public SsoAppFavoriteModel getSysAppFavorite() {
-        return sysAppFavorite;
-    }
-
-    public void setSysAppFavorite(SsoAppFavoriteModel sysAppFavorite) {
-        this.sysAppFavorite = sysAppFavorite;
     }
 }

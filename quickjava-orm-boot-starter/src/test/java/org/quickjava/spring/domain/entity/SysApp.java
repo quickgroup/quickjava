@@ -1,4 +1,4 @@
-package org.quickjava.spring.entity;
+package org.quickjava.spring.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -13,7 +13,7 @@ import java.util.Date;
  * @author origin
  * //@date 2023-10-10
  */
-public class SsoApp extends BaseSimpleEntity
+public class SysApp extends BaseSimpleEntity
 {
 
     /** appId */

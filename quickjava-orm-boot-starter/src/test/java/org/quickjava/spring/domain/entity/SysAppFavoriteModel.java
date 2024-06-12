@@ -1,16 +1,18 @@
-package org.quickjava.spring.entity;
+package org.quickjava.spring.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.util.Date;
 
 /**
- * 应用使用记录
+ * 应用收藏
  */
-public class SsoAppLatest extends BaseSimpleEntity
+@TableName("sso_app_favorite")
+public class SysAppFavoriteModel extends BaseSimpleEntity
 {
 
     @TableId
@@ -30,10 +32,25 @@ public class SsoAppLatest extends BaseSimpleEntity
     @TableField(fill = FieldFill.INSERT)
     private Date createTime;
 
-    public SsoAppLatest() {
+    // 关联应用信息
+    @TableField(exist = false)
+    private SysApp app;
+
+    // 关联应用信息
+    @TableField(exist = false)
+    private SysApp app2;
+
+    // 关联应用信息
+    @TableField(exist = false)
+    private SysApp testAppInfo;
+
+    @TableField(exist = false)
+    private SysAppFavoriteModel sysAppFavorite;
+
+    public SysAppFavoriteModel() {
     }
 
-    public SsoAppLatest(Long userId, Long appId) {
+    public SysAppFavoriteModel(Long userId, Long appId) {
         this.userId = userId;
         this.appId = appId;
     }
@@ -68,5 +85,37 @@ public class SsoAppLatest extends BaseSimpleEntity
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public SysApp getApp() {
+        return app;
+    }
+
+    public void setApp(SysApp app) {
+        this.app = app;
+    }
+
+    public SysApp getApp2() {
+        return app2;
+    }
+
+    public void setApp2(SysApp app2) {
+        this.app2 = app2;
+    }
+
+    public SysApp getTestAppInfo() {
+        return testAppInfo;
+    }
+
+    public void setTestAppInfo(SysApp testAppInfo) {
+        this.testAppInfo = testAppInfo;
+    }
+
+    public SysAppFavoriteModel getSysAppFavorite() {
+        return sysAppFavorite;
+    }
+
+    public void setSysAppFavorite(SysAppFavoriteModel sysAppFavorite) {
+        this.sysAppFavorite = sysAppFavorite;
     }
 }

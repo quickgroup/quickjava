@@ -1,4 +1,4 @@
-package org.quickjava.spring.domain;
+package org.quickjava.spring.domain.entity;
 
 import org.quickjava.orm.model.Model;
 import org.quickjava.orm.model.annotation.ModelField;

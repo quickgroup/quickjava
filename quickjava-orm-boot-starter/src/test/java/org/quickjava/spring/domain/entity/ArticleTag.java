@@ -1,4 +1,4 @@
-package org.quickjava.spring.domain;
+package org.quickjava.spring.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import org.quickjava.orm.model.Model;
@@ -19,25 +19,16 @@ import org.quickjava.orm.model.annotation.ModelName;
  * +-------------------------------------------------------------------
  */
 @ModelName
-public class Comment extends Model {
+public class ArticleTag extends Model {
 
     private Long id;
 
     private Long articleId;
 
-    private Long userId;
-
-    private String content;
-
-    @TableField(exist = false)
-    private User user;
+    private String value;
 
     @TableField(exist = false)
     private Article article;
-
-    public User user() {
-        return hasOne(User.class, "userId", "id");
-    }
 
     public Article article() {
         return hasOne(Article.class, "articleId", "id");

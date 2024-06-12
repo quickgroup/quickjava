@@ -1,4 +1,4 @@
-package org.quickjava.spring.entity;
+package org.quickjava.spring.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -12,7 +12,7 @@ import java.util.Date;
  *
  */
 @TableName(excludeProperty = {"createName", "updateName", "deleteTime", "deleteBy", "deleteName"})
-public class SsoUser extends BaseSimpleEntity
+public class SysUser extends BaseSimpleEntity
 {
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;

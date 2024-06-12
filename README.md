@@ -62,8 +62,8 @@ Maven->QuickJava-www->Lifecycle->packing
 
 ## 用爱发电
 <p align="center">
-  <img src="res/img/001.jpg" width="49%" alt="001.jpg" />
-  <img src="res/img/002.jpg" width="49%" alt="002.jpg" />
+  <img src="data/res/img/001.jpg" width="49%" alt="001.jpg" />
+  <img src="data/res/img/002.jpg" width="49%" alt="002.jpg" />
 </p>
 
 ## 版权申明
