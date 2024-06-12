@@ -73,7 +73,7 @@ public class Model implements IModel {
     private synchronized QuerySet query() {
         synchronized (Model.class) {
             if (reservoir.querySet == null) {
-                reservoir.querySet = QuerySet.table(parseModelTableName(getClass()));
+                reservoir.querySet = QuerySet.table(reservoir.meta.table());
                 QueryReservoir queryReservoir = QuerySetHelper.getQueryReservoir(reservoir.querySet);
                 queryReservoir.setCallback(WhereOptCallback.class, ModelHelper.whereOptCallback, this);
                 queryReservoir.setCallback(OrderByOptCallback.class, ModelHelper.orderByOptCallback, this);
@@ -957,7 +957,6 @@ public class Model implements IModel {
         }
 
         synchronized (Model.class) {
-            // 已加载模型元组信息
             if (ModelHelper.metaExist(clazz)) {
                 model.reservoir.meta = ModelHelper.getMeta(clazz);
                 return;
@@ -965,10 +964,11 @@ public class Model implements IModel {
         }
         // 初始化模型信息
         ModelMeta meta = model.reservoir.meta = new ModelMeta();
-        meta.setTable(parseModelTableName(clazz));
         meta.setClazz(clazz);
+        meta.setTable(clazz.getSimpleName());
         meta.setFieldMap(new LinkedHashMap<>());
         ModelHelper.setMeta(clazz, meta);
+        logger.debug("cache model meta. clazz={}", clazz);
 
         // 全部方法、属性
         Class<?> getClazz = clazz;
@@ -1071,30 +1071,6 @@ public class Model implements IModel {
             return field.getDeclaredAnnotation(OneToMany.class);
         }
         return null;
-    }
-
-    private static String parseModelTableName(Class<?> clazz)
-    {
-        clazz = getModelClass(clazz);
-        String tableName = null;
-        // 获取支持的三方属性注解
-        Class<?> finalClazz = clazz;
-        for (Map.Entry<Class<? extends Annotation>, ModelAnoHelper.TableNameInfo> entry : ModelAnoHelper.tableNameAnoMap.entrySet()) {
-            Object nameAnno = finalClazz.getAnnotation(entry.getKey());
-            if (nameAnno != null && tableName == null) {
-                tableName = entry.getValue().value(nameAnno);
-            }
-        }
-        // orm框架注解
-        ModelName ModelNameAnno = clazz.getAnnotation(ModelName.class);
-        if (ModelNameAnno != null && !"".equals(ModelNameAnno.value())) {
-            tableName = ModelNameAnno.value();
-        }
-        // 默认取模型名称转下划线
-        if (tableName == null) {
-            tableName = ModelHelper.getModelAlias(clazz);
-        }
-        return toUnderlineCase(tableName);
     }
 
     /**

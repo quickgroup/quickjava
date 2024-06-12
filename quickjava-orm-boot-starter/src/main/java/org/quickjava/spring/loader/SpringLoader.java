@@ -99,6 +99,8 @@ public class SpringLoader implements InitializingBean, ORMContextPort {
     public DatabaseMeta getDatabaseMeta() {
         if (dbConfig == null) {
             dbConfig = new DatabaseMeta("SpringBoot " + SpringVersion.getVersion(), getConnectionType());
+            dbConfig.setUnderline(true);
+            dbConfig.setCamelCase(true);
         }
         return dbConfig;
     }

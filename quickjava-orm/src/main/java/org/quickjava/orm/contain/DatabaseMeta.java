@@ -36,7 +36,11 @@ public class DatabaseMeta {
 
     public boolean autoCommit = true;
 
-    public boolean underscoreToCamelCase = true;
+    // 字段转大写
+    public boolean camelCase = true;
+
+    // 属性转下划线列名
+    public boolean underline = true;
 
     public enum DBType {
         MYSQL,
@@ -90,16 +94,53 @@ public class DatabaseMeta {
         throw new RuntimeException("未配置连接类型的配置");
     }
 
+    public String getSubject() {
+        return subject;
+    }
+
+    public void setSubject(String subject) {
+        this.subject = subject;
+    }
+
+    public void setType(DBType type) {
+        this.type = type;
+    }
+
+    public boolean isAutoCommit() {
+        return autoCommit;
+    }
+
+    public void setAutoCommit(boolean autoCommit) {
+        this.autoCommit = autoCommit;
+    }
+
+    public boolean isCamelCase() {
+        return camelCase;
+    }
+
+    public void setCamelCase(boolean camelCase) {
+        this.camelCase = camelCase;
+    }
+
+    public boolean isUnderline() {
+        return underline;
+    }
+
+    public void setUnderline(boolean underline) {
+        this.underline = underline;
+    }
+
     @Override
     public String toString() {
-        return "Config{" +
-                "subject=" + subject +
+        return "DatabaseMeta{" +
+                "subject='" + subject + '\'' +
                 ", type=" + type +
                 ", url='" + url + '\'' +
                 ", database='" + database + '\'' +
                 ", driver='" + driver + '\'' +
                 ", autoCommit=" + autoCommit +
-                ", underscoreToCamelCase=" + underscoreToCamelCase +
+                ", camelCase=" + camelCase +
+                ", underline=" + underline +
                 '}';
     }
 }

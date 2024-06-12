@@ -1,6 +1,8 @@
 package org.quickjava.orm.model.contain;
 
 import org.quickjava.orm.ORMContext;
+import org.quickjava.orm.model.annotation.ModelName;
+import org.quickjava.orm.utils.SqlUtil;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -30,6 +32,7 @@ public class ModelMeta {
 
     // 表名
     private String table;
+    private String tableCache;
 
     /**
      * 属性字段
@@ -58,7 +61,25 @@ public class ModelMeta {
     }
 
     public String table() {
-        return table;
+        if (tableCache == null) {
+            // 模型注解
+            ModelName modelName = clazz.getAnnotation(ModelName.class);
+            if (modelName != null) {
+                tableCache = modelName.value();
+            }
+            // 三方支持
+            if (tableCache == null && ORMContext.getModelStrut() != null) {
+                tableCache = ORMContext.getModelStrut().getTableName(this);
+            }
+            // 默认类名
+            if (tableCache == null) {
+                tableCache = table;
+                if (ORMContext.getDatabaseMeta().isUnderline()) {
+                    tableCache = SqlUtil.toUnderlineCase(tableCache);
+                }
+            }
+        }
+        return tableCache;
     }
 
     /**
@@ -67,7 +88,8 @@ public class ModelMeta {
      * @return 表名加别名的声明sql
      */
     public String tableAlias(String alias) {
-        return table.equals(alias) ? table : table + " " + alias;
+        String tableName = this.table();
+        return tableName.equals(alias) ? tableName : tableName + " " + alias;
     }
 
     public void setTable(String table) {
@@ -114,6 +136,7 @@ public class ModelMeta {
         return "ModelMeta{" +
                 "clazz=" + clazz +
                 ", table='" + table + '\'' +
+                ", tableCache='" + tableCache + '\'' +
                 ", fieldMap=" + fieldMap +
                 ", relationMap=" + relationMap +
                 '}';

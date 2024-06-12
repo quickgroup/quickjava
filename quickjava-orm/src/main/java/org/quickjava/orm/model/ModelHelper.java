@@ -42,18 +42,18 @@ public class ModelHelper extends SqlUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(ModelHelper.class);
 
-    public static final ConcurrentHashMap<String, ModelMeta> modelCache = new ConcurrentHashMap<>();
+    public static final ConcurrentHashMap<String, ModelMeta> modelMateCache = new ConcurrentHashMap<>();
 
     public static ModelMeta getMeta(Class<?> clazz) {
-        return modelCache.get(clazz.getName());
+        return modelMateCache.get(clazz.getName());
     }
 
     public static boolean metaExist(Class<?> clazz) {
-        return modelCache.containsKey(clazz.getName());
+        return modelMateCache.containsKey(clazz.getName());
     }
 
     public static void setMeta(Class<?> clazz, ModelMeta meta) {
-        if (modelCache.putIfAbsent(clazz.getName(), meta) != null) {
+        if (modelMateCache.putIfAbsent(clazz.getName(), meta) != null) {
             logger.warn("Key '" + clazz.getName() + "' already exists in the map.");
         }
     }

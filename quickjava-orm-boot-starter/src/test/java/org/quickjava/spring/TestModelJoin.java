@@ -29,22 +29,20 @@ public class TestModelJoin {
         Long startTime = TimeUtils.getNanoTime();
         IPagination<SysAppFavoriteModel> pagination = new ModelWrapper<>(SysAppFavoriteModel.class)
                 // TODO::关联表
-                // 与主表一对一关联join
+                // # 与主表一对一关联join
                 .leftJoin(SysApp.class, SysAppFavoriteModel::getApp, SysApp::getAppId, SysAppFavoriteModel::getAppId)
 //                .leftJoin(SsoApp.class, "app", SsoApp::getAppId, SsoAppFavoriteModel::getAppId)   // 等价上面调用
-                // 与主表一对一关联join，并加载数据
-                .leftJoin2(SysApp.class, SysAppFavoriteModel::getApp, SysApp::getAppId, SysAppFavoriteModel::getAppId, SysAppFavoriteModel::getApp)
+                // ## 与主表一对一关联join，并加载数据
+                .leftJoin2(SysApp.class, "app2", SysApp::getAppId, SysAppFavoriteModel::getAppId, SysAppFavoriteModel::getApp)
 //                .leftJoin2(SsoApp.class, "app", SsoApp::getAppId, SsoAppFavoriteModel::getAppId, SsoAppFavoriteModel::getApp)   // 等价上面调用
-                // 与主表一对一关联join，字符串别名
+                // ## 与主表一对一关联join，字符串别名
                 .leftJoin(SysApp.class, "aliasApp01", SysApp::getAppId, SysAppFavoriteModel::getAppId)
-                // 与主表一对一关联join，复合条件查询
+                // ## 与主表一对一关联join，复合条件查询
                 .leftJoin(SysApp.class, "app3", whereLeft -> whereLeft
                         .eq(SysApp::getAppId, SysAppFavoriteModel.class, SysAppFavoriteModel::getAppId)
                         .eq(SysApp::getOpen, 1)
                         .isNotNull(SysApp::getName)
                 )
-                // 与主表一对一关联join，指定数据加载到主实体指定属性
-                .leftJoin2(SysApp.class, SysAppFavoriteModel::getApp2, SysApp::getAppId, SysAppFavoriteModel::getAppId, SysAppFavoriteModel::getApp2)
                 // 关联其他表
                 .leftJoin(SysAppLatest.class, SysAppLatest::getAppId, SysAppFavoriteModel::getAppId)
                 // 关联其他表
