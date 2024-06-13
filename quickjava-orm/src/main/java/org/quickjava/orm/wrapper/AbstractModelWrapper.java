@@ -336,33 +336,34 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
             ModelMeta main = ModelHelper.getMeta(this.model.getClass());
             loadModelAccurateFields(querySet, main, main.table());
         }
-        // 关联表元信息
-        ModelMeta leftMeta = getModelMeta(join.getLeft());
-        if (leftMeta == null) {
-            return chain();
+        // 默认为主表
+        if (join.getLeft() == null) {
+            join.setLeft((Class<Model>) this.model.getClass());
         }
-        // 关联表名称和别名
-        String rightAlias = join.getLeftAlias();
-        // 在左表上的属性名
-        if (rightAlias == null) {
-            ModelFieldMeta fieldMeta = getModelClazzFieldMap(mainMeta).get(join.getLeft());
-            rightAlias = fieldMeta == null ? null : fieldMeta.getName();
+        if (join.getRight() == null) {
+            join.setRight((Class<Model>) this.model.getClass());
         }
-        // 表名
-        if (rightAlias == null) {
-            rightAlias = leftMeta.table();
+        // 关联表
+        String relName = join.getRightAlias();
+        Class<Model> relClazz = (Class<Model>) join.getRight();
+        ModelMeta relMeta = ModelHelper.getMeta(relClazz);
+        if (relName == null) {
+            relName = relMeta.table();
         }
+        if (relName == null) {
+            relName = relClazz.getSimpleName();
+        }
+
         // 声明左表数据字段
-        if (join.getLoadDataFieldName() != null && ModelHelper.isNotEmpty(rightAlias)) {
-            loadModelAccurateFields(querySet, leftMeta, rightAlias);
+        if (join.getLoadDataFieldName() != null && ModelHelper.isNotEmpty(relName)) {
+            loadModelAccurateFields(querySet, relMeta, relName);
         }
-        // 缓存条件
+
+        // 缓存
         if (joinMap == null) {
             joinMap = new LinkedHashMap<>();
         }
-        // 会覆盖之前的
-        joinMap.put(rightAlias, join);
-        join.setLeftAlias(rightAlias);
+        joinMap.put(relName, join);
 
         // join条件（支持多个
         List<JoinConditionAbs> conditions = new LinkedList<>();
@@ -383,7 +384,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
             joinCondition.setRightValue(it.getRightValue());
             conditions.add(joinCondition);
         });
-        querySet.join(leftMeta.tableAlias(rightAlias), conditions, type);
+        querySet.join(relMeta.tableAlias(relName), conditions, type);
 
         return chain();
     }
