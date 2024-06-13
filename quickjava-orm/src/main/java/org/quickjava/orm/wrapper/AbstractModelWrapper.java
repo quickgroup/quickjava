@@ -6,7 +6,6 @@ import org.quickjava.orm.contain.DataMap;
 import org.quickjava.orm.contain.IPagination;
 import org.quickjava.orm.contain.Pagination;
 import org.quickjava.orm.enums.JoinType;
-import org.quickjava.orm.enums.LogicType;
 import org.quickjava.orm.model.Model;
 import org.quickjava.orm.model.ModelHelper;
 import org.quickjava.orm.model.ModelReservoir;
@@ -15,12 +14,12 @@ import org.quickjava.orm.model.contain.ModelMeta;
 import org.quickjava.orm.query.QueryReservoir;
 import org.quickjava.orm.query.QuerySet;
 import org.quickjava.orm.query.QuerySetHelper;
-import org.quickjava.orm.query.build.JoinCondition;
+import org.quickjava.orm.query.build.JoinConditionAbs;
 import org.quickjava.orm.query.build.Where;
-import org.quickjava.orm.query.enums.Operator;
 import org.quickjava.orm.query.enums.OrderByType;
 import org.quickjava.orm.utils.SqlUtil;
-import org.quickjava.orm.wrapper.join.JoinSpecifyBase;
+import org.quickjava.orm.wrapper.join.JoinSpecifyLeft;
+import org.quickjava.orm.wrapper.join.JoinSpecify;
 import org.quickjava.orm.wrapper.join.ModelJoinWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +36,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
 
     protected Class<M> modelClazz;
 
-    protected Map<String, JoinSpecifyBase<?, ?>> joinMap;
+    protected Map<String, JoinSpecify<?, ?>> joinMap;
 
     public AbstractModelWrapper() {
     }
@@ -253,20 +252,20 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         // 一对一的数据加载
         joinMap.forEach((alias, join) -> {
             // 跳过：不加载数据
-            if (!join.isLoadData()) {
+            if (!join.getLoadDataFieldName()) {
                 return;
             }
             // 关联模型元数据
             ModelMeta leftMeta = getModelMeta(join.getLeft());
             // 是和主模型关联的条件
-            JoinSpecifyBase.Item<?, ?> it = join.onList.get(0);
+            JoinSpecify.Item<?, ?> it = join.onList.get(0);
             if (!it.getRight().equals(mainMeta.getClazz())) {
                 return;
             }
             // 数据装载
             Model left = Model.newModel(leftMeta.getClazz(), null, main);
             ModelHelper.resultTranshipmentWith(left, data, alias);
-            ReflectUtil.setFieldValue(main, join.getLoadDataField(), left);
+            ReflectUtil.setFieldValue(main, join.getLoadData(), left);
         });
         return main;
     }
@@ -322,7 +321,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
      * 关联查询实现
      */
     @Override
-    public Children join(JoinType type, JoinSpecifyBase<?, ?> join) {
+    public Children join(JoinType type, JoinSpecifyLeft<?, ?> join) {
         // 为空过滤
         if (join.onList.isEmpty()) {
             return chain();
@@ -341,48 +340,49 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         if (leftMeta == null) {
             return chain();
         }
-        // 如果指定在父实体上的属性
-        String leftAlias = join.getLeftAlias();
-        // 在主表上的属性名
-        if (leftAlias == null) {
+        // 关联表名称和别名
+        String rightAlias = join.getLeftAlias();
+        // 在左表上的属性名
+        if (rightAlias == null) {
             ModelFieldMeta fieldMeta = getModelClazzFieldMap(mainMeta).get(join.getLeft());
-            leftAlias = fieldMeta == null ? null : fieldMeta.getName();
+            rightAlias = fieldMeta == null ? null : fieldMeta.getName();
         }
         // 表名
-        if (leftAlias == null) {
-            leftAlias = leftMeta.table();
+        if (rightAlias == null) {
+            rightAlias = leftMeta.table();
         }
         // 声明左表数据字段
-        if (join.isLoadData() && ModelHelper.isNotEmpty(leftAlias)) {
-            loadModelAccurateFields(querySet, leftMeta, leftAlias);
+        if (join.getLoadDataFieldName() && ModelHelper.isNotEmpty(rightAlias)) {
+            loadModelAccurateFields(querySet, leftMeta, rightAlias);
         }
         // 缓存条件
         if (joinMap == null) {
             joinMap = new LinkedHashMap<>();
         }
         // 会覆盖之前的
-        joinMap.put(leftAlias, join);
-        join.setLeftAlias(leftAlias);
+        joinMap.put(rightAlias, join);
+        join.setLeftAlias(rightAlias);
 
         // join条件（支持多个
-        List<JoinCondition> conditions = new LinkedList<>();
+        List<JoinConditionAbs> conditions = new LinkedList<>();
         join.onList.forEach(it -> {
-            // 右条件是主表
-            it.setRight(it.getRight() == null ? (Class<? extends Model>) mainMeta.getClazz() : it.getRight());
-            // 模型元信息
-            ModelMeta right = getModelMeta(it.getRight());
-            String rightAlias = SqlUtil.isNotEmpty(it.getRightAlias()) ? it.getRightAlias() : right.table();
+            // 为空取主表
+            it.setLeft(it.getLeft() == null ? mainMeta.getClazz() : it.getLeft());
+            ModelMeta<?> onLeft = getModelMeta(it.getLeft());
+            String onLeftAlias = SqlUtil.isNotEmpty(it.getLeftAlias()) ? it.getLeftAlias() : onLeft.table();
+            String onLeftColumn = it.getLeftFun() == null ? null : it.getLeftFun().getName();
+            // 右表信息
+            it.setRight(it.getRight() == null ? mainMeta.getClazz() : it.getRight());
+            ModelMeta<?> onRight = getModelMeta(it.getRight());
+            String onRightAlias = SqlUtil.isNotEmpty(it.getRightAlias()) ? it.getRightAlias() : onRight.table();
+            String onRightColumn = it.getRightFun() == null ? null : it.getRightFun().getName();
             // 一：方法引用
-            JoinCondition joinCondition = new JoinCondition(
-                    join.getLeftAlias(), it.getLeftFun().getName(),
-                    1, it.getType(),
-                    rightAlias, null
-            );
-            joinCondition.setRightColumn(it.getRightFun() == null ? null : it.getRightFun().getName());
+            JoinConditionAbs joinCondition = new JoinConditionAbs(it.getLogic(), it.getCompare(),
+                    onLeftAlias, onLeftColumn, onRightAlias, onRightColumn);
             joinCondition.setRightValue(it.getRightValue());
             conditions.add(joinCondition);
         });
-        querySet.join(leftMeta.tableAlias(leftAlias), conditions, type);
+        querySet.join(leftMeta.tableAlias(rightAlias), conditions, type);
 
         return chain();
     }

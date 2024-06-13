@@ -1,7 +1,5 @@
 package org.quickjava.orm.query.build;
 
-import cn.hutool.core.util.StrUtil;
-import org.quickjava.common.utils.ComUtil;
 import org.quickjava.orm.contain.DriveConfigure;
 import org.quickjava.orm.enums.JoinType;
 import org.quickjava.orm.utils.SqlUtil;
@@ -29,7 +27,7 @@ public class Join {
 
     protected String table;
 
-    protected List<JoinCondition> conditions;
+    protected List<JoinConditionAbs> conditions;
 
     private DriveConfigure driveConfigure;
 
@@ -38,13 +36,13 @@ public class Join {
         this.table = table;
     }
 
-    public Join(JoinType type, String table, List<JoinCondition> conditions) {
+    public Join(JoinType type, String table, List<JoinConditionAbs> conditions) {
         this.type = type;
         this.table = table;
         this.conditions = conditions;
     }
 
-    public Join(JoinType type, String table, JoinCondition condition) {
+    public Join(JoinType type, String table, JoinConditionAbs condition) {
         this.type = type;
         this.table = table;
         this.conditions = new LinkedList<>();
@@ -60,17 +58,17 @@ public class Join {
         return this;
     }
 
-    public List<JoinCondition> getConditions() {
+    public List<JoinConditionAbs> getConditions() {
         conditions = conditions == null ? new LinkedList<>() : conditions;
         return conditions;
     }
 
-    public Join setConditions(List<JoinCondition> conditions) {
+    public Join setConditions(List<JoinConditionAbs> conditions) {
         this.conditions = conditions;
         return this;
     }
 
-    public Join addCondition(JoinCondition condition) {
+    public Join addCondition(JoinConditionAbs condition) {
         this.getConditions().add(condition);
         return this;
     }

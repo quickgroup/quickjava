@@ -1,6 +1,7 @@
 package org.quickjava.orm.model.contain;
 
 import org.quickjava.orm.ORMContext;
+import org.quickjava.orm.model.Model;
 import org.quickjava.orm.model.annotation.ModelName;
 import org.quickjava.orm.utils.SqlUtil;
 
@@ -28,7 +29,7 @@ public class ModelMeta {
     /**
      * 模型类
      * */
-    private Class<?> clazz;
+    private Class<Model> clazz;
 
     // 表名
     private String table;
@@ -45,18 +46,18 @@ public class ModelMeta {
     public ModelMeta() {
     }
 
-    public ModelMeta(Class<?> clazz, String table, Map<String, ModelFieldMeta> fieldMap, Map<String, Relation> relationMap) {
+    public ModelMeta(Class<Model> clazz, String table, Map<String, ModelFieldMeta> fieldMap, Map<String, Relation> relationMap) {
         this.clazz = clazz;
         this.table = table;
         this.fieldMap = fieldMap;
         this.relationMap = relationMap;
     }
 
-    public Class<?> getClazz() {
+    public Class<? extends Model> getClazz() {
         return clazz;
     }
 
-    public void setClazz(Class<?> clazz) {
+    public void setClazz(Class<Model> clazz) {
         this.clazz = clazz;
     }
 

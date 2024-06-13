@@ -4,32 +4,36 @@ import org.quickjava.orm.model.Model;
 import org.quickjava.orm.wrapper.MFunction;
 
 /**
- * 左表确定，右表不确定
+ * join条件
+ * 左右两边对象类确定
+ * 右表确定
  */
-public class JoinSpecifyLeft<Left extends Model> extends JoinSpecifyBase<JoinSpecifyLeft<Left>, Left> {
+public class JoinSpecifyLeft<Left extends Model, Right extends Model>
+        extends JoinSpecifyAbs<JoinSpecifyLeft<Left, Right>, Left, Right>
+{
 
-    public JoinSpecifyLeft(Class<Left> left) {
-        super(left);
+    public JoinSpecifyLeft(Class<Right> right) {
+        super(null, right);
     }
 
-    public <Right extends Model> JoinSpecifyLeft<Left> eq(MFunction<Left, ?> lf, Class<Right> right, MFunction<Right, ?> rf) {
-        return super.eq(lf, right, rf);
+    public JoinSpecifyLeft(Class<Right> right, String rightAlias) {
+        super(null, "", right, rightAlias);
     }
 
-    public JoinSpecifyLeft<Left> eq(MFunction<Left, ?> lf, Object val) {
-        return super.eq(lf, val);
+    public JoinSpecifyLeft<Left, Right> setRight(Class<Right> right) {
+        this.right = right;
+        return this;
     }
 
-    public <Right extends Model> JoinSpecifyLeft<Left> neq(MFunction<Left, ?> lf, Class<Right> right, MFunction<Right, ?> rf) {
-        return super.neq(lf, right, rf);
+    public JoinSpecifyLeft<Left, Right> setRight(Class<Right> right, String rightAlias) {
+        this.right = right;
+        this.rightAlias = rightAlias;
+        return this;
     }
 
-    public JoinSpecifyLeft<Left> isNull(MFunction<Left, ?> lf) {
-        return super.isNull(lf);
-    }
-
-    public JoinSpecifyLeft<Left> isNotNull(MFunction<Left, ?> lf) {
-        return super.isNotNull(lf);
+    public JoinSpecifyLeft<Left, Right> setRightAlias(String rightAlias) {
+        this.rightAlias = rightAlias;
+        return this;
     }
 
 }

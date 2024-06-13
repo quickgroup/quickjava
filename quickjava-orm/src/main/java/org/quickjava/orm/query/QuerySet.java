@@ -72,15 +72,15 @@ public class QuerySet {
     }
 
     public QuerySet join(String table, String condition, JoinType type) {
-        return join(table, new JoinCondition(null).setRaw(condition), type);
+        return join(table, new JoinConditionAbs().setRaw(condition), type);
     }
 
-    public QuerySet join(String table, JoinCondition condition, JoinType type) {
+    public QuerySet join(String table, JoinConditionAbs condition, JoinType type) {
         reservoir.getJoinList().add(new Join(type, table, condition));
         return this;
     }
 
-    public QuerySet join(String table, List<JoinCondition> conditions, JoinType type) {
+    public QuerySet join(String table, List<JoinConditionAbs> conditions, JoinType type) {
         reservoir.getJoinList().add(new Join(type, table, conditions));
         return this;
     }

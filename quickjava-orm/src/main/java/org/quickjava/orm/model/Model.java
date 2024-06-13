@@ -964,7 +964,7 @@ public class Model implements IModel {
         }
         // 初始化模型信息
         ModelMeta meta = model.reservoir.meta = new ModelMeta();
-        meta.setClazz(clazz);
+        meta.setClazz((Class<Model>) clazz);
         meta.setTable(clazz.getSimpleName());
         meta.setFieldMap(new LinkedHashMap<>());
         ModelHelper.setMeta(clazz, meta);
