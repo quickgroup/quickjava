@@ -20,11 +20,6 @@ public class JoinSpecifyLeft<Left extends Model, Right extends Model>
         super(null, "", right, rightAlias);
     }
 
-    public JoinSpecifyLeft<Left, Right> setRight(Class<Right> right) {
-        this.right = right;
-        return this;
-    }
-
     public JoinSpecifyLeft<Left, Right> setRight(Class<Right> right, String rightAlias) {
         this.right = right;
         this.rightAlias = rightAlias;

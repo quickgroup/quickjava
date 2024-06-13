@@ -16,7 +16,7 @@ public interface JoinSpecify<Left extends Model, Right extends Model>
 
     public Class<Right> getRight();
 
-    public JoinSpecify<Left, Right> setRight(Class<Model> left);
+    public JoinSpecify<Left, Right> setRight(Class<Model> right);
 
     public String getRightAlias();
 

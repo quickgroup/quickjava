@@ -260,8 +260,9 @@ public class JoinSpecifyAbs<Children extends JoinSpecifyAbs<Children, Left, Righ
         return left;
     }
 
-    public Children setLeft(Class<Left> left) {
-        this.left = left;
+    @Override
+    public Children setLeft(Class<Model> left) {
+        this.left = (Class<Left>) left;
         return chain();
     }
 
@@ -277,6 +278,12 @@ public class JoinSpecifyAbs<Children extends JoinSpecifyAbs<Children, Left, Righ
     @Override
     public Class<Right> getRight() {
         return right;
+    }
+
+    @Override
+    public Children setRight(Class<Model> right) {
+        this.right = (Class<Right>) right;
+        return chain();
     }
 
     @Override

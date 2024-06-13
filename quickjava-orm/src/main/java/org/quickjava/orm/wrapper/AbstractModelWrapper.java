@@ -346,6 +346,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         // 关联表
         String relName = join.getRightAlias();
         Class<Model> relClazz = (Class<Model>) join.getRight();
+
         ModelMeta relMeta = ModelHelper.getMeta(relClazz);
         if (relName == null) {
             relName = relMeta.table();

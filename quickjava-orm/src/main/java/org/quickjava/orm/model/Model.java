@@ -949,21 +949,23 @@ public class Model implements IModel {
 
     // 缓存字段和方法
     protected static void initModel(Model model, Class<?> clazz) {
+        if (!ModelHelper.metaExist(clazz)) {
+            synchronized (Model.class) {
+                model.reservoir.meta = initModel(clazz);
+            }
+        }
+    }
+
+    // 缓存字段和方法
+    protected static ModelMeta initModel(Class<?> clazz) {
         if (!Model.class.isAssignableFrom(clazz)) {
-            return;
+            return null;
         }
         if (Enhancer.isEnhanced(clazz)) {
             clazz = clazz.getSuperclass();
         }
-
-        synchronized (Model.class) {
-            if (ModelHelper.metaExist(clazz)) {
-                model.reservoir.meta = ModelHelper.getMeta(clazz);
-                return;
-            }
-        }
         // 初始化模型信息
-        ModelMeta meta = model.reservoir.meta = new ModelMeta();
+        ModelMeta meta = new ModelMeta();
         meta.setClazz((Class<Model>) clazz);
         meta.setTable(clazz.getSimpleName());
         meta.setFieldMap(new LinkedHashMap<>());
@@ -996,6 +998,8 @@ public class Model implements IModel {
             }
             meta.fieldMap().put(field.getName(), fieldMeta);
         }
+
+        return meta;
     }
 
     /**
