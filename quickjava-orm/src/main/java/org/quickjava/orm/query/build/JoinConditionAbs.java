@@ -24,7 +24,7 @@ import org.quickjava.orm.utils.QuickORMException;
 /**
  * join的on条件
  */
-public class JoinConditionAbs extends ConditionAbs {
+public class JoinConditionAbs extends ConditionAbs<JoinConditionAbs> {
 
     // 左表
     protected String leftTable;

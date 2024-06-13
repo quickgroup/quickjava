@@ -18,6 +18,7 @@ import org.quickjava.orm.query.build.JoinConditionAbs;
 import org.quickjava.orm.query.build.Where;
 import org.quickjava.orm.query.enums.OrderByType;
 import org.quickjava.orm.utils.SqlUtil;
+import org.quickjava.orm.wrapper.join.JoinSpecifyAbs;
 import org.quickjava.orm.wrapper.join.JoinSpecifyLeft;
 import org.quickjava.orm.wrapper.join.JoinSpecify;
 import org.quickjava.orm.wrapper.join.ModelJoinWrapper;
@@ -252,20 +253,20 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         // 一对一的数据加载
         joinMap.forEach((alias, join) -> {
             // 跳过：不加载数据
-            if (!join.getLoadDataFieldName()) {
+            if (join.getLoadDataFieldName() != null) {
                 return;
             }
             // 关联模型元数据
             ModelMeta leftMeta = getModelMeta(join.getLeft());
             // 是和主模型关联的条件
-            JoinSpecify.Item<?, ?> it = join.onList.get(0);
+            JoinSpecifyAbs.Item<?, ?> it = join.getOnList().get(0);
             if (!it.getRight().equals(mainMeta.getClazz())) {
                 return;
             }
             // 数据装载
             Model left = Model.newModel(leftMeta.getClazz(), null, main);
             ModelHelper.resultTranshipmentWith(left, data, alias);
-            ReflectUtil.setFieldValue(main, join.getLoadData(), left);
+            ReflectUtil.setFieldValue(main, join.getLoadDataFieldName(), left);
         });
         return main;
     }
@@ -321,9 +322,9 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
      * 关联查询实现
      */
     @Override
-    public Children join(JoinType type, JoinSpecifyLeft<?, ?> join) {
+    public Children join(JoinType type, JoinSpecify<?, ?> join) {
         // 为空过滤
-        if (join.onList.isEmpty()) {
+        if (join.getOnList().isEmpty()) {
             return chain();
         }
         // 查询器
@@ -352,7 +353,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
             rightAlias = leftMeta.table();
         }
         // 声明左表数据字段
-        if (join.getLoadDataFieldName() && ModelHelper.isNotEmpty(rightAlias)) {
+        if (join.getLoadDataFieldName() != null && ModelHelper.isNotEmpty(rightAlias)) {
             loadModelAccurateFields(querySet, leftMeta, rightAlias);
         }
         // 缓存条件
@@ -365,15 +366,15 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
 
         // join条件（支持多个
         List<JoinConditionAbs> conditions = new LinkedList<>();
-        join.onList.forEach(it -> {
+        join.getOnList().forEach(it -> {
             // 为空取主表
             it.setLeft(it.getLeft() == null ? mainMeta.getClazz() : it.getLeft());
-            ModelMeta<?> onLeft = getModelMeta(it.getLeft());
+            ModelMeta onLeft = getModelMeta(it.getLeft());
             String onLeftAlias = SqlUtil.isNotEmpty(it.getLeftAlias()) ? it.getLeftAlias() : onLeft.table();
             String onLeftColumn = it.getLeftFun() == null ? null : it.getLeftFun().getName();
             // 右表信息
             it.setRight(it.getRight() == null ? mainMeta.getClazz() : it.getRight());
-            ModelMeta<?> onRight = getModelMeta(it.getRight());
+            ModelMeta onRight = getModelMeta(it.getRight());
             String onRightAlias = SqlUtil.isNotEmpty(it.getRightAlias()) ? it.getRightAlias() : onRight.table();
             String onRightColumn = it.getRightFun() == null ? null : it.getRightFun().getName();
             // 一：方法引用

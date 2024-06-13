@@ -274,18 +274,24 @@ public class JoinSpecifyAbs<Children extends JoinSpecifyAbs<Children, Left, Righ
         return chain();
     }
 
-    public boolean getLoadDataFieldName() {
-        return loadDataFieldName != null;
+    @Override
+    public Class<Right> getRight() {
+        return right;
+    }
+
+    @Override
+    public String getRightAlias() {
+        return null;
+    }
+
+    public String getLoadDataFieldName() {
+        return loadDataFieldName;
     }
 
     // 加载数据到主表
-    public<Right extends Model> Children setLoadDataFieldName(MFunction<Right, ?> rightField) {
+    public<MRight extends Model> Children setLoadDataFieldName(MFunction<MRight, ?> rightField) {
         this.loadDataFieldName = rightField.getName();
         return chain();
-    }
-
-    public String getLoadData() {
-        return loadDataFieldName;
     }
 
     public List<Item<?, ?>> getOnList() {
