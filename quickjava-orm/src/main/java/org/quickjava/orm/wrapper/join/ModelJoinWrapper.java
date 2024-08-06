@@ -108,18 +108,16 @@ public interface ModelJoinWrapper<
 
     /**
      * 左表关联右多个表多个条件
-     * @return Children
      */
-    default <Left extends Model> Children leftJoin(Class<Left> left, JoinSpecifyLeftClosure<Left> closure) {
-        return leftJoin(left, null, closure);
+    default <Left extends Model> Children leftJoin(Class<Left> left, JoinSpecifyLeftClosure<Left, M> closure) {
+        return leftJoin(left, "", closure);
     }
 
     /**
      * 左表关联右多个表多个条件
-     * @return Children
      */
-    default <Left extends Model> Children leftJoin(Class<Left> left, String alias, JoinSpecifyLeftClosure<Left> closure) {
-        JoinSpecifyLeft<Left, ?> condition = new JoinSpecifyLeft<>(left);
+    default <Left extends Model> Children leftJoin(Class<Left> left, String alias, JoinSpecifyLeftClosure<Left, M> closure) {
+        JoinSpecify<M, Left> condition = new JoinSpecifyLeft<M, Left>(left);
         closure.call(condition);
         condition.setLeftAlias(alias);
         return join(JoinType.LEFT, condition);

@@ -1,14 +1,12 @@
 package org.quickjava.orm.wrapper.join;
 
-import org.quickjava.orm.model.Model;
-
 import java.util.List;
 
-public interface JoinSpecify<Left extends Model, Right extends Model>
+public interface JoinSpecify<Left, Right>
 {
     public Class<Left> getLeft();
 
-    public JoinSpecify<Left, Right> setLeft(Class<Model> left);
+    public JoinSpecify<Left, Right> setLeft(Class<?> left);
 
     public String getLeftAlias();
 
@@ -16,7 +14,7 @@ public interface JoinSpecify<Left extends Model, Right extends Model>
 
     public Class<Right> getRight();
 
-    public JoinSpecify<Left, Right> setRight(Class<Model> right);
+    public JoinSpecify<Left, Right> setRight(Class<?> right);
 
     public String getRightAlias();
 

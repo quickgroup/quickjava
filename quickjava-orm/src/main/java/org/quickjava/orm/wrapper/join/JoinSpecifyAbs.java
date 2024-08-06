@@ -2,14 +2,13 @@ package org.quickjava.orm.wrapper.join;
 
 import org.quickjava.orm.enums.CompareType;
 import org.quickjava.orm.enums.LogicType;
-import org.quickjava.orm.model.Model;
 import org.quickjava.orm.wrapper.MFunction;
 
 import java.util.LinkedList;
 import java.util.List;
 
 // 根model绑定条件
-public class JoinSpecifyAbs<Children extends JoinSpecifyAbs<Children, Left, Right>, Left extends Model, Right extends Model>
+public class JoinSpecifyAbs<Children extends JoinSpecifyAbs<Children, Left, Right>, Left, Right>
         implements JoinSpecify<Left, Right>
 {
 
@@ -26,7 +25,7 @@ public class JoinSpecifyAbs<Children extends JoinSpecifyAbs<Children, Left, Righ
     protected List<String> loadDataRightColumns = null;
 
     // join-on关联条件
-    public final List<Item<? extends Model, ? extends Model>> onList = new LinkedList<>();
+    public final List<Item<?, ?>> onList = new LinkedList<>();
 
     public JoinSpecifyAbs(Class<Left> left, String leftAlias) {
         this.left = left;
@@ -61,11 +60,11 @@ public class JoinSpecifyAbs<Children extends JoinSpecifyAbs<Children, Left, Righ
         return where(CompareType.EQ, lf, val);
     }
 
-    public <MRight extends Model> Children eq(MFunction<Left, ?> lf, Class<MRight> right, MFunction<MRight, ?> rf) {
+    public <MRight> Children eq(MFunction<Left, ?> lf, Class<MRight> right, MFunction<MRight, ?> rf) {
         return where(CompareType.EQ, lf, right, rf);
     }
 
-    public <MRight extends Model> Children neq(MFunction<Left, ?> lf, Class<MRight> right, MFunction<MRight, ?> rf) {
+    public <MRight> Children neq(MFunction<Left, ?> lf, Class<MRight> right, MFunction<MRight, ?> rf) {
         return where(CompareType.NEQ, lf, right, rf);
     }
 
@@ -93,7 +92,7 @@ public class JoinSpecifyAbs<Children extends JoinSpecifyAbs<Children, Left, Righ
         return where(CompareType.BETWEEN, lf, val);
     }
 
-    protected <MRight extends Model> Children where(CompareType type, MFunction<Left, ?> lf, MFunction<MRight, ?> rf) {
+    protected <MRight> Children where(CompareType type, MFunction<Left, ?> lf, MFunction<MRight, ?> rf) {
         onList.add(new Item<>(type, lf, rf));
         return chain();
     }
@@ -103,7 +102,7 @@ public class JoinSpecifyAbs<Children extends JoinSpecifyAbs<Children, Left, Righ
         return chain();
     }
 
-    protected <MRight extends Model> Children where(CompareType type, MFunction<Left, ?> lf, Class<MRight> right, MFunction<MRight, ?> rf) {
+    protected <MRight> Children where(CompareType type, MFunction<Left, ?> lf, Class<MRight> right, MFunction<MRight, ?> rf) {
         onList.add(new Item<>(type, lf, right, rf));
         return chain();
     }
@@ -113,7 +112,7 @@ public class JoinSpecifyAbs<Children extends JoinSpecifyAbs<Children, Left, Righ
         return chain();
     }
 
-    public static class Item<OL extends Model, OR extends Model> {
+    public static class Item<OL, OR> {
         // 逻辑类型
         private LogicType logic = LogicType.AND;
         // 条件运算符
@@ -191,7 +190,7 @@ public class JoinSpecifyAbs<Children extends JoinSpecifyAbs<Children, Left, Righ
             return left;
         }
 
-        public void setLeft(Class<? extends Model> left) {
+        public void setLeft(Class<?> left) {
             this.left = (Class<OL>) left;
         }
 
@@ -219,7 +218,7 @@ public class JoinSpecifyAbs<Children extends JoinSpecifyAbs<Children, Left, Righ
             return right;
         }
 
-        public void setRight(Class<? extends Model> right) {
+        public void setRight(Class<?> right) {
             this.right = (Class<OR>) right;
         }
 
@@ -261,7 +260,7 @@ public class JoinSpecifyAbs<Children extends JoinSpecifyAbs<Children, Left, Righ
     }
 
     @Override
-    public Children setLeft(Class<Model> left) {
+    public Children setLeft(Class<?> left) {
         this.left = (Class<Left>) left;
         return chain();
     }
@@ -281,7 +280,7 @@ public class JoinSpecifyAbs<Children extends JoinSpecifyAbs<Children, Left, Righ
     }
 
     @Override
-    public Children setRight(Class<Model> right) {
+    public Children setRight(Class<?> right) {
         this.right = (Class<Right>) right;
         return chain();
     }
@@ -296,7 +295,7 @@ public class JoinSpecifyAbs<Children extends JoinSpecifyAbs<Children, Left, Righ
     }
 
     // 加载数据到主表
-    public<MRight extends Model> Children setLoadDataFieldName(MFunction<MRight, ?> rightField) {
+    public<MRight> Children setLoadDataFieldName(MFunction<MRight, ?> rightField) {
         this.loadDataFieldName = rightField.getName();
         return chain();
     }

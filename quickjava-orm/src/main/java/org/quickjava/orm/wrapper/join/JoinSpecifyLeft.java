@@ -1,14 +1,11 @@
 package org.quickjava.orm.wrapper.join;
 
-import org.quickjava.orm.model.Model;
-import org.quickjava.orm.wrapper.MFunction;
-
 /**
  * join条件
  * 左右两边对象类确定
  * 右表确定
  */
-public class JoinSpecifyLeft<Left extends Model, Right extends Model>
+public class JoinSpecifyLeft<Left, Right>
         extends JoinSpecifyAbs<JoinSpecifyLeft<Left, Right>, Left, Right>
 {
 
