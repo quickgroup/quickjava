@@ -53,8 +53,8 @@ public class ModelHelper extends SqlUtil {
     }
 
     public static void setMeta(Class<?> clazz, ModelMeta meta) {
-        if (modelMateCache.putIfAbsent(clazz.getName(), meta) != null) {
-            logger.warn("Key '" + clazz.getName() + "' already exists in the map.");
+        if (!modelMateCache.containsKey(clazz.getName())) {
+            modelMateCache.put(clazz.getName(), meta);
         }
     }
 
