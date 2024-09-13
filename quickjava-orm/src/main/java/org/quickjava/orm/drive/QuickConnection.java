@@ -131,14 +131,11 @@ public class QuickConnection {
     public List<Map<String, Object>> select(String sql)
             throws SQLException
     {
-        List<Map<String, Object>> rows = new LinkedList<>();
-        ResultSet resultSet = null;
-
-        try {
-            Statement statement = connection.createStatement();
-            resultSet = statement.executeQuery(sql);
+        Statement statement = connection.createStatement();
+        try (ResultSet resultSet = statement.executeQuery(sql)) {
             List<String> fieldNameArr = prepareField(resultSet);
             // 数据组装
+            List<Map<String, Object>> rows = new LinkedList<>();
             while (resultSet.next()) {
                 Map<String, Object> item = new LinkedHashMap<>();
                 for (int fi = 0; fi < fieldNameArr.size(); fi++) {
@@ -146,14 +143,8 @@ public class QuickConnection {
                 }
                 rows.add(item);
             }
-
-        } finally {
-            if (resultSet != null) {
-                resultSet.close();
-            }
+            return rows;
         }
-
-        return rows;
     }
 
     private static List<String> prepareField(ResultSet resultSet) throws SQLException
