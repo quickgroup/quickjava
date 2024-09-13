@@ -21,5 +21,5 @@ package org.quickjava.orm.wrapper.join;
  * @param <Right>
  */
 public interface JoinWhereClosure<Left, Right> {
-    void call(JoinWhere<Left, Left, Right> condition);
+    void call(JoinOn<Left, Left, Right> condition);
 }

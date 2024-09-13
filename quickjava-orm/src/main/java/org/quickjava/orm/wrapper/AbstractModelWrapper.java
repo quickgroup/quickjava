@@ -388,15 +388,15 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     }
 
     @Override
-    public Children join(JoinType type, JoinWhere<?, ?, ?> joinWhere) {
-        joinWhere = joinWhere.base();
+    public Children join(JoinType type, JoinOn<?, ?, ?> joinOn) {
+        joinOn = joinOn.base();
         // join
         QuerySet querySet = querySet();
-        ModelMeta leftMeta = ModelHelper.getMeta(joinWhere.getLeftClass());
-        String leftName = joinWhere.getRightAlias();
+        ModelMeta leftMeta = ModelHelper.getMeta(joinOn.getLeftClass());
+        String leftName = joinOn.getRightAlias();
         querySet.join(leftMeta.tableAlias(leftName), conditions, type);
         // 将条件追加到模型查询条件
-        joinWhere.wheres.forEach(this::where);
+        joinOn.wheres.forEach(this::where);
         return chain();
     }
 

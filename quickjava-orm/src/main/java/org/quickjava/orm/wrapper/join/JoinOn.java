@@ -13,103 +13,106 @@ package org.quickjava.orm.wrapper.join;/*
  * +-------------------------------------------------------------------
  */
 
-import org.quickjava.orm.enums.CompareType;
-import org.quickjava.orm.model.Model;
 import org.quickjava.orm.query.build.Where;
 import org.quickjava.orm.wrapper.MFunction;
 import org.quickjava.orm.wrapper.ModelWhere;
 
-public class JoinWhere<M, Left, Right> extends ModelWhere<JoinWhere<M, Left, Right>, M, MFunction<M, ?>> {
+public class JoinOn<M, Left, Right> extends ModelWhere<JoinOn<M, Left, Right>, M, MFunction<M, ?>> {
 
-    private JoinWhere<?, Left, Right> base;
-    private JoinWhere<Left, Left, Right> left;
-    private JoinWhere<Right, Left, Right> right;
+    private JoinOn<?, Left, Right> base;
+    private JoinOn<Left, Left, Right> left;
+    private JoinOn<Right, Left, Right> right;
     private Class<M> mainClass;
     private Class<Left> leftClass;
     protected String leftAlias;
     private Class<Right> rightClass;
     protected String rightAlias;
 
-    public JoinWhere() {
+    public JoinOn() {
     }
 
-    public JoinWhere(Class<M> mainClass, Class<Left> leftClass, Class<Right> rightClass) {
+    public JoinOn(Class<M> mainClass, Class<Left> leftClass, Class<Right> rightClass) {
         this.mainClass = mainClass;
         this.leftClass = leftClass;
         this.rightClass = rightClass;
     }
 
-    public JoinWhere<M, Left, Right> setMainClass(Class<M> mainClass) {
+    public JoinOn<M, Left, Right> setMainClass(Class<M> mainClass) {
         this.mainClass = mainClass;
         return this;
     }
 
-    public JoinWhere<?, Left, Right> base() {
+    public JoinOn<?, Left, Right> base() {
         return base == null ? this : base;
     }
 
-    public JoinWhere<Left, Left, Right> left() {
+    public JoinOn<Left, Left, Right> left() {
         if (base.left == null) {
-            base.left = new JoinWhere<Left, Left, Right>().setMainClass(leftClass);
+            base.left = new JoinOn<Left, Left, Right>().setMainClass(leftClass);
             base.left.base = base;
         }
         return base.left;
     }
 
-    public JoinWhere<Right, Left, Right> right() {
+    public JoinOn<Right, Left, Right> right() {
         if (base.right == null) {
-            base.right = new JoinWhere<Right, Left, Right>().setMainClass(rightClass);
+            base.right = new JoinOn<Right, Left, Right>().setMainClass(rightClass);
             base.right.base = base;
         }
         return base.right;
     }
 
+    public JoinOn<M, Left, Right> on(MFunction<Left, ?> lf, MFunction<Right, ?> rf) {
+        eq(lf, rf);
+        return chain();
+    }
+
     @Override
-    public JoinWhere<M, Left, Right> where(Where where) {
+    public JoinOn<M, Left, Right> where(Where where) {
         base().where(where);
         return chain();
     }
 
-    public JoinWhere<M, Left, Right> setBase(JoinWhere<?, Left, Right> base) {
+    public JoinOn<M, Left, Right> setBase(JoinOn<?, Left, Right> base) {
         this.base = base;
         return chain();
     }
 
-    public JoinWhere<M, Left, Right> setLeft(JoinWhere<Left, Left, Right> left) {
+    public JoinOn<M, Left, Right> setLeft(JoinOn<Left, Left, Right> left) {
         this.left = left;
         return chain();
     }
 
-    public JoinWhere<M, Left, Right> setRight(JoinWhere<Right, Left, Right> right) {
+    public JoinOn<M, Left, Right> setRight(JoinOn<Right, Left, Right> right) {
         this.right = right;
         return chain();
     }
 
-    public JoinWhere<M, Left, Right> setLeftClass(Class<Left> leftClass) {
+    public JoinOn<M, Left, Right> setLeftClass(Class<Left> leftClass) {
         this.leftClass = leftClass;
         return chain();
     }
 
-    public JoinWhere<M, Left, Right> setLeftAlias(String leftAlias) {
+    public JoinOn<M, Left, Right> setLeftAlias(String leftAlias) {
         this.leftAlias = leftAlias;
         return chain();
     }
 
-    public JoinWhere<M, Left, Right> setRightClass(Class<Right> rightClass) {
+    public JoinOn<M, Left, Right> setRightClass(Class<Right> rightClass) {
         this.rightClass = rightClass;
         return chain();
     }
 
-    public JoinWhere<M, Left, Right> setRightAlias(String rightAlias) {
+    public JoinOn<M, Left, Right> setRightAlias(String rightAlias) {
         this.rightAlias = rightAlias;
         return chain();
     }
 
-    public JoinWhere<Left, Left, Right> getLeft() {
+    public JoinOn<Left, Left, Right> getLeft() {
         return left;
     }
 
-    public JoinWhere<Right, Left, Right> getRight() {
+    public JoinOn<Right, Left, Right> getRight() {
         return right;
     }
 
@@ -134,7 +137,8 @@ public class JoinWhere<M, Left, Right> extends ModelWhere<JoinWhere<M, Left, Rig
     }
 
     // TODO::-------------------- Join两表条件 --------------------
-    public JoinWhere<M, Left, Right> eq(MFunction<Left, ?> lf, MFunction<Right, ?> rf) {
+    public JoinOn<M, Left, Right> eq(MFunction<Left, ?> lf, MFunction<Right, ?> rf) {
+
         return chain();
     }
 }
