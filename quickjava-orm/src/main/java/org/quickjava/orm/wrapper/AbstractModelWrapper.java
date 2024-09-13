@@ -18,10 +18,7 @@ import org.quickjava.orm.query.build.JoinConditionAbs;
 import org.quickjava.orm.query.build.Where;
 import org.quickjava.orm.query.enums.OrderByType;
 import org.quickjava.orm.utils.SqlUtil;
-import org.quickjava.orm.wrapper.join.JoinSpecifyAbs;
-import org.quickjava.orm.wrapper.join.JoinSpecifyLeft;
-import org.quickjava.orm.wrapper.join.JoinSpecify;
-import org.quickjava.orm.wrapper.join.ModelJoinWrapper;
+import org.quickjava.orm.wrapper.join.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -338,10 +335,10 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         }
         // 默认为主表
         if (join.getLeft() == null) {
-            join.setLeft((Class<Model>) this.model.getClass());
+            join.setLeft(this.model.getClass());
         }
         if (join.getRight() == null) {
-            join.setRight((Class<Model>) this.model.getClass());
+            join.setRight(this.model.getClass());
         }
         // 关联表
         String relName = join.getRightAlias();
@@ -387,6 +384,19 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         });
         querySet.join(relMeta.tableAlias(relName), conditions, type);
 
+        return chain();
+    }
+
+    @Override
+    public Children join(JoinType type, JoinWhere<?, ?, ?> joinWhere) {
+        joinWhere = joinWhere.base();
+        // join
+        QuerySet querySet = querySet();
+        ModelMeta leftMeta = ModelHelper.getMeta(joinWhere.getLeftClass());
+        String leftName = joinWhere.getRightAlias();
+        querySet.join(leftMeta.tableAlias(leftName), conditions, type);
+        // 将条件追加到模型查询条件
+        joinWhere.wheres.forEach(this::where);
         return chain();
     }
 

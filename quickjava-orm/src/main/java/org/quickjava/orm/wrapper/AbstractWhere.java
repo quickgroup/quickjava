@@ -10,7 +10,7 @@ import org.quickjava.orm.query.enums.Operator;
 /**
  * 基础条件定义
  */
-public interface AbstractWhere<Children, M extends Model, Func extends MFunction<M, ?>> extends Wrapper<Children> {
+public interface AbstractWhere<Children, M, Func extends MFunction<M, ?>> extends Wrapper<Children> {
 
     Children where(Where where);
 

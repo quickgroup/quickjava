@@ -1,7 +1,5 @@
 package org.quickjava.orm.wrapper.join;
 
-import org.quickjava.orm.model.Model;
-
 /*
  * Copyright (c) 2020~2024 http://www.quickjava.org All rights reserved.
  * +-------------------------------------------------------------------
@@ -16,6 +14,12 @@ import org.quickjava.orm.model.Model;
  * License: Apache Licence 2.0
  * +-------------------------------------------------------------------
  */
-public interface JoinSpecifyLeftClosure<Left, Right> {
-    void call(JoinSpecify<Left, Right> condition);
+
+/**
+ * LEFT JOIN 闭包条件
+ * @param <Left>
+ * @param <Right>
+ */
+public interface JoinWhereClosure<Left, Right> {
+    void call(JoinWhere<Left, Left, Right> condition);
 }

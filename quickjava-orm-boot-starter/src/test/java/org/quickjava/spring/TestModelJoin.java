@@ -38,10 +38,14 @@ public class TestModelJoin {
                 // ## 与主表一对一关联join，字符串别名
                 .leftJoin(SysApp.class, "aliasApp01", SysApp::getAppId, SysAppFavoriteModel::getAppId)
                 // ## 与主表一对一关联join，复合条件查询
-                .leftJoin(SysApp.class, "app3", whereLeft -> whereLeft
-                        .eq(SysApp::getAppId, SysAppFavoriteModel.class, SysAppFavoriteModel::getAppId)
-                        .eq(SysApp::getOpen, 1)
-                        .isNotNull(SysApp::getName)
+                .leftJoin(SysApp.class, "app3", query -> query
+                        .eq(SysAppFavoriteModel::getAppId, SysApp::getAppId)
+                        .left()
+                            .isNull(SysAppFavoriteModel::getAppId)
+                        .right()
+                            .eq(SysApp::getOpen, 1)
+                            .isNotNull(SysApp::getName)
+                            .isNull(SysApp::getAppSecret)
                 )
                 // 关联其他表
                 .leftJoin(SysAppLatest.class, SysAppLatest::getAppId, SysAppFavoriteModel::getAppId)

@@ -5,8 +5,7 @@ package org.quickjava.orm.wrapper.join;
  * 左右两边对象类确定
  * 右表确定
  */
-public class JoinSpecifyLeft<Left, Right>
-        extends JoinSpecifyAbs<JoinSpecifyLeft<Left, Right>, Left, Right>
+public class JoinSpecifyLeft<Left, Right> extends JoinSpecifyAbs<JoinSpecifyLeft<Left, Right>, Left, Right>
 {
 
     public JoinSpecifyLeft(Class<Right> right) {

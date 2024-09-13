@@ -7,7 +7,9 @@ import org.quickjava.orm.wrapper.MFunction;
 import java.util.LinkedList;
 import java.util.List;
 
-// 根model绑定条件
+/**
+ * Join构造器
+ */
 public class JoinSpecifyAbs<Children extends JoinSpecifyAbs<Children, Left, Right>, Left, Right>
         implements JoinSpecify<Left, Right>
 {
@@ -52,24 +54,32 @@ public class JoinSpecifyAbs<Children extends JoinSpecifyAbs<Children, Left, Righ
     }
 
     //TODO:-------------------- 查询条件 --------------------
-    public Children neq(MFunction<Left, ?> lf, MFunction<Right, ?> rf) {
-        return where(CompareType.NEQ, lf, right, rf);
-    }
-
     public Children eq(MFunction<Left, ?> lf, Object val) {
         return where(CompareType.EQ, lf, val);
     }
 
-    public <MRight> Children eq(MFunction<Left, ?> lf, Class<MRight> right, MFunction<MRight, ?> rf) {
+    public Children eq(MFunction<Left, ?> lf, MFunction<Right, ?> rf) {
         return where(CompareType.EQ, lf, right, rf);
     }
 
-    public <MRight> Children neq(MFunction<Left, ?> lf, Class<MRight> right, MFunction<MRight, ?> rf) {
-        return where(CompareType.NEQ, lf, right, rf);
+    public Children eq(Class<Right> right, MFunction<Right, ?> rf, Object value) {
+        return whereRight(CompareType.EQ, rf, value);
+    }
+
+    public <MRight> Children eq(MFunction<Left, ?> lf, Class<MRight> right, MFunction<MRight, ?> rf) {
+        return where(CompareType.EQ, null, right, rf);
     }
 
     public Children neq(MFunction<Left, ?> lf, Object val) {
         return where(CompareType.NEQ, lf, val);
+    }
+
+    public Children neq(MFunction<Left, ?> lf, MFunction<Right, ?> rf) {
+        return where(CompareType.NEQ, lf, right, rf);
+    }
+
+    public <MRight> Children neq(MFunction<Left, ?> lf, Class<MRight> right, MFunction<MRight, ?> rf) {
+        return where(CompareType.NEQ, lf, right, rf);
     }
 
     public Children in(MFunction<Left, ?> lf, Object val) {
@@ -88,13 +98,12 @@ public class JoinSpecifyAbs<Children extends JoinSpecifyAbs<Children, Left, Righ
         return where(CompareType.IS_NOT_NULL, lf, null);
     }
 
-    public Children between(MFunction<Left, ?> lf, Object val) {
-        return where(CompareType.BETWEEN, lf, val);
+    public Children isNotNull(Class<Right> right, MFunction<Right, ?> rf) {
+        return where(CompareType.IS_NOT_NULL, null, rf);
     }
 
-    protected <MRight> Children where(CompareType type, MFunction<Left, ?> lf, MFunction<MRight, ?> rf) {
-        onList.add(new Item<>(type, lf, rf));
-        return chain();
+    public Children between(MFunction<Left, ?> lf, Object val) {
+        return where(CompareType.BETWEEN, lf, val);
     }
 
     protected Children where(CompareType type, MFunction<Left, ?> lf, Object value) {
@@ -102,8 +111,18 @@ public class JoinSpecifyAbs<Children extends JoinSpecifyAbs<Children, Left, Righ
         return chain();
     }
 
+    protected <MRight> Children where(CompareType type, MFunction<Left, ?> lf, MFunction<MRight, ?> rf) {
+        onList.add(new Item<>(type, lf, rf));
+        return chain();
+    }
+
     protected <MRight> Children where(CompareType type, MFunction<Left, ?> lf, Class<MRight> right, MFunction<MRight, ?> rf) {
         onList.add(new Item<>(type, lf, right, rf));
+        return chain();
+    }
+
+    protected Children whereRight(CompareType type, MFunction<Right, ?> rf, Object value) {
+        onList.add(new Item<>(type, null, right, rf).setRightValue(value));
         return chain();
     }
 
@@ -123,9 +142,9 @@ public class JoinSpecifyAbs<Children extends JoinSpecifyAbs<Children, Left, Righ
         private MFunction<OL, ?> leftFun;
         private Object leftValue;
         // 右表和字段
-        private Class<OR> right;
-        private String rightAlias;
-        private MFunction<OR, ?> rightFun;
+        private Class<OR> right;    // 右表
+        private String rightAlias;  // 右表别名
+        private MFunction<OR, ?> rightFun;  // 右表字段
         private Object rightValue;
         // 原生sql
         private String sql;
@@ -242,8 +261,9 @@ public class JoinSpecifyAbs<Children extends JoinSpecifyAbs<Children, Left, Righ
             return rightValue;
         }
 
-        public void setRightValue(Object rightValue) {
+        public Item<OL, OR> setRightValue(Object rightValue) {
             this.rightValue = rightValue;
+            return this;
         }
 
         public String getSql() {

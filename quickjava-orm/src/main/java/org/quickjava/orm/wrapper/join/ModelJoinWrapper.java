@@ -109,17 +109,17 @@ public interface ModelJoinWrapper<
     /**
      * 左表关联右多个表多个条件
      */
-    default <Left extends Model> Children leftJoin(Class<Left> left, JoinSpecifyLeftClosure<Left, M> closure) {
+    default <Left extends Model> Children leftJoin(Class<Left> left, JoinWhereClosure<M, Left> closure) {
         return leftJoin(left, "", closure);
     }
 
     /**
      * 左表关联右多个表多个条件
      */
-    default <Left extends Model> Children leftJoin(Class<Left> left, String alias, JoinSpecifyLeftClosure<Left, M> closure) {
-        JoinSpecify<M, Left> condition = new JoinSpecifyLeft<M, Left>(left);
+    default <Right extends Model> Children leftJoin(Class<Right> rClass, String rAlias, JoinWhereClosure<M, Right> closure) {
+        JoinWhere<M, M, Right> condition = new JoinWhere<>();
+        condition.setLeftAlias(rAlias);
         closure.call(condition);
-        condition.setLeftAlias(alias);
         return join(JoinType.LEFT, condition);
     }
 
@@ -133,6 +133,7 @@ public interface ModelJoinWrapper<
     }
 
     Children join(JoinType type, JoinSpecify<?, ?> condition);
+    Children join(JoinType type, JoinWhere<?, ?, ?> joinWhere);
 
     //TODO::-------------------- 关联表查询条件 START --------------------
     default <Left extends Model> Children where(boolean condition, Class<Left> left, MFunction<Left, ?> lc, Operator operator, Object val) {
