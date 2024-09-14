@@ -301,11 +301,6 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         return chain();
     }
 
-    public Children with(String fields) {
-        model().with(fields);
-        return chain();
-    }
-
     @Override
     public String toString() {
         return model().toString();

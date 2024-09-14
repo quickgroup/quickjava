@@ -109,4 +109,26 @@ public class TestModelJoin {
         System.out.println("耗时=" + TimeUtils.endNanoTime(startTime) + "ms");
     }
 
+    @Test
+    public void testWithFunction()
+    {
+        Long startTime = TimeUtils.getNanoTime();
+        List<SysAppFavoriteModel> favorites = new ModelWrapper<>(SysAppFavoriteModel.class)
+                .with(SysAppFavoriteModel::getApp)
+                .select();
+        System.out.println("with return=" + favorites);
+        System.out.println("耗时=" + TimeUtils.endNanoTime(startTime) + "ms");
+    }
+
+    @Test
+    public void testWithString()
+    {
+        Long startTime = TimeUtils.getNanoTime();
+        List<SysAppFavoriteModel> favorites = new ModelWrapper<>(SysAppFavoriteModel.class)
+                .with("app")
+                .select();
+        System.out.println("with return=" + favorites);
+        System.out.println("耗时=" + TimeUtils.endNanoTime(startTime) + "ms");
+    }
+
 }

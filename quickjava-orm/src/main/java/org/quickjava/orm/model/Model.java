@@ -921,6 +921,9 @@ public class Model implements IModel {
         if (ModelHelper.isEmpty(fields)) {
             return this;
         }
+        if (fields.length == 1) {
+            return this.with(fields[0].split(","));
+        }
         List<String> withs = Arrays.asList(fields);
         ComUtil.trimList(withs);
         withs.forEach(name -> {
@@ -930,13 +933,6 @@ public class Model implements IModel {
         });
         reservoir.getWiths().addAll(withs);
         return this;
-    }
-
-    public Model with(String fields) {
-        if (ModelHelper.isEmpty(fields)) {
-            return this;
-        }
-        return this.with(fields.split(","));
     }
 
     private static boolean isModel(Class<?> clazz) {
