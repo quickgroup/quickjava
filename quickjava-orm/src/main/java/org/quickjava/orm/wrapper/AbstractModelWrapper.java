@@ -397,10 +397,9 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
 
         querySet.join(rightMeta.tableAlias(rightAlias), joinOn.wheres, type);
         // 缓存
-        if (joinOnMap == null) {
-            joinOnMap = new LinkedHashMap<>();
-        }
-        joinOnMap.put(joinOn.getRightAlias(), joinOn);
+        String cacheName = SqlUtil.isEmpty(joinOn.getRightAlias()) ? rightMeta.table() : joinOn.getRightAlias();
+        joinOnMap = joinOnMap == null ? new LinkedHashMap<>() : joinOnMap;
+        joinOnMap.put(cacheName, joinOn);
         return chain();
     }
 

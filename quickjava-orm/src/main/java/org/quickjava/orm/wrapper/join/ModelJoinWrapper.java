@@ -122,7 +122,7 @@ public interface ModelJoinWrapper<Children, M, MC extends MFunction<M, ?>>
      */
     default <Right> Children leftJoin(Class<Right> rClass, String rAlias, JoinOnClosure<M, Right> closure) {
         JoinOn<M, M, Right> condition = new JoinOn<>(getModelClass(), rClass);
-        condition.setLeftAlias(rAlias);
+        condition.setRightAlias(rAlias);
         closure.call(condition);
         return join(JoinType.LEFT, condition);
     }

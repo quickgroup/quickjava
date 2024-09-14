@@ -36,9 +36,9 @@ public class TestModelJoin {
                 .leftJoin2(SsoAppFavoriteModel::getAppId, SsoApp.class, "app2", SsoApp::getAppId, SsoAppFavoriteModel::getApp)
 //                .leftJoin2(SsoApp.class, "app", SsoApp::getAppId, SsoAppFavoriteModel::getAppId, SsoAppFavoriteModel::getApp)   // 等价上面调用
                 // ## 与主表一对一关联join，字符串别名
-                .leftJoin(SsoAppFavoriteModel::getAppId, SsoApp.class, "aliasApp01", SsoApp::getAppId)
+                .leftJoin(SsoAppFavoriteModel::getAppId, SsoApp.class, "app3", SsoApp::getAppId)
                 // ## 与主表一对一关联join，复合条件查询
-                .leftJoin(SsoApp.class, "app3", query -> query
+                .leftJoin(SsoApp.class, "app4", query -> query
                         .eq(SsoAppFavoriteModel::getAppId, SsoApp::getAppId)
                         .left()
                             .isNotNull(SsoAppFavoriteModel::getAppId)
@@ -47,7 +47,7 @@ public class TestModelJoin {
                             .isNotNull(SsoApp::getName)
                 )
                 // ## 与主表一对一关联join，复合条件查询
-                .leftJoin(SsoApp.class, "app4", query -> query
+                .leftJoin(SsoApp.class, "app5", query -> query
                         .eq(SsoAppFavoriteModel::getAppId, SsoApp::getAppId)
                         .and().eq(SsoAppFavoriteModel::getAppId, SsoApp::getAppId)
                         .or().eq(SsoAppFavoriteModel::getAppId, SsoApp::getAppId)
@@ -76,8 +76,8 @@ public class TestModelJoin {
                 .eq(SsoApp.class, SsoAppFavoriteModel::getTestAppInfo, SsoApp::getAppId, 1)
 //                .eq(SsoApp.class, "testAppInfo", SsoApp::getAppId, 1)     // 等价上面调用
                 //      3. 字符串表名
-                .eq(SsoApp.class, "aliasApp01", SsoApp::getAppId, 1)
                 .eq(SsoApp.class, "app3", SsoApp::getAppId, 1)
+                .eq(SsoApp.class, "app4", SsoApp::getAppId, 1)
                 // TODO::排序字段
                 .order(SsoAppFavoriteModel::getCreateTime, true)
                 .order(SsoApp.class, SsoApp::getAppId)

@@ -156,17 +156,6 @@ public class SqlUtil extends ComUtil {
         return ret;
     }
 
-    // 缓存原始表字段
-    public static Map<String, List<TableColumnMeta>> tableColumnCache = new LinkedHashMap<>();
-
-    public static List<TableColumnMeta> getTableColumns(String table) {
-        return tableColumnCache.get(table);
-    }
-
-    public static void setTableColumns(String table, List<TableColumnMeta> columns) {
-        tableColumnCache.put(table, columns);
-    }
-
     // 数组查询
     public static boolean inArray(Object[] arr, Object target) {
         for (Object o : arr) {

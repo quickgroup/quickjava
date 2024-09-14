@@ -494,7 +494,7 @@ public class QuerySet {
     public List<TableColumnMeta> getColumns(String table)
     {
         // 先查内存缓存
-        List<TableColumnMeta> ret = SqlUtil.getTableColumns(table);
+        List<TableColumnMeta> ret = QueryCache.getTableColumns(table);
         if (ret != null) {
             return ret;
         }
@@ -505,7 +505,7 @@ public class QuerySet {
         }
         List<TableColumnMeta> columns1 = new LinkedList<>();
         columns.forEach(info -> columns1.add(new TableColumnMeta(info)));
-        SqlUtil.setTableColumns(table, columns1);
+        QueryCache.setTableColumns(table, columns1);
         return columns1;
     }
 

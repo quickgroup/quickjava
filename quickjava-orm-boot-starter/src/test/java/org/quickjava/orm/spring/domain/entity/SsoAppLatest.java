@@ -11,7 +11,7 @@ import java.util.Date;
 /**
  * 应用使用记录
  */
-@TableName("sso_app_favorite")
+@TableName("sso_app_latest")
 public class SsoAppLatest extends BaseSimpleEntity
 {
 
