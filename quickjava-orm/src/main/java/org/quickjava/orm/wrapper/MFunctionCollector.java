@@ -9,8 +9,7 @@ import java.util.List;
 /**
  * 游离model方法调用
  */
-public class MFunctionCollector<M extends Model, MC extends MFunction<M, ?>>
-        implements AbstractWhere<MFunctionCollector<M, MC>, M, MC> {
+public class MFunctionCollector<M extends Model, MC extends MFunction<M, ?>> extends AbstractWhere<MFunctionCollector<M, MC>, M, MC> {
 
     private Class<M> modelClazz;
 
