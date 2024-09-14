@@ -1,5 +1,6 @@
 package org.quickjava.orm.query.build;
 
+import org.quickjava.orm.contain.Chain;
 import org.quickjava.orm.contain.DriveConfigure;
 import org.quickjava.orm.utils.SqlUtil;
 
@@ -43,6 +44,9 @@ public class TableColumn {
 
     public TableColumn(String column) {
         this.column = column;
+    }
+
+    public TableColumn() {
     }
 
     public String getTable() {

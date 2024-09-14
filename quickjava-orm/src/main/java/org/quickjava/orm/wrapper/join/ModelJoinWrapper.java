@@ -3,68 +3,76 @@ package org.quickjava.orm.wrapper.join;
 import org.quickjava.orm.model.Model;
 import org.quickjava.orm.query.enums.Operator;
 import org.quickjava.orm.query.enums.OrderByType;
+import org.quickjava.orm.utils.ReflectUtil;
+import org.quickjava.orm.utils.SqlUtil;
 import org.quickjava.orm.wrapper.*;
 import org.quickjava.orm.enums.JoinType;
 
 import java.io.Serializable;
+import java.util.List;
 
-public interface ModelJoinWrapper<
-            Children,
-            M extends Model,
-            MC extends MFunction<M, ?>
-        >
-        extends AbstractWhere<Children, M, MC>, Serializable {
+public interface ModelJoinWrapper<Children, M, MC extends MFunction<M, ?>>
+        extends WhereWrapper<Children, M, MC>, Serializable
+{
+
+    public Class<M> getModelClass();
 
     /**
      * 与主表关联
      */
-    default <R extends Model> Children leftJoin(Class<R> right, MFunction<R, ?> rc, MC lf) {
-        return join(JoinType.LEFT, new JoinSpecifyLeft<M, R>(right).eq(lf, rc));
+    default <Right> Children leftJoin(MC lf, Class<Right> right, MFunction<Right, ?> rc) {
+        return join(JoinType.LEFT, new JoinOn<M, M, Right>(null, null, right).eq(lf, rc));
     }
 
     /**
-     * 与主表关联，并加载数据
+     * 与主表关联，并加载关联表数据
      */
-    default <R extends Model> Children leftJoin2(Class<R> right, MFunction<R, ?> rc, MC lf, MC dataField) {
-        return join(JoinType.LEFT, new JoinSpecifyLeft<M, R>(right).eq(lf, rc).setLoadDataFieldName(dataField));
+    default <Right> Children leftJoin2(MC lf, Class<Right> right, MFunction<Right, ?> rightFunc, MFunction<Right, ?> ... dataColumns) {
+        return join(JoinType.LEFT, new JoinOn<M, M, Right>(null, null, right).eq(lf, rightFunc).right().rightField(dataColumns));
     }
 
     /**
      * 与主表一个条件关联，并指定关联表别名
      * TODO::涉及关联表别名的方法，表class后第一个参数就是指定别名
-     * @param alias 关联表别名，用于：相同表多次关联、关联表数据加载到right表属性名
+     * @param alias 用主表属性做别名
      */
-    default <R extends Model> Children leftJoin(Class<R> right, MC alias, MFunction<R, ?> rc, MC lf) {
-        return leftJoin(right, alias.getName(), rc, lf);
+    default <Right> Children leftJoin(MC lf, Class<Right> right, MC alias, MFunction<Right, ?> rc) {
+        return leftJoin(lf, right, alias.getName(), rc);
     }
 
     /**
      * 与主表一个条件关，并加载数据
-     * @param right 关联表cLass
-     * @param alias 关联表别名
-     * @param rc 关联表字段名
-     * @param lf 右表字段名
-     * @param dataField 关联数据写入到right表属性
      */
-    default <R extends Model> Children leftJoin2(Class<R> right, MC alias, MFunction<R, ?> rc, MC lf, MC dataField) {
-        return leftJoin2(right, alias.getName(), rc, lf, dataField);
+    default <Right> Children leftJoin2(MC lf, Class<Right> right, MC alias, MFunction<Right, ?> rc, MFunction<Right, ?> ... dataColumns) {
+        return leftJoin2(lf, right, alias.getName(), rc, dataColumns);
     }
 
-    default <R extends Model> Children leftJoin(Class<R> right, String alias, MFunction<R, ?> rc, MC lf) {
-        return join(JoinType.LEFT, new JoinSpecifyLeft<M, R>(right, alias).eq(lf, rc));
+    default <Right> Children leftJoin2(MC lf, Class<Right> right, MC alias, MFunction<Right, ?> rc, MC leftDataField) {
+        return leftJoin2(lf, right, alias.getName(), rc, leftDataField);
     }
 
-    default <R extends Model> Children leftJoin2(Class<R> left, String alias, MFunction<R, ?> rc, MC lf, MC dataField) {
-        return join(JoinType.LEFT, new JoinSpecifyLeft<M, R>(left, alias).setLoadDataFieldName(dataField).eq(lf, rc));
+    default <Right> Children leftJoin(MC lf, Class<Right> right, String alias, MFunction<Right, ?> rc) {
+        return join(JoinType.LEFT, new JoinOn<M, M, Right>(null, right).setRightAlias(alias).eq(lf, rc));
+    }
+
+    default <Right> Children leftJoin2(MC lf, Class<Right> right, String alias, MFunction<Right, ?> rc, MFunction<Right, ?> ... dataColumns) {
+        return join(JoinType.LEFT, new JoinOn<M, M, Right>(null, right).setRightAlias(alias).eq(lf, rc).right().rightField(dataColumns));
+    }
+
+    default <Right> Children leftJoin2(MC lf, Class<Right> right, String alias, MFunction<Right, ?> rc, MC leftDataField) {
+        Class<?> dataFieldClass = leftDataField.getFieldClass();
+        List<String> fieldList = ReflectUtil.getAllGetterConvFieldName(dataFieldClass);
+        String[] fields = fieldList.toArray(new String[]{});
+        return join(JoinType.LEFT, new JoinOn<M, M, Right>(null, right).setRightAlias(alias).eq(lf, rc)
+                .rightField(fields));
     }
 
     /**
      * 两张子表一个条件关联
      * @return Children
      */
-    default <Left extends Model, Right extends Model> Children leftJoin(Class<Left> left, MFunction<Left, ?> lc,
-                                                                        Class<Right> right, MFunction<Right, ?> rf) {
-        return join(JoinType.LEFT, new JoinSpecifyAbs<>(left, right).eq(lc, rf));
+    default <Left, Right> Children leftJoin(Class<Left> left, MFunction<Left, ?> lc, Class<Right> right, MFunction<Right, ?> rf) {
+        return join(JoinType.LEFT, new JoinOn<Left, Left, Right>(left, left, right).eq(lc, rf));
     }
 
     /**
@@ -76,22 +84,26 @@ public interface ModelJoinWrapper<
      * @param rightAlias 右表别名，传入null默认使用表全名
      * @param rf 右表属性名
      */
-    default <Left extends Model, Right extends Model> Children leftJoin(Class<Left> left, String leftAlias, MFunction<Left, ?> lc,
+    default <Left, Right> Children leftJoin(Class<Left> left, String leftAlias, MFunction<Left, ?> lc,
                                                                         Class<Right> right, String rightAlias, MFunction<Right, ?> rf) {
-        return join(JoinType.LEFT, new JoinSpecifyAbs<>(left, leftAlias, right, rightAlias).eq(lc, rf));
+        return join(JoinType.LEFT, new JoinOn<Left, Left, Right>(left, left, right).setLeftAlias(leftAlias).setRightAlias(rightAlias).eq(lc, rf));
     }
 
     /**
      * 与主表多条件关联
      */
-    default <R extends Model> Children leftJoin(Class<R> r, JoinSpecifyClosure<M, R> closure) {
-        JoinSpecifyLeft<M, R> condition = new JoinSpecifyLeft<M, R>(r);
+    default <Right> Children leftJoin(Class<Right> right, JoinOnClosure<M, Right> closure) {
+        JoinOn<M, M, Right> condition = new JoinOn<>(null, right);
         closure.call(condition);
         return join(JoinType.LEFT, condition);
     }
 
-    default <R extends Model> Children leftJoin(Class<R> r, JoinSpecifyClosure<M, R> closure, MC rightField) {
-        JoinSpecifyLeft<M, R> condition = new JoinSpecifyLeft<M, R>(r).setLoadDataFieldName(rightField);
+    default <R extends Model> Children leftJoin(Class<R> r, JoinOnClosure<M, R> closure, MC leftDataField) {
+        Class<?> dataFieldClass = leftDataField.getFieldClass();
+        List<String> fieldList = ReflectUtil.getAllGetterConvFieldName(dataFieldClass);
+        String[] fields = fieldList.toArray(new String[]{});
+
+        JoinOn<M, M, R> condition = new JoinOn<M, M, R>().rightField(fields);
         closure.call(condition);
         return join(JoinType.LEFT, condition);
     }
@@ -100,8 +112,8 @@ public interface ModelJoinWrapper<
      * 两张子表多个条件关联
      * @return Children
      */
-    default <Left extends Model, Right extends Model> Children leftJoin(Class<Left> left, Class<Right> right, JoinSpecifyClosure<Left, Right> closure) {
-        JoinSpecify<Left, Right> condition = new JoinSpecifyAbs<>(left, right);
+    default <Left, Right> Children leftJoin(Class<Left> left, Class<Right> right, JoinOnClosure<Left, Right> closure) {
+        JoinOn<Left, Left, Right> condition = new JoinOn<>(left, right);
         closure.call(condition);
         return join(JoinType.LEFT, condition);
     }
@@ -109,14 +121,7 @@ public interface ModelJoinWrapper<
     /**
      * 左表关联右多个表多个条件
      */
-    default <Left extends Model> Children leftJoin(Class<Left> left, JoinWhereClosure<M, Left> closure) {
-        return leftJoin(left, "", closure);
-    }
-
-    /**
-     * 左表关联右多个表多个条件
-     */
-    default <Right extends Model> Children leftJoin(Class<Right> rClass, String rAlias, JoinWhereClosure<M, Right> closure) {
+    default <Right> Children leftJoin(Class<Right> rClass, String rAlias, JoinOnClosure<M, Right> closure) {
         JoinOn<M, M, Right> condition = new JoinOn<>();
         condition.setLeftAlias(rAlias);
         closure.call(condition);
@@ -124,16 +129,15 @@ public interface ModelJoinWrapper<
     }
 
     /**
-     * 对应sql的join默认行为为INNER JOIN
-     * @param  condition 关联条件
-     * @return Children
+     * 自定义
      */
-    default Children join(JoinSpecifyLeft<?, ?> condition) {
+    default Children join(JoinOn<?, ?, ?> condition) {
         return join(JoinType.INNER, condition);
     }
 
-    Children join(JoinType type, JoinSpecify<?, ?> condition);
     Children join(JoinType type, JoinOn<?, ?, ?> joinOn);
+
+
 
     //TODO::-------------------- 关联表查询条件 START --------------------
     default <Left extends Model> Children where(boolean condition, Class<Left> left, MFunction<Left, ?> lc, Operator operator, Object val) {

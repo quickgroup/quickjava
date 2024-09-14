@@ -1,6 +1,6 @@
-package org.quickjava.orm.wrapper;
+package org.quickjava.orm.contain;
 
-public interface Wrapper<Children> {
+public interface Chain<Children> {
 
     /**
      * 返回自己

@@ -3,7 +3,7 @@ package org.quickjava.orm.enums;
 /**
  * 语句逻辑
  */
-public enum LogicType {
+public enum Logic {
     /** 与 */
     AND("AND"),
     /** 或 */
@@ -14,7 +14,7 @@ public enum LogicType {
 
     private final String sql;
 
-    LogicType(String sql) {
+    Logic(String sql) {
         this.sql = sql;
     }
 

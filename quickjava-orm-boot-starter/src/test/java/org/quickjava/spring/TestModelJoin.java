@@ -30,13 +30,13 @@ public class TestModelJoin {
         IPagination<SysAppFavoriteModel> pagination = new ModelWrapper<>(SysAppFavoriteModel.class)
                 // TODO::关联表
                 // # 与主表一对一关联join
-                .leftJoin(SysApp.class, SysAppFavoriteModel::getApp, SysApp::getAppId, SysAppFavoriteModel::getAppId)
+                .leftJoin(SysAppFavoriteModel::getAppId, SysApp.class, SysAppFavoriteModel::getApp, SysApp::getAppId)
 //                .leftJoin(SsoApp.class, "app", SsoApp::getAppId, SsoAppFavoriteModel::getAppId)   // 等价上面调用
                 // ## 与主表一对一关联join，并加载数据
-                .leftJoin2(SysApp.class, "app2", SysApp::getAppId, SysAppFavoriteModel::getAppId, SysAppFavoriteModel::getApp)
+                .leftJoin2(SysAppFavoriteModel::getAppId, SysApp.class, "app2", SysApp::getAppId, SysAppFavoriteModel::getApp)
 //                .leftJoin2(SsoApp.class, "app", SsoApp::getAppId, SsoAppFavoriteModel::getAppId, SsoAppFavoriteModel::getApp)   // 等价上面调用
                 // ## 与主表一对一关联join，字符串别名
-                .leftJoin(SysApp.class, "aliasApp01", SysApp::getAppId, SysAppFavoriteModel::getAppId)
+                .leftJoin(SysAppFavoriteModel::getAppId, SysApp.class, "aliasApp01", SysApp::getAppId)
                 // ## 与主表一对一关联join，复合条件查询
                 .leftJoin(SysApp.class, "app3", query -> query
                         .eq(SysAppFavoriteModel::getAppId, SysApp::getAppId)
@@ -47,10 +47,17 @@ public class TestModelJoin {
                             .isNotNull(SysApp::getName)
                             .isNull(SysApp::getAppSecret)
                 )
+                // ## 与主表一对一关联join，复合条件查询
+                .leftJoin(SysApp.class, "app4", query -> query
+                        .eq(SysAppFavoriteModel::getAppId, SysApp::getAppId)
+                        .and().eq(SysAppFavoriteModel::getAppId, SysApp::getAppId)
+                        .or().eq(SysAppFavoriteModel::getAppId, SysApp::getAppId)
+                        .rightField(SysApp::getAppId)
+                )
                 // 关联其他表
-                .leftJoin(SysAppLatest.class, SysAppLatest::getAppId, SysAppFavoriteModel::getAppId)
+                .leftJoin(SysAppFavoriteModel::getAppId, SysAppLatest.class, SysAppLatest::getAppId)
                 // 关联其他表
-                .leftJoin(SysAppLatest.class, SysAppFavoriteModel::getTestAppInfo, SysAppLatest::getAppId, SysAppFavoriteModel::getAppId)
+                .leftJoin(SysAppFavoriteModel::getAppId, SysAppLatest.class, SysAppFavoriteModel::getTestAppInfo, SysAppLatest::getAppId)
 //                .leftJoin(SsoAppLatest.class, "testAppInfo", SsoAppLatest::getAppId, SsoAppFavoriteModel::getAppId)       // 等价上面
 
                 // 通过中间表关联
@@ -94,9 +101,9 @@ public class TestModelJoin {
         Long startTime = TimeUtils.getNanoTime();
         List<SysAppFavoriteModel> favorites = new ModelWrapper<>(SysAppFavoriteModel.class)
                 // 一对一关联
-                .leftJoin(SysApp.class, SysAppFavoriteModel::getApp, SysApp::getAppId, SysAppFavoriteModel::getAppId)
+                .leftJoin(SysAppFavoriteModel::getAppId, SysApp.class, SysAppFavoriteModel::getApp, SysApp::getAppId)
                 // 一对一关联 并把关联表数据加载到app属性上
-                .leftJoin2(SysApp.class, SysAppFavoriteModel::getApp, SysApp::getAppId, SysAppFavoriteModel::getAppId, SysAppFavoriteModel::getApp)
+                .leftJoin2(SysAppFavoriteModel::getAppId, SysApp.class, SysAppFavoriteModel::getApp, SysApp::getAppId, SysAppFavoriteModel::getApp)
                 .select();
         System.out.println("leftJoin return=" + favorites);
         System.out.println("耗时=" + TimeUtils.endNanoTime(startTime) + "ms");

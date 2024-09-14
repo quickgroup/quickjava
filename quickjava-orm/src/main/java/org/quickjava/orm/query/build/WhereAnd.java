@@ -23,4 +23,7 @@ public class WhereAnd extends Where {
         super(1, wheres);
     }
 
+    public WhereAnd() {
+        super();
+    }
 }

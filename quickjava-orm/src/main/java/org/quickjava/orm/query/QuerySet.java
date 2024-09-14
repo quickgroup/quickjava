@@ -72,15 +72,15 @@ public class QuerySet {
     }
 
     public QuerySet join(String table, String condition, JoinType type) {
-        return join(table, new JoinConditionAbs().setRaw(condition), type);
+        return join(table, new WhereRaw(condition), type);
     }
 
-    public QuerySet join(String table, JoinConditionAbs condition, JoinType type) {
+    public QuerySet join(String table, Where condition, JoinType type) {
         reservoir.getJoinList().add(new Join(type, table, condition));
         return this;
     }
 
-    public QuerySet join(String table, List<JoinConditionAbs> conditions, JoinType type) {
+    public QuerySet join(String table, List<Where> conditions, JoinType type) {
         reservoir.getJoinList().add(new Join(type, table, conditions));
         return this;
     }
@@ -593,11 +593,11 @@ public class QuerySet {
 
     //TODO::--------------- 统计方法 ---------------
     public Integer count() {
-        return count(new TableColumn(null).setRaw("COUNT(*)"));
+        return count(new TableColumn().setRaw("COUNT(*)"));
     }
 
     public Integer count(String field) {
-        return count(new TableColumn(null).setRaw("COUNT("+field+")"));
+        return count(new TableColumn().setRaw("COUNT("+field+")"));
     }
 
     public Integer count(TableColumn column)

@@ -1,27 +1,22 @@
 package org.quickjava.orm.utils;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.ListUtil;
 import org.quickjava.common.utils.SimpleCache;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
-/*
- * Copyright (c) 2020~2023 http://www.quickjava.org All rights reserved.
- * +-------------------------------------------------------------------
- * Organization: QuickJava
- * +-------------------------------------------------------------------
- * Author: Qlo1062
- * +-------------------------------------------------------------------
- * File: ReflectUtil
- * +-------------------------------------------------------------------
- * Date: 2023-5-29 17:30
- * +-------------------------------------------------------------------
- * License: Apache Licence 2.0
- * +-------------------------------------------------------------------
- */
 public class ReflectUtil {
+    private static final Logger logger = LoggerFactory.getLogger(ReflectUtil.class);
 
     private static final SimpleCache<Class<?>, Field[]> FIELDS_CACHE = new SimpleCache<>();
     private static final SimpleCache<Class<?>, Method[]> METHODS_CACHE = new SimpleCache<>();
@@ -286,6 +281,24 @@ public class ReflectUtil {
             return setter != null;
         } catch (Exception e) {
             return false;
+        }
+    }
+
+    // 获取全部get的名称列表
+    public static List<String> getAllGetterConvFieldName(Class<?> clazz) {
+        try {
+            Method[] methods = clazz.getMethods();
+            List<String> fields = new LinkedList<>();
+            for (Method method : methods) {
+                String methodName = method.getName();
+                if (methodName.startsWith("get") && methodName.length() > 3 && Character.isUpperCase(methodName.charAt(3))) {
+                    fields.add(SqlUtil.toCamelCase(methodName));
+                }
+            }
+            return fields;
+        } catch (Exception e) {
+            logger.error("getAllGetterConvFieldName error:{}", e.getMessage(), e);
+            return ListUtil.empty();
         }
     }
 

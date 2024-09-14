@@ -1,6 +1,7 @@
 package org.quickjava.orm.wrapper;
 
 import cn.hutool.core.util.ReflectUtil;
+import org.quickjava.orm.contain.Chain;
 import org.quickjava.orm.model.IModel;
 import org.quickjava.orm.model.Model;
 import org.quickjava.orm.model.ModelHelper;
@@ -28,7 +29,7 @@ import java.util.Map;
  */
 public class WrapperUtil {
 
-    public static Model getWrapperModel(Wrapper<?> wrapper) {
+    public static Model getWrapperModel(Chain<?> wrapper) {
         return (Model) ReflectUtil.getFieldValue(wrapper, "model");
     }
 
@@ -36,7 +37,7 @@ public class WrapperUtil {
         return ReflectUtil.invoke(model, "query");
     }
 
-    public static QuerySet getQuerySet(Wrapper<?> wrapper) {
+    public static QuerySet getQuerySet(Chain<?> wrapper) {
         return ReflectUtil.invoke(getWrapperModel(wrapper), "query");
     }
 
@@ -64,7 +65,7 @@ public class WrapperUtil {
         return fieldMetaClazzMap;
     }
 
-    public static <Left> String autoTable(String table, Wrapper<?> wrapper, Class<Left> left) {
+    public static <Left> String autoTable(String table, Chain<?> wrapper, Class<Left> left) {
         return autoTable(table, getWrapperModel(wrapper).getClass(), left);
     }
 

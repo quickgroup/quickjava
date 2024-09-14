@@ -44,6 +44,10 @@ public abstract class Where extends TableColumn {
         this.children = wheres;
     }
 
+    public Where() {
+        super(null);
+    }
+
     public int getLogic() {
         return logic;
     }

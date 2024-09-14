@@ -27,7 +27,7 @@ public class Join {
 
     protected String table;
 
-    protected List<JoinConditionAbs> conditions;
+    protected List<Where> conditions;
 
     private DriveConfigure driveConfigure;
 
@@ -36,13 +36,13 @@ public class Join {
         this.table = table;
     }
 
-    public Join(JoinType type, String table, List<JoinConditionAbs> conditions) {
+    public Join(JoinType type, String table, List<Where> conditions) {
         this.type = type;
         this.table = table;
         this.conditions = conditions;
     }
 
-    public Join(JoinType type, String table, JoinConditionAbs condition) {
+    public Join(JoinType type, String table, Where condition) {
         this.type = type;
         this.table = table;
         this.conditions = new LinkedList<>();
@@ -58,17 +58,17 @@ public class Join {
         return this;
     }
 
-    public List<JoinConditionAbs> getConditions() {
+    public List<Where> getConditions() {
         conditions = conditions == null ? new LinkedList<>() : conditions;
         return conditions;
     }
 
-    public Join setConditions(List<JoinConditionAbs> conditions) {
+    public Join setConditions(List<Where> conditions) {
         this.conditions = conditions;
         return this;
     }
 
-    public Join addCondition(JoinConditionAbs condition) {
+    public Join addCondition(Where condition) {
         this.getConditions().add(condition);
         return this;
     }

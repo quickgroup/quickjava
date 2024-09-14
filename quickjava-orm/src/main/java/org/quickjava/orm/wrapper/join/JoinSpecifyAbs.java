@@ -1,7 +1,7 @@
 package org.quickjava.orm.wrapper.join;
 
 import org.quickjava.orm.enums.CompareType;
-import org.quickjava.orm.enums.LogicType;
+import org.quickjava.orm.enums.Logic;
 import org.quickjava.orm.wrapper.MFunction;
 
 import java.util.LinkedList;
@@ -133,7 +133,7 @@ public class JoinSpecifyAbs<Children extends JoinSpecifyAbs<Children, Left, Righ
 
     public static class Item<OL, OR> {
         // 逻辑类型
-        private LogicType logic = LogicType.AND;
+        private Logic logic = Logic.AND;
         // 条件运算符
         private final CompareType compare;
         // 左表
@@ -149,7 +149,7 @@ public class JoinSpecifyAbs<Children extends JoinSpecifyAbs<Children, Left, Righ
         // 原生sql
         private String sql;
 
-        public Item(LogicType logic, CompareType compare, Class<OL> left, String leftAlias, MFunction<OL, ?> leftFun, Class<OR> right, String rightAlias, MFunction<OR, ?> rightFun) {
+        public Item(Logic logic, CompareType compare, Class<OL> left, String leftAlias, MFunction<OL, ?> leftFun, Class<OR> right, String rightAlias, MFunction<OR, ?> rightFun) {
             this.logic = logic;
             this.compare = compare;
             this.left = left;
@@ -160,17 +160,17 @@ public class JoinSpecifyAbs<Children extends JoinSpecifyAbs<Children, Left, Righ
             this.rightFun = rightFun;
         }
 
-        public Item(LogicType logic, CompareType compare, Class<OL> left, String leftAlias, Object leftVal, Class<OR> right, String rightAlias, MFunction<OR, ?> rightFun) {
+        public Item(Logic logic, CompareType compare, Class<OL> left, String leftAlias, Object leftVal, Class<OR> right, String rightAlias, MFunction<OR, ?> rightFun) {
             this(logic, compare, left, "", null, right, "", rightFun);
             this.leftValue = leftVal;
         }
 
-        public Item(LogicType logic, CompareType compare, Class<OL> left, String leftAlias, MFunction<OL, ?> leftFun, Class<OR> right, String rightAlias, Object rightVal) {
+        public Item(Logic logic, CompareType compare, Class<OL> left, String leftAlias, MFunction<OL, ?> leftFun, Class<OR> right, String rightAlias, Object rightVal) {
             this(logic, compare, left, "", leftFun, right, "", null);
             this.rightValue = rightVal;
         }
 
-        public Item(LogicType logic, CompareType compare, Class<OL> left, MFunction<OL, ?> leftFun, Class<OR> right, MFunction<OR, ?> rightFun) {
+        public Item(Logic logic, CompareType compare, Class<OL> left, MFunction<OL, ?> leftFun, Class<OR> right, MFunction<OR, ?> rightFun) {
             this(logic, compare, left, "", leftFun, right, "", rightFun);
         }
 
@@ -193,11 +193,11 @@ public class JoinSpecifyAbs<Children extends JoinSpecifyAbs<Children, Left, Righ
             this.rightFun = rightFun;
         }
 
-        public LogicType getLogic() {
+        public Logic getLogic() {
             return logic;
         }
 
-        public void setLogic(LogicType logic) {
+        public void setLogic(Logic logic) {
             this.logic = logic;
         }
 

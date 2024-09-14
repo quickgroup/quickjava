@@ -13,20 +13,26 @@ package org.quickjava.orm.wrapper.join;/*
  * +-------------------------------------------------------------------
  */
 
+import org.quickjava.orm.query.QuerySetHelper;
 import org.quickjava.orm.query.build.Where;
 import org.quickjava.orm.wrapper.MFunction;
 import org.quickjava.orm.wrapper.ModelWhere;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class JoinOn<M, Left, Right> extends ModelWhere<JoinOn<M, Left, Right>, M, MFunction<M, ?>> {
 
-    private JoinOn<?, Left, Right> base;
-    private JoinOn<Left, Left, Right> left;
-    private JoinOn<Right, Left, Right> right;
-    private Class<M> mainClass;
-    private Class<Left> leftClass;
+    protected JoinOn<?, Left, Right> base;
+    protected JoinOn<Left, Left, Right> left;
+    protected JoinOn<Right, Left, Right> right;
+    protected Class<M> mainClass;
+    protected Class<Left> leftClass;
     protected String leftAlias;
-    private Class<Right> rightClass;
+    protected Class<Right> rightClass;
     protected String rightAlias;
+    // 加载数据的列
+    protected List<String> dataFields;
 
     public JoinOn() {
     }
@@ -37,34 +43,15 @@ public class JoinOn<M, Left, Right> extends ModelWhere<JoinOn<M, Left, Right>, M
         this.rightClass = rightClass;
     }
 
+    public JoinOn(Class<Left> leftClass, Class<Right> rightClass) {
+        this.mainClass = (Class<M>) leftClass;
+        this.leftClass = leftClass;
+        this.rightClass = rightClass;
+    }
+
     public JoinOn<M, Left, Right> setMainClass(Class<M> mainClass) {
         this.mainClass = mainClass;
         return this;
-    }
-
-    public JoinOn<?, Left, Right> base() {
-        return base == null ? this : base;
-    }
-
-    public JoinOn<Left, Left, Right> left() {
-        if (base.left == null) {
-            base.left = new JoinOn<Left, Left, Right>().setMainClass(leftClass);
-            base.left.base = base;
-        }
-        return base.left;
-    }
-
-    public JoinOn<Right, Left, Right> right() {
-        if (base.right == null) {
-            base.right = new JoinOn<Right, Left, Right>().setMainClass(rightClass);
-            base.right.base = base;
-        }
-        return base.right;
-    }
-
-    public JoinOn<M, Left, Right> on(MFunction<Left, ?> lf, MFunction<Right, ?> rf) {
-        eq(lf, rf);
-        return chain();
     }
 
     @Override
@@ -73,22 +60,12 @@ public class JoinOn<M, Left, Right> extends ModelWhere<JoinOn<M, Left, Right>, M
         return chain();
     }
 
-    public JoinOn<M, Left, Right> setBase(JoinOn<?, Left, Right> base) {
+    private JoinOn<M, Left, Right> setBase(JoinOn<?, Left, Right> base) {
         this.base = base;
         return chain();
     }
 
-    public JoinOn<M, Left, Right> setLeft(JoinOn<Left, Left, Right> left) {
-        this.left = left;
-        return chain();
-    }
-
-    public JoinOn<M, Left, Right> setRight(JoinOn<Right, Left, Right> right) {
-        this.right = right;
-        return chain();
-    }
-
-    public JoinOn<M, Left, Right> setLeftClass(Class<Left> leftClass) {
+    private JoinOn<M, Left, Right> setLeftClass(Class<Left> leftClass) {
         this.leftClass = leftClass;
         return chain();
     }
@@ -98,7 +75,7 @@ public class JoinOn<M, Left, Right> extends ModelWhere<JoinOn<M, Left, Right>, M
         return chain();
     }
 
-    public JoinOn<M, Left, Right> setRightClass(Class<Right> rightClass) {
+    private JoinOn<M, Left, Right> setRightClass(Class<Right> rightClass) {
         this.rightClass = rightClass;
         return chain();
     }
@@ -106,14 +83,6 @@ public class JoinOn<M, Left, Right> extends ModelWhere<JoinOn<M, Left, Right>, M
     public JoinOn<M, Left, Right> setRightAlias(String rightAlias) {
         this.rightAlias = rightAlias;
         return chain();
-    }
-
-    public JoinOn<Left, Left, Right> getLeft() {
-        return left;
-    }
-
-    public JoinOn<Right, Left, Right> getRight() {
-        return right;
     }
 
     public Class<M> getMainClass() {
@@ -136,9 +105,55 @@ public class JoinOn<M, Left, Right> extends ModelWhere<JoinOn<M, Left, Right>, M
         return rightAlias;
     }
 
+    /**
+     * 加载右表数据
+     */
+    @SafeVarargs
+    public final JoinOn<M, Left, Right> rightField(MFunction<Right, ?>... fields) {
+        JoinOn<?, Left, Right> base = base();
+        base.dataFields = QuerySetHelper.initList(base.dataFields);
+        for (MFunction<Right, ?> field : fields) {
+            base.dataFields.add(field.getName());
+        }
+        return chain();
+    }
+
+    public final JoinOn<M, Left, Right> rightField(String... fields) {
+        JoinOn<?, Left, Right> base = base();
+        base.dataFields = QuerySetHelper.initList(base.dataFields);
+        base.dataFields.addAll(Arrays.asList(fields));
+        return chain();
+    }
+
+
+    // TODO::-------------------- 操作方法 --------------------
+    public JoinOn<?, Left, Right> base() {
+        return base == null ? this : base.base();
+    }
+
+    public JoinOn<Left, Left, Right> left() {
+        JoinOn<?, Left, Right> base = base();
+        if (base.left == null) {
+            base.left = new JoinOn<Left, Left, Right>(leftClass, leftClass, rightClass).setBase(base);
+        }
+        return base.left;
+    }
+
+    public JoinOn<Right, Left, Right> right() {
+        JoinOn<?, Left, Right> base = base();
+        if (base.right == null) {
+            base.right = new JoinOn<Right, Left, Right>(rightClass, leftClass, rightClass).setBase(base);
+        }
+        return base.right;
+    }
+
+
     // TODO::-------------------- Join两表条件 --------------------
     public JoinOn<M, Left, Right> eq(MFunction<Left, ?> lf, MFunction<Right, ?> rf) {
+        return chain();
+    }
 
+    public JoinOn<M, Left, Right> neq(MFunction<Left, ?> lf, MFunction<Right, ?> rf) {
         return chain();
     }
 }

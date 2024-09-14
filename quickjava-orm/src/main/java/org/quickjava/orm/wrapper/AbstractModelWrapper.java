@@ -6,6 +6,7 @@ import org.quickjava.orm.contain.DataMap;
 import org.quickjava.orm.contain.IPagination;
 import org.quickjava.orm.contain.Pagination;
 import org.quickjava.orm.enums.JoinType;
+import org.quickjava.orm.enums.Logic;
 import org.quickjava.orm.model.Model;
 import org.quickjava.orm.model.ModelHelper;
 import org.quickjava.orm.model.ModelReservoir;
@@ -14,7 +15,6 @@ import org.quickjava.orm.model.contain.ModelMeta;
 import org.quickjava.orm.query.QueryReservoir;
 import org.quickjava.orm.query.QuerySet;
 import org.quickjava.orm.query.QuerySetHelper;
-import org.quickjava.orm.query.build.JoinConditionAbs;
 import org.quickjava.orm.query.build.Where;
 import org.quickjava.orm.query.enums.OrderByType;
 import org.quickjava.orm.utils.SqlUtil;
@@ -26,14 +26,13 @@ import java.io.Serializable;
 import java.util.*;
 
 public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper<Children, M, R>, M extends Model, R extends MFunction<M, ?>>
-        implements AbstractWhere<Children, M, R>, ModelJoinWrapper<Children, M, R>, Serializable {
+        extends AbstractWhere<Children, M, R>
+        implements ModelJoinWrapper<Children, M, R>, Serializable {
 
     protected static final Logger logger = LoggerFactory.getLogger(AbstractModelWrapper.class);
 
     protected M model;
-
     protected Class<M> modelClazz;
-
     protected Map<String, JoinSpecify<?, ?>> joinMap;
 
     public AbstractModelWrapper() {
@@ -41,6 +40,11 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
 
     protected Model model() {
         return model;
+    }
+
+    @Override
+    public Class<M> getModelClass() {
+        return modelClazz;
     }
 
     //TODO::-------------------- 查询条件  --------------------
@@ -318,7 +322,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     /**
      * 关联查询实现
      */
-    @Override
+//    @Override
     public Children join(JoinType type, JoinSpecify<?, ?> join) {
         // 为空过滤
         if (join.getOnList().isEmpty()) {
@@ -364,25 +368,25 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         joinMap.put(relName, join);
 
         // join条件（支持多个
-        List<JoinConditionAbs> conditions = new LinkedList<>();
-        join.getOnList().forEach(it -> {
-            // 为空取主表
-            it.setLeft(it.getLeft() == null ? mainMeta.getClazz() : it.getLeft());
-            ModelMeta onLeft = getModelMeta(it.getLeft());
-            String onLeftAlias = SqlUtil.isNotEmpty(it.getLeftAlias()) ? it.getLeftAlias() : onLeft.table();
-            String onLeftColumn = it.getLeftFun() == null ? null : it.getLeftFun().getName();
-            // 右表信息
-            it.setRight(it.getRight() == null ? mainMeta.getClazz() : it.getRight());
-            ModelMeta onRight = getModelMeta(it.getRight());
-            String onRightAlias = SqlUtil.isNotEmpty(it.getRightAlias()) ? it.getRightAlias() : onRight.table();
-            String onRightColumn = it.getRightFun() == null ? null : it.getRightFun().getName();
-            // 一：方法引用
-            JoinConditionAbs joinCondition = new JoinConditionAbs(it.getLogic(), it.getCompare(),
-                    onLeftAlias, onLeftColumn, onRightAlias, onRightColumn);
-            joinCondition.setRightValue(it.getRightValue());
-            conditions.add(joinCondition);
-        });
-        querySet.join(relMeta.tableAlias(relName), conditions, type);
+//        List<JoinConditionAbs> conditions = new LinkedList<>();
+//        join.getOnList().forEach(it -> {
+//            // 为空取主表
+//            it.setLeft(it.getLeft() == null ? mainMeta.getClazz() : it.getLeft());
+//            ModelMeta onLeft = getModelMeta(it.getLeft());
+//            String onLeftAlias = SqlUtil.isNotEmpty(it.getLeftAlias()) ? it.getLeftAlias() : onLeft.table();
+//            String onLeftColumn = it.getLeftFun() == null ? null : it.getLeftFun().getName();
+//            // 右表信息
+//            it.setRight(it.getRight() == null ? mainMeta.getClazz() : it.getRight());
+//            ModelMeta onRight = getModelMeta(it.getRight());
+//            String onRightAlias = SqlUtil.isNotEmpty(it.getRightAlias()) ? it.getRightAlias() : onRight.table();
+//            String onRightColumn = it.getRightFun() == null ? null : it.getRightFun().getName();
+//            // 一：方法引用
+//            JoinConditionAbs joinCondition = new JoinConditionAbs(it.getLogic(), it.getCompare(),
+//                    onLeftAlias, onLeftColumn, onRightAlias, onRightColumn);
+//            joinCondition.setRightValue(it.getRightValue());
+//            conditions.add(joinCondition);
+//        });
+//        querySet.join(relMeta.tableAlias(relName), conditions, type);
 
         return chain();
     }
@@ -394,9 +398,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         QuerySet querySet = querySet();
         ModelMeta leftMeta = ModelHelper.getMeta(joinOn.getLeftClass());
         String leftName = joinOn.getRightAlias();
-        querySet.join(leftMeta.tableAlias(leftName), conditions, type);
-        // 将条件追加到模型查询条件
-        joinOn.wheres.forEach(this::where);
+        querySet.join(leftMeta.tableAlias(leftName), joinOn.wheres, type);
         return chain();
     }
 
