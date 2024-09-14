@@ -16,13 +16,7 @@ logging:
   level:
     org.quickjava.orm: DEBUG
 
-# 统一门户配置
-smsso:
-  # 应用 id
-  appId: 1722265049400950785
-  # 应用 Secret
-  appSecret: appTest_ijklmnopqrstuv
-  # 统一门户前台地址
-  ssoFrontUrl: http://127.0.0.1:20100
-  # 统一门户后端地址
-  ssoBackendUrl: http://127.0.0.1:20101
+# ORM配置
+quickjava:
+  orm:
+    type-aliases-package: org.quickjava.orm.spring

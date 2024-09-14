@@ -9,11 +9,7 @@ public class ModelWrapper<M extends Model> extends AbstractModelWrapper<ModelWra
     }
 
     public ModelWrapper(Class<M> modelClass) {
-        try {
-            this.modelClazz = modelClass;
-            this.model = modelClass.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
+        this.modelClazz = modelClass;
+        this.model = Model.newModel(modelClass);
     }
 }

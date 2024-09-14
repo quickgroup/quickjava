@@ -3,17 +3,17 @@
  * More Info to http://www.quickjava.org
  */
 
-package org.quickjava.spring;
+package org.quickjava.orm.spring;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.quickjava.common.utils.TimeUtils;
 import org.quickjava.orm.contain.IPagination;
 import org.quickjava.orm.query.enums.OrderByType;
+import org.quickjava.orm.spring.domain.entity.SysApp;
+import org.quickjava.orm.spring.domain.entity.SysAppFavoriteModel;
+import org.quickjava.orm.spring.domain.entity.SysAppLatest;
 import org.quickjava.orm.wrapper.ModelWrapper;
-import org.quickjava.spring.domain.entity.SysApp;
-import org.quickjava.spring.domain.entity.SysAppLatest;
-import org.quickjava.spring.domain.entity.SysAppFavoriteModel;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 

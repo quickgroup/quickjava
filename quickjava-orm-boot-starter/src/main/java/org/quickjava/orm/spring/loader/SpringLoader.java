@@ -129,7 +129,7 @@ public class SpringLoader implements InitializingBean, ORMContextPort {
             try {
                 Class<?> clazz = Class.forName(m.getClassMetadata().getClassName());
                 if (Model.class.isAssignableFrom(clazz)) {
-//                    logger.debug("Load model entity: {}", clazz.getName());
+                    logger.debug("Load model entity: {}", clazz.getName());
                     Model model = (Model) clazz.newInstance();
                     models.add(model);
                 }

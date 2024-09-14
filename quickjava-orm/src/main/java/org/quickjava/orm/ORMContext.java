@@ -15,6 +15,7 @@ package org.quickjava.orm;
  * +-------------------------------------------------------------------
  */
 
+import org.quickjava.orm.domain.ORMConfiguration;
 import org.quickjava.orm.loader.ORMContextPort;
 import org.quickjava.orm.model.callback.ModelStrut;
 import org.quickjava.orm.utils.ReflectUtil;
@@ -39,6 +40,8 @@ public class ORMContext {
     private static ORMContextPort contextPort = null;
 
     private static List<ModelListener> modelListenerList = new LinkedList<>();
+
+    private static ORMConfiguration configuration = new ORMConfiguration();
 
     private static ModelStrut modelStrut = null;
 
@@ -159,4 +162,7 @@ public class ORMContext {
         modelListenerList.remove(callback);
     }
 
+    public static ORMConfiguration getConfiguration() {
+        return configuration;
+    }
 }

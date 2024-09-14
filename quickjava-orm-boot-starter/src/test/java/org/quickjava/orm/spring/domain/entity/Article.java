@@ -1,4 +1,4 @@
-package org.quickjava.spring.domain.entity;
+package org.quickjava.orm.spring.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import org.quickjava.orm.model.Model;

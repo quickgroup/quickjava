@@ -1,4 +1,4 @@
-package org.quickjava.spring.domain.entity;
+package org.quickjava.orm.spring.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonIgnore;

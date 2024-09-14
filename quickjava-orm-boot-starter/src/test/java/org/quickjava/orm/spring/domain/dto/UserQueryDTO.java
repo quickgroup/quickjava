@@ -1,11 +1,11 @@
-package org.quickjava.spring.domain.vo;/*
+package org.quickjava.orm.spring.domain.dto;/*
  * Copyright (c) 2020~2024 http://www.quickjava.org All rights reserved.
  * +-------------------------------------------------------------------
  * Organization: QuickJava
  * +-------------------------------------------------------------------
  * Author: Qlo1062
  * +-------------------------------------------------------------------
- * File: UserVO
+ * File: UserQueryDTO
  * +-------------------------------------------------------------------
  * Date: 2024/6/12 11:14
  * +-------------------------------------------------------------------
@@ -13,5 +13,5 @@ package org.quickjava.spring.domain.vo;/*
  * +-------------------------------------------------------------------
  */
 
-public class UserVO {
+public class UserQueryDTO {
 }

@@ -73,6 +73,9 @@ public class Model implements IModel {
     private synchronized QuerySet query() {
         synchronized (Model.class) {
             if (reservoir.querySet == null) {
+                if (reservoir.meta == null) {
+                    throw new RuntimeException("元信息丢失：" + this.getClass());
+                }
                 reservoir.querySet = QuerySet.table(reservoir.meta.table());
                 QueryReservoir queryReservoir = QuerySetHelper.getQueryReservoir(reservoir.querySet);
                 queryReservoir.setCallback(WhereOptCallback.class, ModelHelper.whereOptCallback, this);
@@ -785,6 +788,13 @@ public class Model implements IModel {
         enhancer.setCallback(modelProxyMethodInterceptor);
         D model = toD(enhancer.create());
         ModelReservoir reservoir = ModelHelper.getModelReservoir(model);
+        // 元信息
+        if (reservoir.meta == null) {
+            reservoir.meta = ModelHelper.getMeta(clazz);
+        }
+        if (reservoir.meta == null) {
+            throw new RuntimeException("元信息丢失：" + model.getClass());
+        }
         // 加载数据
         if (!ModelHelper.isEmpty(data)) {
             ((Model) model).data((DataMap) data);
@@ -1185,8 +1195,13 @@ public class Model implements IModel {
 
     @Override
     public String toString() {
-        Map<String, Object> dataMap = new LinkedHashMap<>(data());
-        reservoir.meta.relationMap().forEach((name, relation) -> dataMap.put(name, ReflectUtil.getFieldValue(this, name)));
-        return getMClass().getSimpleName() + dataMap;
+        try {
+            Map<String, Object> dataMap = new LinkedHashMap<>(data());
+            reservoir.meta.relationMap().forEach((name, relation) -> dataMap.put(name, ReflectUtil.getFieldValue(this, name)));
+            return getMClass().getSimpleName() + dataMap;
+        } catch (Exception e) {
+            logger.error("toString err：{}", e.getMessage(), e);
+        }
+        return null;
     }
 }
