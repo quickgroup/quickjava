@@ -78,7 +78,7 @@ public interface WhereWrapper<Children, M, Func extends MFunction<M, ?>> extends
     }
 
     default Children eq(boolean condition, Func column, Object val) {
-        this.where(condition, column.getName(), Operator.EQ, val);
+        this.where(condition, column.name(), Operator.EQ, val);
         return chain();
     }
 
@@ -215,6 +215,6 @@ public interface WhereWrapper<Children, M, Func extends MFunction<M, ?>> extends
     }
 
     default String parseColumnName(MFunction<?, ?> function) {
-        return function.getName();
+        return function.name();
     }
 }

@@ -12,7 +12,7 @@ import java.util.Date;
  * 应用使用记录
  */
 @TableName("sso_app_favorite")
-public class SysAppLatest extends BaseSimpleEntity
+public class SsoAppLatest extends BaseSimpleEntity
 {
 
     @TableId
@@ -32,10 +32,10 @@ public class SysAppLatest extends BaseSimpleEntity
     @TableField(fill = FieldFill.INSERT)
     private Date createTime;
 
-    public SysAppLatest() {
+    public SsoAppLatest() {
     }
 
-    public SysAppLatest(Long userId, Long appId) {
+    public SsoAppLatest(Long userId, Long appId) {
         this.userId = userId;
         this.appId = appId;
     }

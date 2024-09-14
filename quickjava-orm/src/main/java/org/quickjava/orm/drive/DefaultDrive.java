@@ -1,6 +1,6 @@
 package org.quickjava.orm.drive;
 
-import org.quickjava.orm.contain.DriveConfigure;
+import org.quickjava.orm.domain.DriveConfigure;
 
 /*
  * Copyright (c) 2020~2023 http://www.quickjava.org All rights reserved.

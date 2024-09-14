@@ -5,20 +5,26 @@ package org.quickjava.orm.enums;
  */
 public enum Logic {
     /** 与 */
-    AND("AND"),
+    AND("AND", 1),
     /** 或 */
-    OR("OR"),
+    OR("OR", 2),
     /** 原生语句 */
-    RAW(null),
+    RAW(null, 3),
     ;
 
     private final String sql;
+    private final int num;
 
-    Logic(String sql) {
+    Logic(String sql, int num) {
         this.sql = sql;
+        this.num = num;
     }
 
     public String sql() {
         return sql;
+    }
+
+    public int num() {
+        return num;
     }
 }

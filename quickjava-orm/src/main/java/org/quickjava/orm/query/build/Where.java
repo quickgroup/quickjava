@@ -5,20 +5,26 @@
 
 package org.quickjava.orm.query.build;
 
-import org.quickjava.orm.contain.DriveConfigure;
+import org.quickjava.orm.domain.DriveConfigure;
+import org.quickjava.orm.enums.Logic;
 import org.quickjava.orm.query.enums.Operator;
 import org.quickjava.orm.utils.SqlUtil;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public abstract class Where extends TableColumn {
+public class Where extends TableColumn {
 
+    /**
+     * 逻辑类型：1=AND,2=OR,3=RAW
+     */
     private int logic = 1;
 
     private Operator operator = null;
 
     private Object value = null;
+    private String valueTable = null;
+    private String valueColumn = null;
 
     private List<Where> children = null;
 
@@ -32,6 +38,14 @@ public abstract class Where extends TableColumn {
 
     public Where(int logic, String table, String column, Operator operator, Object value) {
         this(logic, table, column, operator, value, null);
+    }
+
+    public Where(int logic, String table, String column, Operator operator, String valueTable, String valueColumn) {
+        super(table, column);
+        this.logic = logic;
+        this.operator = operator;
+        this.valueTable = valueTable;
+        this.valueColumn = valueColumn;
     }
 
     public Where(int logic, String column, Operator operator, Object value) {
@@ -56,16 +70,12 @@ public abstract class Where extends TableColumn {
         // 如果字段带有logic就返回空字符串
         if (this.column != null && this.operator == Operator.RAW) {
             String fieldClear = this.column.toUpperCase().trim();
-            if (fieldClear.startsWith(LOGIC_AND) || fieldClear.startsWith(LOGIC_OR)) {
+            if (fieldClear.startsWith(Logic.AND.sql()) || fieldClear.startsWith(Logic.OR.sql())) {
                 return "";
             }
         }
-        return logic == 1 ? LOGIC_AND : LOGIC_OR;
+        return logic == 1 ? Logic.AND.sql() : Logic.OR.sql();
     }
-
-    public static final String LOGIC_OR = "OR";
-
-    public static final String LOGIC_AND = "AND";
 
     public static Map<String, String> OpMap = new LinkedHashMap<>();
 
@@ -133,7 +143,12 @@ public abstract class Where extends TableColumn {
             return getLogicSql() + " (" + cutFirstLogic(SqlUtil.collJoin(" ", sqlList)) + ")";
         }
         ValueConv conv = ValueConv.getConv(cfg);
-        // 输出
+        // 右边为表字段
+        if (valueColumn != null) {
+            String right = driveConfigure.tableColumn(valueTable, valueColumn);
+            return getLogicSql() + " " + getColumnSql() + " " + getOperatorSql() + " " + right;
+        }
+        // 右边为值
         switch (operator) {
             case RAW:
                 return column;
@@ -175,13 +190,12 @@ public abstract class Where extends TableColumn {
 
     /**
      * 去掉查询条件第一个logic
-     * @param whereSql 查询语句
-     * @return 连接符AND、OR
      * */
     public static String cutFirstLogic(String whereSql) {
-        if (whereSql.toUpperCase().startsWith("AND ")) {
+        String sqlSimple = whereSql.substring(0, 10).toUpperCase();
+        if (sqlSimple.startsWith(Logic.AND.sql() + " ")) {
             return whereSql.substring(4);
-        } else if (whereSql.toUpperCase().startsWith("OR ")) {
+        } else if (sqlSimple.startsWith(Logic.OR.sql() + " ")) {
             return whereSql.substring(3);
         }
         return whereSql;

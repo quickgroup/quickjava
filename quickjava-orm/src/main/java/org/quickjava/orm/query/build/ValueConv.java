@@ -8,7 +8,7 @@ package org.quickjava.orm.query.build;
 import cn.hutool.core.convert.Convert;
 import org.quickjava.common.utils.DatetimeUtil;
 import org.quickjava.orm.model.annotation.ModelField;
-import org.quickjava.orm.contain.DriveConfigure;
+import org.quickjava.orm.domain.DriveConfigure;
 import org.quickjava.orm.utils.SqlUtil;
 
 import java.util.Date;

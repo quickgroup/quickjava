@@ -1,8 +1,8 @@
 package org.quickjava.orm.utils;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.IterUtil;
 import org.quickjava.common.utils.ComUtil;
+import org.quickjava.orm.domain.DriveConfigure;
 import org.quickjava.orm.model.ModelHelper;
 import org.quickjava.orm.model.contain.ModelFieldMeta;
 import org.quickjava.orm.query.build.TableColumn;

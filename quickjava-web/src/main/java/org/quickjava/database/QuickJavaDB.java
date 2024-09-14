@@ -15,7 +15,7 @@ package org.quickjava.database;/*
 
 import org.quickjava.common.QuickJavaVersion;
 import org.quickjava.orm.ORMContext;
-import org.quickjava.orm.contain.DatabaseMeta;
+import org.quickjava.orm.domain.DatabaseMeta;
 import org.quickjava.orm.loader.ORMContextPort;
 import org.quickjava.orm.utils.QueryException;
 import org.quickjava.orm.utils.ReflectUtil;

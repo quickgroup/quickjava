@@ -4,7 +4,6 @@ import org.quickjava.orm.model.Model;
 import org.quickjava.orm.query.enums.Operator;
 import org.quickjava.orm.query.enums.OrderByType;
 import org.quickjava.orm.utils.ReflectUtil;
-import org.quickjava.orm.utils.SqlUtil;
 import org.quickjava.orm.wrapper.*;
 import org.quickjava.orm.enums.JoinType;
 
@@ -21,14 +20,14 @@ public interface ModelJoinWrapper<Children, M, MC extends MFunction<M, ?>>
      * 与主表关联
      */
     default <Right> Children leftJoin(MC lf, Class<Right> right, MFunction<Right, ?> rc) {
-        return join(JoinType.LEFT, new JoinOn<M, M, Right>(null, null, right).eq(lf, rc));
+        return join(JoinType.LEFT, new JoinOn<M, M, Right>(getModelClass(), right).eq(lf, rc));
     }
 
     /**
      * 与主表关联，并加载关联表数据
      */
     default <Right> Children leftJoin2(MC lf, Class<Right> right, MFunction<Right, ?> rightFunc, MFunction<Right, ?> ... dataColumns) {
-        return join(JoinType.LEFT, new JoinOn<M, M, Right>(null, null, right).eq(lf, rightFunc).right().rightField(dataColumns));
+        return join(JoinType.LEFT, new JoinOn<M, M, Right>(getModelClass(), right).eq(lf, rightFunc).right().rightField(dataColumns));
     }
 
     /**
@@ -37,33 +36,33 @@ public interface ModelJoinWrapper<Children, M, MC extends MFunction<M, ?>>
      * @param alias 用主表属性做别名
      */
     default <Right> Children leftJoin(MC lf, Class<Right> right, MC alias, MFunction<Right, ?> rc) {
-        return leftJoin(lf, right, alias.getName(), rc);
+        return leftJoin(lf, right, alias.name(), rc);
     }
 
     /**
      * 与主表一个条件关，并加载数据
      */
     default <Right> Children leftJoin2(MC lf, Class<Right> right, MC alias, MFunction<Right, ?> rc, MFunction<Right, ?> ... dataColumns) {
-        return leftJoin2(lf, right, alias.getName(), rc, dataColumns);
+        return leftJoin2(lf, right, alias.name(), rc, dataColumns);
     }
 
     default <Right> Children leftJoin2(MC lf, Class<Right> right, MC alias, MFunction<Right, ?> rc, MC leftDataField) {
-        return leftJoin2(lf, right, alias.getName(), rc, leftDataField);
+        return leftJoin2(lf, right, alias.name(), rc, leftDataField);
     }
 
     default <Right> Children leftJoin(MC lf, Class<Right> right, String alias, MFunction<Right, ?> rc) {
-        return join(JoinType.LEFT, new JoinOn<M, M, Right>(null, right).setRightAlias(alias).eq(lf, rc));
+        return join(JoinType.LEFT, new JoinOn<M, M, Right>(getModelClass(), right).setRightAlias(alias).eq(lf, rc));
     }
 
     default <Right> Children leftJoin2(MC lf, Class<Right> right, String alias, MFunction<Right, ?> rc, MFunction<Right, ?> ... dataColumns) {
-        return join(JoinType.LEFT, new JoinOn<M, M, Right>(null, right).setRightAlias(alias).eq(lf, rc).right().rightField(dataColumns));
+        return join(JoinType.LEFT, new JoinOn<M, M, Right>(getModelClass(), right).setRightAlias(alias).eq(lf, rc).right().rightField(dataColumns));
     }
 
     default <Right> Children leftJoin2(MC lf, Class<Right> right, String alias, MFunction<Right, ?> rc, MC leftDataField) {
         Class<?> dataFieldClass = leftDataField.getFieldClass();
         List<String> fieldList = ReflectUtil.getAllGetterConvFieldName(dataFieldClass);
         String[] fields = fieldList.toArray(new String[]{});
-        return join(JoinType.LEFT, new JoinOn<M, M, Right>(null, right).setRightAlias(alias).eq(lf, rc)
+        return join(JoinType.LEFT, new JoinOn<M, M, Right>(getModelClass(), right).setRightAlias(alias).eq(lf, rc)
                 .rightField(leftDataField, fields));
     }
 
@@ -72,7 +71,7 @@ public interface ModelJoinWrapper<Children, M, MC extends MFunction<M, ?>>
      * @return Children
      */
     default <Left, Right> Children leftJoin(Class<Left> left, MFunction<Left, ?> lc, Class<Right> right, MFunction<Right, ?> rf) {
-        return join(JoinType.LEFT, new JoinOn<Left, Left, Right>(left, left, right).eq(lc, rf));
+        return join(JoinType.LEFT, new JoinOn<Left, Left, Right>(left, right).eq(lc, rf));
     }
 
     /**
@@ -86,24 +85,24 @@ public interface ModelJoinWrapper<Children, M, MC extends MFunction<M, ?>>
      */
     default <Left, Right> Children leftJoin(Class<Left> left, String leftAlias, MFunction<Left, ?> lc,
                                                                         Class<Right> right, String rightAlias, MFunction<Right, ?> rf) {
-        return join(JoinType.LEFT, new JoinOn<Left, Left, Right>(left, left, right).setLeftAlias(leftAlias).setRightAlias(rightAlias).eq(lc, rf));
+        return join(JoinType.LEFT, new JoinOn<Left, Left, Right>(left, right).setLeftAlias(leftAlias).setRightAlias(rightAlias).eq(lc, rf));
     }
 
     /**
      * 与主表多条件关联
      */
     default <Right> Children leftJoin(Class<Right> right, JoinOnClosure<M, Right> closure) {
-        JoinOn<M, M, Right> condition = new JoinOn<>(null, right);
+        JoinOn<M, M, Right> condition = new JoinOn<>(getModelClass(), right);
         closure.call(condition);
         return join(JoinType.LEFT, condition);
     }
 
-    default <R extends Model> Children leftJoin(Class<R> r, JoinOnClosure<M, R> closure, MC leftDataField) {
+    default <Right extends Model> Children leftJoin(Class<Right> right, JoinOnClosure<M, Right> closure, MC leftDataField) {
         Class<?> dataFieldClass = leftDataField.getFieldClass();
         List<String> fieldList = ReflectUtil.getAllGetterConvFieldName(dataFieldClass);
         String[] fields = fieldList.toArray(new String[]{});
 
-        JoinOn<M, M, R> condition = new JoinOn<M, M, R>().rightField(fields);
+        JoinOn<M, M, Right> condition = new JoinOn<M, M, Right>(getModelClass(), right).rightField(fields);
         closure.call(condition);
         return join(JoinType.LEFT, condition);
     }
@@ -122,7 +121,7 @@ public interface ModelJoinWrapper<Children, M, MC extends MFunction<M, ?>>
      * 左表关联右多个表多个条件
      */
     default <Right> Children leftJoin(Class<Right> rClass, String rAlias, JoinOnClosure<M, Right> closure) {
-        JoinOn<M, M, Right> condition = new JoinOn<>();
+        JoinOn<M, M, Right> condition = new JoinOn<>(getModelClass(), rClass);
         condition.setLeftAlias(rAlias);
         closure.call(condition);
         return join(JoinType.LEFT, condition);
@@ -144,14 +143,14 @@ public interface ModelJoinWrapper<Children, M, MC extends MFunction<M, ?>>
         return where(condition, left, "", lc, operator, val);
     }
     default <Left extends Model> Children where(boolean condition, Class<Left> left, MC alias, MFunction<Left, ?> lc, Operator operator, Object val) {
-        return where(condition, left, alias.getName(), lc, operator, val);
+        return where(condition, left, alias.name(), lc, operator, val);
     }
     default <Left extends Model> Children where(boolean condition, Class<Left> left, String alias, MFunction<Left, ?> lc, Operator operator, Object val) {
         String leftTable = WrapperUtil.autoTable(null, this, left);
         if (alias != null && !alias.isEmpty()) {
             leftTable = alias;
         }
-        return where(condition, leftTable, lc.getName(), operator, val);
+        return where(condition, leftTable, lc.name(), operator, val);
     }
 
     //TODO::-------------------- 关联表查询条件抽离 START --------------------
@@ -170,7 +169,7 @@ public interface ModelJoinWrapper<Children, M, MC extends MFunction<M, ?>>
         return eq(true, left, lc, val);
     }
     default <Left extends Model> Children eq(Class<Left> left, MC alias, MFunction<Left, ?> lc, Object val) {
-        return eq(true, left, alias.getName(), lc, val);
+        return eq(true, left, alias.name(), lc, val);
     }
     default <Left extends Model> Children eq(Class<Left> left, String alias, MFunction<Left, ?> lc, Object val) {
         return eq(true, left, alias, lc, val);
@@ -218,7 +217,7 @@ public interface ModelJoinWrapper<Children, M, MC extends MFunction<M, ?>>
         return gt(true, left, lc, val);
     }
     default <Left extends Model> Children gt(Class<Left> left, MC alias, MFunction<Left, ?> lc, Object val) {
-        return gt(true, left, alias.getName(), lc, val);
+        return gt(true, left, alias.name(), lc, val);
     }
     default <Left extends Model> Children gt(Class<Left> left, String alias, MFunction<Left, ?> lc, Object val) {
         return gt(true, left, alias, lc, val);

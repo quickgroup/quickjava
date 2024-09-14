@@ -11,8 +11,8 @@ import java.util.Date;
  * 用户对象 sso_user
  *
  */
-@TableName(excludeProperty = {"createName", "updateName", "deleteTime", "deleteBy", "deleteName"})
-public class SysUser extends BaseSimpleEntity
+@TableName(value = "sso_user", excludeProperty = {"createName", "updateName", "deleteTime", "deleteBy", "deleteName"})
+public class SsoUser extends BaseSimpleEntity
 {
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;

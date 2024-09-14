@@ -1,7 +1,7 @@
 package org.quickjava.orm.drive;
 
 import org.quickjava.orm.ORMContext;
-import org.quickjava.orm.contain.DatabaseMeta;
+import org.quickjava.orm.domain.DatabaseMeta;
 import org.quickjava.orm.utils.QueryException;
 import org.quickjava.orm.utils.QuickORMException;
 

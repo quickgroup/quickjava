@@ -15,6 +15,10 @@ public class WhereAnd extends Where {
         super(1, table, column, operator, value);
     }
 
+    public WhereAnd(String table, String column, Operator operator, String valueTable, String valueColumn) {
+        super(1, table, column, operator, valueTable, valueColumn);
+    }
+
     public WhereAnd(String column, Operator operator, Object value) {
         super(1, column, operator, value);
     }

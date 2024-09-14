@@ -20,7 +20,7 @@ import org.quickjava.orm.loader.ORMContextPort;
 import org.quickjava.orm.model.callback.ModelStrut;
 import org.quickjava.orm.utils.ReflectUtil;
 import org.quickjava.orm.model.callback.ModelListener;
-import org.quickjava.orm.contain.DatabaseMeta;
+import org.quickjava.orm.domain.DatabaseMeta;
 import org.quickjava.orm.drive.*;
 import org.quickjava.orm.model.Model;
 

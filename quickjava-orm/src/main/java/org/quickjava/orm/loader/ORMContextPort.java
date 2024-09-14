@@ -13,7 +13,7 @@ package org.quickjava.orm.loader;/*
  * +-------------------------------------------------------------------
  */
 
-import org.quickjava.orm.contain.DatabaseMeta;
+import org.quickjava.orm.domain.DatabaseMeta;
 
 import java.sql.Connection;
 import java.sql.SQLException;

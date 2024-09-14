@@ -5,7 +5,7 @@ import org.quickjava.orm.query.build.Join;
 import org.quickjava.orm.query.build.TableColumn;
 import org.quickjava.orm.query.callback.QuerySetCallback;
 import org.quickjava.orm.query.contain.Action;
-import org.quickjava.orm.contain.DriveConfigure;
+import org.quickjava.orm.domain.DriveConfigure;
 import org.quickjava.orm.query.build.OrderBy;
 import org.quickjava.orm.query.build.Where;
 

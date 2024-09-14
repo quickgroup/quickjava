@@ -60,7 +60,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     @SafeVarargs
     public final Children field(R... fields) {
         for (R field : fields) {
-            querySet().field(field.getName());
+            querySet().field(field.name());
         }
         return chain();
     }
@@ -71,7 +71,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     public final <TM> Children field(Class<TM> tm, MFunction<TM, ?>... tfs) {
         String table = WrapperUtil.autoTable(null, this, tm);
         for (MFunction<TM, ?> tf : tfs) {
-            querySet().field(table, SqlUtil.toUnderlineCase(tf.getName()));
+            querySet().field(table, SqlUtil.toUnderlineCase(tf.name()));
         }
         return chain();
     }
@@ -80,7 +80,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     @SafeVarargs
     public final Children group(R... fields) {
         for (R field : fields) {
-            querySet().group(field.getName());
+            querySet().group(field.name());
         }
         return chain();
     }
@@ -91,7 +91,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     public final <TM> Children group(Class<TM> tm, MFunction<TM, ?>... tfs) {
         String table = WrapperUtil.autoTable(null, this, tm);
         for (MFunction<TM, ?> tf : tfs) {
-            querySet().group(table, SqlUtil.toUnderlineCase(tf.getName()));
+            querySet().group(table, SqlUtil.toUnderlineCase(tf.name()));
         }
         return chain();
     }
@@ -99,7 +99,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     @SafeVarargs
     public final Children having(R... fields) {
         for (R field : fields) {
-            model().having(field.getName());
+            model().having(field.name());
         }
         return chain();
     }
@@ -110,7 +110,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     public final <TM> Children having(Class<TM> tm, MFunction<TM, ?>... tfs) {
         String table = WrapperUtil.autoTable(null, this, tm);
         for (MFunction<TM, ?> tf : tfs) {
-            querySet().having(table, SqlUtil.toUnderlineCase(tf.getName()));
+            querySet().having(table, SqlUtil.toUnderlineCase(tf.name()));
         }
         return chain();
     }
@@ -137,7 +137,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
 
     //TODO::--------------- 排序和数量 ---------------
     public Children order(R r, boolean desc) {
-        querySet().order(r.getName(), desc ? OrderByType.DESC : OrderByType.ASC);
+        querySet().order(r.name(), desc ? OrderByType.DESC : OrderByType.ASC);
         return chain();
     }
 
@@ -156,7 +156,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     // 关联表支持
     public <TM> Children order(Class<TM> tm, MFunction<TM, ?> tf, OrderByType type) {
         String table = WrapperUtil.autoTable(null, this, tm);
-        querySet().order(table, SqlUtil.toUnderlineCase(tf.getName()), type);
+        querySet().order(table, SqlUtil.toUnderlineCase(tf.name()), type);
         return chain();
     }
 
@@ -289,7 +289,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     @SafeVarargs
     public final Children with(R... fields) {
         for (R field : fields) {
-            model().with(field.getName());
+            model().with(field.name());
         }
         return chain();
     }
@@ -305,7 +305,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     }
 
     private String parseFieldName(MFunction<?, ?> function) {
-        return function.getName();
+        return function.name();
     }
 
     private QuerySet querySet() {
@@ -390,8 +390,12 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         // join
         Class<?> leftClass = joinOn.getLeftClass() == null ? getModelClass() : joinOn.getLeftClass();
         ModelMeta leftMeta = ModelHelper.getMeta(leftClass);
-        String leftName = joinOn.getRightAlias();
-        querySet.join(leftMeta.tableAlias(leftName), joinOn.wheres, type);
+        String leftAlias = joinOn.getLeftAlias();
+        Class<?> rightClass = joinOn.getRightClass() == null ? getModelClass() : joinOn.getRightClass();
+        ModelMeta rightMeta = ModelHelper.getMeta(rightClass);
+        String rightAlias = joinOn.getRightAlias();
+
+        querySet.join(rightMeta.tableAlias(rightAlias), joinOn.wheres, type);
         // 缓存
         if (joinOnMap == null) {
             joinOnMap = new LinkedHashMap<>();

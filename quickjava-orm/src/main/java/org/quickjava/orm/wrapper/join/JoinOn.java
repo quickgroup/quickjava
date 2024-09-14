@@ -13,8 +13,13 @@ package org.quickjava.orm.wrapper.join;/*
  * +-------------------------------------------------------------------
  */
 
+import org.quickjava.orm.enums.Logic;
+import org.quickjava.orm.model.ModelHelper;
+import org.quickjava.orm.model.contain.ModelMeta;
 import org.quickjava.orm.query.QuerySetHelper;
 import org.quickjava.orm.query.build.Where;
+import org.quickjava.orm.query.enums.Operator;
+import org.quickjava.orm.utils.SqlUtil;
 import org.quickjava.orm.wrapper.MFunction;
 import org.quickjava.orm.wrapper.ModelWhere;
 
@@ -119,7 +124,7 @@ public class JoinOn<M, Left, Right> extends ModelWhere<JoinOn<M, Left, Right>, M
         base.dataFieldName = mField == null ? null : mField.getFieldName();
         base.dataRightFields = QuerySetHelper.initList(base.dataRightFields);
         for (MFunction<Right, ?> field : fields) {
-            base.dataRightFields.add(field.getName());
+            base.dataRightFields.add(field.name());
         }
         return chain();
     }
@@ -179,10 +184,22 @@ public class JoinOn<M, Left, Right> extends ModelWhere<JoinOn<M, Left, Right>, M
 
     // TODO::-------------------- Join两表条件 --------------------
     public JoinOn<M, Left, Right> eq(MFunction<Left, ?> lf, MFunction<Right, ?> rf) {
-        return chain();
+        return where(Operator.EQ, lf, rf);
     }
 
     public JoinOn<M, Left, Right> neq(MFunction<Left, ?> lf, MFunction<Right, ?> rf) {
+        return where(Operator.NEQ, lf, rf);
+    }
+
+    public JoinOn<M, Left, Right> where(Operator operator, MFunction<Left, ?> lf, MFunction<Right, ?> rf) {
+        ModelMeta leftMeta = ModelHelper.getMeta(getLeftClass()),
+                rightMeta = ModelHelper.getMeta(getRightClass());
+        String leftName = leftMeta == null ? getLeftClass().getSimpleName() : leftMeta.table();
+        leftName = SqlUtil.isEmpty(getLeftAlias()) ? leftName : getLeftAlias();
+        String rightName = rightMeta == null ? getRightClass().getSimpleName() : rightMeta.table();
+        rightName = SqlUtil.isEmpty(getRightAlias()) ? rightName : getRightAlias();
+
+        where(new Where(Logic.AND.num(), leftName, lf.name(), operator, rightName, rf.name()));
         return chain();
     }
 }

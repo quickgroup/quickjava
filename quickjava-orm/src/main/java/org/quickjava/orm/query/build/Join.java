@@ -1,6 +1,6 @@
 package org.quickjava.orm.query.build;
 
-import org.quickjava.orm.contain.DriveConfigure;
+import org.quickjava.orm.domain.DriveConfigure;
 import org.quickjava.orm.enums.JoinType;
 import org.quickjava.orm.utils.SqlUtil;
 
@@ -31,11 +31,6 @@ public class Join {
 
     private DriveConfigure driveConfigure;
 
-    public Join(JoinType type, String table) {
-        this.type = type;
-        this.table = table;
-    }
-
     public Join(JoinType type, String table, List<Where> conditions) {
         this.type = type;
         this.table = table;
@@ -43,9 +38,7 @@ public class Join {
     }
 
     public Join(JoinType type, String table, Where condition) {
-        this.type = type;
-        this.table = table;
-        this.conditions = new LinkedList<>();
+        this(type, table, new LinkedList<>());
         this.conditions.add(condition);
     }
 
@@ -68,16 +61,18 @@ public class Join {
         return this;
     }
 
-    public Join addCondition(Where condition) {
-        this.getConditions().add(condition);
-        return this;
-    }
-
     public String toSql(DriveConfigure driveConfigure) {
         this.driveConfigure = driveConfigure;
-        List<String> conditionsStrList = new LinkedList<>();
-        getConditions().forEach(it -> conditionsStrList.add(it.toSql(driveConfigure)));
-        String conditionsStr = SqlUtil.strJoin(" AND ", conditionsStrList);
+
+        StringBuilder sb = new StringBuilder();
+        for (Where condition : getConditions()) {
+            sb.append(condition.toSql(driveConfigure)).append(" ");
+        }
+        // 去掉最后一个空格
+        if (sb.length() > 0) {
+            sb.deleteCharAt(sb.length() - 1);
+        }
+        String conditionsStr = Where.cutFirstLogic(sb.toString());
         return String.format("%s JOIN %s ON %s", type.name(), table, conditionsStr);
     }
 }

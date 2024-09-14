@@ -5,12 +5,13 @@
 
 package org.quickjava.orm.drive;
 
+import org.quickjava.orm.domain.DatabaseMeta;
+import org.quickjava.orm.domain.DriveConfigure;
 import org.quickjava.orm.query.QuerySetHelper;
 import org.quickjava.orm.query.QueryReservoir;
 import org.quickjava.orm.query.QuerySet;
 import org.quickjava.orm.query.build.ValueConv;
 import org.quickjava.orm.query.build.Where;
-import org.quickjava.orm.contain.*;
 import org.quickjava.orm.query.contain.Action;
 import org.quickjava.orm.utils.QueryException;
 import org.quickjava.orm.utils.QuickORMException;

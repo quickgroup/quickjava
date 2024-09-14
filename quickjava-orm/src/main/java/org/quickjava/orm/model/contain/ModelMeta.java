@@ -90,6 +90,9 @@ public class ModelMeta {
      */
     public String tableAlias(String alias) {
         String tableName = this.table();
+        if (alias == null || alias.isEmpty()) {
+            return tableName;
+        }
         return tableName.equals(alias) ? tableName : tableName + " " + alias;
     }
 

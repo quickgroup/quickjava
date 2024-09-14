@@ -1,7 +1,6 @@
 package org.quickjava.orm.query.build;
 
-import org.quickjava.orm.contain.Chain;
-import org.quickjava.orm.contain.DriveConfigure;
+import org.quickjava.orm.domain.DriveConfigure;
 import org.quickjava.orm.utils.SqlUtil;
 
 /*
@@ -69,22 +68,7 @@ public class TableColumn {
         if (raw != null) {
             return getRaw();
         }
-        String columnSql = column;
-        if (driveConfigure.columnLeft != null) {
-            columnSql = driveConfigure.columnLeft + columnSql;
-        }
-        if (driveConfigure.columnRight != null) {
-            columnSql = columnSql + driveConfigure.columnRight;
-        }
-        // 表名
-        if (table != null) {
-            columnSql = SqlUtil.tableColumn(table, columnSql);
-        }
-        // 别名
-        if (columnAlias != null) {
-            columnSql = columnSql + " AS " + columnAlias;
-        }
-        return columnSql;
+        return driveConfigure.tableColumn(table, column, columnAlias);
     }
 
     public String getColumnAlias() {

@@ -1,4 +1,4 @@
-package org.quickjava.orm.contain;
+package org.quickjava.orm.domain;
 
 import java.sql.Connection;
 import java.sql.SQLException;

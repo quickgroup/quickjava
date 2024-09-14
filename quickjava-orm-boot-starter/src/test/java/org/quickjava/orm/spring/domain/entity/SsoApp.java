@@ -13,7 +13,7 @@ import java.util.Date;
  * @author origin
  * //@date 2023-10-10
  */
-public class SysApp extends BaseSimpleEntity
+public class SsoApp extends BaseSimpleEntity
 {
 
     /** appId */

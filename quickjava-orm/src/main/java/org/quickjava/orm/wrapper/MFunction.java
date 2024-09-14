@@ -18,7 +18,10 @@ public interface MFunction<M, R> extends Function<M, R>, Serializable {
         return CharSequenceUtil.lowerFirst(methodName);
     }
 
-    default String getName() {
+    /**
+     * From: {@link #getFieldName()}
+     */
+    default String name() {
         return getFieldName();
     }
 

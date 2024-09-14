@@ -1,4 +1,6 @@
-package org.quickjava.orm.contain;
+package org.quickjava.orm.domain;
+
+import org.quickjava.orm.utils.SqlUtil;
 
 /*
  * Copyright (c) 2020~2023 http://www.quickjava.org All rights reserved.
@@ -36,5 +38,32 @@ public class DriveConfigure {
         this.columnRight = columnRight;
         this.valueStrLeft = valueStrLeft;
         this.valueStrRight = valueStrRight;
+    }
+
+    /**
+     * 使用驱动配置拼接表名+字段名
+     */
+    public String tableColumn(String table, String column, String columnAlias) {
+        DriveConfigure driveConfigure = this;
+        String columnSql = column;
+        if (driveConfigure.columnLeft != null) {
+            columnSql = driveConfigure.columnLeft + columnSql;
+        }
+        if (driveConfigure.columnRight != null) {
+            columnSql = columnSql + driveConfigure.columnRight;
+        }
+        // 表名
+        if (table != null) {
+            columnSql = SqlUtil.tableColumn(table, columnSql);
+        }
+        // 别名
+        if (columnAlias != null) {
+            columnSql = columnSql + " AS " + columnAlias;
+        }
+        return columnSql;
+    }
+
+    public String tableColumn(String table, String column) {
+        return tableColumn(table, column, null);
     }
 }

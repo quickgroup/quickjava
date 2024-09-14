@@ -1,9 +1,8 @@
 package org.quickjava.orm.spring.loader;
 
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import org.quickjava.orm.ORMContext;
-import org.quickjava.orm.contain.DatabaseMeta;
+import org.quickjava.orm.domain.DatabaseMeta;
 import org.quickjava.orm.loader.ORMContextPort;
 import org.quickjava.orm.model.IModel;
 import org.quickjava.orm.model.Model;

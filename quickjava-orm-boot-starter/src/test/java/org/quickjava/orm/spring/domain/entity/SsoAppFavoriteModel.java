@@ -12,7 +12,7 @@ import java.util.Date;
  * 应用收藏
  */
 @TableName("sso_app_favorite")
-public class SysAppFavoriteModel extends BaseSimpleEntity
+public class SsoAppFavoriteModel extends BaseSimpleEntity
 {
 
     @TableId
@@ -34,23 +34,23 @@ public class SysAppFavoriteModel extends BaseSimpleEntity
 
     // 关联应用信息
     @TableField(exist = false)
-    private SysApp app;
+    private SsoApp app;
 
     // 关联应用信息
     @TableField(exist = false)
-    private SysApp app2;
+    private SsoApp app2;
 
     // 关联应用信息
     @TableField(exist = false)
-    private SysApp testAppInfo;
+    private SsoApp testAppInfo;
 
     @TableField(exist = false)
-    private SysAppFavoriteModel sysAppFavorite;
+    private SsoAppFavoriteModel ssoAppFavorite;
 
-    public SysAppFavoriteModel() {
+    public SsoAppFavoriteModel() {
     }
 
-    public SysAppFavoriteModel(Long userId, Long appId) {
+    public SsoAppFavoriteModel(Long userId, Long appId) {
         this.userId = userId;
         this.appId = appId;
     }
@@ -87,35 +87,35 @@ public class SysAppFavoriteModel extends BaseSimpleEntity
         this.createTime = createTime;
     }
 
-    public SysApp getApp() {
+    public SsoApp getApp() {
         return app;
     }
 
-    public void setApp(SysApp app) {
+    public void setApp(SsoApp app) {
         this.app = app;
     }
 
-    public SysApp getApp2() {
+    public SsoApp getApp2() {
         return app2;
     }
 
-    public void setApp2(SysApp app2) {
+    public void setApp2(SsoApp app2) {
         this.app2 = app2;
     }
 
-    public SysApp getTestAppInfo() {
+    public SsoApp getTestAppInfo() {
         return testAppInfo;
     }
 
-    public void setTestAppInfo(SysApp testAppInfo) {
+    public void setTestAppInfo(SsoApp testAppInfo) {
         this.testAppInfo = testAppInfo;
     }
 
-    public SysAppFavoriteModel getSysAppFavorite() {
-        return sysAppFavorite;
+    public SsoAppFavoriteModel getSsoAppFavorite() {
+        return ssoAppFavorite;
     }
 
-    public void setSysAppFavorite(SysAppFavoriteModel sysAppFavorite) {
-        this.sysAppFavorite = sysAppFavorite;
+    public void setSsoAppFavorite(SsoAppFavoriteModel ssoAppFavorite) {
+        this.ssoAppFavorite = ssoAppFavorite;
     }
 }

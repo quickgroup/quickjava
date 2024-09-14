@@ -1,6 +1,6 @@
 package org.quickjava.orm.query.build;
 
-import org.quickjava.orm.contain.DriveConfigure;
+import org.quickjava.orm.domain.DriveConfigure;
 import org.quickjava.orm.query.enums.OrderByType;
 
 /*

@@ -10,6 +10,7 @@ import org.quickjava.common.enums.DatetimeCurrType;
 import org.quickjava.common.enums.DatetimeRangeType;
 import org.quickjava.common.utils.DatetimeUtil;
 import org.quickjava.orm.ORMContext;
+import org.quickjava.orm.domain.DatabaseMeta;
 import org.quickjava.orm.enums.JoinType;
 import org.quickjava.orm.model.ModelHelper;
 import org.quickjava.orm.query.build.*;
