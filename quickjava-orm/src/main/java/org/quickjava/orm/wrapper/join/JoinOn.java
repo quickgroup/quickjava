@@ -57,7 +57,11 @@ public class JoinOn<M, Left, Right> extends ModelWhere<JoinOn<M, Left, Right>, M
 
     @Override
     public JoinOn<M, Left, Right> where(Where where) {
-        base().where(where);
+        if (base == null) {
+            super.where(where);
+        } else {
+            base.where(where);
+        }
         return chain();
     }
 

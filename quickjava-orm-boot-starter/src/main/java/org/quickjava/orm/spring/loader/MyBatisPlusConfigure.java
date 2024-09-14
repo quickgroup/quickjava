@@ -1,4 +1,4 @@
-package org.quickjava.spring.loader;/*
+package org.quickjava.orm.spring.loader;/*
  * Copyright (c) 2020~2024 http://www.quickjava.org All rights reserved.
  * +-------------------------------------------------------------------
  * Organization: QuickJava
@@ -13,6 +13,7 @@ package org.quickjava.spring.loader;/*
  * +-------------------------------------------------------------------
  */
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
@@ -30,11 +31,28 @@ public class MyBatisPlusConfigure {
     protected static TableId getTableId(ModelFieldMeta fieldMeta) {
         return fieldMeta.getField().getAnnotation(TableId.class);
     }
+
     protected static TableField getTableField(ModelFieldMeta fieldMeta) {
         return fieldMeta.getField().getAnnotation(TableField.class);
     }
 
-    protected static void init() {
+    protected static void loadConfig(SpringLoader loader) {
+        if (ObjectUtil.isEmpty(loader.getOrmProps().getTypeAliasesPackage())) {
+            String typeAliasesPackage = loader.getEnvironment().getProperty("mybatis.type-aliases-package");
+            if (ObjectUtil.isEmpty(typeAliasesPackage)) {
+                typeAliasesPackage = loader.getEnvironment().getProperty("mybatis-plus.type-aliases-package");
+            }
+            if (ObjectUtil.isEmpty(typeAliasesPackage)) {
+                typeAliasesPackage = loader.getEnvironment().getProperty("spring.component-scan.base-package");
+            }
+            loader.getOrmProps().setTypeAliasesPackage(typeAliasesPackage);
+        }
+    }
+
+    protected static void init(SpringLoader loader) {
+        // mp配置加载
+        loadConfig(loader);
+        // 插槽处理
         ORMContext.setModelStrut(new ModelStrut() {
 
             @Override

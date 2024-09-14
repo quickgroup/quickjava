@@ -1,4 +1,4 @@
-package org.quickjava.spring.loader;
+package org.quickjava.orm.spring.loader;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
@@ -7,6 +7,7 @@ import org.quickjava.orm.contain.DatabaseMeta;
 import org.quickjava.orm.loader.ORMContextPort;
 import org.quickjava.orm.model.IModel;
 import org.quickjava.orm.model.Model;
+import org.quickjava.orm.spring.domain.QuickJavaOrmProps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -33,16 +34,12 @@ public class SpringLoader implements InitializingBean, ORMContextPort {
 
     private static ApplicationContext applicationContext;
 
-    public static SpringLoader instance;
-
-//    public static MybatisProperties mybatisProperties;
-
-//    public static MybatisPlusProperties mybatisPlusProperties;
+    private static SpringLoader instance;
 
     @Autowired
     private Environment environment;
-
-    // 数据源
+    @Autowired
+    private QuickJavaOrmProps ormProps;
     @Autowired
     private DataSource druidDataSource;
 
@@ -74,9 +71,9 @@ public class SpringLoader implements InitializingBean, ORMContextPort {
         // 配置数据库来源
         ORMContext.setContextPort(this);
         // mybatis-plus字段支持
-        MyBatisPlusConfigure.init();
+        MyBatisPlusConfigure.init(this);
         // 加载模型
-        this.loadModel();
+        this.loadModels();
         // 更换classLoader
         ORMContext.setClassLoader(applicationContext.getClassLoader());
     }
@@ -110,14 +107,16 @@ public class SpringLoader implements InitializingBean, ORMContextPort {
         return druidDataSource.getConnection();
     }
 
-    private void loadModel() {
-        String typeAliasesPackage = environment.getProperty("mybatis.type-aliases-package");
-        if (ObjectUtil.isEmpty(typeAliasesPackage)) {
-            typeAliasesPackage = environment.getProperty("mybatis-plus.type-aliases-package");
-        }
-        if (ObjectUtil.isEmpty(typeAliasesPackage)) {
-            typeAliasesPackage = environment.getProperty("spring.component-scan.base-package");
-        }
+    public Environment getEnvironment() {
+        return environment;
+    }
+
+    public QuickJavaOrmProps getOrmProps() {
+        return ormProps;
+    }
+
+    private void loadModels() {
+        String typeAliasesPackage = getOrmProps().getTypeAliasesPackage();
         logger.debug("Load model entities, in package: " + typeAliasesPackage);
         if (typeAliasesPackage == null) {
             logger.warn("model entities package path error");

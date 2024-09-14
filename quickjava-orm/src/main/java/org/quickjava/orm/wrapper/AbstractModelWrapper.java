@@ -53,6 +53,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     }
 
     //TODO::-------------------- 查询字段  --------------------
+
     /**
      * 限定返回数据列
      */
@@ -382,16 +383,19 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
 //
 //        return chain();
 //    }
-
     @Override
     public Children join(JoinType type, JoinOn<?, ?, ?> joinOn) {
         joinOn = joinOn.base();
-        // join
         QuerySet querySet = querySet();
-        ModelMeta leftMeta = ModelHelper.getMeta(joinOn.getLeftClass());
+        // join
+        Class<?> leftClass = joinOn.getLeftClass() == null ? getModelClass() : joinOn.getLeftClass();
+        ModelMeta leftMeta = ModelHelper.getMeta(leftClass);
         String leftName = joinOn.getRightAlias();
         querySet.join(leftMeta.tableAlias(leftName), joinOn.wheres, type);
-        // 缓存信息
+        // 缓存
+        if (joinOnMap == null) {
+            joinOnMap = new LinkedHashMap<>();
+        }
         joinOnMap.put(joinOn.getRightAlias(), joinOn);
         return chain();
     }

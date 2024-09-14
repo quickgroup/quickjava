@@ -1,4 +1,4 @@
-package org.quickjava.spring.utils;/*
+package org.quickjava.orm.spring.utils;/*
  * Copyright (c) 2020~2024 http://www.quickjava.org All rights reserved.
  * +-------------------------------------------------------------------
  * Organization: QuickJava

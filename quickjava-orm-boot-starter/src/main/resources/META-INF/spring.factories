@@ -1,3 +1,4 @@
 # Auto Configure
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  org.quickjava.spring.loader.SpringLoader
+  org.quickjava.orm.spring.loader.SpringLoader, \
+  org.quickjava.orm.spring.domain.QuickJavaOrmProps
