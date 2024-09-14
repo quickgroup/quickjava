@@ -31,8 +31,9 @@ public class JoinOn<M, Left, Right> extends ModelWhere<JoinOn<M, Left, Right>, M
     protected String leftAlias;
     protected Class<Right> rightClass;
     protected String rightAlias;
-    // 加载数据的列
-    protected List<String> dataFields;
+    // 加载数据
+    protected String dataFieldName;
+    protected List<String> dataRightFields;
 
     public JoinOn() {
     }
@@ -109,22 +110,46 @@ public class JoinOn<M, Left, Right> extends ModelWhere<JoinOn<M, Left, Right>, M
      * 加载右表数据
      */
     @SafeVarargs
-    public final JoinOn<M, Left, Right> rightField(MFunction<Right, ?>... fields) {
+    public final JoinOn<M, Left, Right> rightField(MFunction<Left, ?> mField, MFunction<Right, ?>... fields) {
         JoinOn<?, Left, Right> base = base();
-        base.dataFields = QuerySetHelper.initList(base.dataFields);
+        base.dataFieldName = mField == null ? null : mField.getFieldName();
+        base.dataRightFields = QuerySetHelper.initList(base.dataRightFields);
         for (MFunction<Right, ?> field : fields) {
-            base.dataFields.add(field.getName());
+            base.dataRightFields.add(field.getName());
         }
         return chain();
     }
 
-    public final JoinOn<M, Left, Right> rightField(String... fields) {
+    @SafeVarargs
+    public final JoinOn<M, Left, Right> rightField(MFunction<Right, ?>... fields) {
+        return rightField(null, fields);
+    }
+
+    public final JoinOn<M, Left, Right> rightField(MFunction<Left, ?> mField, String... fields) {
+        return rightField(mField == null ? null : mField.getFieldName(), fields);
+    }
+
+    public final JoinOn<M, Left, Right> rightField(String mField, String... fields) {
         JoinOn<?, Left, Right> base = base();
-        base.dataFields = QuerySetHelper.initList(base.dataFields);
-        base.dataFields.addAll(Arrays.asList(fields));
+        base.dataFieldName = mField;
+        base.dataRightFields = QuerySetHelper.initList(base.dataRightFields);
+        base.dataRightFields.addAll(Arrays.asList(fields));
         return chain();
     }
 
+    public final JoinOn<M, Left, Right> rightField(String... fields) {
+        rightField("", fields);
+        base.dataFieldName = null;
+        return chain();
+    }
+
+    public String getDataFieldName() {
+        return dataFieldName;
+    }
+
+    public List<String> getDataRightFields() {
+        return dataRightFields;
+    }
 
     // TODO::-------------------- 操作方法 --------------------
     public JoinOn<?, Left, Right> base() {

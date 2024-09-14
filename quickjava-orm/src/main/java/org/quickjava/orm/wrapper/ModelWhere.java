@@ -30,4 +30,8 @@ public abstract class ModelWhere<Children extends ModelWhere<Children, M, R>, M,
         wheres.add(where);
         return chain();
     }
+
+    protected List<Where> getWheres() {
+        return wheres;
+    }
 }

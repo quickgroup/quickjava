@@ -64,7 +64,7 @@ public interface ModelJoinWrapper<Children, M, MC extends MFunction<M, ?>>
         List<String> fieldList = ReflectUtil.getAllGetterConvFieldName(dataFieldClass);
         String[] fields = fieldList.toArray(new String[]{});
         return join(JoinType.LEFT, new JoinOn<M, M, Right>(null, right).setRightAlias(alias).eq(lf, rc)
-                .rightField(fields));
+                .rightField(leftDataField, fields));
     }
 
     /**
