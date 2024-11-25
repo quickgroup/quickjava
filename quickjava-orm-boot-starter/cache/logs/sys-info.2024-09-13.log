@@ -1,0 +1,7 @@
+18:04:48.539 [main] INFO  o.q.s.TestModelJoin - [logStarting,55] - Starting TestModelJoin using Java 1.8.0_291 on DESKTOP-6BAV2RA with PID 24820 (started by QloPC-TBK in E:\Long_File\gits\quickjava\quickjava\quickjava-orm-boot-starter)
+18:04:48.542 [main] INFO  o.q.s.TestModelJoin - [logStartupProfileInfo,680] - No active profile set, falling back to 1 default profile: "default"
+18:04:50.011 [main] INFO  c.a.d.s.b.a.DruidDataSourceAutoConfigure - [dataSource,55] - Init DruidDataSource
+18:04:50.281 [main] INFO  c.a.d.p.DruidDataSource - [init,996] - {dataSource-1} inited
+18:04:51.139 [main] INFO  o.q.s.TestModelJoin - [logStarted,61] - Started TestModelJoin in 2.88 seconds (JVM running for 3.778)
+18:04:55.092 [SpringApplicationShutdownHook] INFO  c.a.d.p.DruidDataSource - [close,2138] - {dataSource-1} closing ...
+18:04:55.095 [SpringApplicationShutdownHook] INFO  c.a.d.p.DruidDataSource - [close,2211] - {dataSource-1} closed

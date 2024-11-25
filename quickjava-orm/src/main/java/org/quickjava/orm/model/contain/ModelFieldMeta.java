@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import org.quickjava.common.utils.ComUtil;
+import org.quickjava.orm.loader.MyBatisPlusHelper;
+import org.quickjava.orm.loader.SpringLoader;
 import org.quickjava.orm.model.ModelHelper;
 import org.quickjava.orm.model.annotation.ModelField;
 import org.quickjava.orm.model.annotation.ModelId;
@@ -14,6 +16,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 public class ModelFieldMeta {
+
+    private ModelMeta modelMeta;
 
     private String name;
 
@@ -43,7 +47,8 @@ public class ModelFieldMeta {
     public ModelFieldMeta() {
     }
 
-    public ModelFieldMeta(Field field) {
+    public ModelFieldMeta(Field field, ModelMeta modelMeta) {
+        this.modelMeta = modelMeta;
         this.name = field.getName();
         this.clazz = field.getType();
         this.field = field;
@@ -52,13 +57,6 @@ public class ModelFieldMeta {
         this.tableField = field.getAnnotation(TableField.class);
         this.tableId = field.getAnnotation(TableId.class);
         this.tableLogic = field.getAnnotation(TableLogic.class);
-    }
-
-    public ModelFieldMeta(Field field, Object relationWay, Method setter, Method getter) {
-        this(field);
-        this.relationWay = relationWay;
-        this.setter = setter;
-        this.getter = getter;
     }
 
     public String getName() {
@@ -205,6 +203,18 @@ public class ModelFieldMeta {
             return true;
         }
         return false;
+    }
+
+    /**
+     * 获取未删除时的值
+     */
+    public Object getSoftDeleteNotDelValue() {
+        if (modelField != null) {
+            return null;
+        } else if (tableLogic != null) {
+            return MyBatisPlusHelper.getLogicNotDeletedValue(this.modelMeta.getClazz());
+        }
+        return null;
     }
 
     /**

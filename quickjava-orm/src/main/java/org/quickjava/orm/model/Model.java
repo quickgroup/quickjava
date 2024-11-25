@@ -648,7 +648,7 @@ public class Model implements IModel {
                 if (Date.class.isAssignableFrom(field.getField().getType())) {
                     where(field.getName(), Operator.IS_NULL);
                 } else {
-                    throw new QuickORMException("不支持的软删除字段");
+                    where(field.getName(), field.getSoftDeleteNotDelValue());
                 }
             }
         }
@@ -932,7 +932,7 @@ public class Model implements IModel {
             if (Modifier.isStatic(field.getModifiers())) {
                 continue;
             }
-            ModelFieldMeta fieldMeta = new ModelFieldMeta(field);
+            ModelFieldMeta fieldMeta = new ModelFieldMeta(field, meta);
             // 隐藏字段
             if (!fieldMeta.isExist()) {
                 continue;
@@ -972,7 +972,7 @@ public class Model implements IModel {
             if (Modifier.isStatic(field.getModifiers())) {
                 continue;
             }
-            ModelFieldMeta fieldMeta = new ModelFieldMeta(field);
+            ModelFieldMeta fieldMeta = new ModelFieldMeta(field, meta);
             boolean isModelChild = Model.class.isAssignableFrom(fieldMeta.getClazz());
             boolean isModelChildList = List.class.isAssignableFrom(fieldMeta.getClazz());
             if (isModelChildList) {

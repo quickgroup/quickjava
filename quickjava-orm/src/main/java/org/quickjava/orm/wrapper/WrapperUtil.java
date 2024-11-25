@@ -58,7 +58,7 @@ public class WrapperUtil {
         Map<Class<?>, ModelFieldMeta> fieldMetaClazzMap = new LinkedHashMap<>();
         for (Field field : meta.getClazz().getDeclaredFields()) {
             if (!fieldMetaClazzMap.containsKey(field.getType())) {
-                fieldMetaClazzMap.put(field.getType(), new ModelFieldMeta(field));
+                fieldMetaClazzMap.put(field.getType(), new ModelFieldMeta(field, meta));
             }
         }
         return fieldMetaClazzMap;
