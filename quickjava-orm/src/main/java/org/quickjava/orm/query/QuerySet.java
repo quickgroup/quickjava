@@ -4,6 +4,7 @@
 
 package org.quickjava.orm.query;
 
+import cn.hutool.core.convert.Convert;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreType;
 import org.quickjava.common.enums.DatetimeCurrType;
@@ -618,7 +619,8 @@ public class QuerySet {
         if (resultSet == null || resultSet.isEmpty()) {
             return 0;
         }
-        return Math.toIntExact((Long) resultSet.get(0).get(column.getRaw()));
+        Object countValue = resultSet.get(0).get(column.getRaw());
+        return Convert.toInt(countValue);
     }
 
     //TODO::--------------- 事务操作方法 ---------------
