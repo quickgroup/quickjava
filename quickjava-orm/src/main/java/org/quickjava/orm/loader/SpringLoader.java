@@ -73,10 +73,8 @@ public class SpringLoader implements InitializingBean {
     public DatabaseConfig.DBType getConnectionType() {
         synchronized (SpringLoader.class) {
             if (dbType == null) {
-                try {
-                    Connection connection = getDataSource().getConnection();
+                try (Connection connection = getDataSource().getConnection()) {
                     dbType = DatabaseConfig.parseTypeFromConnection(connection);
-                    connection.close();
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
