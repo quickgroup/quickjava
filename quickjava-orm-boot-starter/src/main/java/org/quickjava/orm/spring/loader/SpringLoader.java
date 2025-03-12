@@ -80,10 +80,8 @@ public class SpringLoader implements InitializingBean, ORMContextPort {
     public DatabaseMeta.DBType getConnectionType() {
         synchronized (SpringLoader.class) {
             if (dbType == null) {
-                try {
-                    Connection connection = druidDataSource.getConnection();
+                try (Connection connection = druidDataSource.getConnection()) {
                     dbType = DatabaseMeta.parseTypeFromConnection(connection);
-                    connection.close();
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
