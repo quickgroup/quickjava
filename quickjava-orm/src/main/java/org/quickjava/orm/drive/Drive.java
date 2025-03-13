@@ -298,6 +298,7 @@ public abstract class Drive {
         __THREAD_CONNECTION.set(autoCommit ? null : connection);
         // 事务隔离
         if (!autoCommit) {
+            logger.info("Transaction start");
             connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
         }
         connection.setAutoCommit(autoCommit);
@@ -310,6 +311,7 @@ public abstract class Drive {
     public void commit() {
         QuickConnection connection = __THREAD_CONNECTION.get();
         if (connection != null) {
+            logger.info("Transaction commit");
             connection.commit();
             connection.setAutoCommit(true);
             connection.close();
@@ -320,6 +322,7 @@ public abstract class Drive {
     public void rollback() {
         QuickConnection connection = __THREAD_CONNECTION.get();
         if (connection != null) {
+            logger.info("Transaction rollback");
             connection.rollback();
             connection.setAutoCommit(true);
             connection.close();
