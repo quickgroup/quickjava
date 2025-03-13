@@ -37,6 +37,7 @@ import java.util.Map;
  * - select 返回 {@code List<Map<String,Object>>}
  * - find 返回 {@code Map<String,Object>}
  * - QuerySet 是不支持层级模型返回的，只支持简单查询和join查询，数据层级封装由Model自己负责
+ *
  * @author Qlo1062-(QloPC-zs)
  * &#064;date  2021/1/19 10:18
  */
@@ -46,7 +47,8 @@ public class QuerySet {
     @JsonIgnore
     private QueryReservoir reservoir = new QueryReservoir();
 
-    public QuerySet() {}
+    public QuerySet() {
+    }
 
     public QuerySet(String table) {
         reservoir.setTable(table);
@@ -55,8 +57,7 @@ public class QuerySet {
     public QuerySet(DatabaseMeta config) {
     }
 
-    public static QuerySet table(String table)
-    {
+    public static QuerySet table(String table) {
         return new QuerySet(table);
     }
 
@@ -89,11 +90,11 @@ public class QuerySet {
 
     /**
      * 限定查询返回的数据字段
+     *
      * @param columns 字段
      * @return 查询器
      */
-    public QuerySet field(String ... columns)
-    {
+    public QuerySet field(String... columns) {
         if (ModelHelper.isEmpty(columns)) {
             return this;
         }
@@ -107,37 +108,33 @@ public class QuerySet {
         return this;
     }
 
-    public QuerySet field(String table, String column)
-    {
+    public QuerySet field(String table, String column) {
         field(new TableColumn(table, column));
         return this;
     }
 
     /**
      * 限定查询返回的数据字段
+     *
      * @param columns 字段
      * @return 查询器
      */
-    public QuerySet field(List<String> columns)
-    {
+    public QuerySet field(List<String> columns) {
         columns.forEach(this::field);
         return this;
     }
 
-    public QuerySet field(TableColumn column)
-    {
+    public QuerySet field(TableColumn column) {
         reservoir.getColumnList().add(column);
         return this;
     }
 
     //TODO::-------------------- 查询条件 --------------------
-    public QuerySet where(String field, Object value)
-    {
+    public QuerySet where(String field, Object value) {
         return this.where(field, Operator.EQ, value);
     }
 
-    public QuerySet where(String field, Operator operator, Object value)
-    {
+    public QuerySet where(String field, Operator operator, Object value) {
         if (ModelHelper.isEmpty(field)) {
             return this;
         }
@@ -145,8 +142,7 @@ public class QuerySet {
         return this;
     }
 
-    public QuerySet where(String table, String field, Operator operator, Object value)
-    {
+    public QuerySet where(String table, String field, Operator operator, Object value) {
         if (ModelHelper.isEmpty(field)) {
             return this;
         }
@@ -154,8 +150,7 @@ public class QuerySet {
         return this;
     }
 
-    public QuerySet whereOr(String table, String field, Operator operator, Object value)
-    {
+    public QuerySet whereOr(String table, String field, Operator operator, Object value) {
         if (ModelHelper.isEmpty(field)) {
             return this;
         }
@@ -165,17 +160,16 @@ public class QuerySet {
 
     /**
      * 高级sql语句查询
+     *
      * @param sql SQL语句
      * @return 查询器
-     * */
-    public QuerySet where(String sql)
-    {
+     */
+    public QuerySet where(String sql) {
         where(sql, Operator.RAW, null);
         return this;
     }
 
-    public QuerySet where(Where where)
-    {
+    public QuerySet where(Where where) {
         WhereOptCallback whereOptCallback = reservoir.getCallback(WhereOptCallback.class);
         if (whereOptCallback != null) {
             whereOptCallback.call(where, this, reservoir.getCallbackUserData(WhereOptCallback.class));
@@ -184,19 +178,18 @@ public class QuerySet {
         return this;
     }
 
-    public QuerySet where(List<Where> wheres)
-    {
+    public QuerySet where(List<Where> wheres) {
         reservoir.getWhereList().addAll(wheres);
         return this;
     }
 
     /**
      * 闭包查询
+     *
      * @param callback 闭包方法
      * @return 查询器
-     * */
-    public QuerySet where(WhereClosure callback)
-    {
+     */
+    public QuerySet where(WhereClosure callback) {
         QuerySet querySet = new QuerySet();
         callback.call(querySet);
         if (querySet.reservoir.whereList != null) {
@@ -205,43 +198,38 @@ public class QuerySet {
         return this;
     }
 
-    public QuerySet where(String field, DatetimeRangeType range)
-    {
+    public QuerySet where(String field, DatetimeRangeType range) {
         where(new WhereAnd(field, Operator.BETWEEN, DatetimeUtil.rangeType(range)));
         return this;
     }
 
-    public QuerySet where(String field, DatetimeCurrType currType)
-    {
+    public QuerySet where(String field, DatetimeCurrType currType) {
         where(new WhereOr(field, Operator.EQ, DatetimeUtil.currType(currType)));
         return this;
     }
 
-    public QuerySet whereOr(String field, Operator operator, Object value)
-    {
+    public QuerySet whereOr(String field, Operator operator, Object value) {
         where(new WhereOr(field, operator, value));
         return this;
     }
 
     /**
      * OR查询
+     *
      * @param field 字段名
      * @param value 数值
      * @return 查询器
      */
-    public QuerySet whereOr(String field, Object value)
-    {
+    public QuerySet whereOr(String field, Object value) {
         return this.whereOr(field, Operator.EQ, value);
     }
 
-    public QuerySet whereOr(String sql)
-    {
+    public QuerySet whereOr(String sql) {
         where(sql, Operator.RAW, null);
         return this;
     }
 
-    public QuerySet whereOr(WhereClosure callback)
-    {
+    public QuerySet whereOr(WhereClosure callback) {
         QuerySet querySet = new QuerySet();
         callback.call(querySet);
         if (querySet.reservoir.whereList != null) {
@@ -250,8 +238,7 @@ public class QuerySet {
         return this;
     }
 
-    public QuerySet between(String field, Object v1, Object v2)
-    {
+    public QuerySet between(String field, Object v1, Object v2) {
         where(new WhereAnd(field, Operator.BETWEEN, new Object[]{v1, v2}));
         return this;
     }
@@ -267,8 +254,7 @@ public class QuerySet {
     }
 
     //TODO::-------------------- 特性 --------------------
-    public QuerySet group(String ... columns)
-    {
+    public QuerySet group(String... columns) {
         for (String column : columns) {
             if (column.contains(",")) {
                 Arrays.stream(column.split(",")).forEach(this::group);
@@ -283,8 +269,7 @@ public class QuerySet {
         return group(new TableColumn(table, column));
     }
 
-    public QuerySet group(TableColumn ... columns)
-    {
+    public QuerySet group(TableColumn... columns) {
         for (TableColumn column : columns) {
             reservoir.getGroupBy().add(column);
         }
@@ -295,8 +280,7 @@ public class QuerySet {
         return having(columns.split(","));
     }
 
-    public QuerySet having(String ... columns)
-    {
+    public QuerySet having(String... columns) {
         for (String column : columns) {
             having(new TableColumn(column.trim()));
         }
@@ -307,8 +291,7 @@ public class QuerySet {
         return having(new TableColumn(table, column));
     }
 
-    public QuerySet having(TableColumn ... columns)
-    {
+    public QuerySet having(TableColumn... columns) {
         for (TableColumn column : columns) {
             reservoir.getHaving().add(column);
         }
@@ -338,8 +321,7 @@ public class QuerySet {
     }
 
     //TODO::-------------------- 排序 --------------------
-    public QuerySet order(String table, String field, OrderByType type)
-    {
+    public QuerySet order(String table, String field, OrderByType type) {
         OrderBy orderBy = new OrderBy(table, field, type);
         // 回调处理
         OrderByOptCallback orderByOptCallback = reservoir.getCallback(OrderByOptCallback.class);
@@ -350,8 +332,7 @@ public class QuerySet {
         return this;
     }
 
-    public QuerySet order(String field, OrderByType type)
-    {
+    public QuerySet order(String field, OrderByType type) {
         if (field.contains(".")) {
             String[] fieldArr = field.split("\\.");
             order(fieldArr[0], fieldArr[1], type);
@@ -361,12 +342,15 @@ public class QuerySet {
         return this;
     }
 
+    public QuerySet order(String field, String desc) {
+        return order(field, OrderByType.getByName(desc));
+    }
+
     public QuerySet order(String field, boolean desc) {
         return order(field, desc ? OrderByType.DESC : OrderByType.ASC);
     }
 
-    public QuerySet order(String columns)
-    {
+    public QuerySet order(String columns) {
         if (ModelHelper.isEmpty(columns)) {
             return this;
         }
@@ -390,8 +374,7 @@ public class QuerySet {
     }
 
     //TODO::-------------------- 数量限制 --------------------
-    public QuerySet limit(Long index, Long count)
-    {
+    public QuerySet limit(Long index, Long count) {
         reservoir.limitIndex = index;
         reservoir.limitSize = count;
         return this;
@@ -406,33 +389,28 @@ public class QuerySet {
     }
 
     //TODO::-------------------- 数据 --------------------
-    public QuerySet data(String field, Object value)
-    {
+    public QuerySet data(String field, Object value) {
         reservoir.getData().put(field, value);
         return this;
     }
 
-    public QuerySet data(Map<String, Object> data)
-    {
+    public QuerySet data(Map<String, Object> data) {
         reservoir.getData().putAll(data);
         return this;
     }
 
-    public Map<String, Object> data()
-    {
+    public Map<String, Object> data() {
         return reservoir.dataList == null || reservoir.dataList.size() == 0 ? null : reservoir.getData();
     }
 
     //TODO::-------------------- 增删改查 --------------------
-    public List<Map<String, Object>> select()
-    {
+    public List<Map<String, Object>> select() {
         queryBefore();
         List<Map<String, Object>> resultSet = executeSql();
         return SqlUtil.isEmpty(resultSet) ? new LinkedList<>() : resultSet;
     }
 
-    public Map<String, Object> find()
-    {
+    public Map<String, Object> find() {
         limit(0L, 1L);
         List<Map<String, Object>> resultSet = select();
         return SqlUtil.isEmpty(resultSet) ? null : resultSet.get(0);
@@ -443,47 +421,41 @@ public class QuerySet {
      */
     private void queryBefore() {
         // 默认查询全部字段
-        if (reservoir.columnList == null  || reservoir.getColumnList().isEmpty())
+        if (reservoir.columnList == null || reservoir.getColumnList().isEmpty())
             field(new TableColumn(null).setRaw("*"));
     }
 
-    public Integer update(Map<String, Object> data)
-    {
+    public Integer update(Map<String, Object> data) {
         reservoir.action = Action.UPDATE;
         this.data(data);
         return executeSql();
     }
 
-    public Integer update()
-    {
+    public Integer update() {
         reservoir.action = Action.UPDATE;
         return executeSql();
     }
 
-    public Integer insert(Map<String, Object> data)
-    {
+    public Integer insert(Map<String, Object> data) {
         reservoir.action = Action.INSERT;
         this.data(data);
         return executeSql();
     }
 
-    public Long insertGetId(Map<String, Object> data)
-    {
+    public Long insertGetId(Map<String, Object> data) {
         reservoir.action = Action.INSERT;
         reservoir.addLabel(Label.INSERT_GET_ID);
         this.data(data);
         return executeSql();
     }
 
-    public Integer insertAll(List<DataMap> dataList)
-    {
+    public Integer insertAll(List<DataMap> dataList) {
         reservoir.action = Action.INSERT;
         reservoir.getDataList().addAll(dataList);
         return executeSql();
     }
 
-    public Integer delete()
-    {
+    public Integer delete() {
         if (QuerySetHelper.isEmpty(reservoir.whereList)) {
             throw new QueryException("不允许空条件的删除执行");
         }
@@ -492,16 +464,17 @@ public class QuerySet {
     }
 
     //TODO::-------------------- 扩展方法 --------------------
+
     /**
      * 获取表全部字段
+     *
      * @return 字段列表
-     * */
+     */
     public List<TableColumnMeta> getColumns() {
         return getColumns(reservoir.table);
     }
 
-    public List<TableColumnMeta> getColumns(String table)
-    {
+    public List<TableColumnMeta> getColumns(String table) {
         // 先查内存缓存
         List<TableColumnMeta> ret = QueryCache.getTableColumns(table);
         if (ret != null) {
@@ -529,8 +502,7 @@ public class QuerySet {
     }
 
     //TODO::--------------- 语句方法 ---------------
-    public String buildSql()
-    {
+    public String buildSql() {
         reservoir.action = reservoir.action == null ? Action.SELECT : reservoir.action;
         if (Action.SELECT == reservoir.action) {
             queryBefore();
@@ -547,8 +519,7 @@ public class QuerySet {
         return this;
     }
 
-    private <T> T executeSql()
-    {
+    private <T> T executeSql() {
         reservoir.action = reservoir.action == null ? Action.SELECT : reservoir.action;
         if (reservoir.fetchSql) {
             reservoir.setSql(ORMContext.getDrive().pretreatment(this));
@@ -560,8 +531,7 @@ public class QuerySet {
         return ORMContext.getDrive().executeSql(this);
     }
 
-    private  <T> T executeSql(String sql)
-    {
+    private <T> T executeSql(String sql) {
         return ORMContext.getDrive().executeSql(Action.SELECT, sql, QueryReservoir.EMPTY);
     }
 
@@ -575,8 +545,7 @@ public class QuerySet {
 
     //TODO::--------------- 增强方法 ---------------
     // 分页查询
-    public IPagination<Map<String, Object>> pagination()
-    {
+    public IPagination<Map<String, Object>> pagination() {
         List<TableColumn> cacheFiledList = new LinkedList<>(reservoir.getColumnList());
         // 分页器开启直接打印sql
         reservoir.printSql = true;
@@ -611,11 +580,10 @@ public class QuerySet {
     }
 
     public Integer count(String field) {
-        return count(new TableColumn().setRaw("COUNT("+field+")"));
+        return count(new TableColumn().setRaw("COUNT(" + field + ")"));
     }
 
-    public Integer count(TableColumn column)
-    {
+    public Integer count(TableColumn column) {
         QueryReservoir reservoirOld = this.reservoir;
         this.reservoir = new QueryReservoir();
         // 聚合count只需要field、where
@@ -641,9 +609,10 @@ public class QuerySet {
     }
 
     //TODO::--------------- 事务操作方法 ---------------
+
     /**
      * 开启事务
-     * */
+     */
     public static void startTrans() {
         startTrans(ORMContext.getDrive());
     }
@@ -654,7 +623,7 @@ public class QuerySet {
 
     /**
      * 提交事务
-     * */
+     */
     public static void commit() {
         commit(ORMContext.getDrive());
     }
@@ -665,7 +634,7 @@ public class QuerySet {
 
     /**
      * 事务回滚
-     * */
+     */
     public static void rollback() {
         rollback(ORMContext.getDrive());
     }
@@ -676,20 +645,19 @@ public class QuerySet {
 
     /**
      * 回调方法中执行事务
+     *
      * @param callback 事务回调方法
-     * */
-    public static void transaction(TransactionCallback callback)
-    {
+     */
+    public static void transaction(TransactionCallback callback) {
         transaction(ORMContext.getDrive(), callback);
     }
 
-    public static void transaction(Drive drive, TransactionCallback callback)
-    {
+    public static void transaction(Drive drive, TransactionCallback callback) {
         startTrans(drive);
         try {
             callback.call();
             commit(drive);
-        } catch (Throwable th){
+        } catch (Throwable th) {
             rollback(drive);
         }
     }

@@ -101,7 +101,7 @@ public class TestDb {
         data.put("email", "123456@qq.com");
         data.put("create_time", new Date());
         data.put("update_time", new Date());
-        Long result = QuerySet.table("qj_user").insert(data);
+        Integer result = QuerySet.table("qj_user").insert(data);
         System.out.println("INSERT.return=" + result);
 
         System.out.println("耗时=" + QuickUtil.endNanoTimeMS(startTime) + "ms");
