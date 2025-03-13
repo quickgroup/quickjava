@@ -57,8 +57,6 @@ public class FileUtils {
 
     /**
      * #quickLang 从输入流读取内容
-     * @param inputStream
-     * @return
      */
     public static String getInputStreamContent(InputStream inputStream)
     {
@@ -70,16 +68,16 @@ public class FileUtils {
                 stringBuffer.append(new String(buf, 0, num));
             }
         } catch (Exception exc) {
-            exc.printStackTrace();
+            throw new RuntimeException(exc);
         }
         return stringBuffer.toString();
     }
 
     /**
      * #quickLang 按环境读取文件
-     * @param packageName
-     * @param filename
-     * @return
+     * @param packageName 包名
+     * @param filename 文件名
+     * @return 文件内容
      */
     public static String getPackageFileContent(String packageName, String filename)
     {
@@ -91,7 +89,7 @@ public class FileUtils {
                 content = FileUtils.getFileContents(filePath);
 
             } else if (QuickUtil.isJarMode()) {
-                if (!"".equals(packageName)) {
+                if (!packageName.isEmpty()) {
                     packageName += "/";
                 }
                 String filePath = packageName + filename;
@@ -100,7 +98,7 @@ public class FileUtils {
 
             }
         } catch (Exception exc) {
-            exc.printStackTrace();
+            throw new RuntimeException(exc);
         }
         return content;
     }

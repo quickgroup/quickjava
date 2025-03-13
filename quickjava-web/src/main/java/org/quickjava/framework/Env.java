@@ -16,11 +16,14 @@ import java.util.Properties;
  */
 public class Env {
 
+    private static Class<?> applicationClass = null;
     private static Map<String, Object> data = new HashMap<String, Object>();
 
-    public static void init(Class applicationClass)
+    public static void init(Class<?> applicationClass)
             throws Exception
     {
+        // 应用的启动类（读取配置等使用
+        Env.applicationClass = applicationClass;
         // 根目录
         set("rootPath", QuickUtil.getRootPath());
         set("classPath", applicationClass.getClassLoader().getResource("").getPath());
@@ -32,6 +35,10 @@ public class Env {
         Env.systemEnvInit();
 
         QuickLog.debug(Lang.to("Env init Complete."));
+    }
+
+    public static Class<?> getApplicationClass() {
+        return applicationClass;
     }
 
     public static void systemEnvInit()

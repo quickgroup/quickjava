@@ -10,6 +10,9 @@ import org.quickjava.framework.server.TomcatServer;
 import org.quickjava.framework.view.ViewMan;
 
 import javax.servlet.ServletContext;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Map;
 
 /**
  * @author Qlo1062 [ QloPC-zs ]
@@ -116,13 +119,17 @@ public class Kernel {
 
     /**
      * #quickLang 加载配置文件
-     * @throws Exception
      */
     public void loadConfig() throws Exception
     {
-        String configYmlContent = FileUtils.getPackageFileContent("", "config.yml");
-        config = AppConfig.Factory.loadFormYml(configYmlContent);
-        QuickLog.debug(Lang.to("Config load Complete."));
+        Class<?> applicationClass = Env.getApplicationClass();
+        try (InputStream in = applicationClass.getClassLoader().getResourceAsStream("application.yml")) {
+            String content = FileUtils.getInputStreamContent(in);
+            config = AppConfig.Factory.loadFormYml(content);
+            QuickLog.debug(Lang.to("Config load Complete."));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static Dict config() {

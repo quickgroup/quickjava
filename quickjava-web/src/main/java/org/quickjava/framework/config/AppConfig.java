@@ -6,6 +6,8 @@ import org.quickjava.common.utils.FileUtils;
 import org.quickjava.framework.bean.Dict;
 import org.yaml.snakeyaml.Yaml;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 
 /**
@@ -48,28 +50,18 @@ public class AppConfig {
             return dictUser;
         }
 
+        /**
+         * 加载默认配置文件
+         */
         private static Dict loadDefaultConfig(Yaml yaml)
         {
-            String configContent;
-            String filename = "default.yml";
-
-            if (QuickUtil.isClassMode()) {
-                /**
-                 * #quickLang 多模块开发模式下，框架资源文件需要特殊读取
-                 */
-                String packageName = AppConfig.class.getPackage().getName();
-                packageName = "/" + packageName.replaceAll("\\.", "/");
-                String filePath = QuickUtil.getRootPath() + "/quickjava-web/target/classes" + packageName + "/" + filename;
-                configContent = FileUtils.getFileContents(filePath);
-
-            } else {
-                configContent = FileUtils.getPackageFileContent(
-                        AppConfig.class.getPackage().getName(), filename);
+            try (InputStream in = AppConfig.class.getResourceAsStream("/quickjava-web/config/application.yml")) {
+                String content = FileUtils.getInputStreamContent(in);
+                Map<String, Object> resultDefault = yaml.load(content);
+                return new Dict(resultDefault);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-
-            Map<String, Object> resultDefault = yaml.load(configContent);
-
-            return new Dict(resultDefault);
         }
     }
 }
