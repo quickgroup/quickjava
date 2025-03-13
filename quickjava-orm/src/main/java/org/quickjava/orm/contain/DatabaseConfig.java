@@ -53,6 +53,9 @@ public class DatabaseConfig {
         SPRING,
     }
 
+    public DatabaseConfig() {
+    }
+
     public DatabaseConfig(DBSubject subject, String url, String username, String password) {
         this.subject = subject;
         this.url = url;
@@ -75,6 +78,12 @@ public class DatabaseConfig {
         } else {
             this.type = DBType.DEFAULT;
         }
+    }
+
+    public DatabaseConfig loadUrl(String url) {
+        this.url = url;
+        this.parseTypeFromUrl(url);
+        return this;
     }
 
     public static DBType parseTypeFromConnection(Connection connection) {

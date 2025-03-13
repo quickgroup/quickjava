@@ -21,6 +21,8 @@ import org.quickjava.orm.model.callback.ModelListener;
 import org.quickjava.orm.contain.DatabaseConfig;
 import org.quickjava.orm.drive.*;
 import org.quickjava.orm.model.Model;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -31,6 +33,7 @@ import java.util.Map;
  * ORM唯一实例
  */
 public class ORMContext {
+    protected static final Logger logger = LoggerFactory.getLogger(ORMContext.class);
 
 //    private static ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
     private static ClassLoader classLoader = ORMContext.class.getClassLoader();
@@ -103,17 +106,18 @@ public class ORMContext {
         try {
             Class<?> kernelClazz = ORMContext.class.getClassLoader().loadClass("org.quickjava.framework.Kernel");
             Object configMap = ReflectUtil.getFieldValue(kernelClazz, "config");
-            Object databaseMap = ReflectUtil.invoke(configMap, "get", "database");
-            DatabaseConfig config1 = new DatabaseConfig(
-                    DatabaseConfig.DBSubject.QUICKJAVA,
-                    ReflectUtil.invoke(databaseMap, "getString", "url"),
-                    ReflectUtil.invoke(databaseMap, "getString", "username"),
-                    ReflectUtil.invoke(databaseMap, "getString", "password")
-            );
+            Map<String, Object> databaseMap = ReflectUtil.invoke(configMap, "getDict", "database");
+            DatabaseConfig config1 = new DatabaseConfig();
+            for (Map.Entry<String, Object> entry : databaseMap.entrySet()) {
+                if (ReflectUtil.hasField(config1.getClass(), entry.getKey())) {
+                    ReflectUtil.setFieldValue(config1, entry.getKey(), entry.getValue());
+                }
+            }
+            config1.loadUrl(config1.url);
             config1.subject = DatabaseConfig.DBSubject.QUICKJAVA;
             return config1;
         } catch (Throwable th) {
-            return defaultConfig;
+            throw new RuntimeException(th.getMessage(), th);
         }
     }
 

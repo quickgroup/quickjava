@@ -43,7 +43,7 @@ public class FreeMarkerEngine implements Engine {
             configuration.setCacheStorage(new freemarker.cache.MruCacheStorage(20, 999999));
             configuration.setSetting(Configuration.CACHE_STORAGE_KEY, "strong:20, soft:999999");
 
-            timeZone = TimeZone.getTimeZone(Kernel.config().get("app").getString("timeZone", "GMT+8"));
+            timeZone = TimeZone.getTimeZone(Kernel.config().getDict("app").getString("timeZone", "GMT+8"));
 
         } catch (Exception e) {
             throw new QuickException(Lang.to("模板引擎初始化失败：" + e), e);

@@ -148,6 +148,10 @@ public class ReflectUtil {
 //        }
     }
 
+    public static boolean hasField(Class<?> clazz, String fieldName) {
+        return cn.hutool.core.util.ReflectUtil.hasField(clazz, fieldName);
+    }
+
     public static void setFieldValueDirect(Object obj, String fieldName, Object value) {
         setFieldValueDirect(obj.getClass(), obj, fieldName, value);
     }

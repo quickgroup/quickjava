@@ -108,27 +108,43 @@ public class Dict extends LinkedHashMap<String, Object> {
         return new Dict(mapPutAll(dst, src));
     }
 
-    private static Map<String, Object> mapPutAll(Map<String, Object> dstMap, Map<String, Object> srcMap) {
-        for (Map.Entry<String, Object> entry : dstMap.entrySet()) {
-
-            Object value = entry.getValue();
-            Object valueSrc = srcMap.get(entry.getKey());
-
-            if (value == null) {    // 默认配置都没有，就跳过
-                dstMap.put(entry.getKey(), entry.getValue());
+    private static Map<String, Object> mapPutAll(Map<String, Object> dst, Map<String, Object> src) {
+        for (Map.Entry<String, Object> entry : dst.entrySet()) {
+            Object dstValue = entry.getValue();
+            Object srcValue = src.get(entry.getKey());
+            if (dstValue == null) {    // 默认配置都没有，就跳过
+                dst.put(entry.getKey(), srcValue);
                 continue;
             }
 
-            if (Map.class.isAssignableFrom(value.getClass()) && (valueSrc != null && valueSrc instanceof Map)) {
-                Map<String, Object> childDataDst = (Map<String, Object>) value;
-                Map<String, Object> childDataSrc = (Map<String, Object>) valueSrc;
-                dstMap.put(entry.getKey(), mapPutAll(childDataDst, childDataSrc));
-//                System.out.println("value is Map.");
+            if (Map.class.isAssignableFrom(dstValue.getClass()) && (srcValue != null && srcValue instanceof Map)) {
+                if (srcValue != null && Map.class.isAssignableFrom(srcValue.getClass())) {
+                    Map<String, Object> childDataDst = (Map<String, Object>) dstValue;
+                    Map<String, Object> childDataSrc = (Map<String, Object>) srcValue;
+                    dst.put(entry.getKey(), mapPutAll(childDataDst, childDataSrc));
+                }
             } else {
-                dstMap.put(entry.getKey(), valueSrc);
+                dst.put(entry.getKey(), srcValue);
             }
         }
-        return dstMap;
+        // src to dst
+        for (Map.Entry<String, Object> entry : src.entrySet()) {
+            if (entry.getValue() == null) {
+                continue;
+            }
+            if (Map.class.isAssignableFrom(entry.getValue().getClass())) {
+                if (!dst.containsKey(entry.getKey())) {
+                    dst.put(entry.getKey(), new LinkedHashMap<>());
+                }
+                if (Map.class.isAssignableFrom(dst.get(entry.getKey()).getClass())) {
+                    Map<String, Object> childDataDst = (Map<String, Object>) dst.get(entry.getKey());
+                    dst.put(entry.getKey(), mapPutAll(childDataDst, (Map<String, Object>) entry.getValue()));
+                }
+            } else {
+                dst.put(entry.getKey(), entry.getValue());
+            }
+        }
+        return dst;
     }
 
 }

@@ -11,6 +11,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -177,8 +179,8 @@ public class Request {
 
     public void initData()
     {
-        this.postData = new Dict(httpServletRequest.getParameterMap());
-        this.queryData = new Dict(this.pathinfo.queryData);
+        this.postData = new Dict(new LinkedHashMap<>(httpServletRequest.getParameterMap()));
+        this.queryData = new Dict(new LinkedHashMap<>(this.pathinfo.queryData));
     }
 
     public HttpServletRequest getHttpServletRequest() {

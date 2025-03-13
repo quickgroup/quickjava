@@ -28,8 +28,8 @@ public class Cache {
     private static Map<Object, Object> data = null;
 
     public static void init() {
-        handler = Kernel.config().get("cache").getString("handler");
-        timeout = Kernel.config().get("cache").getInteger("timeout");
+        handler = Kernel.config().getDict("cache").getString("handler");
+        timeout = Kernel.config().getDict("cache").getInteger("timeout");
         data = new LinkedHashMap<>();
     }
 
