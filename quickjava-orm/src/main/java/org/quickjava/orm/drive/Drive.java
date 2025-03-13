@@ -225,7 +225,7 @@ public abstract class Drive {
                     } else if (gk instanceof Integer) {
                         execResult = gk;
                     } else {
-                        execResult = null;
+                        execResult = 0;
                     }
                 }
 

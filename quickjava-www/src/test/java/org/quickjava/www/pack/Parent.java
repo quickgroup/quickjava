@@ -12,8 +12,7 @@ public abstract class Parent<T> {
         try {
             return (T) type.getDeclaredConstructor().newInstance();
         } catch (Exception exc) {
-            exc.printStackTrace();
+            throw new RuntimeException(exc);
         }
-        return null;
     }
 }

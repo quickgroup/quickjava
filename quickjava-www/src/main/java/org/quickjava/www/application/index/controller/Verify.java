@@ -16,7 +16,7 @@
 
 package org.quickjava.www.application.index.controller;
 
-import org.quickjava.framework.module.Controller;
+import org.quickjava.web.framework.module.Controller;
 
 public class Verify extends Controller {
 

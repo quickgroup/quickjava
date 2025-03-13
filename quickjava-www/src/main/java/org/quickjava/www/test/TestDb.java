@@ -7,8 +7,8 @@ package org.quickjava.www.test;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.quickjava.common.QuickUtil;
-import org.quickjava.framework.QuickJavaRunner;
+import org.quickjava.web.common.QuickUtil;
+import org.quickjava.web.framework.QuickJavaRunner;
 import org.quickjava.orm.query.QuerySet;
 import org.quickjava.orm.query.enums.Operator;
 import org.slf4j.Logger;
@@ -48,7 +48,7 @@ public class TestDb {
 
         for (int i = 1; i <= 10; i++) {
             data.put("id", i);
-            Long result = QuerySet.table("qj_user").insert(data);
+            int result = QuerySet.table("qj_user").insert(data);
             System.out.println("INSERT.return=" + result);
         }
 
@@ -56,7 +56,7 @@ public class TestDb {
         startTime = QuickUtil.getNanoTime();
 
         // NOTE::删除
-        Integer number = QuerySet.table("qj_user").where("id", 1).where("status", 1).delete();
+        int number = QuerySet.table("qj_user").where("id", 1).where("status", 1).delete();
 
         System.out.println("DELETE.return=" + number);
         System.out.println("耗时=" + QuickUtil.endNanoTimeMS(startTime) + "ms");

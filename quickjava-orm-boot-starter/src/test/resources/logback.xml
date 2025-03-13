@@ -31,7 +31,7 @@
 	<logger name="org.springframework" level="info" />
 	<logger name="org.apache.tomcat" level="info" />
 	<!-- quickjava 日志级别控制  -->
-	<logger name="org.quickjava" level="debug" />
+	<logger name="org.quickjava.web" level="debug" />
 
 	<root level="info">
 		<appender-ref ref="console" />
