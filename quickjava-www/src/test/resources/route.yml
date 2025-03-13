@@ -1,0 +1,11 @@
+# 路由配置
+route:
+  # default=自动映射和路由并用、route=严格路由模式，需要为每一个控制器或方法指定url路径
+  type: default
+  # url.path map Controller.method
+  list:
+    [
+      "/": "index/index/index",
+      "/index": "index/index/index",
+      "/index.html": "index/index/index",
+    ]
