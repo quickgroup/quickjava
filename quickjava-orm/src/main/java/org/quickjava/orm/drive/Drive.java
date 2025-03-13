@@ -13,6 +13,7 @@ import org.quickjava.orm.query.QuerySet;
 import org.quickjava.orm.query.build.ValueConv;
 import org.quickjava.orm.query.build.Where;
 import org.quickjava.orm.query.contain.Action;
+import org.quickjava.orm.query.contain.SqlResult;
 import org.quickjava.orm.query.contain.Label;
 import org.quickjava.orm.utils.QueryException;
 import org.quickjava.orm.utils.QuickORMException;
@@ -190,7 +191,7 @@ public abstract class Drive {
         return SqlUtil.collJoin(" ", sqlList);
     }
 
-    public <T> T executeSql(QuerySet query) {
+    public SqlResult executeSql(QuerySet query) {
         QueryReservoir reservoir = QuerySetHelper.getQueryReservoir(query);
         return executeSql(reservoir.action, pretreatment(query), reservoir);
     }
@@ -201,45 +202,39 @@ public abstract class Drive {
      * @param sql 语句
      * @param reservoir 执行信息
      * @return 数据
-     * @param <T> 数据类型
      */
-    public <T> T executeSql(Action action, String sql, QueryReservoir reservoir)
+    public SqlResult executeSql(Action action, String sql, QueryReservoir reservoir)
     {
         long startTime = System.currentTimeMillis();
         boolean isError = false;
-        Object execResult = null;
+        SqlResult result;
         QuickConnection quickConnection = getQuickConnection();
 
         try {
             // 执行操作
             if (action == Action.INSERT) {
-                Map<String, Object> generatedKeys = quickConnection.insert(sql, reservoir.getLabels());
-                if (generatedKeys == null || generatedKeys.isEmpty()) {
-                    return null;
-                }
+                Map<String, Object> insertRet = quickConnection.insert(sql, reservoir.getLabels());
+                result = new SqlResult((int) insertRet.get("__orm_count"));
                 // 返回自增id
                 if (reservoir.labelContain(Label.INSERT_GET_ID)) {
-                    Object gk = generatedKeys.get("GENERATED_KEY");
-                    if (gk instanceof Long) {
-                        execResult = gk;
-                    } else if (gk instanceof Integer) {
-                        execResult = gk;
-                    } else {
-                        execResult = 0;
-                    }
+                    result.setData((insertRet.get("GENERATED_KEY")));
                 }
 
             } else if (action == Action.DELETE) {
-                execResult = quickConnection.delete(sql);
+                int count = quickConnection.delete(sql);
+                result = new SqlResult(count);
 
             } else if (action == Action.UPDATE) {
-                execResult = quickConnection.update(sql);
+                int count = quickConnection.update(sql);
+                result = new SqlResult(count);
 
             } else if (action == Action.SELECT) {
                 List<Map<String, Object>> rows = quickConnection.select(sql);
-                return (T) rows;
+                result = new SqlResult(rows.size(), rows);
+            } else {
+                throw new SQLException("Unknown action: " + action);
             }
-            return (T) execResult;
+            return result;
 
         } catch (SQLException e) {
             isError = true;

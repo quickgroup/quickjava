@@ -32,7 +32,7 @@ public class TableColumnMeta {
     public TableColumnMeta() {
     }
 
-    public TableColumnMeta(Map<String, String> info) {
+    public TableColumnMeta(Map<String, Object> info) {
         info.forEach((k, v) -> ReflectUtil.setFieldValue(this, k, v));
     }
 

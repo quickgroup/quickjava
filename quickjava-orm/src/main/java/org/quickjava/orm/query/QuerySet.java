@@ -20,6 +20,7 @@ import org.quickjava.orm.query.callback.WhereOptCallback;
 import org.quickjava.orm.contain.*;
 import org.quickjava.orm.drive.Drive;
 import org.quickjava.orm.query.contain.Action;
+import org.quickjava.orm.query.contain.SqlResult;
 import org.quickjava.orm.query.contain.Label;
 import org.quickjava.orm.query.contain.TableColumnMeta;
 import org.quickjava.orm.query.enums.Operator;
@@ -408,13 +409,13 @@ public class QuerySet {
     }
 
     public Map<String, Object> data() {
-        return reservoir.dataList == null || reservoir.dataList.size() == 0 ? null : reservoir.getData();
+        return reservoir.dataList == null || reservoir.dataList.isEmpty() ? null : reservoir.getData();
     }
 
     //NOTE::-------------------- 增删改查 --------------------
     public List<Map<String, Object>> select() {
         queryBefore();
-        List<Map<String, Object>> resultSet = executeSql();
+        List<Map<String, Object>> resultSet = execute().getData();
         return SqlUtil.isEmpty(resultSet) ? new LinkedList<>() : resultSet;
     }
 
@@ -436,31 +437,31 @@ public class QuerySet {
     public int update(Map<String, Object> data) {
         reservoir.action = Action.UPDATE;
         this.data(data);
-        return executeSql();
+        return execute().getCount();
     }
 
     public int update() {
         reservoir.action = Action.UPDATE;
-        return executeSql();
+        return execute().getCount();
     }
 
     public int insert(Map<String, Object> data) {
         reservoir.action = Action.INSERT;
         this.data(data);
-        return executeSql();
+        return execute().getCount();
     }
 
     public Long insertGetId(Map<String, Object> data) {
         reservoir.action = Action.INSERT;
         reservoir.addLabel(Label.INSERT_GET_ID);
         this.data(data);
-        return executeSql();
+        return (Long) execute().getData();
     }
 
     public int insertAll(List<DataMap> dataList) {
         reservoir.action = Action.INSERT;
         reservoir.getDataList().addAll(dataList);
-        return executeSql();
+        return execute().getCount();
     }
 
     public int delete() {
@@ -468,7 +469,7 @@ public class QuerySet {
             throw new QueryException("不允许空条件的删除执行");
         }
         reservoir.action = Action.DELETE;
-        return executeSql();
+        return execute().getCount();
     }
 
     //NOTE::-------------------- 扩展方法 --------------------
@@ -489,7 +490,7 @@ public class QuerySet {
             return ret;
         }
         String sql = "SHOW FULL COLUMNS FROM " + table;
-        List<Map<String, String>> columns = this.executeSql(sql);
+        List<Map<String, Object>> columns = this.executeSelect(sql);
         if (ModelHelper.isEmpty(columns)) {
             return new LinkedList<>();
         }
@@ -527,27 +528,28 @@ public class QuerySet {
         return this;
     }
 
-    private <T> T executeSql() {
+    private SqlResult execute() {
         reservoir.action = reservoir.action == null ? Action.SELECT : reservoir.action;
         if (reservoir.fetchSql) {
             reservoir.setSql(ORMContext.getDrive().pretreatment(this));
             if (reservoir.printSql) {
                 System.out.println(reservoir.getSql());
             }
-            return (T) Integer.valueOf(0);
+            return new SqlResult(0);
         }
         return ORMContext.getDrive().executeSql(this);
     }
 
-    private <T> T executeSql(String sql) {
-        return ORMContext.getDrive().executeSql(Action.SELECT, sql, QueryReservoir.EMPTY);
+    private List<Map<String, Object>> execute(String sql) {
+        return ORMContext.getDrive().executeSql(Action.INSERT, sql, QueryReservoir.EMPTY).getData();
     }
 
-    public <T> T execute(String sql) {
-        return ORMContext.getDrive().executeSql(Action.INSERT, sql, QueryReservoir.EMPTY);
+    public List<Map<String, Object>> executeSelect(String sql) {
+        SqlResult result = ORMContext.getDrive().executeSql(Action.SELECT, sql, QueryReservoir.EMPTY);
+        return result.getData();
     }
 
-    public <T> T query(String sql) {
+    public SqlResult query(String sql) {
         return ORMContext.getDrive().executeSql(Action.SELECT, sql, QueryReservoir.EMPTY);
     }
 
@@ -606,7 +608,7 @@ public class QuerySet {
         this.reservoir.distinct = reservoirOld.distinct;
         this.field(column);
 
-        List<Map<String, Object>> resultSet = executeSql();
+        List<Map<String, Object>> resultSet = execute().getData();
         // 恢复
         this.reservoir = reservoirOld;
 

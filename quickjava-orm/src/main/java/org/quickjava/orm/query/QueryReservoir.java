@@ -314,7 +314,7 @@ public class QueryReservoir {
     }
 
     public boolean labelContain(Label label) {
-        return getLabels().containsKey(label);
+        return labels != null && getLabels().containsKey(label);
     }
 
     public QueryReservoir addLabel(Label label) {

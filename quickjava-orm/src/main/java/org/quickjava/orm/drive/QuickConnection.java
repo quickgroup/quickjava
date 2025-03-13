@@ -118,23 +118,22 @@ public class QuickConnection implements AutoCloseable {
         try (Statement statement = connection.createStatement()) {
             Map<String, Object> ret = new LinkedHashMap<>();
             // 执行
-            int count = 0;
+            int count;
             if (labels != null && labels.containsKey(Label.INSERT_GET_ID)) {
                 count = statement.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
+                // 获取自增
+                generatedKeys = statement.getGeneratedKeys();
+                List<String> fieldNameArr = prepareField(generatedKeys);
+                if (!fieldNameArr.isEmpty()) {
+                    generatedKeys.next();
+                    for (int fi = 1; fi <= generatedKeys.getRow(); fi++) {
+                        ret.put(fieldNameArr.get(fi - 1), generatedKeys.getObject(fi));
+                    }
+                }
             } else {
                 count = statement.executeUpdate(sql);
             }
             ret.put("__orm_count", count);
-            // 获取自增
-            generatedKeys = statement.getGeneratedKeys();
-            List<String> fieldNameArr = prepareField(generatedKeys);
-            if (fieldNameArr.isEmpty()) {
-                return ret;
-            }
-            generatedKeys.next();
-            for (int fi = 1; fi <= generatedKeys.getRow(); fi++) {
-                ret.put(fieldNameArr.get(fi - 1), generatedKeys.getObject(fi));
-            }
             return ret;
         } finally {
             if (generatedKeys != null) {
