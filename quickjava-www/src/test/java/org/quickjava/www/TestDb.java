@@ -40,9 +40,13 @@ public class TestDb {
         data.put("email", "123456@qq.com");
         data.put("create_time", new Date());
         data.put("update_time", new Date());
-        Long result = QuerySet.table("qj_user").insert(data);
 
-        System.out.println("INSERT.return=" + result);
+        for (int i = 1; i <= 10; i++) {
+            data.put("id", i);
+            Long result = QuerySet.table("qj_user").insert(data);
+            System.out.println("INSERT.return=" + result);
+        }
+
         System.out.println("耗时=" + QuickUtil.endNanoTimeMS(startTime) + "ms");
         startTime = QuickUtil.getNanoTime();
 
@@ -64,7 +68,9 @@ public class TestDb {
         System.out.println("耗时=" + QuickUtil.endNanoTimeMS(startTime) + "ms");
 
         // 查
-        List<Map<String, Object>> rows = QuerySet.table("qj_user").where("name", "xiaolong").order("create_time", "DESC").select();
+        List<Map<String, Object>> rows = QuerySet.table("qj_user").where("name", "xiaolong")
+                .order("create_time", "DESC")
+                .select();
         System.out.println("SELECT.return=" + rows);
     }
 
@@ -85,7 +91,7 @@ public class TestDb {
             Map<String, Object> updateData = new LinkedHashMap<>();
             updateData.put("name", "xiaolong");
             updateData.put("age", 15);
-            QuerySet.table("qj_user").where("id", "longlong").update(updateData);
+            QuerySet.table("qj_user").where("id", 1).update(updateData);
             // TODO::查询
             QuerySet.table("qj_user").field("id").select();
         });

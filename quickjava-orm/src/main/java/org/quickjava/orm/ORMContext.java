@@ -65,9 +65,8 @@ public class ORMContext {
     public static Drive getDrive() {
         DatabaseConfig config;
         synchronized (Drive.class) {
-            // 检测spring
             if (SpringLoader.instance != null) {
-                config = SpringLoader.instance.getConfig();
+                config = SpringLoader.instance.getConfig();  // spring方式
             } else {
                 config = getQuickJavaConfig();
             }
@@ -85,7 +84,7 @@ public class ORMContext {
         // 加载驱动操作类
         try {
             Drive drive = driveMap.get(config.type).newInstance();
-            ReflectUtil.setFieldValueDirect(drive, "config", config);
+            drive.setConfig(config);
             return drive;
         } catch (InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);

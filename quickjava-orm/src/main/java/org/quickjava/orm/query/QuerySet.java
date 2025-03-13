@@ -325,10 +325,6 @@ public class QuerySet {
         return this;
     }
 
-    public QuerySet order(String field, String type) {
-        return order(field, type, OrderByType.valueOf(type));
-    }
-
     public QuerySet order(String field, OrderByType type) {
         if (field.contains(".")) {
             String[] fieldArr = field.split("\\.");
@@ -337,6 +333,10 @@ public class QuerySet {
             order(null, field, type);
         }
         return this;
+    }
+
+    public QuerySet order(String field, String type) {
+        return order(field, OrderByType.valueOf(type));
     }
 
     public QuerySet order(String field, boolean desc) {

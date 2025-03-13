@@ -34,7 +34,7 @@ public class DatabaseConfig {
     public String password = null;		//数据库密码
 
     // jdbc驱动
-    public String driver = "com.mysql.jdbc.Driver";
+    public String driver = null;
 
     public boolean autoCommit = true;
 
