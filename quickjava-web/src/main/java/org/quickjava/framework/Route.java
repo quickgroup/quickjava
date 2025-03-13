@@ -65,9 +65,9 @@ public class Route {
             throw new ClassNotFoundException("package not found, basePackages=" + basePackages);
         }
 
-        boolean caseSensitive = config.get("url").getBoolean("caseSensitive", false);
+        boolean caseSensitive = config.getDict("url").getBoolean("caseSensitive", false);
 
-        Dict dirname = config.get("module").get("dirname");
+        Dict dirname = config.getDict("module").getDict("dirname");
         String controllerDirName = dirname.getString("controller", "controller");
         QuickLog.debug("classPath=" + classPath);
 

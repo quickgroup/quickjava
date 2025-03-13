@@ -36,17 +36,12 @@ public class AppConfig {
             Yaml yaml = new Yaml();
             // Default config
             Dict dictDefault = loadDefaultConfig(yaml);
-//            QuickLog.debug("dictDefault: " + dictDefault);
             // User config
             Map<String, Object> resultUser = yaml.load(content);
             Dict dictUser = new Dict(resultUser);
-//            QuickLog.debug("dictUser: " + dictUser);
             // merger
-            dictUser = Dict.merge(dictDefault, dictUser);
-
-            QuickLog.debug("dictUser: " + dictUser);
-
-            return dictUser;
+            Dict ret = Dict.merge(dictDefault, dictUser);
+            return ret;
         }
 
         /**
