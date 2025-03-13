@@ -11,11 +11,14 @@ import org.quickjava.common.QuickUtil;
 import org.quickjava.framework.QuickJavaRunner;
 import org.quickjava.orm.query.QuerySet;
 import org.quickjava.orm.query.enums.Operator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 @RunWith(QuickJavaRunner.class)
 public class TestDb {
+    protected static final Logger logger = LoggerFactory.getLogger(TestDb.class);
 
     /**
      * 测试数据库ORM操作类
@@ -75,7 +78,7 @@ public class TestDb {
     }
 
     /**
-     * 测试事物操作
+     * 测试事务操作
      */
     @Test
     public void testTransaction() {
@@ -84,6 +87,7 @@ public class TestDb {
             QuerySet.table("qj_user").field("id").select();
         });
 
+        // 事务提交
         QuerySet.transaction(() -> {
             // TODO::查询
             QuerySet.table("qj_user").field("id").select();
@@ -91,10 +95,29 @@ public class TestDb {
             Map<String, Object> updateData = new LinkedHashMap<>();
             updateData.put("name", "xiaolong");
             updateData.put("age", 15);
-            QuerySet.table("qj_user").where("id", 1).update(updateData);
+            QuerySet.table("qj_user").where("id", 5).update(updateData);
             // TODO::查询
             QuerySet.table("qj_user").field("id").select();
         });
+
+        // 事务回滚
+        try {
+            QuerySet.transaction(() -> {
+                // TODO::查询
+                QuerySet.table("qj_user").field("id").select();
+                // TODO::更新
+                Map<String, Object> updateData = new LinkedHashMap<>();
+                updateData.put("name", "xiaolong");
+                updateData.put("age", 15);
+                QuerySet.table("qj_user").where("id", 1).update(updateData);
+                // TODO::查询
+                QuerySet.table("qj_user").field("id").select();
+
+                throw new RuntimeException("打断事物提交");
+            });
+        } catch (Exception e) {
+            logger.info("测试出异常: {}", e.getMessage());
+        }
     }
 
 }
