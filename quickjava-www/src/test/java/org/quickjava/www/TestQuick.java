@@ -37,7 +37,7 @@ public class TestQuick {
     public void test3()
     {
 //        try {
-//            String configYmlContent = QuickFileUtil.getPackageFileContent("", "config.yml");
+//            String configYmlContent = QuickFileUtil.getPackageFileContent("", "application.yml");
 //            AppConfig.Factory.loadFormYml(configYmlContent);
 //
 //        } catch (Exception exc) {
@@ -119,8 +119,8 @@ public class TestQuick {
     @Test
     public void test8()
     {
-        URL url = TestClass.class.getClassLoader().getResource("default.yml");
-        URL url2 = TestClass.class.getClassLoader().getResource("default.yml");
+        URL url = TestClass.class.getClassLoader().getResource("application.yml");
+        URL url2 = TestClass.class.getClassLoader().getResource("application.yml");
         System.out.println("url: " + url);
         System.out.println("url2: " + url2);
 
