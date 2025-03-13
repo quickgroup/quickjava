@@ -20,6 +20,7 @@ import org.quickjava.orm.query.callback.WhereOptCallback;
 import org.quickjava.orm.contain.*;
 import org.quickjava.orm.drive.Drive;
 import org.quickjava.orm.query.contain.Action;
+import org.quickjava.orm.query.contain.Label;
 import org.quickjava.orm.query.contain.TableColumnMeta;
 import org.quickjava.orm.query.enums.Operator;
 import org.quickjava.orm.query.enums.OrderByType;
@@ -446,34 +447,42 @@ public class QuerySet {
             field(new TableColumn(null).setRaw("*"));
     }
 
-    public Long update(Map<String, Object> data)
+    public Integer update(Map<String, Object> data)
     {
         reservoir.action = Action.UPDATE;
         this.data(data);
         return executeSql();
     }
 
-    public Long update()
+    public Integer update()
     {
         reservoir.action = Action.UPDATE;
         return executeSql();
     }
 
-    public Long insert(Map<String, Object> data)
+    public Integer insert(Map<String, Object> data)
     {
         reservoir.action = Action.INSERT;
         this.data(data);
         return executeSql();
     }
 
-    public Long insertAll(List<DataMap> dataList)
+    public Long insertGetId(Map<String, Object> data)
+    {
+        reservoir.action = Action.INSERT;
+        reservoir.addLabel(Label.INSERT_GET_ID);
+        this.data(data);
+        return executeSql();
+    }
+
+    public Integer insertAll(List<DataMap> dataList)
     {
         reservoir.action = Action.INSERT;
         reservoir.getDataList().addAll(dataList);
         return executeSql();
     }
 
-    public Long delete()
+    public Integer delete()
     {
         if (QuerySetHelper.isEmpty(reservoir.whereList)) {
             throw new QueryException("不允许空条件的删除执行");
@@ -553,15 +562,15 @@ public class QuerySet {
 
     private  <T> T executeSql(String sql)
     {
-        return ORMContext.getDrive().executeSql(Action.SELECT, sql);
+        return ORMContext.getDrive().executeSql(Action.SELECT, sql, QueryReservoir.EMPTY);
     }
 
     public <T> T execute(String sql) {
-        return ORMContext.getDrive().executeSql(Action.INSERT, sql);
+        return ORMContext.getDrive().executeSql(Action.INSERT, sql, QueryReservoir.EMPTY);
     }
 
     public <T> T query(String sql) {
-        return ORMContext.getDrive().executeSql(Action.SELECT, sql);
+        return ORMContext.getDrive().executeSql(Action.SELECT, sql, QueryReservoir.EMPTY);
     }
 
     //TODO::--------------- 增强方法 ---------------

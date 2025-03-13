@@ -47,8 +47,7 @@ public class BeanUtil {
 
         } catch (Exception e) {
             if (!isIgnoreError) {
-                e.printStackTrace();
-                throw new RuntimeException(e.getMessage());
+                throw new RuntimeException(e);
             }
             return null;
         }

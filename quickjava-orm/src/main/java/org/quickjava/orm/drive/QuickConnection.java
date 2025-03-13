@@ -2,8 +2,11 @@ package org.quickjava.orm.drive;
 
 import org.quickjava.orm.ORMContext;
 import org.quickjava.orm.domain.DatabaseMeta;
+import org.quickjava.orm.query.contain.Label;
 import org.quickjava.orm.utils.QueryException;
 import org.quickjava.orm.utils.QuickORMException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.LinkedHashMap;
@@ -12,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 
 public class QuickConnection implements AutoCloseable {
+
+    private static final Logger logger = LoggerFactory.getLogger(QuickConnection.class);
 
     private DatabaseMeta databaseMeta;
 
@@ -26,16 +31,29 @@ public class QuickConnection implements AutoCloseable {
 
     /**
      * 连接数据库
+     *
      * @return 数据库连接
      */
     public QuickConnection connect() {
+        logger.info("Connecting to database... {}", this);
         try {
             this.databaseMeta = ORMContext.getDatabaseMeta();
-            this.connection = ORMContext.getContextPort().getConnection();
+            this.connection = connect(this, this.databaseMeta);
         } catch (Exception e) {
             throw new QueryException(e);
         }
         return this;
+    }
+
+    public static synchronized Connection connect(QuickConnection quickConnection, DatabaseMeta config) {
+        if (quickConnection.connection != null) {
+            throw new RuntimeException("重复连接");
+        }
+        try {
+            return ORMContext.getContextPort().getConnection();
+        } catch (SQLException e) {
+            throw new QueryException("数据库连接失败：" + config.url + "=>" + e.getMessage());
+        }
     }
 
     public void setAutoCommit(boolean autoCommit) {
@@ -43,8 +61,7 @@ public class QuickConnection implements AutoCloseable {
             this.autoCommit = autoCommit;
             connection.setAutoCommit(autoCommit);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw new QuickORMException(e.getMessage());
+            throw new QuickORMException(e);
         }
     }
 
@@ -52,8 +69,7 @@ public class QuickConnection implements AutoCloseable {
         try {
             connection.setTransactionIsolation(level);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw new QuickORMException(e.getMessage());
+            throw new QuickORMException(e);
         }
     }
 
@@ -79,6 +95,7 @@ public class QuickConnection implements AutoCloseable {
     @Override
     public void close() {
         if (connection != null) {
+            logger.info("Closing connection... {}", this);
             try {
                 connection.close();
                 connection = null;
@@ -90,28 +107,35 @@ public class QuickConnection implements AutoCloseable {
 
     /**
      * 数据插入
+     *
      * @param sql 语句
      * @return map
      * @throws SQLException e
      */
-    public Map<String, Object> insert(String sql)
+    public Map<String, Object> insert(String sql, Map<Label, Object> labels)
             throws SQLException {
         ResultSet generatedKeys = null;
         try (Statement statement = connection.createStatement()) {
-            // 执行查询
-            statement.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
+            Map<String, Object> ret = new LinkedHashMap<>();
+            // 执行
+            int count = 0;
+            if (labels.containsKey(Label.INSERT_GET_ID)) {
+                count = statement.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
+            } else {
+                count = statement.executeUpdate(sql);
+            }
+            ret.put("__orm_count", count);
             // 获取自增
             generatedKeys = statement.getGeneratedKeys();
             List<String> fieldNameArr = prepareField(generatedKeys);
             if (fieldNameArr.isEmpty()) {
-                return null;
+                return ret;
             }
-            Map<String, Object> map = new LinkedHashMap<>();
             generatedKeys.next();
             for (int fi = 1; fi <= generatedKeys.getRow(); fi++) {
-                map.put(fieldNameArr.get(fi - 1), generatedKeys.getObject(fi));
+                ret.put(fieldNameArr.get(fi - 1), generatedKeys.getObject(fi));
             }
-            return map;
+            return ret;
         } finally {
             if (generatedKeys != null) {
                 generatedKeys.close();
@@ -136,10 +160,7 @@ public class QuickConnection implements AutoCloseable {
     public List<Map<String, Object>> select(String sql)
             throws SQLException {
         List<Map<String, Object>> rows = new LinkedList<>();
-        ResultSet resultSet = null;
-
-        try (Statement statement = connection.createStatement()) {
-            resultSet = statement.executeQuery(sql);
+        try (Statement statement = connection.createStatement(); ResultSet resultSet = statement.executeQuery(sql)) {
             List<String> fieldNameArr = prepareField(resultSet);
             // 数据组装
             while (resultSet.next()) {
@@ -148,10 +169,6 @@ public class QuickConnection implements AutoCloseable {
                     item.put(fieldNameArr.get(fi), resultSet.getObject(fi + 1));
                 }
                 rows.add(item);
-            }
-        } finally {
-            if (resultSet != null) {
-                resultSet.close();
             }
         }
         return rows;
@@ -164,5 +181,10 @@ public class QuickConnection implements AutoCloseable {
             fieldNameArr.add(metaData.getColumnLabel(i));
         }
         return fieldNameArr;
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "@" + Integer.toHexString(hashCode());
     }
 }

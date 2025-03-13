@@ -13,6 +13,7 @@ import org.quickjava.orm.query.QuerySet;
 import org.quickjava.orm.query.build.ValueConv;
 import org.quickjava.orm.query.build.Where;
 import org.quickjava.orm.query.contain.Action;
+import org.quickjava.orm.query.contain.Label;
 import org.quickjava.orm.utils.QueryException;
 import org.quickjava.orm.utils.QuickORMException;
 import org.quickjava.orm.utils.SqlUtil;
@@ -190,44 +191,49 @@ public abstract class Drive {
     }
 
     public <T> T executeSql(QuerySet query) {
-        return executeSql(QuerySetHelper.getQueryReservoir(query).action, pretreatment(query));
+        QueryReservoir reservoir = QuerySetHelper.getQueryReservoir(query);
+        return executeSql(reservoir.action, pretreatment(query), reservoir);
     }
 
     /**
      * 执行原生sql语句
-     * @param action 语句类型
+     * @param action action
      * @param sql 语句
+     * @param reservoir 执行信息
      * @return 数据
      * @param <T> 数据类型
      */
-    public <T> T executeSql(Action action, String sql)
+    public <T> T executeSql(Action action, String sql, QueryReservoir reservoir)
     {
         long startTime = System.currentTimeMillis();
         boolean isError = false;
-        Object number = null;
+        Object execResult = null;
         QuickConnection quickConnection = getQuickConnection();
 
         try {
             // 执行操作
             if (action == Action.INSERT) {
-                Map<String, Object> generatedKeys = quickConnection.insert(sql);
+                Map<String, Object> generatedKeys = quickConnection.insert(sql, reservoir.getLabels());
                 if (generatedKeys == null || generatedKeys.isEmpty()) {
                     return null;
                 }
-                Object gk = generatedKeys.get("GENERATED_KEY");
-                number = gk instanceof Long ? (Long) gk : Long.valueOf(String.valueOf(gk));
+                // 返回自增id
+                if (reservoir.labelContain(Label.INSERT_GET_ID)) {
+                    Object gk = generatedKeys.get("GENERATED_KEY");
+                    execResult = gk == null ? null : gk instanceof Long ? (Long) gk : Long.valueOf(String.valueOf(gk));
+                }
 
             } else if (action == Action.DELETE) {
-                number = quickConnection.delete(sql).longValue();
+                execResult = quickConnection.delete(sql);
 
             } else if (action == Action.UPDATE) {
-                number = quickConnection.update(sql).longValue();
+                execResult = quickConnection.update(sql);
 
             } else if (action == Action.SELECT) {
                 List<Map<String, Object>> rows = quickConnection.select(sql);
                 return (T) rows;
             }
-            return (T) number;
+            return (T) execResult;
 
         } catch (SQLException e) {
             isError = true;
