@@ -395,6 +395,10 @@ public class Model implements IModel {
         return toD(pagination1);
     }
 
+    public <D> IPagination<D> pagination(Integer page, Integer pageSize) {
+        return pagination(page.longValue(), pageSize.longValue());
+    }
+
     public <D> IPagination<D> pagination() {
         return pagination(1L, 20L);
     }

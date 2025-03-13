@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.quickjava.common.QuickUtil;
 import org.quickjava.framework.QuickJavaRunner;
-import org.quickjava.orm.QuerySet;
+import org.quickjava.orm.query.QuerySet;
 
 import java.util.*;
 

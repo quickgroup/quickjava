@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.quickjava.common.QuickUtil;
 import org.quickjava.framework.QuickJavaRunner;
-import org.quickjava.orm.QuerySet;
+import org.quickjava.orm.query.QuerySet;
 
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -66,6 +66,29 @@ public class TestModel {
         // 查
         List<Map<String, Object>> rows = QuerySet.table("user").where("name", "xiaolong").order("create_time", "DESC").select();
         System.out.println("SELECT.return=" + rows);
+    }
+
+    /**
+     * 测试事物操作
+     */
+    @Test
+    public void testTransaction() {
+        QuerySet.transaction(() -> {
+            // TODO::查询
+            QuerySet.table("user").field("id").select();
+        });
+
+        QuerySet.transaction(() -> {
+            // TODO::查询
+            QuerySet.table("user").field("id").select();
+            // TODO::更新
+            Map<String, Object> updateData = new LinkedHashMap<>();
+            updateData.put("name", "xiaolong");
+            updateData.put("age", 15);
+            QuerySet.table("user").where("id", "longlong").update(updateData);
+            // TODO::查询
+            QuerySet.table("user").field("id").select();
+        });
     }
 
 }
