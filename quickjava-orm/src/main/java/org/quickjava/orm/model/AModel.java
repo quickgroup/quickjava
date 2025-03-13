@@ -85,14 +85,14 @@
 //    protected boolean __vegetarian = true;
 //
 //
-//    //TODO:---------- 类方法 ----------
+//    //NOTE:---------- 类方法 ----------
 //    // 强制修改对象是否是素模型
 //    public AModel vegetarian(boolean vegetarian) {
 //        this.__vegetarian = vegetarian;
 //        return this;
 //    }
 //
-//    //TODO:---------- 查询方法 ----------
+//    //NOTE:---------- 查询方法 ----------
 //    public abstract AModel where(String field, Operator opr, Object val);
 //
 //    public abstract AModel where(String field, String opr, Object val);
@@ -131,7 +131,7 @@
 //
 //    public abstract AModel between(String field, Object val1, Object val2);
 //
-//    //---------- TODO::操作方法：增删改查 ----------
+//    //---------- NOTE::操作方法：增删改查 ----------
 //    public abstract <D extends IModel> D insert();
 //
 //    /**
@@ -181,7 +181,7 @@
 //
 //    public abstract <D> Pagination<D> pagination();
 //
-//    //---------- TODO::操作方法：排序、聚合等 ----------
+//    //---------- NOTE::操作方法：排序、聚合等 ----------
 //    /**
 //     * 排序
 //     * @param field 字段
@@ -234,7 +234,7 @@
 //
 //
 //
-//    //TODO::---------- 数据方法 START ----------
+//    //NOTE::---------- 数据方法 START ----------
 //    /**
 //     * 实体通过map装载数据
 //     * @param data 数据集
@@ -266,11 +266,11 @@
 //    public abstract String pk();
 //
 //    public abstract Object pkVal();
-//    //TODO::---------- 数据方法 END ----------
+//    //NOTE::---------- 数据方法 END ----------
 //
 //
 //
-//    //TODO::---------- 静态操作方法 START ----------
+//    //NOTE::---------- 静态操作方法 START ----------
 //    /**
 //     * 通过 Map 创建对象
 //     * @param data 数据集
@@ -293,5 +293,5 @@
 //     * @return 对象数量
 //     */
 //    public abstract Integer bulkCreate(List<DataMap> dataList);
-//    //TODO::---------- 静态操作方法 END ----------
+//    //NOTE::---------- 静态操作方法 END ----------
 //}

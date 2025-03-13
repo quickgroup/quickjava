@@ -78,7 +78,7 @@ public class FreeMarkerEngine implements Engine {
             }
 
             StringWriter writer = new StringWriter();
-            template.process(dataMap, writer);        // TODO::渲染
+            template.process(dataMap, writer);        // NOTE::渲染
             return writer.toString();
 
         } catch (TemplateException | IOException e) {

@@ -72,7 +72,7 @@ public interface WhereWrapper<Children, M, Func extends MFunction<M, ?>> extends
         return this.where(Logic.OR, condition, null, column, operator, val);
     }
 
-    //TODO::--------------- 抽离条件 ---------------
+    //NOTE::--------------- 抽离条件 ---------------
     default Children eq(Func column, Object val) {
         return this.eq(true, column, val);
     }

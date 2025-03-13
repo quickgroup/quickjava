@@ -220,7 +220,13 @@ public abstract class Drive {
                 // 返回自增id
                 if (reservoir.labelContain(Label.INSERT_GET_ID)) {
                     Object gk = generatedKeys.get("GENERATED_KEY");
-                    execResult = gk == null ? null : gk instanceof Long ? (Long) gk : Long.valueOf(String.valueOf(gk));
+                    if (gk instanceof Long) {
+                        execResult = gk;
+                    } else if (gk instanceof Integer) {
+                        execResult = gk;
+                    } else {
+                        execResult = null;
+                    }
                 }
 
             } else if (action == Action.DELETE) {
@@ -291,7 +297,7 @@ public abstract class Drive {
         return bool != null && bool;
     }
 
-    //TODO::---------- 事务方法 ----------
+    //NOTE::---------- 事务方法 ----------
 
     public void setAutoCommit(boolean autoCommit)
     {

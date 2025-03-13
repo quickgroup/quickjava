@@ -28,7 +28,7 @@ public class TestModelJoin {
     {
         Long startTime = TimeUtils.getNanoTime();
         IPagination<SysAppFavoriteModel> pagination = new ModelWrapper<>(SysAppFavoriteModel.class)
-                // TODO::关联表
+                // NOTE::关联表
                 // # 与主表一对一关联join
                 .leftJoin(SysApp.class, SysAppFavoriteModel::getApp, SysApp::getAppId, SysAppFavoriteModel::getAppId)
 //                .leftJoin(SsoApp.class, "app", SsoApp::getAppId, SsoAppFavoriteModel::getAppId)   // 等价上面调用
@@ -53,7 +53,7 @@ public class TestModelJoin {
 //                .leftJoin(SsoApp.class, SsoApp::getAppId, SsoAppFavoriteModel::getAppId)
 //                .leftJoin(SsoAppLatest.class, SsoAppLatest::getAppId, SsoApp::getAppId, SsoAppFavoriteModel::getTestAppInfo)
 
-                // TODO::查询条件
+                // NOTE::查询条件
                 // 主表查询条件
                 .eq(SysAppFavoriteModel::getUserId, 1)
                 .neq(SysAppFavoriteModel::getUserId, 0)
@@ -68,13 +68,13 @@ public class TestModelJoin {
                 //      3. 字符串表名
                 .eq(SysApp.class, "aliasApp01", SysApp::getAppId, 1)
                 .eq(SysApp.class, "app3", SysApp::getAppId, 1)
-                // TODO::排序字段
+                // NOTE::排序字段
                 .order(SysAppFavoriteModel::getCreateTime, true)
                 .order(SysApp.class, SysApp::getAppId)
                 .order(SysApp.class, SysApp::getAppId, true)
                 .order(SysApp.class, SysApp::getAppId, OrderByType.DESC)
 
-                // TODO::asd
+                // NOTE::asd
                 .field(SysApp.class, SysApp::getAppId, SysApp::getName)
 
                 // 分页查询

@@ -78,7 +78,7 @@ public class Route {
             if (item.getProtocol().equals("file"))
             {
                 String classesPath = QuickUtil.getClassesPath();
-                // TODO::模块列表
+                // NOTE::模块列表
                 File appFile = new File(item.getFile());
                 File[] moduleFiles = appFile.listFiles();
                 for (File moduleFile : moduleFiles) {
@@ -86,7 +86,7 @@ public class Route {
                         Module module = new Module(moduleFile.getName(), moduleFile.getAbsolutePath().replace(classPath, ""));
                         moduleList.put(nameCaseSensitive(module.name, caseSensitive), module);
 
-                        // TODO::控制器列表
+                        // NOTE::控制器列表
                         File controllerDir = new File(module.controllerPath);
                         if (controllerDir.exists()) {
                             for (File controllerFile : controllerDir.listFiles()) {
@@ -184,19 +184,19 @@ public class Route {
         Pathinfo pathinfo = request.pathinfo;
         RequestAction requestAction = null;
 
-        // TODO::先寻找资源文件
+        // NOTE::先寻找资源文件
         if (1 == 2) {
             QuickLog.debug("资源模式：" + path);
             return requestAction;
         }
 
-        // TODO::路由模式
+        // NOTE::路由模式
         if (routeList.containsKey(path)) {
             QuickLog.debug("路由模式：" + path);
             return requestAction;
         }
 
-        // TODO::REST模式
+        // NOTE::REST模式
         Module module = moduleList.get(pathinfo.module.toLowerCase());
         if (module != null) {
             ControllerPath controller = module.controllerList.get(pathinfo.controller.toLowerCase());

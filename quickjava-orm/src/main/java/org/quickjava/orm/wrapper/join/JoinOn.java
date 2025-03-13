@@ -160,7 +160,7 @@ public class JoinOn<M, Left, Right> extends ModelWhere<JoinOn<M, Left, Right>, M
         return dataRightFields;
     }
 
-    // TODO::-------------------- 操作方法 --------------------
+    // NOTE::-------------------- 操作方法 --------------------
     public JoinOn<?, Left, Right> base() {
         return base == null ? this : base.base();
     }
@@ -182,7 +182,7 @@ public class JoinOn<M, Left, Right> extends ModelWhere<JoinOn<M, Left, Right>, M
     }
 
 
-    // TODO::-------------------- Join两表条件 --------------------
+    // NOTE::-------------------- Join两表条件 --------------------
     public JoinOn<M, Left, Right> eq(MFunction<Left, ?> lf, MFunction<Right, ?> rf) {
         return where(Operator.EQ, lf, rf);
     }

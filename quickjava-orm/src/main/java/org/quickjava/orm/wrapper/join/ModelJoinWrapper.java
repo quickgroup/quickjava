@@ -32,7 +32,7 @@ public interface ModelJoinWrapper<Children, M, MC extends MFunction<M, ?>>
 
     /**
      * 与主表一个条件关联，并指定关联表别名
-     * TODO::涉及关联表别名的方法，表class后第一个参数就是指定别名
+     * NOTE::涉及关联表别名的方法，表class后第一个参数就是指定别名
      * @param alias 用主表属性做别名
      */
     default <Right> Children leftJoin(MC lf, Class<Right> right, MC alias, MFunction<Right, ?> rc) {
@@ -138,7 +138,7 @@ public interface ModelJoinWrapper<Children, M, MC extends MFunction<M, ?>>
 
 
 
-    //TODO::-------------------- 关联表查询条件 START --------------------
+    //NOTE::-------------------- 关联表查询条件 START --------------------
     default <Left extends Model> Children where(boolean condition, Class<Left> left, MFunction<Left, ?> lc, Operator operator, Object val) {
         return where(condition, left, "", lc, operator, val);
     }
@@ -153,7 +153,7 @@ public interface ModelJoinWrapper<Children, M, MC extends MFunction<M, ?>>
         return where(condition, leftTable, lc.name(), operator, val);
     }
 
-    //TODO::-------------------- 关联表查询条件抽离 START --------------------
+    //NOTE::-------------------- 关联表查询条件抽离 START --------------------
     // 自动识别查询表名
     default <Left extends Model> Children eq(boolean condition, Class<Left> left, MFunction<Left, ?> lc, Object val) {
         return where(condition, left, lc, Operator.EQ, val);
@@ -399,8 +399,8 @@ public interface ModelJoinWrapper<Children, M, MC extends MFunction<M, ?>>
         return between(true, left, alias, lc, v1, v2);
     }
 
-    //TODO::-------------------- 查询条件 END  --------------------
-    //TODO::-------------------- 特性 START --------------------
+    //NOTE::-------------------- 查询条件 END  --------------------
+    //NOTE::-------------------- 特性 START --------------------
     /**
      * 声明字段
      * @param tm 目标模型类
@@ -414,8 +414,8 @@ public interface ModelJoinWrapper<Children, M, MC extends MFunction<M, ?>>
 
     <TM> Children having(Class<TM> tm, MFunction<TM, ?>... tfs);
 
-    //TODO::-------------------- 特性 END --------------------
-    //TODO::-------------------- 排序和数量 START --------------------
+    //NOTE::-------------------- 特性 END --------------------
+    //NOTE::-------------------- 排序和数量 START --------------------
     <TM> Children order(Class<TM> tm, MFunction<TM, ?> tf, OrderByType type);
 
     default <Left> Children order(Class<Left> left, MFunction<Left, ?> lc, boolean desc) {
@@ -426,6 +426,6 @@ public interface ModelJoinWrapper<Children, M, MC extends MFunction<M, ?>>
         return order(left, lc, OrderByType.ASC);
     }
 
-    //TODO::-------------------- 排序和数量 END --------------------
+    //NOTE::-------------------- 排序和数量 END --------------------
 
 }

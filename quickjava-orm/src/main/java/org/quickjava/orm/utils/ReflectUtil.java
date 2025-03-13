@@ -74,7 +74,7 @@ public class ReflectUtil {
     public static Field[] findFields(Class<?> clazz) {
         synchronized (ReflectUtil.FIELDS_CACHE) {
             if (!FIELDS_CACHE.contains(clazz)) {
-                // TODO::只能当前类的字段
+                // NOTE::只能当前类的字段
                 FIELDS_CACHE.put(clazz, clazz.getDeclaredFields());
             }
         }

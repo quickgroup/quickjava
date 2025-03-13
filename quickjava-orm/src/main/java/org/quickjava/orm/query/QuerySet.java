@@ -61,7 +61,7 @@ public class QuerySet {
         return new QuerySet(table);
     }
 
-    //TODO::-------------------- 关联查询 --------------------
+    //NOTE::-------------------- 关联查询 --------------------
     public QuerySet join(String table, String condition) {
         return join(table, condition, JoinType.INNER);
     }
@@ -129,7 +129,7 @@ public class QuerySet {
         return this;
     }
 
-    //TODO::-------------------- 查询条件 --------------------
+    //NOTE::-------------------- 查询条件 --------------------
     public QuerySet where(String field, Object value) {
         return this.where(field, Operator.EQ, value);
     }
@@ -253,7 +253,7 @@ public class QuerySet {
         return new TableColumn(column);
     }
 
-    //TODO::-------------------- 特性 --------------------
+    //NOTE::-------------------- 特性 --------------------
     public QuerySet group(String... columns) {
         for (String column : columns) {
             if (column.contains(",")) {
@@ -320,7 +320,7 @@ public class QuerySet {
         return this;
     }
 
-    //TODO::-------------------- 排序 --------------------
+    //NOTE::-------------------- 排序 --------------------
     public QuerySet order(String table, String field, OrderByType type) {
         OrderBy orderBy = new OrderBy(table, field, type);
         // 回调处理
@@ -373,7 +373,7 @@ public class QuerySet {
         return this;
     }
 
-    //TODO::-------------------- 数量限制 --------------------
+    //NOTE::-------------------- 数量限制 --------------------
     public QuerySet limit(Long index, Long count) {
         reservoir.limitIndex = index;
         reservoir.limitSize = count;
@@ -388,7 +388,7 @@ public class QuerySet {
         return limit((page - 1) * size, size);
     }
 
-    //TODO::-------------------- 数据 --------------------
+    //NOTE::-------------------- 数据 --------------------
     public QuerySet data(String field, Object value) {
         reservoir.getData().put(field, value);
         return this;
@@ -403,7 +403,7 @@ public class QuerySet {
         return reservoir.dataList == null || reservoir.dataList.size() == 0 ? null : reservoir.getData();
     }
 
-    //TODO::-------------------- 增删改查 --------------------
+    //NOTE::-------------------- 增删改查 --------------------
     public List<Map<String, Object>> select() {
         queryBefore();
         List<Map<String, Object>> resultSet = executeSql();
@@ -425,18 +425,18 @@ public class QuerySet {
             field(new TableColumn(null).setRaw("*"));
     }
 
-    public Integer update(Map<String, Object> data) {
+    public int update(Map<String, Object> data) {
         reservoir.action = Action.UPDATE;
         this.data(data);
         return executeSql();
     }
 
-    public Integer update() {
+    public int update() {
         reservoir.action = Action.UPDATE;
         return executeSql();
     }
 
-    public Integer insert(Map<String, Object> data) {
+    public int insert(Map<String, Object> data) {
         reservoir.action = Action.INSERT;
         this.data(data);
         return executeSql();
@@ -449,13 +449,13 @@ public class QuerySet {
         return executeSql();
     }
 
-    public Integer insertAll(List<DataMap> dataList) {
+    public int insertAll(List<DataMap> dataList) {
         reservoir.action = Action.INSERT;
         reservoir.getDataList().addAll(dataList);
         return executeSql();
     }
 
-    public Integer delete() {
+    public int delete() {
         if (QuerySetHelper.isEmpty(reservoir.whereList)) {
             throw new QueryException("不允许空条件的删除执行");
         }
@@ -463,7 +463,7 @@ public class QuerySet {
         return executeSql();
     }
 
-    //TODO::-------------------- 扩展方法 --------------------
+    //NOTE::-------------------- 扩展方法 --------------------
 
     /**
      * 获取表全部字段
@@ -501,7 +501,7 @@ public class QuerySet {
         return null;
     }
 
-    //TODO::--------------- 语句方法 ---------------
+    //NOTE::--------------- 语句方法 ---------------
     public String buildSql() {
         reservoir.action = reservoir.action == null ? Action.SELECT : reservoir.action;
         if (Action.SELECT == reservoir.action) {
@@ -526,7 +526,7 @@ public class QuerySet {
             if (reservoir.printSql) {
                 System.out.println(reservoir.getSql());
             }
-            return null;
+            return (T) Integer.valueOf(0);
         }
         return ORMContext.getDrive().executeSql(this);
     }
@@ -543,7 +543,7 @@ public class QuerySet {
         return ORMContext.getDrive().executeSql(Action.SELECT, sql, QueryReservoir.EMPTY);
     }
 
-    //TODO::--------------- 增强方法 ---------------
+    //NOTE::--------------- 增强方法 ---------------
     // 分页查询
     public IPagination<Map<String, Object>> pagination() {
         List<TableColumn> cacheFiledList = new LinkedList<>(reservoir.getColumnList());
@@ -574,7 +574,7 @@ public class QuerySet {
         return this.pagination(page, 20L);
     }
 
-    //TODO::--------------- 统计方法 ---------------
+    //NOTE::--------------- 统计方法 ---------------
     public Integer count() {
         return count(new TableColumn().setRaw("COUNT(*)"));
     }
@@ -608,7 +608,7 @@ public class QuerySet {
         return Math.toIntExact((Long) resultSet.get(0).get(column.getRaw()));
     }
 
-    //TODO::--------------- 事务操作方法 ---------------
+    //NOTE::--------------- 事务操作方法 ---------------
 
     /**
      * 开启事务
@@ -648,11 +648,11 @@ public class QuerySet {
      *
      * @param callback 事务回调方法
      */
-    public static void transaction(TransactionCallback callback) {
+    public static void transaction(TransactionClosure callback) {
         transaction(ORMContext.getDrive(), callback);
     }
 
-    public static void transaction(Drive drive, TransactionCallback callback) {
+    public static void transaction(Drive drive, TransactionClosure callback) {
         startTrans(drive);
         try {
             callback.call();
@@ -662,7 +662,7 @@ public class QuerySet {
         }
     }
 
-    public interface TransactionCallback {
+    public interface TransactionClosure {
         void call();
     }
 }

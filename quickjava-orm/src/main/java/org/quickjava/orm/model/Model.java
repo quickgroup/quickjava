@@ -89,7 +89,7 @@ public class Model implements IModel {
         return QuerySetHelper.getQueryReservoir(query());
     }
 
-    //TODO:---------- 查询方法 ----------
+    //NOTE:---------- 查询方法 ----------
     public Model where(String field, Operator opr, Object val) {
         query().where(field, opr, val);
         return this;
@@ -178,25 +178,22 @@ public class Model implements IModel {
         return where(field, Operator.BETWEEN, new Object[]{val1, val2});
     }
 
-    //TODO::---------- 查询方法二 ----------
+    //NOTE::---------- 查询方法二 ----------
     public Model field(String ... fields) {
         query().field(fields);
         return this;
     }
 
-    //TODO::---------- 操作方法-增删改查 ----------
+    //NOTE::---------- 操作方法-增删改查 ----------
 
     /**
      * 新增
-     *
-     * @param <D> D
-     * @return D
      */
-    public <D extends IModel> D insert()
+    public int insert()
     {
         insertBefore();
         // 执行
-        Long pkVal = query().insert(this.sqlData());
+        Long pkVal = query().insertGetId(this.sqlData());
         // 编译sql
         if (querySetReservoir().isFetchSql())
             return toD(new ModelSql(querySetReservoir().getSql()));
@@ -204,7 +201,7 @@ public class Model implements IModel {
         if (pkVal != null) {
             setData(pk(), pkVal);
         }
-        return toD(ModelHelper.isProxyModel(this) ? this : newModel(getMClass(), data()));
+        return 1;
     }
 
     protected void insertBefore() {
@@ -217,21 +214,16 @@ public class Model implements IModel {
             }
         });
         // 雪花id
-
     }
 
     /**
      * 使用数据集新增
-     *
-     * @param data 数据集
-     * @param <D>  D
-     * @return 模型对象
      */
-    public <D extends IModel> D insert(DataMap data) {
+    public int insert(DataMap data) {
         return insert((Map<String, Object>) data);
     }
 
-    public <D extends IModel> D insert(Map<String, Object> data) {
+    public int insert(Map<String, Object> data) {
         data(data);
         return insert();
     }
@@ -241,7 +233,7 @@ public class Model implements IModel {
      *
      * @return 1
      */
-    public Long delete() {
+    public int delete() {
         // 软删除字段
         for (ModelFieldMeta field : reservoir.meta.fieldMap().values()) {
             if (field.isSoftDelete()) {
@@ -251,7 +243,7 @@ public class Model implements IModel {
                 } else {
                     throw new QuickORMException("不支持的软删除字段");
                 }
-                return 1L;
+                return 1;
             }
         }
         // 真实删除默认条件
@@ -264,11 +256,8 @@ public class Model implements IModel {
 
     /**
      * 更新
-     *
-     * @param <D> D
-     * @return 模型对象
      */
-    public <D extends IModel> D update() {
+    public int update() {
         // 默认填充数据
         reservoir.meta.fieldMap().forEach((name, field) -> {
             if (!reservoir.data.containsKey(name)) {
@@ -277,52 +266,46 @@ public class Model implements IModel {
                 }
             }
         });
-        // 执行
-        query().update(this.sqlData());
         // 编译sql
         if (querySetReservoir().isFetchSql())
-            return toD(new ModelSql(querySetReservoir().getSql()));
-        // 返回模型
-        return toD(ModelHelper.isProxyModel(this) ? this : newModel(getMClass(), data()));
+            return 0;
+        // 执行
+        return query().update(this.sqlData());
     }
 
-    public <D extends IModel> D update(DataMap data) {
+    public int update(DataMap data) {
         return update((Map<String, Object>) data);
     }
 
-    public <D extends IModel> D update(Map<String, Object> data) {
+    public int update(Map<String, Object> data) {
         data(data);
         return update();
     }
 
-    public <D extends IModel> D updateById() {
+    public int updateById() {
         String pk = pk();
         where(pk, data(pk));
-//        reservoir.data.remove(pk);  // 不去更新主键
+        reservoir.data.remove(pk);  // 不去更新主键
         return update();
     }
 
     /**
      * 保存数据
      * - 自动判断主键是否为null，为null执行新增，否则进行更新
-     *
-     * @param <D> D
-     * @return 模型对象
      */
-    public <D extends IModel> D save() {
+    public int save() {
         String pk = pk();
         Object pkVal = data(pk);
         return pkVal == null ? insert() : where(pk, pkVal).update();
     }
 
-    public <D extends IModel> D save(DataMap data) {
+    public int save(DataMap data) {
         return save((Map<String, Object>) data);
     }
 
-    public <D extends IModel> D save(Map<String, Object> data) {
+    public int save(Map<String, Object> data) {
         data(data);
-        save();
-        return toD(this);
+        return save();
     }
 
     /**
@@ -388,7 +371,7 @@ public class Model implements IModel {
         return toD(find());
     }
 
-    //TODO::---------- 分页方法 ----------
+    //NOTE::---------- 分页方法 ----------
     public <D> IPagination<D> pagination(Long page, Long pageSize) {
         // 查询前处理：预载入
         queryBefore();
@@ -408,7 +391,7 @@ public class Model implements IModel {
         return pagination(1L, 20L);
     }
 
-    //TODO::---------- 操作方法：排序、聚合等 START ----------
+    //NOTE::---------- 操作方法：排序、聚合等 START ----------
 
     /**
      * 排序
@@ -511,9 +494,9 @@ public class Model implements IModel {
         query().fetchSql(fetch);
         return this;
     }
-    //TODO::---------- 操作方法：排序、聚合等 END ----------
+    //NOTE::---------- 操作方法：排序、聚合等 END ----------
 
-    //TODO::---------- 数据方法 START ----------
+    //NOTE::---------- 数据方法 START ----------
 
     /**
      * 实体通过map装载数据
@@ -613,9 +596,9 @@ public class Model implements IModel {
         }
         return ret;
     }
-    //TODO::---------- 数据方法 END ----------
+    //NOTE::---------- 数据方法 END ----------
 
-    //TODO::---------- 静态方法、批量方法 START ----------
+    //NOTE::---------- 静态方法、批量方法 START ----------
 
     /**
      * 通过 Map 创建对象
@@ -657,7 +640,7 @@ public class Model implements IModel {
             models.add(model);
         });
         QuerySet querySet = ModelHelper.getModelQuery(models.get(0));
-        Long insertId = querySet.insertAll(modelDataList);
+        Integer insertId = querySet.insertAll(modelDataList);
         // 回写自增id
         if (insertId != null) {
             String pkName = models.get(0).pk();
@@ -668,9 +651,9 @@ public class Model implements IModel {
         return models;
     }
 
-    public static<MC extends Model> Long batchCreate(List<MC> models) {
+    public static<MC extends Model> int batchCreate(List<MC> models) {
         if (models == null || models.isEmpty()) {
-            return 0L;
+            return 0;
         }
         List<DataMap> modelDataList = new LinkedList<>();
         for (Model model : models) {
@@ -687,16 +670,16 @@ public class Model implements IModel {
      * @param dataList 数据列表
      * @return 对象数量
      */
-    public Integer bulkCreate(List<DataMap> dataList) {
+    public int bulkCreate(List<DataMap> dataList) {
         dataList.forEach(data -> {
             Model model = newModel(this.getMClass());
             model.save(data);
         });
         return dataList.size();
     }
-    //TODO::---------- 静态操作方法 END ----------
+    //NOTE::---------- 静态操作方法 END ----------
 
-    //TODO::---------- 模型控制方法 ----------
+    //NOTE::---------- 模型控制方法 ----------
 
     /**
      * 查询前处理预载入
@@ -714,7 +697,7 @@ public class Model implements IModel {
             }
         }
 
-        // TODO::一对一关联查询
+        // NOTE::一对一关联查询
         Map<String, Relation> relationMap = getWithRelation(new RelationType[]{RelationType.OneToOne});
         logger.debug("relationMap=" + relationMap);
         if (!relationMap.isEmpty()) {
@@ -763,7 +746,7 @@ public class Model implements IModel {
         return (D) model;
     }
 
-    //TODO::---------- 模型实例化----------
+    //NOTE::---------- 模型实例化----------
     public static <D extends IModel> D newModel(Class<?> clazz) {
         return newModel(clazz, null, null);
     }
@@ -853,7 +836,7 @@ public class Model implements IModel {
         }
     }
 
-    //---------- TODO::关联方法 ----------//
+    //---------- NOTE::关联方法 ----------//
     /*
      * 关联方法
      * */

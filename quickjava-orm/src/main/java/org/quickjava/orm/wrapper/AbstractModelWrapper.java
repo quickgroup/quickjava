@@ -45,14 +45,14 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         return modelClazz;
     }
 
-    //TODO::-------------------- 查询条件  --------------------
+    //NOTE::-------------------- 查询条件  --------------------
     @Override
     public Children where(Where where) {
         querySet().where(where);
         return chain();
     }
 
-    //TODO::-------------------- 查询字段  --------------------
+    //NOTE::-------------------- 查询字段  --------------------
 
     /**
      * 限定返回数据列
@@ -76,7 +76,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         return chain();
     }
 
-    //TODO::--------------- 特性 ---------------
+    //NOTE::--------------- 特性 ---------------
     @SafeVarargs
     public final Children group(R... fields) {
         for (R field : fields) {
@@ -135,7 +135,7 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         return chain();
     }
 
-    //TODO::--------------- 排序和数量 ---------------
+    //NOTE::--------------- 排序和数量 ---------------
     public Children order(R r, boolean desc) {
         querySet().order(r.name(), desc ? OrderByType.DESC : OrderByType.ASC);
         return chain();
@@ -180,35 +180,36 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         return chain();
     }
 
-    public M insert() {
+    // NOTE::---------- 操作方法-增删改查 ----------
+    public int insert() {
         return model().insert();
     }
 
-    public M insert(DataMap data) {
+    public int insert(DataMap data) {
         return model().insert(data);
     }
 
-    public Long delete() {
+    public int delete() {
         return model().delete();
     }
 
-    public M update() {
+    public int update() {
         return model().update();
     }
 
-    public M update(DataMap data) {
+    public int update(DataMap data) {
         return model().update(data);
     }
 
-    public M save() {
+    public int save() {
         return model().save();
     }
 
-    public M save(DataMap data) {
+    public int save(DataMap data) {
         return model().save(data);
     }
 
-    //TODO:---------- 查询执行方法 ----------
+    //NOTE:---------- 查询执行方法 ----------
     public M find() {
         queryBefore();
         Map<String, Object> data = querySet().find();
@@ -224,7 +225,6 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
     }
 
     private Children queryBefore() {
-        // 主表字段
         ModelReservoir reservoir = ModelHelper.getModelReservoir(model);
         QueryReservoir queryReservoir = QuerySetHelper.getQueryReservoir(reservoir.querySet);
 //        if (queryReservoir.columnList == null || queryReservoir.columnList.isEmpty()) {

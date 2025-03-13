@@ -39,19 +39,19 @@
 //        data.put("create_time", new Date());
 //        data.put("update_time", new Date());
 //
-//        // TODO::查询
+//        // NOTE::查询
 //        QuerySet.table("user").field("id").select();
 //
 //        Long startTime = TimeUtils.getNanoTime();
 //
-//        // TODO::新增
+//        // NOTE::新增
 //        Long result = QuerySet.table("user").insert(data);
 //
 //        System.out.println("INSERT.return=" + result);
 //        System.out.println("耗时=" + TimeUtils.endNanoTime(startTime) + "ms");
 //        startTime = TimeUtils.getNanoTime();
 //
-//        // TODO::删除
+//        // NOTE::删除
 //        Integer number = QuerySet.table("user").where("id", 1).where("status", 1).delete();
 //
 //        System.out.println("DELETE.return=" + number);
@@ -62,7 +62,7 @@
 //        updateData.put("name", "xiaolong");
 //        updateData.put("age", 15);
 //
-//        // TODO::更新
+//        // NOTE::更新
 //        number = QuerySet.table("user").where("name", "longlong").update(updateData);
 //
 //        System.out.println("UPDATE.return=" + number);
