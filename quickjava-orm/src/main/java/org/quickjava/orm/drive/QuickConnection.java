@@ -187,6 +187,6 @@ public class QuickConnection implements AutoCloseable {
 
     @Override
     public String toString() {
-        return "QuickConnection-" + hashCode();
+        return "QuickConnection@" + Integer.toHexString(hashCode());
     }
 }
