@@ -104,7 +104,7 @@ public class ORMContext {
     public static DatabaseConfig getQuickJavaConfig()
     {
         try {
-            Class<?> kernelClazz = ORMContext.class.getClassLoader().loadClass("org.quickjava.framework.Kernel");
+            Class<?> kernelClazz = ORMContext.class.getClassLoader().loadClass("org.quickjava.web.framework.Kernel");
             Object configMap = ReflectUtil.getFieldValue(kernelClazz, "config");
             Map<String, Object> databaseMap = ReflectUtil.invoke(configMap, "getDict", "database");
             DatabaseConfig config1 = new DatabaseConfig();
