@@ -114,7 +114,7 @@ public class ORMContext {
         // 加载驱动操作类
         try {
             Drive drive = driveMap.get(meta.type).newInstance();
-            ReflectUtil.setFieldValueDirect(drive, "config", meta);
+            drive.setConfig(meta);
             return drive;
         } catch (InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
