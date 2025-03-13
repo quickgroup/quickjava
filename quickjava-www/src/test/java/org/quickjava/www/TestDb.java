@@ -10,6 +10,7 @@ import org.junit.runner.RunWith;
 import org.quickjava.common.QuickUtil;
 import org.quickjava.framework.QuickJavaRunner;
 import org.quickjava.orm.query.QuerySet;
+import org.quickjava.orm.query.enums.Operator;
 
 import java.util.*;
 
@@ -22,14 +23,8 @@ public class TestDb {
     @Test
     public void test1()
     {
-        Map<String, Object> data = new LinkedHashMap<>();
-        data.put("account", "123456");
-        data.put("password", "pwd123");
-        data.put("name", "longlong");
-        data.put("age", 12);
-        data.put("email", "123456@qq.com");
-        data.put("create_time", new Date());
-        data.put("update_time", new Date());
+        // 先删除所有数据
+        QuerySet.table("qj_user").where("id", Operator.RAW, "IS NOT NULL").delete();
 
         // TODO::查询
         QuerySet.table("qj_user").field("id").select();
@@ -37,6 +32,14 @@ public class TestDb {
         Long startTime = QuickUtil.getNanoTime();
 
         // TODO::新增
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("username", "123456");
+        data.put("password", "pwd123");
+        data.put("name", "longlong");
+        data.put("age", 12);
+        data.put("email", "123456@qq.com");
+        data.put("create_time", new Date());
+        data.put("update_time", new Date());
         Long result = QuerySet.table("qj_user").insert(data);
 
         System.out.println("INSERT.return=" + result);
@@ -66,19 +69,26 @@ public class TestDb {
     }
 
     /**
-     * 表别名
-     * JOIN查询
+     * 测试事物操作
      */
     @Test
-    public void test2()
-    {
-        // JOIN
-//        Q.table("qj_user")
-//                .where("account", "longlong")
-//                .where("status", 0)
-//                .join("user_address", "user_address.user_id = user.id", "LEFT")
-//                .join("user_order", "user_order.user_id = user.id", "LEFT")
-//                .order("create_time", "DESC")
-//                .select();
+    public void testTransaction() {
+        QuerySet.transaction(() -> {
+            // TODO::查询
+            QuerySet.table("qj_user").field("id").select();
+        });
+
+        QuerySet.transaction(() -> {
+            // TODO::查询
+            QuerySet.table("qj_user").field("id").select();
+            // TODO::更新
+            Map<String, Object> updateData = new LinkedHashMap<>();
+            updateData.put("name", "xiaolong");
+            updateData.put("age", 15);
+            QuerySet.table("qj_user").where("id", "longlong").update(updateData);
+            // TODO::查询
+            QuerySet.table("qj_user").field("id").select();
+        });
     }
+
 }
