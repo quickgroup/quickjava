@@ -1,7 +1,6 @@
 package org.quickjava.framework.config;
 
 import org.quickjava.common.QuickLog;
-import org.quickjava.common.QuickUtil;
 import org.quickjava.common.utils.FileUtils;
 import org.quickjava.framework.bean.Dict;
 import org.yaml.snakeyaml.Yaml;
@@ -43,7 +42,7 @@ public class AppConfig {
             Dict dictUser = new Dict(resultUser);
 //            QuickLog.debug("dictUser: " + dictUser);
             // merger
-            dictUser = Dict.putAll(dictDefault, dictUser);
+            dictUser = Dict.merge(dictDefault, dictUser);
 
             QuickLog.debug("dictUser: " + dictUser);
 

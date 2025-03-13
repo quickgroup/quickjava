@@ -32,7 +32,7 @@ public class DatabaseMeta {
     public String database = null;
 
     // jdbc驱动
-    public String driver = "com.mysql.jdbc.Driver";
+    public String driver = null;
 
     public boolean autoCommit = true;
 

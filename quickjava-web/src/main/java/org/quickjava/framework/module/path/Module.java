@@ -49,14 +49,14 @@ public class Module extends BasePath {
 
     public Map<String, ControllerPath> controllerList = new LinkedHashMap<>();
 
-    public Module(String name, String dirpath)
+    public Module(String name, String dirPath)
     {
         this.type = Type.MODULE;
         this.name = name;
-        this.dirpath = dirpath;
+        this.dirpath = dirPath;
         this.path = "/" + name;
 
-        Dict dirDict = Kernel.config().get("module").get("dirname");
+        Dict dirDict = Kernel.config().getDict("module").getDict("dirname");
         this.controllerPath = this.dirpath + "/" + dirDict.getString("controller", "controller");
         this.modelPath = this.dirpath + "/" + dirDict.getString("model", "model");
         this.viewPath = this.dirpath + "/" + dirDict.getString("view", "view");

@@ -68,14 +68,8 @@ log:
   level: DEBUG
 
 # Database
-database2:
-  url: jdbc:mysql://127.0.0.1:3306/www_lcdp_com?useSSL=false
-  driver: com.mysql.jdbc.Driver
-  username: root
-  password: 123456
-
 database:
-  url: jdbc:mysql://192.168.10.53:53306/www_lcdp_com?useSSL=false
-  driver: com.mysql.jdbc.Driver
-  username: www_lcdp_com
-  password: X3yTEyF8PeYJkfnA
+  url: jdbc:mysql://192.168.10.53:53306/quickjava_db?useSSL=false&allowPublicKeyRetrieval=true
+  driver: com.mysql.cj.jdbc.Driver
+  username: quickjava_db
+  password: ZDHdYPixHrn7Atb5

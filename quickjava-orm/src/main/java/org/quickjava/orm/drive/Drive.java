@@ -48,6 +48,10 @@ public abstract class Drive {
         return DRIVE_CONFIGURE_DEF;
     }
 
+    public void setConfig(DatabaseConfig config) {
+        this.config = config;
+    }
+
     /**
      * 获取连接
      * @return 连接
@@ -198,7 +202,7 @@ public abstract class Drive {
      */
     public <T> T executeSql(Action action, String sql)
     {
-        long startTime = System.nanoTime();
+        long startTime = System.currentTimeMillis();
         boolean isError = false;
         Object number = null;
         QuickConnection quickConnection = getQuickConnection();
@@ -231,12 +235,12 @@ public abstract class Drive {
             throw new QueryException(e);
 
         } finally {
-            long endTime = System.nanoTime();
+            long endTime = System.currentTimeMillis();
             String printSql = sql;
             if (action == Action.INSERT) {
                 printSql = sql.length() < 2560 ? sql: sql.substring(0, 2560);
             }
-            String msg = "SQL execution " + ((double) (endTime - startTime)) / 1000000 + "ms: " + printSql;
+            String msg = "SQL execution " + (endTime - startTime) + "ms: " + printSql;
             if (isError) {
                 logger.error(msg);
             } else {
