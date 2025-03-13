@@ -2,10 +2,9 @@ package org.quickjava.www;
 
 import org.quickjava.framework.QuickJavaBoot;
 import org.quickjava.framework.annotation.ApplicationQuickBoot;
-import org.quickjava.orm.QuerySet;
-import org.quickjava.orm.callback.WhereCallback;
-import org.quickjava.orm.enums.Operator;
 import org.quickjava.orm.example.Article;
+import org.quickjava.orm.query.QuerySet;
+import org.quickjava.orm.query.enums.Operator;
 
 @ApplicationQuickBoot
 public class ApplicationBoot {
@@ -62,7 +61,7 @@ public class ApplicationBoot {
 //
 //        System.out.println("insert.sql=" + new Article().fetchSql(true).insert());
 
-        System.out.println("update.sql=" + new Article().where("id", 211).data("id", 123).vegetarian(false).fetchSql(true).update());
+        System.out.println("update.sql=" + new Article().where("id", 211).data("id", 123).fetchSql(true).update());
 
         System.out.println("update.sql=" + new Article().where("id", 211).data("id", 123).fetchSql(true).pagination(1, 10));
 

@@ -588,6 +588,10 @@ public class QuerySet {
         return pagination();
     }
 
+    public IPagination<Map<String, Object>> pagination(Integer page, Integer pageSize) {
+        return pagination(page.longValue(), pageSize.longValue());
+    }
+
     public IPagination<Map<String, Object>> pagination(Long page) {
         return this.pagination(page, 20L);
     }
