@@ -24,6 +24,7 @@ import org.quickjava.orm.utils.ReflectUtil;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Map;
 
 public class QuickJavaDB implements ORMContextPort {
 
@@ -48,11 +49,14 @@ public class QuickJavaDB implements ORMContextPort {
         try {
             Class<?> kernelClazz = ORMContext.class.getClassLoader().loadClass("org.quickjava.web.framework.Kernel");
             Object configMap = ReflectUtil.getFieldValue(kernelClazz, "config");
-            Object databaseMap = ReflectUtil.invoke(configMap, "getDict", "database");
-            DatabaseMeta config1 = new DatabaseMeta(
-                    subjectName,
-                    String.valueOf(ReflectUtil.invoke(databaseMap, "getString", "url"))
-            );
+            Map<String, Object> databaseMap = ReflectUtil.invoke(configMap, "getDict", "database");
+            DatabaseMeta config1 = new DatabaseMeta();
+            for (Map.Entry<String, Object> entry : databaseMap.entrySet()) {
+                if (ReflectUtil.hasField(config1.getClass(), entry.getKey())) {
+                    ReflectUtil.setFieldValue(config1, entry.getKey(), entry.getValue());
+                }
+            }
+            config1.subject = subjectName;
             return config1;
         } catch (Throwable th) {
             return defaultConfig;
@@ -68,8 +72,9 @@ public class QuickJavaDB implements ORMContextPort {
             // 用户名和密码
             Class<?> kernelClazz = ORMContext.class.getClassLoader().loadClass("org.quickjava.web.framework.Kernel");
             Object configMap = ReflectUtil.getFieldValue(kernelClazz, "config");
-            String username = ReflectUtil.invoke(configMap, "getString", "username");
-            String password = ReflectUtil.invoke(configMap, "getString", "password");
+            Map<String, Object> databaseMap = ReflectUtil.invoke(configMap, "getDict", "database");
+            String username = ReflectUtil.invoke(databaseMap, "getString", "username");
+            String password = ReflectUtil.invoke(databaseMap, "getString", "password");
             // 去连接
             return DriverManager.getConnection(config.url, username, password);
         }  catch (ClassNotFoundException e) {

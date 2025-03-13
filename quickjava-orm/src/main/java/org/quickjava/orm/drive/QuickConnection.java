@@ -119,7 +119,7 @@ public class QuickConnection implements AutoCloseable {
             Map<String, Object> ret = new LinkedHashMap<>();
             // 执行
             int count = 0;
-            if (labels.containsKey(Label.INSERT_GET_ID)) {
+            if (labels != null && labels.containsKey(Label.INSERT_GET_ID)) {
                 count = statement.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
             } else {
                 count = statement.executeUpdate(sql);

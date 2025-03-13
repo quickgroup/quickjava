@@ -49,6 +49,9 @@ public class DatabaseMeta {
         DEFAULT,
     }
 
+    public DatabaseMeta() {
+    }
+
     public DatabaseMeta(String subject, String url) {
         this.subject = subject;
         parseDBTypeFromUrl(url);
