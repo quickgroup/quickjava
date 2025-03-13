@@ -32,12 +32,12 @@ public class Module extends BasePath {
     public String name;
 
     /**
-     * @langCn 文件路径
+     * #quickLang 文件路径
      */
     public String dirpath;
 
     /**
-     * @langCn 路由路径(网址路径)
+     * #quickLang 路由路径(网址路径)
      */
     public String path;
 

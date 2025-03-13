@@ -26,7 +26,7 @@ public class TextResponse extends QuickResponse {
     }
 
     /**
-     * @langCn 输出
+     * #quickLang 输出
      * @param response 输出对象
      * @return 渲染后的字节码
      */

@@ -25,17 +25,17 @@ import java.util.Map;
 public class Validator {
 
     /**
-     * @langCn 规则容器
+     * #quickLang 规则容器
      */
     public static RuleMap rules = new RuleMap();
 
     /**
-     * @langCn 场景配置
+     * #quickLang 场景配置
      */
     public static SceneMap scenes = new SceneMap();
 
     /**
-     * @langCn 全部验证
+     * #quickLang 全部验证
      * @param data 数据
      * @return 验证结果
      */

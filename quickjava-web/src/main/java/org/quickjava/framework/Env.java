@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * @langCn 环境变量管理
+ * #quickLang 环境变量管理
  * @author QloPC-Msi
  * @date 2021/0108
  */
@@ -25,7 +25,7 @@ public class Env {
         set("rootPath", QuickUtil.getRootPath());
         set("classPath", applicationClass.getClassLoader().getResource("").getPath());
         // 项目包
-        ApplicationQuickBoot quickBoot = applicationClass.newInstance().getClass().getAnnotation(ApplicationQuickBoot.class);
+        ApplicationQuickBoot quickBoot = (ApplicationQuickBoot) applicationClass.getAnnotation(ApplicationQuickBoot.class);
         String basePackages = "".equals(quickBoot.value()) ? applicationClass.getPackage().getName() + ".application" : quickBoot.value();
         set("basePackages", basePackages);
 

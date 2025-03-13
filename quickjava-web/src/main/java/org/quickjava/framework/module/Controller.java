@@ -100,7 +100,7 @@ public class Controller {
     }
 
     /**
-     * @langCn 渲染页面
+     * #quickLang 渲染页面
      * @param targetPath 路径
      * @return
      */
@@ -114,7 +114,7 @@ public class Controller {
     }
 
     /**
-     * @langCn 向view中添加数据
+     * #quickLang 向view中添加数据
      * @param key
      * @param val
      */

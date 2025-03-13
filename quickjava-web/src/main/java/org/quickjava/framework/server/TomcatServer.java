@@ -26,7 +26,7 @@ public class TomcatServer {
         QuickLog.info("Starting Tomcat.");
 
         /**
-         * @langCn 配置tomcat主机名和端口
+         * #quickLang 配置tomcat主机名和端口
          */
         tomcat.setHostname(Kernel.config().get("app").getString("hostname", "localhost"));
         tomcat.setPort(Kernel.config().get("app").getInteger("port", 8700));

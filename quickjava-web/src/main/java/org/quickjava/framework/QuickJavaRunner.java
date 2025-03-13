@@ -19,7 +19,9 @@ package org.quickjava.framework;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.InitializationError;
+import org.quickjava.framework.annotation.ApplicationQuickBoot;
 
+@ApplicationQuickBoot
 public class QuickJavaRunner extends BlockJUnit4ClassRunner {
 
     public QuickJavaRunner(Class<?> clazz) throws InitializationError {
@@ -29,5 +31,7 @@ public class QuickJavaRunner extends BlockJUnit4ClassRunner {
     @Override
     public void run(RunNotifier runNotifier) {
         System.out.println("run");
+        Kernel.init(QuickJavaRunner.class, new String[]{});
+        super.run(runNotifier);
     }
 }

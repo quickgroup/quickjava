@@ -16,24 +16,24 @@ import java.nio.charset.Charset;
 public abstract class QuickResponse {
 
     /**
-     * @langCn 返回内容
+     * #quickLang 返回内容
      */
     protected byte[] content = null;
 
     /**
-     * @langCn 返回的内容格式
+     * #quickLang 返回的内容格式
      */
     protected String contentType = "text/html; charset=UTF-8";
 
     /**
-     * @langCn 输出渲染方法 {子类必须实现该方法}
+     * #quickLang 输出渲染方法 {子类必须实现该方法}
      * @param response
      * @return
      */
     abstract public byte[] render(Request request, Response response);
 
     /**
-     * @langCn 输出数据写入到输出流
+     * #quickLang 输出数据写入到输出流
      * @param request 请求对象
      * @param response 输出对象
      */
@@ -59,13 +59,13 @@ public abstract class QuickResponse {
     }
 
     /**
-     * @langCn 输出字符转码
-     * @return @langCn 转码完成后的字节码
+     * #quickLang 输出字符转码
+     * @return #quickLang 转码完成后的字节码
      */
     public static byte[] stringToBytes(String string)
     {
         try {
-            return string.getBytes(Charset.forName("UTF-8"));   // @langCn 后面读取配置
+            return string.getBytes(Charset.forName("UTF-8"));   // #quickLang 后面读取配置
         } catch (Exception exc) {
             exc.printStackTrace();
         }

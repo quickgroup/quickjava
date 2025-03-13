@@ -55,7 +55,7 @@ public class AppConfig {
 
             if (QuickUtil.isClassMode()) {
                 /**
-                 * @langCn 多模块开发模式下，框架资源文件需要特殊读取
+                 * #quickLang 多模块开发模式下，框架资源文件需要特殊读取
                  */
                 String packageName = AppConfig.class.getPackage().getName();
                 packageName = "/" + packageName.replaceAll("\\.", "/");

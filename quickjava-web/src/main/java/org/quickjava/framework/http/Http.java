@@ -8,7 +8,7 @@ package org.quickjava.framework.http;
 public class Http {
 
     /**
-     * @langCn header头key，包含request和response
+     * #quickLang header头key，包含request和response
      */
     public class HeaderKey {
         public static final String Accept = "accept";
@@ -29,7 +29,7 @@ public class Http {
     }
 
     /**
-     * @langCn 常见ContentType
+     * #quickLang 常见ContentType
      */
     public class  ContentType {
         public static final String FORM = "application/x-www-form-urlencoded";
@@ -41,7 +41,7 @@ public class Http {
     }
 
     /**
-     * @langCn HTTP状态码
+     * #quickLang HTTP状态码
      */
     public class Status {
         public static final int SUCCESS = 200;

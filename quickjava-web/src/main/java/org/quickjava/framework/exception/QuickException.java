@@ -39,7 +39,7 @@ public class QuickException extends RuntimeException {
     }
 
     /**
-     * @langCn 异常输出为页面
+     * #quickLang 异常输出为页面
      * @param request
      * @param response
      * @return

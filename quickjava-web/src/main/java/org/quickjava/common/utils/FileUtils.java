@@ -56,7 +56,7 @@ public class FileUtils {
     }
 
     /**
-     * @langCn 从输入流读取内容
+     * #quickLang 从输入流读取内容
      * @param inputStream
      * @return
      */
@@ -76,7 +76,7 @@ public class FileUtils {
     }
 
     /**
-     * @langCn 按环境读取文件
+     * #quickLang 按环境读取文件
      * @param packageName
      * @param filename
      * @return
