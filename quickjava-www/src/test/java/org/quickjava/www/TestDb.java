@@ -24,7 +24,7 @@ public class TestDb {
      * 测试数据库ORM操作类
      */
     @Test
-    public void test1() {
+    public void testQuery() {
         // 先删除所有数据
         QuerySet.table("qj_user").where("id", Operator.RAW, "IS NOT NULL").delete();
 
@@ -123,7 +123,7 @@ public class TestDb {
      * 测试 内存泄漏
      */
     @Test
-    public void testTransactionMemoryLeakage() {
+    public void testTransactionOOM() {
         for (int i = 0; i < 100; i++) {
             System.out.println("第" + i + "次");
             testTransaction();
