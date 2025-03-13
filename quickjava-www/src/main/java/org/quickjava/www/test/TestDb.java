@@ -85,7 +85,7 @@ public class TestDb {
     @Test
     public void testQuery() {
         // 先删除所有数据
-        QuerySet.table("qj_user").where("id", Operator.RAW, "IS NOT NULL").delete();
+        QuerySet.table("qj_user").whereRaw("id IS NOT NULL").delete();
 
         // NOTE::查询
         QuerySet.table("qj_user").field("id").select();
