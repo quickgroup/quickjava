@@ -1,12 +1,12 @@
 package org.quickjava.www;
 
 import org.junit.runner.RunWith;
-import org.quickjava.framework.QuickJavaRunner;
+import org.quickjava.web.framework.QuickJavaRunner;
 import org.quickjava.www.application.index.model.UserModel;
 import org.junit.Test;
-import org.quickjava.common.QuickLog;
-import org.quickjava.common.QuickUtil;
-import org.quickjava.framework.http.Pathinfo;
+import org.quickjava.web.common.QuickLog;
+import org.quickjava.web.common.QuickUtil;
+import org.quickjava.web.framework.http.Pathinfo;
 
 import java.net.URL;
 import java.util.*;

@@ -1,9 +1,7 @@
 package org.quickjava.www;
 
-import org.quickjava.framework.Kernel;
-import org.quickjava.framework.QuickJavaBoot;
-import org.quickjava.framework.annotation.ApplicationQuickBoot;
-import org.quickjava.www.test.TestDb;
+import org.quickjava.web.framework.QuickJavaBoot;
+import org.quickjava.web.framework.annotation.ApplicationQuickBoot;
 
 @ApplicationQuickBoot
 public class ApplicationBoot {

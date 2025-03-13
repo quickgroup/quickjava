@@ -17,7 +17,7 @@
     </servlet-mapping>
     <servlet>
         <servlet-name>quickjava</servlet-name>
-        <servlet-class>org.quickjava.framework.server.QuickServlet</servlet-class>
+        <servlet-class>org.quickjava.web.framework.server.QuickServlet</servlet-class>
     </servlet>
 
 </web-app>

@@ -6,7 +6,7 @@
 package org.quickjava.www;
 
 import org.junit.runner.RunWith;
-import org.quickjava.framework.QuickJavaRunner;
+import org.quickjava.web.framework.QuickJavaRunner;
 
 @RunWith(QuickJavaRunner.class)
 public class TestModel {

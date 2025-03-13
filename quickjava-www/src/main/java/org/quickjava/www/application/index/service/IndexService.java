@@ -16,8 +16,8 @@
 
 package org.quickjava.www.application.index.service;
 
-import org.quickjava.framework.bean.Dict;
-import org.quickjava.framework.module.Service;
+import org.quickjava.web.framework.bean.Dict;
+import org.quickjava.web.framework.module.Service;
 import org.quickjava.www.application.index.model.bean.User;
 
 public class IndexService extends Service {

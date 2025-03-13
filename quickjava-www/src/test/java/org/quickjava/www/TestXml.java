@@ -2,7 +2,7 @@ package org.quickjava.www;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.quickjava.framework.QuickJavaRunner;
+import org.quickjava.web.framework.QuickJavaRunner;
 
 /**
  * @author QloPC-Msi

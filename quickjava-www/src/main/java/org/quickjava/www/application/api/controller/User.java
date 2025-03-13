@@ -5,7 +5,7 @@
 
 package org.quickjava.www.application.api.controller;
 
-import org.quickjava.framework.module.Controller;
+import org.quickjava.web.framework.module.Controller;
 
 public class User extends Controller {
 

@@ -6,7 +6,7 @@
 package org.quickjava.www;
 
 import org.junit.BeforeClass;
-import org.quickjava.common.QuickLog;
+import org.quickjava.web.common.QuickLog;
 
 public class TestBoot {
 

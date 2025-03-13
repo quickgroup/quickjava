@@ -16,7 +16,7 @@
 
 package org.quickjava.www.application.index.validator;
 
-import org.quickjava.framework.module.Validator;
+import org.quickjava.web.framework.module.Validator;
 
 public class IndexValidator extends Validator {
 
