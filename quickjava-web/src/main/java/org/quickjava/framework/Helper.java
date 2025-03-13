@@ -10,7 +10,7 @@ import org.quickjava.framework.http.Request;
 public class Helper extends QuickUtil {
 
     /**
-     * @langCn 获取资源文件
+     * #quickLang 获取资源文件
      * @return
      */
     public static String getResource(String name)

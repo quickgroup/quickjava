@@ -28,7 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * @langCn 未找到路径对应操作，交由本Servlet再处理
+ * #quickLang 未找到路径对应操作，交由本Servlet再处理
  */
 public class QuickDefaultServlet extends DefaultServlet {
 

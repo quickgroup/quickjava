@@ -74,7 +74,7 @@ public class Route {
         if (enumeration.hasMoreElements()) {
             URL item = enumeration.nextElement();
 
-            // @langCn classes文件模式
+            // #quickLang classes文件模式
             if (item.getProtocol().equals("file"))
             {
                 String classesPath = QuickUtil.getClassesPath();
@@ -159,7 +159,7 @@ public class Route {
     }
 
     /**
-     * @langCn 加载控制器所有方法
+     * #quickLang 加载控制器所有方法
      */
     public void controllerLoadAction(ControllerPath controller, Boolean caseSensitive)
     {
@@ -175,7 +175,7 @@ public class Route {
 
 
     /**
-     * @langCn 找到控制器方法
+     * #quickLang 找到控制器方法
      * @param request 请求
      */
     public RequestAction findMappingAction(Request request)
@@ -222,7 +222,7 @@ public class Route {
     }
 
     /**
-     * @langCn 请求对应控制器方法
+     * #quickLang 请求对应控制器方法
      */
     public class RequestAction {
 
@@ -235,7 +235,7 @@ public class Route {
         }
 
         /**
-         * @langCn 调用目标方法
+         * #quickLang 调用目标方法
          * @param request
          * @param response
          * @return
@@ -251,16 +251,16 @@ public class Route {
 
             try {
                 /*
-                 * @langCn 函数参数注解{@code{ @GetParam('id') String id }注入调用：前台表单数据注入、前台json数据注入、前台文件注入
-                 * @langCn 函数参数注解{@code{ @PostParam('file') File file }注入调用：前台表单数据注入、前台json数据注入、前台文件注入
+                 * #quickLang 函数参数注解{@code{ @GetParam('id') String id }注入调用：前台表单数据注入、前台json数据注入、前台文件注入
+                 * #quickLang 函数参数注解{@code{ @PostParam('file') File file }注入调用：前台表单数据注入、前台json数据注入、前台文件注入
                  */
 
                 /*
-                 * @langCn 函数注解处理：限定GET、POST等
+                 * #quickLang 函数注解处理：限定GET、POST等
                  */
 
                 /*
-                 * @langCn 默认调用
+                 * #quickLang 默认调用
                  */
                 return action.method.invoke(controller);
 

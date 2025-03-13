@@ -13,7 +13,7 @@ import org.quickjava.framework.response.TextResponse;
 public class QuickExceptionHandler {
 
     /**
-     * @langCn 异常响应处理输出
+     * #quickLang 异常响应处理输出
      */
     public static void onHandler(Throwable thr, Request request, Response response)
     {
@@ -45,7 +45,7 @@ public class QuickExceptionHandler {
     }
 
     /**
-     * @langCn 异常响应处理输出-最终级别
+     * #quickLang 异常响应处理输出-最终级别
      */
     public static void onHandlerTerminal(Throwable thr, Request request, Response response)
     {

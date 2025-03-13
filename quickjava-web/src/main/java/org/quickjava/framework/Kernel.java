@@ -44,6 +44,20 @@ public class Kernel {
     public static void startup(Class applicationClass, String[] args)
     {
         try {
+            // 初始化
+            kernel.init(applicationClass, args);
+            // 运行服务器
+            kernel.run(args);
+        } catch (Exception exc) {
+            QuickLog.error(exc.getMessage());
+            exc.printStackTrace();
+        }
+    }
+
+
+    public static void init(Class applicationClass, String[] args)
+    {
+        try {
             kernel.welcome();
             QuickLog.info(Lang.to("App start ..."));
 
@@ -74,9 +88,6 @@ public class Kernel {
 
             Hook.call("app_init_complete");
 
-            // 运行服务器
-            kernel.run(args);
-
         } catch (Exception exc) {
             QuickLog.error(exc.getMessage());
             exc.printStackTrace();
@@ -84,7 +95,7 @@ public class Kernel {
     }
 
     /**
-     * @langCn 运行Tomcat
+     * #quickLang 运行Tomcat
      * @param args
      */
     private void run(String[] args)
@@ -94,7 +105,7 @@ public class Kernel {
     }
 
     /**
-     * @langCn 启动成功
+     * #quickLang 启动成功
      */
     public static void serverStarting(ServletContext servletContext)
     {
@@ -104,7 +115,7 @@ public class Kernel {
     }
 
     /**
-     * @langCn 加载配置文件
+     * #quickLang 加载配置文件
      * @throws Exception
      */
     public void loadConfig() throws Exception
@@ -123,7 +134,7 @@ public class Kernel {
     }
 
     /**
-     * @langCn welcome
+     * #quickLang welcome
      * @return
      */
     public String welcome()
@@ -141,7 +152,7 @@ public class Kernel {
     }
 
     /**
-     * @langCn 线程存值
+     * #quickLang 线程存值
      */
     private static final ThreadLocal<Object> threadLocal = new ThreadLocal<Object>(){
         @Override

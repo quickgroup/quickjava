@@ -34,7 +34,7 @@ public class JarUtils {
     }
 
     /**
-     * @langCn 扫描文件
+     * #quickLang 扫描文件
      */
     public void scanFiles()
     {

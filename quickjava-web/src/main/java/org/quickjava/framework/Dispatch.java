@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 /**
- * @langCn 请求入口处理器
+ * #quickLang 请求入口处理器
  * @author QloPC-Msi
  * @date 2021/01/21
  */
@@ -76,7 +76,7 @@ public class Dispatch {
     }
 
     /**
-     * @langCn 清理本连接环境
+     * #quickLang 清理本连接环境
      */
     private void clearCurrentRequest(Request request, Response response)
     {

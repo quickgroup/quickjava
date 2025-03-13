@@ -14,7 +14,7 @@ public class QuickUtil {
 
     /**
      * Gets the current environment path
-     * @langCn 获取环境路径
+     * #quickLang 获取环境路径
      * @return String
      */
     public static String getRootPath()
@@ -24,7 +24,7 @@ public class QuickUtil {
 
     /**
      * Gets the current classes environment path
-     * @langCn 获取当前classes路径
+     * #quickLang 获取当前classes路径
      * @return String
      */
     public static String getClassesPath()
@@ -37,7 +37,7 @@ public class QuickUtil {
     }
 
     /**
-     * @langCn 获取纳秒（不是时间戳
+     * #quickLang 获取纳秒（不是时间戳
      * @return Long
      */
     public static Long getNanoTime() {
@@ -45,7 +45,7 @@ public class QuickUtil {
     }
 
     /**
-     * @langCn 获取纳秒间隔时间
+     * #quickLang 获取纳秒间隔时间
      * @return Long
      */
     public static double endNanoTimeMS(Long startTime) {
@@ -55,7 +55,7 @@ public class QuickUtil {
 
     /**
      * Gets a millisecond timestamp
-     * @langCn 获取毫秒级时间戳
+     * #quickLang 获取毫秒级时间戳
      * @return Long
      */
     public static Long getTimestamp() {
@@ -64,7 +64,7 @@ public class QuickUtil {
 
     /**
      * Gets the second timestamp
-     * @langCn 获取秒时间戳
+     * #quickLang 获取秒时间戳
      * @return Long
      */
     public static Long getSecondTimestamp()
@@ -73,7 +73,7 @@ public class QuickUtil {
     }
 
     /**
-     * @langCn 获取格式化时间
+     * #quickLang 获取格式化时间
      * @return
      */
     public static String getDateTime(String format, Date date)
@@ -87,7 +87,7 @@ public class QuickUtil {
     }
 
     /**
-     * @langCn 判断字符串为null 或 空
+     * #quickLang 判断字符串为null 或 空
      * @param s
      * @return
      */
@@ -96,7 +96,7 @@ public class QuickUtil {
     }
 
     /**
-     * @langCn 获取指定范围内的随机整数
+     * #quickLang 获取指定范围内的随机整数
      * @param min
      * @param max
      * @return
@@ -107,7 +107,7 @@ public class QuickUtil {
     }
 
     /**
-     * @langCn 获取调用者类名+方法名+行数
+     * #quickLang 获取调用者类名+方法名+行数
      * @return
      */
     public static String getCallClassMethod()
@@ -117,7 +117,7 @@ public class QuickUtil {
     }
 
     /**
-     * @langCn 获取调用者类名+方法名+行数
+     * #quickLang 获取调用者类名+方法名+行数
      * @return
      */
     public static String getSimpleCallClassMethod()
@@ -157,7 +157,7 @@ public class QuickUtil {
     }
 
     /**
-     * @langCn 堆栈数组转string数组
+     * #quickLang 堆栈数组转string数组
      * @param stackTraceElements
      * @return
      */

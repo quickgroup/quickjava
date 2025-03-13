@@ -58,7 +58,7 @@ public class Pathinfo {
     }
 
     /**
-     * @langCn 解析url参数
+     * #quickLang 解析url参数
      * @param query
      * @return
      */
@@ -76,7 +76,7 @@ public class Pathinfo {
     }
 
     /**
-     * @langCn 将path解析/module/module/action
+     * #quickLang 将path解析/module/module/action
      * @param module 默认模块
      * @param controller 默认控制器
      * @param action 默认方法
@@ -104,7 +104,7 @@ public class Pathinfo {
     }
 
     /**
-     * @langCn 按Pathinfo模式解析url
+     * #quickLang 按Pathinfo模式解析url
      * @param str url
      * @return Pathinfo
      */
@@ -119,7 +119,7 @@ public class Pathinfo {
     }
 
     /**
-     * @langCn 按Pathinfo模式解析url
+     * #quickLang 按Pathinfo模式解析url
      * @param str url
      * @return Pathinfo
      */

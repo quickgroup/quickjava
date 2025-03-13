@@ -20,106 +20,106 @@ public class Request {
     public String url;
 
     /**
-     * @langCn url中的域名
+     * #quickLang url中的域名
      */
     public String domin = null;
 
     /**
-     * @langCn header头中的host，常规情况下和{@see #domin}一致，某些特殊场景会不同
+     * #quickLang header头中的host，常规情况下和{@see #domin}一致，某些特殊场景会不同
      */
     public String host = null;
 
     /**
-     * @langCn 请求端口号
+     * #quickLang 请求端口号
      */
     public Integer port = null;
 
     /**
-     * @langCn 请求类型，大写
+     * #quickLang 请求类型，大写
      */
     public String method = null;
 
     /**
      * eq pathinfo
-     * @langCn 域名后面的路径，pathinfo格式{@code "/index/index/index"}
+     * #quickLang 域名后面的路径，pathinfo格式{@code "/index/index/index"}
      */
     public String path;
 
     /**
-     * @langCn http协议
+     * #quickLang http协议
      */
     public String protocol;
 
     /**
-     * @langCn Pathinfo
+     * #quickLang Pathinfo
      */
     public Pathinfo pathinfo;
 
     /**
-     * @langCn 客户端IP
+     * #quickLang 客户端IP
      */
     public String ip;
 
     /**
-     * @langCn 开始时间
+     * #quickLang 开始时间
      */
     public Long startTime;
 
     /**
-     * @langCn 对应模块
+     * #quickLang 对应模块
      */
     public Module module;
     public String moduleName;
 
     /**
-     * @langCn 对应控制器
+     * #quickLang 对应控制器
      */
     public ControllerPath controllerPath;
     public String controllerName;
 
     /**
-     * @langCn 对应控制器的方法
+     * #quickLang 对应控制器的方法
      */
     public Action action;
     public String actionName;
 
     /**
-     * @langCn 请求header头
+     * #quickLang 请求header头
      */
     public Dict headers = null;
 
     /**
-     * @langCn 请求数据类型
+     * #quickLang 请求数据类型
      */
     public Http.ContentType contentType = null;
 
     /**
-     * @langCn url-query请求数据
+     * #quickLang url-query请求数据
      */
     public Dict queryData = null;
 
     /**
-     * @langCn Post请求数据
+     * #quickLang Post请求数据
      */
     public Dict postData = null;
 
     /**
-     * @langCn Get和Post请求数据，POST会覆盖get中重名的数据
+     * #quickLang Get和Post请求数据，POST会覆盖get中重名的数据
      */
     public Dict params = null;
 
     /**
-     * @langCn 原始HttpServletRequest
+     * #quickLang 原始HttpServletRequest
      */
     public ServletContext servletContext = null;
 
     /**
-     * @langCn 原始HttpServletRequest
+     * #quickLang 原始HttpServletRequest
      */
     public HttpServletRequest httpServletRequest = null;
 
     /**
-     * @langCn 原始HttpServletResponse
+     * #quickLang 原始HttpServletResponse
      */
     public HttpServletResponse httpServletResponse = null;
 
@@ -134,7 +134,7 @@ public class Request {
     }
 
     /**
-     * @langCn 对Servlet进行必要配置：编码、语言
+     * #quickLang 对Servlet进行必要配置：编码、语言
      */
     public void initServlet()
     {

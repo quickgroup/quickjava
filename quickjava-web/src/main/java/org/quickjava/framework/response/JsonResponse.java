@@ -15,12 +15,12 @@ import java.util.Map;
 public class JsonResponse extends QuickResponse {
 
     /**
-     * @langCn 输出数据
+     * #quickLang 输出数据
      */
     public Dict data = new Dict();
 
     /**
-     * @langCn Map对象，解析为JSON输出
+     * #quickLang Map对象，解析为JSON输出
      * @param data
      */
     public JsonResponse(Map data) {
@@ -28,7 +28,7 @@ public class JsonResponse extends QuickResponse {
     }
 
     /**
-     * @langCn
+     * #quickLang
      * @param data
      */
     public JsonResponse(Dict data) {

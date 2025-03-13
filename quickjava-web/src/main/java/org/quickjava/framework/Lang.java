@@ -32,7 +32,7 @@ public class Lang {
     }
 
     /**
-     * @langCn 获取对应输出语言
+     * #quickLang 获取对应输出语言
      * @param text
      * @param language
      * @return
