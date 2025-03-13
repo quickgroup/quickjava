@@ -3,7 +3,7 @@
  * More Info to http://www.quickjava.org
  */
 
-package org.quickjava.www;
+package org.quickjava.www.test;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,7 +14,10 @@ import org.quickjava.orm.query.enums.Operator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @RunWith(QuickJavaRunner.class)
 public class TestDb {
@@ -83,18 +86,20 @@ public class TestDb {
     public void testTransaction() {
         QuerySet.transaction(() -> {
             // TODO::查询
-            QuerySet.table("qj_user").field("id").select();
+            QuerySet.table("qj_user").where("id", Operator.GTE, 0).select();
         });
 
         // 事务提交
         QuerySet.transaction(() -> {
             // TODO::查询
-            QuerySet.table("qj_user").field("id").select();
+            QuerySet.table("qj_user").where("id", Operator.GTE, 0).select();
             // TODO::更新
             Map<String, Object> updateData = new LinkedHashMap<>();
             updateData.put("name", "xiaolong");
             updateData.put("age", 15);
             QuerySet.table("qj_user").where("id", 5).update(updateData);
+            // TODO::查询
+            QuerySet.table("qj_user").field("id").select();
             // TODO::查询
             QuerySet.table("qj_user").field("id").select();
         });
@@ -124,7 +129,7 @@ public class TestDb {
      */
     @Test
     public void testTransactionMemoryLeakage() {
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 3000; i++) {
             System.out.println("第" + i + "次");
             testTransaction();
         }

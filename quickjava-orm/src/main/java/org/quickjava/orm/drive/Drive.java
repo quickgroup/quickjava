@@ -6,7 +6,6 @@
 package org.quickjava.orm.drive;
 
 import org.quickjava.orm.query.QuerySetHelper;
-import org.quickjava.orm.utils.ReflectUtil;
 import org.quickjava.orm.query.QueryReservoir;
 import org.quickjava.orm.query.QuerySet;
 import org.quickjava.orm.query.build.ValueConv;
@@ -35,8 +34,8 @@ public abstract class Drive {
 
     private DatabaseConfig config = null;
 
-    // 开启事务后将连接放到线程缓存中
-    private static final ThreadLocal<QuickConnection> __THREAD_CONNECTION = new ThreadLocal<>();
+    // 当前事务连接
+    private static final ThreadLocal<QuickConnection> __transactionConnection = new ThreadLocal<>();
 
     // 默认mysql风格
     private static final DriveConfigure DRIVE_CONFIGURE_DEF = new DriveConfigure(
@@ -58,8 +57,8 @@ public abstract class Drive {
      */
     public QuickConnection getQuickConnection() {
         // 事务中、线程中的数据库连接
-        if (__THREAD_CONNECTION.get() != null) {
-            return __THREAD_CONNECTION.get();
+        if (__transactionConnection.get() != null) {
+            return __transactionConnection.get();
         }
         // 连接数据库
         return new QuickConnection(config).connect();
@@ -247,7 +246,7 @@ public abstract class Drive {
                 logger.debug(msg);
             }
 
-            // 主动关闭连接
+            // 关闭连接（每次使用完必须关闭，要实现长连接，就需要实现连接池+线程变量
             if (quickConnection.autoCommit) {
                 quickConnection.close();
             }
@@ -289,13 +288,13 @@ public abstract class Drive {
 
     public void setAutoCommit(boolean autoCommit)
     {
-        if (__THREAD_CONNECTION.get() != null && !autoCommit) {
+        if (__transactionConnection.get() != null && !autoCommit) {
 //            throw new QuickORMException("已处于事务中");
             logger.warn("已处于事务中");
             return;
         }
         QuickConnection connection = getQuickConnection();
-        __THREAD_CONNECTION.set(autoCommit ? null : connection);
+        __transactionConnection.set(autoCommit ? null : connection);
         // 事务隔离
         if (!autoCommit) {
             logger.info("Transaction start");
@@ -308,25 +307,31 @@ public abstract class Drive {
         setAutoCommit(false);
     }
 
+    /**
+     * 提交事务，并关闭事务连接
+     */
     public void commit() {
-        QuickConnection connection = __THREAD_CONNECTION.get();
+        QuickConnection connection = __transactionConnection.get();
         if (connection != null) {
             logger.info("Transaction commit");
             connection.commit();
             connection.setAutoCommit(true);
-            connection.close();
-            __THREAD_CONNECTION.set(null);
+            connection.close();   // FIXME::关闭连接
+            __transactionConnection.set(null);
         }
     }
 
+    /**
+     * 回滚事务，并关闭事务连接
+     */
     public void rollback() {
-        QuickConnection connection = __THREAD_CONNECTION.get();
+        QuickConnection connection = __transactionConnection.get();
         if (connection != null) {
-            logger.info("Transaction rollback");
+            logger.info("Transaction rollback {}", connection);
             connection.rollback();
             connection.setAutoCommit(true);
-            connection.close();
-            __THREAD_CONNECTION.set(null);
+            connection.close();   // FIXME::关闭连接
+            __transactionConnection.set(null);
         }
     }
 }

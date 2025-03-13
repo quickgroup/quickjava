@@ -4,6 +4,8 @@ import org.quickjava.orm.loader.SpringLoader;
 import org.quickjava.orm.contain.DatabaseConfig;
 import org.quickjava.orm.utils.QueryException;
 import org.quickjava.orm.utils.QuickORMException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.LinkedHashMap;
@@ -12,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 public class QuickConnection implements AutoCloseable {
+    protected static final Logger logger = LoggerFactory.getLogger(QuickConnection.class);
 
     private DatabaseConfig config;
 
@@ -31,14 +34,8 @@ public class QuickConnection implements AutoCloseable {
     public QuickConnection connect() {
         // 根据配置连接 or QuickJava框架中使用
         if (config.subject == DatabaseConfig.DBSubject.CONFIG || config.subject == DatabaseConfig.DBSubject.QUICKJAVA) {
-            try {
-                Class.forName(config.driver);
-                this.connection = DriverManager.getConnection(config.url, config.username, config.password);
-            } catch (ClassNotFoundException e) {
-                throw new QueryException(e.toString());
-            } catch (SQLException e) {
-                throw new QueryException("数据库连接失败：" + config.url + "=>" + e.getMessage());
-            }
+            logger.info("Connecting to database... {}", this);
+            this.connection = connect(this, config);
         }
 
         // Spring 框架中使用
@@ -49,8 +46,21 @@ public class QuickConnection implements AutoCloseable {
                 throw new QueryException("获取连接失败");
             }
         }
-
         return this;
+    }
+
+    public static synchronized Connection connect(QuickConnection quickConnection, DatabaseConfig config) {
+        if (quickConnection.connection != null) {
+            throw new RuntimeException("重复连接");
+        }
+        try {
+            Class.forName(config.driver);
+            return DriverManager.getConnection(config.url, config.username, config.password);
+        } catch (ClassNotFoundException e) {
+            throw new QueryException(e.toString());
+        } catch (SQLException e) {
+            throw new QueryException("数据库连接失败：" + config.url + "=>" + e.getMessage());
+        }
     }
 
     public void setAutoCommit(boolean autoCommit) {
@@ -94,6 +104,7 @@ public class QuickConnection implements AutoCloseable {
     @Override
     public void close() {
         if (connection != null) {
+            logger.info("Closing connection... {}", this);
             try {
                 connection.close();
                 connection = null;
@@ -151,10 +162,7 @@ public class QuickConnection implements AutoCloseable {
     public List<Map<String, Object>> select(String sql)
             throws SQLException {
         List<Map<String, Object>> rows = new LinkedList<>();
-        ResultSet resultSet = null;
-
-        try (Statement statement = connection.createStatement()) {
-            resultSet = statement.executeQuery(sql);
+        try (Statement statement = connection.createStatement(); ResultSet resultSet = statement.executeQuery(sql)) {
             List<String> fieldNameArr = prepareField(resultSet);
             // 数据组装
             while (resultSet.next()) {
@@ -163,10 +171,6 @@ public class QuickConnection implements AutoCloseable {
                     item.put(fieldNameArr.get(fi), resultSet.getObject(fi + 1));
                 }
                 rows.add(item);
-            }
-        } finally {
-            if (resultSet != null) {
-                resultSet.close();
             }
         }
         return rows;
@@ -179,5 +183,10 @@ public class QuickConnection implements AutoCloseable {
             fieldNameArr.add(metaData.getColumnLabel(i));
         }
         return fieldNameArr;
+    }
+
+    @Override
+    public String toString() {
+        return "QuickConnection-" + hashCode();
     }
 }

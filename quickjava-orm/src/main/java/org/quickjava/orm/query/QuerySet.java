@@ -607,7 +607,6 @@ public class QuerySet {
 
     public static void commit(Drive drive) {
         drive.commit();
-        drive.setAutoCommit(true);
     }
 
     /**
@@ -619,7 +618,6 @@ public class QuerySet {
 
     public static void rollback(Drive drive) {
         drive.rollback();
-        drive.setAutoCommit(true);
     }
 
     /**
