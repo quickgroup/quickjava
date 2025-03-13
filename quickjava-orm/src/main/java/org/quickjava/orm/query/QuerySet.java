@@ -146,6 +146,14 @@ public class QuerySet {
         return this;
     }
 
+    public QuerySet whereRaw(String sql) {
+        if (ModelHelper.isEmpty(sql)) {
+            return this;
+        }
+        where(new WhereAnd(sql, Operator.RAW, null));
+        return this;
+    }
+
     public QuerySet whereOr(String table, String field, Operator operator, Object value) {
         if (ModelHelper.isEmpty(field)) {
             return this;
