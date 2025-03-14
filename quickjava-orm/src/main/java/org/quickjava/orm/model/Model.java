@@ -226,7 +226,7 @@ public class Model implements IModel {
         List<Map<String, Object>> ret = new LinkedList<>();
         for (Map<String, Object> data : dataList) {
             data(data);
-            ret.add(new LinkedHashMap<>(this.data()));
+            ret.add(new LinkedHashMap<>(this.sqlData()));
         }
         return query().insertAll(ret);
     }
@@ -588,7 +588,7 @@ public class Model implements IModel {
     }
 
     /**
-     * 手机执行sql的数据
+     * 数据转sql格式：驼峰转下划线等
      * - insert、update的数据
      *
      * @return 数据集

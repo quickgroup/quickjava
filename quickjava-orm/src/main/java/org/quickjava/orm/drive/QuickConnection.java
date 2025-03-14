@@ -114,31 +114,72 @@ public class QuickConnection implements AutoCloseable {
      */
     public Map<String, Object> insert(String sql, Map<Label, Object> labels)
             throws SQLException {
-        ResultSet generatedKeys = null;
+        Map<String, Object> ret = new LinkedHashMap<>();
         try (Statement statement = connection.createStatement()) {
-            Map<String, Object> ret = new LinkedHashMap<>();
             // 执行
             int count;
             if (labels != null && labels.containsKey(Label.INSERT_GET_ID)) {
                 count = statement.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
                 // 获取自增
-                generatedKeys = statement.getGeneratedKeys();
-                List<String> fieldNameArr = prepareField(generatedKeys);
-                if (!fieldNameArr.isEmpty()) {
-                    generatedKeys.next();
-                    for (int fi = 1; fi <= generatedKeys.getRow(); fi++) {
-                        ret.put(fieldNameArr.get(fi - 1), generatedKeys.getObject(fi));
+                try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                    List<String> fieldNameArr = prepareField(generatedKeys);
+                    if (!fieldNameArr.isEmpty()) {
+                        generatedKeys.next();
+                        for (int fi = 1; fi <= generatedKeys.getRow(); fi++) {
+                            ret.put(fieldNameArr.get(fi - 1), generatedKeys.getObject(fi));
+                        }
                     }
                 }
+
             } else {
                 count = statement.executeUpdate(sql);
             }
             ret.put("__orm_count", count);
             return ret;
-        } finally {
-            if (generatedKeys != null) {
-                generatedKeys.close();
+        }
+    }
+
+    public Map<String, Object> insert(String sql, List<Map<String, Object>> params, Map<Label, Object> labels)
+            throws SQLException {
+        Map<String, Object> ret = new LinkedHashMap<>();
+
+        PreparedStatement ps;
+        if (labels != null && labels.containsKey(Label.INSERT_GET_ID)) {
+            ps = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+        } else {
+            ps = connection.prepareStatement(sql);
+        }
+        try {
+            // 数据处理
+            for (int i = 0; i < params.size(); i++) {
+                Map<String, Object> param = params.get(i);
+                String type = param.get("type").toString();
+                Object value = param.get("value");
+                switch (type) {
+                    case "Integer": ps.setInt(i, (Integer) value); break;
+                    case "String": ps.setString(i, (String) value); break;
+                }
             }
+            // 执行
+            int count = ps.executeUpdate();
+            // 获取自增id
+            if (labels != null && labels.containsKey(Label.INSERT_GET_ID)) {
+                try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+                    List<String> fieldNameArr = prepareField(generatedKeys);
+                    if (!fieldNameArr.isEmpty()) {
+                        generatedKeys.next();
+                        for (int fi = 1; fi <= generatedKeys.getRow(); fi++) {
+                            ret.put(fieldNameArr.get(fi - 1), generatedKeys.getObject(fi));
+                        }
+                    }
+                }
+            }
+            ret.put("__orm_count", count);
+            return ret;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            ps.close();
         }
     }
 
