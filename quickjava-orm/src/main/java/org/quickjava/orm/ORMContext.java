@@ -92,11 +92,7 @@ public class ORMContext {
     }
 
     public static DatabaseMeta getDatabaseMeta() {
-        DatabaseMeta meta;
-        synchronized (Drive.class) {
-            meta = contextPort.getDatabaseMeta();
-        }
-        return meta;
+        return contextPort.getDatabaseMeta();
     }
 
     /**

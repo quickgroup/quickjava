@@ -70,8 +70,8 @@ public class Model implements IModel {
     @JsonIgnore
     private final ModelReservoir reservoir = new ModelReservoir(this);
 
-    private synchronized QuerySet query() {
-        synchronized (Model.class) {
+    private QuerySet query() {
+        synchronized (reservoir) {
             if (reservoir.querySet == null) {
                 if (reservoir.meta == null) {
                     throw new RuntimeException("元信息丢失：" + this.getClass());

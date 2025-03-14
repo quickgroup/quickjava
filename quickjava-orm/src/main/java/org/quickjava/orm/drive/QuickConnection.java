@@ -45,7 +45,7 @@ public class QuickConnection implements AutoCloseable {
         return this;
     }
 
-    public static synchronized Connection connect(QuickConnection quickConnection, DatabaseMeta config) {
+    public static Connection connect(QuickConnection quickConnection, DatabaseMeta config) {
         if (quickConnection.connection != null) {
             throw new RuntimeException("重复连接");
         }

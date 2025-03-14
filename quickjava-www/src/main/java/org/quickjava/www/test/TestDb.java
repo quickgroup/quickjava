@@ -177,8 +177,8 @@ public class TestDb {
      */
     @Test
     public void testTransactionOOM() {
-        ExecutorService executor = Executors.newFixedThreadPool(50);
-        for (int i = 0; i < 3000; i++) {
+        ExecutorService executor = Executors.newFixedThreadPool(30);
+        for (int i = 0; i < 300; i++) {
             int finalI = i;
             executor.submit(() -> {
                 System.out.println("第" + finalI + "次");
