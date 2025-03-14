@@ -61,6 +61,10 @@ public interface WhereWrapper<Children, M, Func extends MFunction<M, ?>> extends
         return this.where(true, null, column, operator, val);
     }
 
+    default Children where(String sql, Operator operator) {
+        return this.where(true, null, sql, operator, null);
+    }
+
     default Children where(String column, Object val) {
         return this.where(true, null, column, Operator.EQ, val);
     }

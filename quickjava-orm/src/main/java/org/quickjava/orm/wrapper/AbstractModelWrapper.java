@@ -185,8 +185,20 @@ public abstract class AbstractModelWrapper<Children extends AbstractModelWrapper
         return model().insert();
     }
 
-    public int insert(DataMap data) {
+    public int insert(Map<String, Object> data) {
         return model().insert(data);
+    }
+
+    public Long insertGetId() {
+        return model().insertGetId();
+    }
+
+    public Long insertGetId(Map<String, Object> data) {
+        return model().insertGetId(data);
+    }
+
+    public int insertAll(List<Map<String, Object>> dataList) {
+        return model().insertAll(dataList);
     }
 
     public int delete() {

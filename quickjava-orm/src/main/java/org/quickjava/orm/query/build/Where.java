@@ -132,7 +132,7 @@ public class Where extends TableColumn {
 
     @Override
     public String toString() {
-        return getLogicSql() + " " + column + " " + operator + " " + value;
+        return getLogicSql() + " " + (operator == Operator.RAW ? column : column + " " + operator + " " + value);
     }
 
     public String toSql(DriveConfigure cfg) {

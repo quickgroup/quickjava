@@ -34,6 +34,7 @@ public class ModelMeta {
     // 表名
     private String table;
     private String tableCache;
+    private String alias;
 
     /**
      * 属性字段
@@ -74,7 +75,7 @@ public class ModelMeta {
             }
             // 默认类名
             if (tableCache == null) {
-                tableCache = table;
+                tableCache = table == null ? clazz.getSimpleName() : table;
                 if (ORMContext.getDatabaseMeta().isUnderline()) {
                     tableCache = SqlUtil.toUnderlineCase(tableCache);
                 }

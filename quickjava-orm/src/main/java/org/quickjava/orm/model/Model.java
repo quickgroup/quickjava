@@ -204,6 +204,33 @@ public class Model implements IModel {
         return 1;
     }
 
+    public int insert(DataMap data) {
+        return insert((Map<String, Object>) data);
+    }
+
+    public int insert(Map<String, Object> data) {
+        data(data);
+        return insert();
+    }
+
+    public Long insertGetId() {
+        return query().insertGetId(this.data());
+    }
+
+    public Long insertGetId(Map<String, Object> data) {
+        data(data);
+        return insertGetId();
+    }
+
+    public int insertAll(List<Map<String, Object>> dataList) {
+        List<Map<String, Object>> ret = new LinkedList<>();
+        for (Map<String, Object> data : dataList) {
+            data(data);
+            ret.add(this.data());
+        }
+        return query().insertAll(ret);
+    }
+
     protected void insertBefore() {
         // 默认填充数据
         reservoir.meta.fieldMap().forEach((name, field) -> {
@@ -214,18 +241,6 @@ public class Model implements IModel {
             }
         });
         // 雪花id
-    }
-
-    /**
-     * 使用数据集新增
-     */
-    public int insert(DataMap data) {
-        return insert((Map<String, Object>) data);
-    }
-
-    public int insert(Map<String, Object> data) {
-        data(data);
-        return insert();
     }
 
     /**
@@ -504,10 +519,6 @@ public class Model implements IModel {
      * @param data 数据集
      * @return 模型对象
      */
-    public Model data(DataMap data) {
-        return data((Map<String, Object>) data);
-    }
-
     public Model data(Map<String, Object> data) {
         data.forEach(this::data);
         return this;
@@ -960,7 +971,8 @@ public class Model implements IModel {
         // 初始化模型信息
         ModelMeta meta = new ModelMeta();
         meta.setClazz((Class<Model>) clazz);
-        meta.setTable(clazz.getSimpleName());
+//        meta.setTable(clazz.getSimpleName());   // 设置表名
+        meta.setTable(meta.table());   // 设置表名
         meta.setFieldMap(new LinkedHashMap<>());
         ModelHelper.setMeta(clazz, meta);
         logger.debug("cache model meta. clazz={}", clazz);
