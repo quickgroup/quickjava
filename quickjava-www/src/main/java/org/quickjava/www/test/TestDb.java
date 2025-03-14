@@ -97,7 +97,9 @@ public class TestDb {
                 .between("status", 1, 2)
                 .distinct(true)
                 .lock(true)
-                .group("id", "DESC")
+                .group("id")
+                .group("id,status")
+                .group("id", "status")
                 .order("status", "ASC")
                 .page(1, 20)
                 .select());

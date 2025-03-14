@@ -282,8 +282,11 @@ public class QuerySet {
         return this;
     }
 
-    public QuerySet group(String table, String column) {
-        return group(new TableColumn(table, column));
+    public QuerySet groupTable(String table, String... columns) {
+        for (String column : columns) {
+            group(new TableColumn(table, column));
+        }
+        return this;
     }
 
     public QuerySet group(TableColumn... columns) {
