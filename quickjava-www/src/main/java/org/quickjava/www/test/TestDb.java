@@ -18,6 +18,8 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @RunWith(QuickJavaRunner.class)
 public class TestDb {
@@ -176,10 +178,16 @@ public class TestDb {
      */
     @Test
     public void testTransactionOOM() {
+        ExecutorService executor = Executors.newFixedThreadPool(50);
         for (int i = 0; i < 3000; i++) {
-            System.out.println("第" + i + "次");
-            testTransaction();
+            int finalI = i;
+            executor.submit(() -> {
+                System.out.println("第" + finalI + "次");
+                testTransaction();
+            });
         }
+        executor.shutdown();
+
         while (true) {
             try {
                 Thread.sleep(1000);
