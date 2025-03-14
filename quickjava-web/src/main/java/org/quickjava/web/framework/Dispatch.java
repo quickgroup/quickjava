@@ -1,6 +1,5 @@
 package org.quickjava.web.framework;
 
-import org.quickjava.web.common.QuickLog;
 import org.quickjava.web.framework.bean.Dict;
 import org.quickjava.web.framework.exception.QuickExceptionHandler;
 import org.quickjava.web.framework.exception.ResponseException;
@@ -9,6 +8,8 @@ import org.quickjava.web.framework.http.Response;
 import org.quickjava.web.framework.response.JsonResponse;
 import org.quickjava.web.framework.response.QuickResponse;
 import org.quickjava.web.framework.response.TextResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,11 +18,12 @@ import java.util.Map;
 /**
  * #quickLang 请求入口处理器
  * @author QloPC-Msi
- * @date 2021/01/21
+ * #date 2021/01/21
  */
 public class Dispatch {
+    private static final Logger logger = LoggerFactory.getLogger(Dispatch.class);
 
-    private static Dispatch dispatch = new Dispatch();
+    private static final Dispatch dispatch = new Dispatch();
 
     public static Dispatch get() {
         return dispatch;
@@ -29,7 +31,7 @@ public class Dispatch {
 
     public static void init()
     {
-        QuickLog.info(Lang.to("Dispatch init complete."));
+        logger.info(Lang.to("Dispatch init complete."));
     }
 
     /**
@@ -44,7 +46,7 @@ public class Dispatch {
 
         Kernel.setCurrentRequest(request);
 
-        QuickLog.info(request.method + " " + request.path);
+        logger.info(request.method + " " + request.path);
 
         try {
 
@@ -71,7 +73,7 @@ public class Dispatch {
             clearCurrentRequest(request, response);
 
             double time = ((double)(System.nanoTime() - startNanoTime)) / 1000000L;
-            QuickLog.debug(Lang.to("Processing time: ") + time + "ms");
+            logger.debug(Lang.to("Processing time: ") + time + "ms");
         }
     }
 

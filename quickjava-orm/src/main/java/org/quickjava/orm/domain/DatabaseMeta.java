@@ -10,7 +10,7 @@ import java.sql.SQLException;
  * +-------------------------------------------------------------------
  * Author: Qlo1062
  * +-------------------------------------------------------------------
- * File: Config
+ * File: DatabaseMeta
  * +-------------------------------------------------------------------
  * Date: 2023-6-1 9:52
  * +-------------------------------------------------------------------
@@ -19,28 +19,42 @@ import java.sql.SQLException;
  */
 public class DatabaseMeta {
 
-    // 连接处理框架
+    /** 连接处理框架 */
     public String subject = null;
 
-    // 数据库类型
+    /** 数据库类型 */
     public DBType type = DBType.MYSQL;
 
-    // 连接语句
+    /** 连接语句 */
     public String url = null;
 
-    // 数据库名称
+    /** 数据库名称 */
     public String database = null;
 
-    // jdbc驱动
+    /** jdbc驱动 */
     public String driver = null;
 
+    /** 自动提交 */
     public boolean autoCommit = true;
 
-    // 字段转大写
+    /** 字段转大写 */
     public boolean camelCase = true;
 
-    // 属性转下划线列名
+    /** 属性转下划线列名 */
     public boolean underline = true;
+
+    /** limit大小最大 */
+    public Integer maxLimit = 999;
+
+    /** 默认limit大小（对应分页大小 */
+    public Integer defaultLimit = 20;
+
+    /** 默认配置 */
+    public static final DatabaseMeta DEFAULT = new DatabaseMeta();
+
+    static {
+        DEFAULT.type = DBType.MYSQL;
+    }
 
     public enum DBType {
         MYSQL,

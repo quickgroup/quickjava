@@ -1,9 +1,10 @@
 package org.quickjava.web.framework;
 
-import org.quickjava.web.common.QuickLog;
 import org.quickjava.web.common.QuickUtil;
 import org.quickjava.web.framework.annotation.ApplicationQuickBoot;
 import org.quickjava.web.framework.exception.MapNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,12 +13,12 @@ import java.util.Properties;
 /**
  * #quickLang 环境变量管理
  * @author QloPC-Msi
- * @date 2021/0108
  */
 public class Env {
+    private static final Logger logger = LoggerFactory.getLogger(Env.class);
 
     private static Class<?> applicationClass = null;
-    private static Map<String, Object> data = new HashMap<String, Object>();
+    private static final Map<String, Object> data = new HashMap<>();
 
     public static void init(Class<?> applicationClass)
             throws Exception
@@ -28,13 +29,13 @@ public class Env {
         set("rootPath", QuickUtil.getRootPath());
         set("classPath", applicationClass.getClassLoader().getResource("").getPath());
         // 项目包
-        ApplicationQuickBoot quickBoot = (ApplicationQuickBoot) applicationClass.getAnnotation(ApplicationQuickBoot.class);
+        ApplicationQuickBoot quickBoot = applicationClass.getAnnotation(ApplicationQuickBoot.class);
         String basePackages = "".equals(quickBoot.value()) ? applicationClass.getPackage().getName() + ".application" : quickBoot.value();
         set("basePackages", basePackages);
 
         Env.systemEnvInit();
 
-        QuickLog.debug(Lang.to("Env init Complete."));
+        logger.debug(Lang.to("Env init Complete."));
     }
 
     public static Class<?> getApplicationClass() {
@@ -50,8 +51,6 @@ public class Env {
 
     /**
      * 获取变量值
-     * @param name
-     * @return Object
      */
     public static Object get(String name)
     {
@@ -81,8 +80,6 @@ public class Env {
 
     /**
      * 获取变量值
-     * @param name
-     * @return
      */
     public static void set(String name, Object object)
     {

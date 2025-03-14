@@ -4,19 +4,21 @@ import org.junit.runner.RunWith;
 import org.quickjava.web.framework.QuickJavaRunner;
 import org.quickjava.www.application.index.model.UserModel;
 import org.junit.Test;
-import org.quickjava.web.common.QuickLog;
 import org.quickjava.web.common.QuickUtil;
 import org.quickjava.web.framework.http.Pathinfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.util.*;
 
 /**
  * @author QloPC-Msi
- * @date
+ * #date
  */
 @RunWith(QuickJavaRunner.class)
 public class TestQuick {
+    private static final Logger logger = LoggerFactory.getLogger(TestQuick.class);
 
     @Test
     public void test1()
@@ -106,7 +108,7 @@ public class TestQuick {
     {
         UserModel user = (new UserModel()).where("id", "=", "1").find();
         List<UserModel> users = (new UserModel()).where("id", "=", "1").select();
-        QuickLog.info(user.table, user);
+        logger.info(user.table, user);
     }
 
     @Test

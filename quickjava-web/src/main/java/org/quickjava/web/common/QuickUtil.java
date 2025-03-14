@@ -6,7 +6,7 @@ import java.util.Date;
 
 /**
  * @author Qlo1062-(QloPC-Msi)
- * @date 2021/1/17 23:01
+ * #date 2021/1/17 23:01
  * @ProjectName quickjava
  */
 public class QuickUtil {

@@ -12,19 +12,21 @@
 package org.quickjava.web.framework;
 
 import javafx.util.Callback;
-import org.quickjava.web.common.QuickLog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 
 public class Hook {
+    private static final Logger logger = LoggerFactory.getLogger(Hook.class);
 
     private static Map<String, List<Object>> hooks = null;
 
     public static void init()
     {
         Hook.hooks = new LinkedHashMap<>();
-        QuickLog.debug(Lang.to("Hook init Complete."));
+        logger.debug(Lang.to("Hook init Complete."));
     }
 
     public static void listen(String key, String className)

@@ -19,7 +19,7 @@ import java.util.Map;
  * example:
  * new DataMap().put("userId", entity.getUserId()).put("postId", postId)
  */
-public class DataMap extends LinkedHashMap<String, Object> {
+public class DataMap extends LinkedHashMap<String, Object> implements Map<String, Object> {
 
     public DataMap() {
     }

@@ -18,7 +18,8 @@ package org.quickjava.web.framework.view.engine;
 
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.runtime.VelocityEngineVersion;
-import org.quickjava.web.common.QuickLog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,10 +27,9 @@ import java.util.Properties;
 
 /**
  * @author Qlo1062-(QloPC-Msi)
- * @date 2021/7/6 14:30
- * @projectName quickjava
  */
 public class VelocityEngine implements Engine {
+    private static final Logger logger = LoggerFactory.getLogger(VelocityEngine.class);
 
     private String template = null;
 
@@ -42,7 +42,7 @@ public class VelocityEngine implements Engine {
 
     @Override
     public void initEngine() {
-        QuickLog.info("View engine: VelocityEngine" + VelocityEngineVersion.VERSION);
+        logger.info("View engine: VelocityEngine" + VelocityEngineVersion.VERSION);
 
         Properties properties = new Properties();
         //从类路径加载模板文件 设置velocity资源加载方式为class

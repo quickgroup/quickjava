@@ -6,14 +6,16 @@ import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.webresources.DirResourceSet;
 import org.apache.catalina.webresources.StandardRoot;
-import org.quickjava.web.common.QuickLog;
 import org.quickjava.web.common.QuickUtil;
 import org.quickjava.web.framework.Kernel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import java.io.File;
 
 public class TomcatServer {
+    private static final Logger logger = LoggerFactory.getLogger(TomcatServer.class);
 
     private static String contextPath = "";
 
@@ -22,15 +24,15 @@ public class TomcatServer {
     {
         Tomcat tomcat = new Tomcat();
 
-        QuickLog.info("Starting Tomcat.");
+        logger.info("Starting Tomcat.");
 
-        /**
+        /*
          * #quickLang 配置tomcat主机名和端口
          */
         tomcat.setHostname(Kernel.config().getDict("app").getString("hostname", "localhost"));
         tomcat.setPort(Kernel.config().getDict("app").getInteger("port", 8700));
         tomcat.getConnector().setUseIPVHosts(true);
-        QuickLog.info("Server Listen: "
+        logger.info("Server Listen: "
                 + Kernel.config().getDict("app").getString("hostname", "localhost")
                 + ":"
                 + Kernel.config().getDict("app").getInteger("port", 8700));

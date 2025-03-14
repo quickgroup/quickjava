@@ -2,7 +2,7 @@ package org.quickjava.web.framework.bean;
 
 /**
  * @author Qlo1062-(QloPC-Msi)
- * @date 2021/1/23 23:19
+ * #date 2021/1/23 23:19
  * @projectName quickjava
  */
 public class DbConfig {

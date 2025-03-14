@@ -6,7 +6,7 @@ import org.quickjava.web.framework.QuickJavaRunner;
 
 /**
  * @author QloPC-Msi
- * @date
+ * #date
  */
 @RunWith(QuickJavaRunner.class)
 public class TestXml {

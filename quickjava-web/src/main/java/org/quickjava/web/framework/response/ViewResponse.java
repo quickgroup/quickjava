@@ -12,7 +12,7 @@ import java.util.Map;
 
 /**
  * @author Qlo1062-QloPC-zs
- * @date 2021/1/18 15:51
+ * #date 2021/1/18 15:51
  */
 public class ViewResponse extends QuickResponse {
 
@@ -50,7 +50,7 @@ public class ViewResponse extends QuickResponse {
         engine.setData(data);
         String result = engine.render();
 
-//        QuickLog.debug("Engine " + engine.getClass().getSimpleName() + ": " + QuickUtil.endNanoTimeMS(startNanoTime) + "ms");
+//        logger.debug("Engine " + engine.getClass().getSimpleName() + ": " + QuickUtil.endNanoTimeMS(startNanoTime) + "ms");
         return this.content = result.getBytes();
     }
 }

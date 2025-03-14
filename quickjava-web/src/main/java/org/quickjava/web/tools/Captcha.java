@@ -6,7 +6,7 @@ import java.util.Random;
 
 /**
  * @author Qlo1062-(QloPC-zs)
- * @date 2021/1/18 17:02
+ * #date 2021/1/18 17:02
  */
 public class Captcha {
 

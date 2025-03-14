@@ -2,7 +2,7 @@ package org.quickjava.web.framework.config;
 
 /**
  * @author Qlo1062-(QloPC-Msi)
- * @date 2021/1/17 21:07
+ * #date 2021/1/17 21:07
  * @ProjectName quickjava
  */
 public class DatabaseConfig {

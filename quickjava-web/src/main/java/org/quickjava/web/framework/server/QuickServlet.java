@@ -1,7 +1,8 @@
 package org.quickjava.web.framework.server;
 
-import org.quickjava.web.common.QuickLog;
 import org.quickjava.web.framework.Dispatch;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -11,11 +12,12 @@ import java.io.IOException;
 
 
 public class QuickServlet extends HttpServlet {
+    private static final Logger logger = LoggerFactory.getLogger(QuickServlet.class);
 
     private static final long serialVersionUID = -1L;
 
     public QuickServlet() {
-        QuickLog.debug("QuickServlet instantiation.");
+        logger.debug("QuickServlet instantiation.");
     }
 
     @Override

@@ -1,16 +1,18 @@
 package org.quickjava.web.framework.exception;
 
-import org.quickjava.web.common.QuickLog;
 import org.quickjava.web.framework.http.Request;
 import org.quickjava.web.framework.http.Response;
 import org.quickjava.web.framework.response.QuickResponse;
 import org.quickjava.web.framework.response.TextResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author QloPC-zs
- * @date 2021/1/19
+ * #date 2021/1/19
  */
 public class QuickExceptionHandler {
+    private static final Logger logger = LoggerFactory.getLogger(QuickExceptionHandler.class);
 
     /**
      * #quickLang 异常响应处理输出
@@ -27,7 +29,7 @@ public class QuickExceptionHandler {
             } else if (thr instanceof ActionNotFoundException) {
                 ActionNotFoundException exception = (ActionNotFoundException) thr;
                 quickResponse = new TextResponse(exception.output(request, response));
-                QuickLog.error(exception.getMessage());
+                logger.error(exception.getMessage());
 
             } else {
                 throw thr;

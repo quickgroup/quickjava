@@ -2,7 +2,7 @@ package org.quickjava.web.framework;
 
 /**
  * @author QloPC-Msi
- * @date 2021/0108
+ * #date 2021/0108
  */
 public class QuickJavaBoot {
 

@@ -17,7 +17,8 @@
 package org.quickjava.web.framework.server;
 
 import org.apache.catalina.servlets.DefaultServlet;
-import org.quickjava.web.common.QuickLog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -28,11 +29,12 @@ import java.io.IOException;
  * #quickLang 未找到路径对应操作，交由本Servlet再处理
  */
 public class QuickDefaultServlet extends DefaultServlet {
+    private static final Logger logger = LoggerFactory.getLogger(QuickDefaultServlet.class);
 
     private static final long serialVersionUID = -1L;
 
     public QuickDefaultServlet() {
-        QuickLog.debug("QuickDefaultServlet instantiation.");
+        logger.debug("QuickDefaultServlet instantiation.");
     }
 
     /**

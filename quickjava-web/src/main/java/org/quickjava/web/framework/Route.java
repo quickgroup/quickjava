@@ -1,6 +1,5 @@
 package org.quickjava.web.framework;
 
-import org.quickjava.web.common.QuickLog;
 import org.quickjava.web.common.QuickUtil;
 import org.quickjava.web.framework.bean.Dict;
 import org.quickjava.web.framework.exception.ActionNotFoundException;
@@ -12,6 +11,8 @@ import org.quickjava.web.framework.module.path.Module;
 import org.quickjava.web.framework.http.Pathinfo;
 import org.quickjava.web.framework.http.Request;
 import org.quickjava.web.framework.http.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
@@ -24,9 +25,10 @@ import java.util.jar.JarFile;
 
 /**
  * @author Qlo1062
- * @date 2021/01/17
+ * #date 2021/01/17
  */
 public class Route {
+    private static final Logger logger = LoggerFactory.getLogger(Route.class);
 
     private static Route route = new Route();
 
@@ -41,7 +43,7 @@ public class Route {
     public static void init() throws Exception
     {
         get().scanPackages();
-        QuickLog.debug("Route init complete");
+        logger.debug("Route init complete");
     }
 
     /**
@@ -59,7 +61,7 @@ public class Route {
         String classPath = Env.getString("classPath");
         String basePackages = Env.getString("basePackages");
         String packagePath = basePackages.replace(".", "/");
-        QuickLog.debug("basePackages => " + basePackages + ", packagePath => " + packagePath);
+        logger.debug("basePackages => {}, packagePath => {}", basePackages, packagePath);
 
         Enumeration<URL> enumeration = classLoader.getResources(packagePath);
         if (enumeration == null) {
@@ -70,7 +72,7 @@ public class Route {
 
         Dict dirname = config.getDict("module").getDict("dirname");
         String controllerDirName = dirname.getString("controller", "controller");
-        QuickLog.debug("classPath=" + classPath);
+        logger.debug("classPath={}", classPath);
 
         if (enumeration.hasMoreElements()) {
             URL item = enumeration.nextElement();
@@ -107,7 +109,7 @@ public class Route {
             // jar包模式
             else if (item.getProtocol().equals("jar"))
             {
-                QuickLog.debug("jar schema, jar=" + item.getFile());
+                logger.debug("jar schema, jar=" + item.getFile());
                 String[] jarInfo = item.getFile().split("!");
                 String jarFilePath = jarInfo[0].substring(jarInfo[0].indexOf("/"));
 //                String packagePath = jarInfo[1].substring(1);
@@ -127,7 +129,7 @@ public class Route {
 
                             // 模块
                             Module module = moduleList.get(nameArr[0]);
-                            if (nameArr.length >= 1 && module == null) {
+                            if (module == null) {
                                 module = new Module(nameArr[0], className);
                                 moduleList.put(nameCaseSensitive(module.name, caseSensitive), module);
                             }
@@ -143,7 +145,7 @@ public class Route {
                 }
             }
 
-            QuickLog.debug("moduleList: " + moduleList.size() + moduleList);
+            logger.debug("moduleList: " + moduleList.size() + moduleList);
         }
     }
 
@@ -187,13 +189,13 @@ public class Route {
 
         // NOTE::先寻找资源文件
         if (1 == 2) {
-            QuickLog.debug("资源模式：" + path);
+            logger.debug("资源模式：" + path);
             return requestAction;
         }
 
         // NOTE::路由模式
         if (routeList.containsKey(path)) {
-            QuickLog.debug("路由模式：" + path);
+            logger.debug("路由模式：" + path);
             return requestAction;
         }
 
@@ -237,10 +239,6 @@ public class Route {
 
         /**
          * #quickLang 调用目标方法
-         * @param request
-         * @param response
-         * @return
-         * @throws Exception
          */
         public Object call(Request request, Response response)
                 throws Throwable

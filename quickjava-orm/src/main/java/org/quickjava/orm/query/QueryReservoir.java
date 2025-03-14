@@ -1,6 +1,7 @@
 package org.quickjava.orm.query;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.quickjava.orm.domain.DatabaseMeta;
 import org.quickjava.orm.query.build.Join;
 import org.quickjava.orm.query.build.TableColumn;
 import org.quickjava.orm.query.callback.QuerySetCallback;
@@ -231,7 +232,7 @@ public class QueryReservoir {
     }
 
     public Long getLimitSize() {
-        return limitSize;
+        return limitSize == null ? DatabaseMeta.DEFAULT.defaultLimit : limitSize;
     }
 
     public void setLimitSize(Long limitSize) {

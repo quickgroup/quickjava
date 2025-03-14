@@ -18,7 +18,7 @@ package org.quickjava.www.common;
 
 /**
  * @author Qlo1062-(QloPC-Msi)
- * @date 2021/1/21 18:13
+ * #date 2021/1/21 18:13
  * @projectName quickjava
  */
 public class Utils {

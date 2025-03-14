@@ -1,9 +1,10 @@
 package org.quickjava.web.framework.response;
 
-import org.quickjava.web.common.QuickLog;
 import org.quickjava.web.framework.http.Http;
 import org.quickjava.web.framework.http.Request;
 import org.quickjava.web.framework.http.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.OutputStream;
@@ -11,9 +12,9 @@ import java.nio.charset.Charset;
 
 /**
  * @author Qlo1062-QloPC-zs
- * @date 2021/1/18 15:51
  */
 public abstract class QuickResponse {
+    private static final Logger logger = LoggerFactory.getLogger(QuickResponse.class);
 
     /**
      * #quickLang 返回内容
@@ -27,8 +28,6 @@ public abstract class QuickResponse {
 
     /**
      * #quickLang 输出渲染方法 {子类必须实现该方法}
-     * @param response
-     * @return
      */
     abstract public byte[] render(Request request, Response response);
 

@@ -6,14 +6,16 @@
 package org.quickjava.www.test;
 
 import org.junit.BeforeClass;
-import org.quickjava.web.common.QuickLog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TestBoot {
+    private static final Logger logger = LoggerFactory.getLogger(TestBoot.class);
 
     @BeforeClass
     public static void start()
     {
-        QuickLog.info("TestBoot");
-        QuickLog.info("Init App");
+        logger.info("TestBoot");
+        logger.info("Init App");
     }
 }

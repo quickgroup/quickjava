@@ -1,7 +1,6 @@
 package org.quickjava.web.framework;
 
 import org.quickjava.web.common.Console;
-import org.quickjava.web.common.QuickLog;
 import org.quickjava.web.common.utils.FileUtils;
 import org.quickjava.web.database.QuickJavaDB;
 import org.quickjava.web.framework.bean.Dict;
@@ -9,6 +8,8 @@ import org.quickjava.web.framework.config.AppConfig;
 import org.quickjava.web.framework.http.Request;
 import org.quickjava.web.framework.server.TomcatServer;
 import org.quickjava.web.framework.view.ViewMan;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContext;
 import java.io.IOException;
@@ -16,21 +17,15 @@ import java.io.InputStream;
 
 /**
  * @author Qlo1062 [ QloPC-zs ]
- * @date 2021/6/1 17:40
- * +----------------------------------------------------------------------
- * Copyright (c) 2020~2021 http://quickjava.org All rights reserved.
- * +----------------------------------------------------------------------
- * Mail: contact@quickjava.org
- * +----------------------------------------------------------------------
- * @description App
  */
 public class Kernel {
+    private static final Logger logger = LoggerFactory.getLogger(Kernel.class);
 
-    private static Kernel kernel = new Kernel();
+    private static final Kernel kernel = new Kernel();
 
     public static String name = "QuickJava";
 
-    private static ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+    private static final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
     public static ServletContext servletContext = null;
 
@@ -59,7 +54,7 @@ public class Kernel {
     {
         try {
             kernel.welcome();
-            QuickLog.info(Lang.to("App start ..."));
+            logger.info(Lang.to("App start ..."));
 
             // 环境
             Env.init(applicationClass);
@@ -109,7 +104,7 @@ public class Kernel {
     {
         Kernel.servletContext = servletContext;
         Hook.call("app_start_complete");
-        QuickLog.info(Lang.to("App start complete"));
+        logger.info(Lang.to("App start complete"));
     }
 
     /**
@@ -121,7 +116,7 @@ public class Kernel {
         try (InputStream in = applicationClass.getClassLoader().getResourceAsStream("application.yml")) {
             String content = FileUtils.getInputStreamContent(in);
             config = AppConfig.Factory.loadFormYml(content);
-            QuickLog.debug(Lang.to("Config load Complete."));
+            logger.debug(Lang.to("Config load Complete."));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

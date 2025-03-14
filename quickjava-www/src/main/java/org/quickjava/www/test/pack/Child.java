@@ -2,7 +2,7 @@ package org.quickjava.www.test.pack;
 
 /**
  * @author Qlo1062-(QloPC-zs)
- * @date 2021/1/22 15:24
+ * #date 2021/1/22 15:24
  */
 public class Child extends Parent<Child> {
     public String _name = "child";

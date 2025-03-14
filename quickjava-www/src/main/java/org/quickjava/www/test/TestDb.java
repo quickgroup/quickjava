@@ -7,6 +7,7 @@ package org.quickjava.www.test;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.quickjava.orm.query.enums.OrderByType;
 import org.quickjava.web.common.QuickUtil;
 import org.quickjava.web.framework.QuickJavaRunner;
 import org.quickjava.orm.query.QuerySet;
@@ -14,10 +15,7 @@ import org.quickjava.orm.query.enums.Operator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -33,26 +31,24 @@ public class TestDb {
         // 先删除所有数据
         QuerySet.table("qj_user").where("ID IS NOT NULL", Operator.RAW).delete();
 
-        // NOTE::查询
-        QuerySet.table("qj_user").select();
-
         Long startTime = QuickUtil.getNanoTime();
-
         // NOTE::新增
-        Map<String, Object> data = new LinkedHashMap<>();
-        data.put("username", "123456");
-        data.put("password", "pwd123");
-        data.put("name", "longlong");
-        data.put("age", 12);
-        data.put("email", "123456@qq.com");
-        data.put("create_time", new Date());
-        data.put("update_time", new Date());
-
+        List<Map<String, Object>> rows = new LinkedList<>();
         for (int i = 1; i <= 10; i++) {
+            Map<String, Object> data = new LinkedHashMap<>();
             data.put("id", i);
-            int result = QuerySet.table("qj_user").insert(data);
-            System.out.println("INSERT.return=" + result);
+            data.put("username", "123456");
+            data.put("password", "pwd123");
+            data.put("name", "longlong");
+            data.put("age", 12);
+            data.put("email", "123456@qq.com");
+            data.put("status", 1);
+            data.put("create_time", new Date());
+            data.put("update_time", new Date());
+            rows.add(data);
         }
+        int result = QuerySet.table("qj_user").insertAll(rows);
+        System.out.println("INSERT.return=" + result);
 
         System.out.println("耗时=" + QuickUtil.endNanoTimeMS(startTime) + "ms");
     }
@@ -61,62 +57,50 @@ public class TestDb {
      * 测试数据库ORM操作类
      */
     @Test
-    public void testQuery() {
-        // 先删除所有数据
-        QuerySet.table("qj_user").whereRaw("id IS NOT NULL").delete();
+    public void testSelect() {
+        testGenerateData();
+        logger.info("result: \n{}", QuerySet.table("qj_user").where("id", 1).select());
+        logger.info("result: \n{}", QuerySet.table("qj_user").where("id", 1).find());
 
-        // NOTE::查询
-        QuerySet.table("qj_user").field("id").select();
+        logger.info("result: \n{}", QuerySet.table("qj_user").where("id", Operator.GTE, 0).select());
 
-        Long startTime = QuickUtil.getNanoTime();
+        logger.info("result: \n{}", QuerySet.table("qj_user")
+                .where("id", Operator.GTE, 0)
+                .where("status", Operator.EQ, 1)
+                .select()
+        );
 
-        // NOTE::新增
-        Map<String, Object> data = new LinkedHashMap<>();
-        data.put("username", "123456");
-        data.put("password", "pwd123");
-        data.put("name", "longlong");
-        data.put("age", 12);
-        data.put("email", "123456@qq.com");
-        data.put("create_time", new Date());
-        data.put("update_time", new Date());
-        Integer result = QuerySet.table("qj_user").insert(data);
-        System.out.println("INSERT.return=" + result);
+        logger.info("result: \n{}", QuerySet.table("qj_user")
+                .where("id", Operator.GTE, 0)
+                .between("status", 1, 2)
+                .select()
+        );
 
-        System.out.println("耗时=" + QuickUtil.endNanoTimeMS(startTime) + "ms");
-        startTime = QuickUtil.getNanoTime();
-
-        // NOTE::删除
-        Integer number = QuerySet.table("qj_user").where("id", 1).where("status", 1).delete();
-
-        System.out.println("DELETE.return=" + number);
-        System.out.println("耗时=" + QuickUtil.endNanoTimeMS(startTime) + "ms");
-        startTime = QuickUtil.getNanoTime();
-
-        Map<String, Object> updateData = new LinkedHashMap<>();
-        updateData.put("name", "xiaolong");
-        updateData.put("age", 15);
-
-        // NOTE::更新
-        number = QuerySet.table("qj_user").where("name", "longlong").update(updateData);
-
-        System.out.println("UPDATE.return=" + number);
-        System.out.println("耗时=" + QuickUtil.endNanoTimeMS(startTime) + "ms");
-
-        // 查
-        List<Map<String, Object>> rows = QuerySet.table("qj_user").where("name", "xiaolong")
-                .order("create_time", "DESC")
-                .select();
-        System.out.println("SELECT.return=" + rows);
+        // 全条件查询
+        QuerySet querySet = QuerySet.table("qj_user")
+                .where("id", Operator.GTE, 0)
+                .between("status", 1, 2)
+                .order("id DESC")
+                .order("id", OrderByType.DESC)
+                .order("id", "DESC")
+                .order("id", true)
+                .order("age")
+                .order("status ASC");
+        logger.info("result: \n{}", querySet.select());
+        logger.info("result: \n{}", querySet.page(1).select());
+        logger.info("result: \n{}", querySet.page(1, 20).select());
+        logger.info("result: \n{}", querySet.pagination(1));
+        logger.info("result: \n{}", querySet.pagination(1, 20));
     }
 
     /**
      * 测试 内存泄漏
      */
     @Test
-    public void testQueryOOM() {
+    public void testQuerySetOOM() {
         for (int i = 0; i < 3000; i++) {
             System.out.println("第" + i + "次");
-            testQuery();
+            testSelect();
         }
         while (true) {
             try {

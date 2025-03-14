@@ -397,12 +397,24 @@ public class QuerySet {
         return this;
     }
 
+    public QuerySet limit(Integer index, Integer count) {
+        return limit(index.longValue(), count.longValue());
+    }
+
     public QuerySet page(Long page) {
-        return page(page, reservoir.limitSize);
+        return page(page, reservoir.getLimitSize());
+    }
+
+    public QuerySet page(Integer page) {
+        return page(page.longValue());
     }
 
     public QuerySet page(Long page, Long size) {
         return limit((page - 1) * size, size);
+    }
+
+    public QuerySet page(Integer page, Integer size) {
+        return page(page.longValue(), size.longValue());
     }
 
     //NOTE::-------------------- 数据 --------------------
@@ -466,7 +478,7 @@ public class QuerySet {
         return (Long) execute().getData();
     }
 
-    public int insertAll(List<DataMap> dataList) {
+    public int insertAll(List<Map<String, Object>> dataList) {
         reservoir.action = Action.INSERT;
         reservoir.getDataList().addAll(dataList);
         return execute().getCount();
@@ -575,8 +587,8 @@ public class QuerySet {
         reservoir.getColumnList().addAll(cacheFiledList);
         List<Map<String, Object>> rows = select();
         // 返回分页
-        Long page = reservoir.limitIndex / reservoir.limitSize + 1;
-        return new Pagination<>(page, reservoir.limitSize, total, rows);
+        long page = reservoir.limitIndex / reservoir.getLimitSize() + 1;
+        return new Pagination<>(page, reservoir.getLimitSize(), total, rows);
     }
 
     public IPagination<Map<String, Object>> pagination(Long page, Long pageSize) {
@@ -590,6 +602,10 @@ public class QuerySet {
 
     public IPagination<Map<String, Object>> pagination(Long page) {
         return this.pagination(page, 20L);
+    }
+
+    public IPagination<Map<String, Object>> pagination(Integer page) {
+        return this.pagination(page.longValue());
     }
 
     //NOTE::--------------- 统计方法 ---------------

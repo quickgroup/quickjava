@@ -16,12 +16,14 @@
 
 package org.quickjava.web.framework.view;
 
-import org.quickjava.web.common.QuickLog;
 import org.quickjava.web.framework.Kernel;
 import org.quickjava.web.framework.view.engine.Engine;
 import org.quickjava.web.framework.view.engine.FreeMarkerEngine;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class ViewMan {
+    private static final Logger logger = LoggerFactory.getLogger(ViewMan.class);
 
     public static Engine engine = null;   // 使用的模板引擎
 
@@ -36,7 +38,7 @@ public abstract class ViewMan {
         engine = new FreeMarkerEngine();
         engine.initEngine();
 
-        QuickLog.info("ViewMan init complete");
+        logger.info("ViewMan init complete");
     }
 
 }

@@ -640,7 +640,7 @@ public class Model implements IModel {
             models.add(model);
         });
         QuerySet querySet = ModelHelper.getModelQuery(models.get(0));
-        Integer insertId = querySet.insertAll(modelDataList);
+        Integer insertId = querySet.insertAll(new LinkedList<>(modelDataList));
         // 回写自增id
         if (insertId != null) {
             String pkName = models.get(0).pk();
@@ -661,7 +661,7 @@ public class Model implements IModel {
             modelDataList.add(model.data());
         }
         QuerySet querySet = ModelHelper.getModelQuery(models.get(0));
-        return querySet.insertAll(modelDataList);
+        return querySet.insertAll(new LinkedList<>(modelDataList));
     }
 
     /**

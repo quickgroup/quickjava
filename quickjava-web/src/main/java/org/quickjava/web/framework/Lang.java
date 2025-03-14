@@ -5,17 +5,19 @@
 
 package org.quickjava.web.framework;
 
-import org.quickjava.web.common.QuickLog;
 import org.quickjava.web.common.utils.Md5Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
  * @author Qlo1062-(QloPC-zs)
- * @date 2021/2/1 11:40
+ * #date 2021/2/1 11:40
  */
 public class Lang {
+    private static final Logger logger = LoggerFactory.getLogger(Lang.class);
 
     private static String language = "zh-cn";
 
@@ -28,7 +30,7 @@ public class Lang {
         // 默认语言包
         tran.put(Md5Utils.encrypt("App start ..."), "应用启动中 ...");
 
-        QuickLog.debug(Lang.to("Lang init Complete."));
+        logger.debug(Lang.to("Lang init Complete."));
     }
 
     /**
