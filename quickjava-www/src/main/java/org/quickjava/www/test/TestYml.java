@@ -1,4 +1,4 @@
-package org.quickjava.framework;
+package org.quickjava.www.test;
 
 /**
  * @author Qlo1062-(QloPC-Msi)

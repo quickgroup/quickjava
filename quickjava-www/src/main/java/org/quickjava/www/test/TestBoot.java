@@ -3,7 +3,7 @@
  * More Info to http://www.quickjava.org
  */
 
-package org.quickjava.www;
+package org.quickjava.www.test;
 
 import org.junit.BeforeClass;
 import org.quickjava.web.common.QuickLog;
@@ -15,8 +15,5 @@ public class TestBoot {
     {
         QuickLog.info("TestBoot");
         QuickLog.info("Init App");
-
-
-
     }
 }

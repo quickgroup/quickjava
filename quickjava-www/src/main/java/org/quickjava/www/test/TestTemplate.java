@@ -1,4 +1,4 @@
-package org.quickjava.www;
+package org.quickjava.www.test;
 
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.template.Configuration;

@@ -27,12 +27,12 @@ public class TestDb {
      * 测试数据库ORM操作类
      */
     @Test
-    public void testCommon() {
+    public void testGenerateData() {
         // 先删除所有数据
-        QuerySet.table("qj_user").where("id", Operator.RAW, "IS NOT NULL").delete();
+        QuerySet.table("qj_user").where("ID IS NOT NULL", Operator.RAW).delete();
 
         // NOTE::查询
-        QuerySet.table("qj_user").field("id").select();
+        QuerySet.table("qj_user").select();
 
         Long startTime = QuickUtil.getNanoTime();
 
@@ -53,30 +53,6 @@ public class TestDb {
         }
 
         System.out.println("耗时=" + QuickUtil.endNanoTimeMS(startTime) + "ms");
-        startTime = QuickUtil.getNanoTime();
-
-        // NOTE::删除
-        int number = QuerySet.table("qj_user").where("id", 1).where("status", 1).delete();
-
-        System.out.println("DELETE.return=" + number);
-        System.out.println("耗时=" + QuickUtil.endNanoTimeMS(startTime) + "ms");
-        startTime = QuickUtil.getNanoTime();
-
-        Map<String, Object> updateData = new LinkedHashMap<>();
-        updateData.put("name", "xiaolong");
-        updateData.put("age", 15);
-
-        // NOTE::更新
-        number = QuerySet.table("qj_user").where("name", "longlong").update(updateData);
-
-        System.out.println("UPDATE.return=" + number);
-        System.out.println("耗时=" + QuickUtil.endNanoTimeMS(startTime) + "ms");
-
-        // 查
-        List<Map<String, Object>> rows = QuerySet.table("qj_user").where("name", "xiaolong")
-                .order("create_time", "DESC")
-                .select();
-        System.out.println("SELECT.return=" + rows);
     }
 
     /**
