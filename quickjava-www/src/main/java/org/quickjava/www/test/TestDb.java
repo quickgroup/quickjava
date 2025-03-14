@@ -91,6 +91,16 @@ public class TestDb {
         logger.info("result: \n{}", querySet.page(1, 20).select());
         logger.info("result: \n{}", querySet.pagination(1));
         logger.info("result: \n{}", querySet.pagination(1, 20));
+
+        logger.info("result: \n{}", QuerySet.table("qj_user")
+                .where("id", Operator.GTE, 0)
+                .between("status", 1, 2)
+                .distinct(true)
+                .lock(true)
+                .group("id", "DESC")
+                .order("status", "ASC")
+                .page(1, 20)
+                .select());
     }
 
     /**
