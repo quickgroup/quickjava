@@ -67,12 +67,10 @@ public class ORMContext {
 
     public static Drive getDrive() {
         DatabaseConfig config;
-        synchronized (Drive.class) {
-            if (SpringLoader.instance != null) {
-                config = SpringLoader.instance.getConfig();  // spring方式
-            } else {
-                config = getQuickJavaConfig();
-            }
+        if (SpringLoader.instance != null) {
+            config = SpringLoader.instance.getConfig();  // spring方式
+        } else {
+            config = getQuickJavaConfig();
         }
         return getDrive(config);
     }

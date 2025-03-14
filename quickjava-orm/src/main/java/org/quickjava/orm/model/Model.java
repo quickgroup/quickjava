@@ -84,8 +84,8 @@ public class Model implements IModel {
     protected void __initialize() {
     }
 
-    private synchronized QuerySet query() {
-        synchronized (Model.class) {
+    private QuerySet query() {
+        synchronized (reservoir) {
             if (reservoir.querySet == null) {
                 reservoir.querySet = QuerySet.table(parseModelTableName(getClass()));
                 QueryReservoir queryReservoir = QuerySetHelper.getQueryReservoir(reservoir.querySet);
