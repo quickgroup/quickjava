@@ -427,38 +427,43 @@ public class QuerySet {
         return SqlUtil.isEmpty(resultSet) ? null : resultSet.get(0);
     }
 
-    public Integer update(Map<String, Object> data) {
+    public int update(Map<String, Object> data) {
         reservoir.action = Action.UPDATE;
         this.data(data);
         executeSql();
-        return null;
+        return 1;
     }
 
-    public Integer update() {
+    public int update() {
         reservoir.action = Action.UPDATE;
         executeSql();
         return 1;
     }
 
-    public Long insert(Map<String, Object> data) {
+    public int insert(Map<String, Object> data) {
         reservoir.action = Action.INSERT;
         this.data(data);
         return executeSql();
     }
 
-    public Integer insertAll(List<DataMap> dataList) {
+    public Long insertGetId(Map<String, Object> data) {
+        reservoir.action = Action.INSERT;
+        this.data(data);
+        return executeSql();
+    }
+
+    public int insertAll(List<DataMap> dataList) {
         reservoir.action = Action.INSERT;
         reservoir.getDataList().addAll(dataList);
         return executeSql();
     }
 
-    public Integer delete() {
+    public int delete() {
         if (QuerySetHelper.isEmpty(reservoir.whereList)) {
             throw new QueryException("不允许空条件的删除执行");
         }
         reservoir.action = Action.DELETE;
-        Long result = executeSql();
-        return result.intValue();
+        return executeSql();
     }
 
     //TODO::-------------------- 扩展方法 --------------------
@@ -522,7 +527,7 @@ public class QuerySet {
             if (reservoir.printSql) {
                 System.out.println(reservoir.getSql());
             }
-            return null;
+            return (T) Integer.valueOf(0);
         }
         return ORMContext.getDrive().executeSql(this);
     }

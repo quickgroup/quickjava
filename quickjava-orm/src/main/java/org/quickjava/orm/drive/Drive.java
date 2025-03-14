@@ -210,17 +210,18 @@ public abstract class Drive {
             // 执行操作
             if (action == Action.INSERT) {
                 Map<String, Object> generatedKeys = quickConnection.insert(sql);
-                if (generatedKeys == null || generatedKeys.isEmpty()) {
-                    return null;
+                if (generatedKeys != null && generatedKeys.containsKey("GENERATED_KEY")) {
+                    Object gk = generatedKeys.get("GENERATED_KEY");
+                    number = gk == null ? 1 : gk instanceof Long ? (Long) gk : Long.valueOf(String.valueOf(gk));
+                } else {
+                    number = 1;
                 }
-                Object gk = generatedKeys.get("GENERATED_KEY");
-                number = gk instanceof Long ? (Long) gk : Long.valueOf(String.valueOf(gk));
 
             } else if (action == Action.DELETE) {
-                number = quickConnection.delete(sql).longValue();
+                number = quickConnection.delete(sql);
 
             } else if (action == Action.UPDATE) {
-                number = quickConnection.update(sql).longValue();
+                number = quickConnection.update(sql);
 
             } else if (action == Action.SELECT) {
                 List<Map<String, Object>> rows = quickConnection.select(sql);

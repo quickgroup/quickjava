@@ -210,7 +210,7 @@ public class Model implements IModel {
         // 雪花id
 
         // 执行
-        Long pkVal = query().insert(this.sqlData());
+        Long pkVal = query().insertGetId(this.sqlData());
         // 编译sql
         if (querySetReservoir().isFetchSql())
             return toD(new ModelSql(querySetReservoir().getSql()));

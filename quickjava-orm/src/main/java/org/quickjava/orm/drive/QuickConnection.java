@@ -145,14 +145,14 @@ public class QuickConnection implements AutoCloseable {
         }
     }
 
-    public Integer update(String sql)
+    public int update(String sql)
             throws SQLException {
         try (Statement statement = connection.createStatement()) {
             return statement.executeUpdate(sql);
         }
     }
 
-    public Integer delete(String sql)
+    public int delete(String sql)
             throws SQLException {
         try (Statement statement = connection.createStatement()) {
             return statement.executeUpdate(sql);
