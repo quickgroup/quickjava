@@ -1,4 +1,4 @@
-package org.quickjava.www.pack;
+package org.quickjava.www.test.pack;
 
 /**
  * @author Qlo1062-(QloPC-zs)

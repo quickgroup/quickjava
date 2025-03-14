@@ -1,7 +1,7 @@
-package org.quickjava.www;
+package org.quickjava.www.test;
 
-import org.quickjava.www.pack.Child;
-import org.quickjava.www.pack.Parent;
+import org.quickjava.www.test.pack.Child;
+import org.quickjava.www.test.pack.Parent;
 import org.junit.Test;
 
 import java.util.ArrayList;

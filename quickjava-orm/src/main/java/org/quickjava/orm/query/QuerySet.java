@@ -138,6 +138,14 @@ public class QuerySet {
         return this;
     }
 
+    public QuerySet where(String sql, Operator operator) {
+        if (ModelHelper.isEmpty(sql)) {
+            return this;
+        }
+        where(new WhereAnd(sql, operator, null));
+        return this;
+    }
+
     public QuerySet where(String table, String field, Operator operator, Object value) {
         if (ModelHelper.isEmpty(field)) {
             return this;

@@ -27,16 +27,16 @@ public class TestDb {
      * 测试数据库ORM操作类
      */
     @Test
-    public void testCommon() {
+    public void testGenerateData() {
         // 先删除所有数据
-        QuerySet.table("qj_user").where("id", Operator.RAW, "IS NOT NULL").delete();
+        QuerySet.table("qj_user").where("ID IS NOT NULL", Operator.RAW).delete();
 
-        // TODO::查询
-        QuerySet.table("qj_user").field("id").select();
+        // NOTE::查询
+        QuerySet.table("qj_user").select();
 
         Long startTime = QuickUtil.getNanoTime();
 
-        // TODO::新增
+        // NOTE::新增
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("username", "123456");
         data.put("password", "pwd123");
@@ -48,35 +48,11 @@ public class TestDb {
 
         for (int i = 1; i <= 10; i++) {
             data.put("id", i);
-            Long result = QuerySet.table("qj_user").insert(data);
+            int result = QuerySet.table("qj_user").insert(data);
             System.out.println("INSERT.return=" + result);
         }
 
         System.out.println("耗时=" + QuickUtil.endNanoTimeMS(startTime) + "ms");
-        startTime = QuickUtil.getNanoTime();
-
-        // TODO::删除
-        Integer number = QuerySet.table("qj_user").where("id", 1).where("status", 1).delete();
-
-        System.out.println("DELETE.return=" + number);
-        System.out.println("耗时=" + QuickUtil.endNanoTimeMS(startTime) + "ms");
-        startTime = QuickUtil.getNanoTime();
-
-        Map<String, Object> updateData = new LinkedHashMap<>();
-        updateData.put("name", "xiaolong");
-        updateData.put("age", 15);
-
-        // TODO::更新
-        number = QuerySet.table("qj_user").where("name", "longlong").update(updateData);
-
-        System.out.println("UPDATE.return=" + number);
-        System.out.println("耗时=" + QuickUtil.endNanoTimeMS(startTime) + "ms");
-
-        // 查
-        List<Map<String, Object>> rows = QuerySet.table("qj_user").where("name", "xiaolong")
-                .order("create_time", "DESC")
-                .select();
-        System.out.println("SELECT.return=" + rows);
     }
 
     /**
@@ -87,12 +63,12 @@ public class TestDb {
         // 先删除所有数据
         QuerySet.table("qj_user").whereRaw("id IS NOT NULL").delete();
 
-        // TODO::查询
+        // NOTE::查询
         QuerySet.table("qj_user").field("id").select();
 
         Long startTime = QuickUtil.getNanoTime();
 
-        // TODO::新增
+        // NOTE::新增
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("username", "123456");
         data.put("password", "pwd123");
@@ -101,13 +77,13 @@ public class TestDb {
         data.put("email", "123456@qq.com");
         data.put("create_time", new Date());
         data.put("update_time", new Date());
-        Long result = QuerySet.table("qj_user").insert(data);
+        Integer result = QuerySet.table("qj_user").insert(data);
         System.out.println("INSERT.return=" + result);
 
         System.out.println("耗时=" + QuickUtil.endNanoTimeMS(startTime) + "ms");
         startTime = QuickUtil.getNanoTime();
 
-        // TODO::删除
+        // NOTE::删除
         Integer number = QuerySet.table("qj_user").where("id", 1).where("status", 1).delete();
 
         System.out.println("DELETE.return=" + number);
@@ -118,7 +94,7 @@ public class TestDb {
         updateData.put("name", "xiaolong");
         updateData.put("age", 15);
 
-        // TODO::更新
+        // NOTE::更新
         number = QuerySet.table("qj_user").where("name", "longlong").update(updateData);
 
         System.out.println("UPDATE.return=" + number);
@@ -155,36 +131,36 @@ public class TestDb {
     @Test
     public void testTransaction() {
         QuerySet.transaction(() -> {
-            // TODO::查询
+            // NOTE::查询
             QuerySet.table("qj_user").where("id", Operator.GTE, 0).select();
         });
 
         // 事务提交
         QuerySet.transaction(() -> {
-            // TODO::查询
+            // NOTE::查询
             QuerySet.table("qj_user").where("id", Operator.GTE, 0).select();
-            // TODO::更新
+            // NOTE::更新
             Map<String, Object> updateData = new LinkedHashMap<>();
             updateData.put("name", "xiaolong");
             updateData.put("age", 15);
             QuerySet.table("qj_user").where("id", 5).update(updateData);
-            // TODO::查询
+            // NOTE::查询
             QuerySet.table("qj_user").field("id").select();
-            // TODO::查询
+            // NOTE::查询
             QuerySet.table("qj_user").field("id").select();
         });
 
         // 事务回滚
         try {
             QuerySet.transaction(() -> {
-                // TODO::查询
+                // NOTE::查询
                 QuerySet.table("qj_user").field("id").select();
-                // TODO::更新
+                // NOTE::更新
                 Map<String, Object> updateData = new LinkedHashMap<>();
                 updateData.put("name", "xiaolong");
                 updateData.put("age", 15);
                 QuerySet.table("qj_user").where("id", 1).update(updateData);
-                // TODO::查询
+                // NOTE::查询
                 QuerySet.table("qj_user").field("id").select();
 
                 throw new RuntimeException("打断事物提交");

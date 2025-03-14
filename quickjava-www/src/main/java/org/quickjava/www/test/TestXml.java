@@ -1,4 +1,4 @@
-package org.quickjava.www;
+package org.quickjava.www.test;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
