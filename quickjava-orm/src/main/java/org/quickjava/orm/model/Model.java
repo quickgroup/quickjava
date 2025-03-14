@@ -226,7 +226,7 @@ public class Model implements IModel {
         List<Map<String, Object>> ret = new LinkedList<>();
         for (Map<String, Object> data : dataList) {
             data(data);
-            ret.add(this.data());
+            ret.add(new LinkedHashMap<>(this.data()));
         }
         return query().insertAll(ret);
     }
