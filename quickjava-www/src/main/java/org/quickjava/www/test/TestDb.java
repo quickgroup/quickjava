@@ -48,7 +48,8 @@ public class TestDb {
 
         for (int i = 1; i <= 10; i++) {
             data.put("id", i);
-            int result = QuerySet.table("qj_user").insert(data);
+//            int result = QuerySet.table("qj_user").insert(data);
+            Long result = QuerySet.table("qj_user").insertGetId(data);
             System.out.println("INSERT.return=" + result);
         }
 

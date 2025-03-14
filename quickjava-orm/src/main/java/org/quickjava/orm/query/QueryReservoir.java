@@ -8,6 +8,7 @@ import org.quickjava.orm.query.contain.Action;
 import org.quickjava.orm.contain.DriveConfigure;
 import org.quickjava.orm.query.build.OrderBy;
 import org.quickjava.orm.query.build.Where;
+import org.quickjava.orm.query.contain.Label;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -98,6 +99,11 @@ public class QueryReservoir {
 
     @JsonIgnore
     public String sql = null;
+
+    @JsonIgnore
+    public Map<Label, Object> labels;
+
+    public static final QueryReservoir EMPTY = new QueryReservoir();
 
     public String getTable() {
         return table;
@@ -297,6 +303,26 @@ public class QueryReservoir {
 
     public void setSql(String sql) {
         this.sql = sql;
+    }
+
+    public void setLabels(Map<Label, Object> labels) {
+        this.labels = labels;
+    }
+
+    public Map<Label, Object> getLabels() {
+        return labels;
+    }
+
+    public boolean labelContain(Label label) {
+        return labels != null && getLabels().containsKey(label);
+    }
+
+    public QueryReservoir addLabel(Label label) {
+        labels = labels == null ? new LinkedHashMap<>() : labels;
+        if (!labels.containsKey(label)) {
+            labels.put(label, null);
+        }
+        return this;
     }
 
     public <D extends TableColumn> void fillTable(boolean condition, List<D> columns) {

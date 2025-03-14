@@ -12,6 +12,7 @@ import org.quickjava.orm.query.build.ValueConv;
 import org.quickjava.orm.query.build.Where;
 import org.quickjava.orm.contain.*;
 import org.quickjava.orm.query.contain.Action;
+import org.quickjava.orm.query.contain.Label;
 import org.quickjava.orm.utils.QueryException;
 import org.quickjava.orm.utils.QuickORMException;
 import org.quickjava.orm.utils.SqlUtil;
@@ -189,7 +190,8 @@ public abstract class Drive {
     }
 
     public <T> T executeSql(QuerySet query) {
-        return executeSql(QuerySetHelper.getQueryReservoir(query).action, pretreatment(query));
+        QueryReservoir reservoir = QuerySetHelper.getQueryReservoir(query);
+        return executeSql(reservoir.action, pretreatment(query), reservoir);
     }
 
     /**
@@ -201,6 +203,11 @@ public abstract class Drive {
      */
     public <T> T executeSql(Action action, String sql)
     {
+        return executeSql(action, sql, QueryReservoir.EMPTY);
+    }
+
+    public <T> T executeSql(Action action, String sql, QueryReservoir reservoir)
+    {
         long startTime = System.currentTimeMillis();
         boolean isError = false;
         Object number = null;
@@ -210,7 +217,7 @@ public abstract class Drive {
             // 执行操作
             if (action == Action.INSERT) {
                 Map<String, Object> generatedKeys = quickConnection.insert(sql);
-                if (generatedKeys != null && generatedKeys.containsKey("GENERATED_KEY")) {
+                if (reservoir.labelContain(Label.INSERT_GET_ID) && generatedKeys != null && generatedKeys.containsKey("GENERATED_KEY")) {
                     Object gk = generatedKeys.get("GENERATED_KEY");
                     number = gk == null ? 1 : gk instanceof Long ? (Long) gk : Long.valueOf(String.valueOf(gk));
                 } else {

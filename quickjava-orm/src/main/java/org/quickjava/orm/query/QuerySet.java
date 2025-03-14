@@ -20,6 +20,7 @@ import org.quickjava.orm.query.callback.WhereOptCallback;
 import org.quickjava.orm.contain.*;
 import org.quickjava.orm.drive.Drive;
 import org.quickjava.orm.query.contain.Action;
+import org.quickjava.orm.query.contain.Label;
 import org.quickjava.orm.query.contain.TableColumnMeta;
 import org.quickjava.orm.query.enums.Operator;
 import org.quickjava.orm.query.enums.OrderByType;
@@ -448,6 +449,7 @@ public class QuerySet {
 
     public Long insertGetId(Map<String, Object> data) {
         reservoir.action = Action.INSERT;
+        reservoir.addLabel(Label.INSERT_GET_ID);
         this.data(data);
         return executeSql();
     }
