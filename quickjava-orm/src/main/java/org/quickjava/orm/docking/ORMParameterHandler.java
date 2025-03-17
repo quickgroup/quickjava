@@ -7,7 +7,7 @@ package org.quickjava.orm.docking;
  * +-------------------------------------------------------------------
  * Author: Qlo1062
  * +-------------------------------------------------------------------
- * File: ValueConversion
+ * File: ORMParameterHandler
  * +-------------------------------------------------------------------
  * Date: 2025/3/14 18:38
  * +-------------------------------------------------------------------
@@ -22,17 +22,16 @@ import java.sql.SQLException;
 /**
  * 数据转换对接
  */
-public interface ORMParameterHandlerDocking {
+public interface ORMParameterHandler {
 
     /**
-     *
+     * 是否支持参数
+     */
+    public boolean checkParameter(PreparedStatement ps, int i, Object parameter, JDBCType jdbcType);
+
+    /**
+     * 设置参数
      */
     public void setParameter(PreparedStatement ps, int i, Object parameter, JDBCType jdbcType) throws SQLException;
-    /*
-        @Override
-    public void setNonNullParameter(PreparedStatement ps, int i, E parameter, JdbcType jdbcType) throws SQLException {
-        ps.setString(i, parameter.name()); // 将枚举值存储为字符串
-    }
-    * */
 
 }
