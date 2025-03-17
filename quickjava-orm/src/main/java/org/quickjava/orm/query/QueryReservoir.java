@@ -44,24 +44,42 @@ public class QueryReservoir {
     @JsonIgnore
     private String alias;
 
+    /**
+     * 执行动作
+     */
     @JsonIgnore
     public Action action;
 
+    /**
+     * 输出字段
+     */
     @JsonIgnore
     public List<TableColumn> columnList;
 
+    /**
+     * JOIN表
+     */
     @JsonIgnore
     public List<Join> joinList;
 
     @JsonIgnore
     public List<String> unionList;
 
+    /**
+     * 查询条件
+     */
     @JsonIgnore
     public List<Where> whereList;
 
+    /**
+     * 排序条件
+     */
     @JsonIgnore
     public List<OrderBy> orderByList;
 
+    /**
+     * 数据
+     */
     @JsonIgnore
     public List<Map<String, Object>> dataList;
 

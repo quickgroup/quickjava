@@ -1,9 +1,9 @@
-package org.quickjava.orm.deliver.mybatisplus.loader;
+package org.quickjava.orm.deliver.mybatisplus.spring.loader;
 
 import cn.hutool.core.util.ReflectUtil;
 import org.quickjava.orm.ORMContext;
 import org.quickjava.orm.domain.DatabaseMeta;
-import org.quickjava.orm.loader.ORMContextPort;
+import org.quickjava.orm.docking.ORMContextPort;
 import org.quickjava.orm.model.IModel;
 import org.quickjava.orm.model.Model;
 import org.quickjava.orm.deliver.mybatisplus.domain.QuickJavaOrmProps;
@@ -27,13 +27,13 @@ import java.util.List;
 
 @Configuration
 @ConditionalOnSingleCandidate(DataSource.class)
-public class SpringLoader implements InitializingBean, ORMContextPort {
+public class ORMMyBatisPlusLoader implements InitializingBean, ORMContextPort {
 
-    private static final Logger logger = LoggerFactory.getLogger(SpringLoader.class);
+    private static final Logger logger = LoggerFactory.getLogger(ORMMyBatisPlusLoader.class);
 
     private static ApplicationContext applicationContext;
 
-    private static SpringLoader instance;
+    private static ORMMyBatisPlusLoader instance;
 
     @Autowired
     private Environment environment;
@@ -46,7 +46,7 @@ public class SpringLoader implements InitializingBean, ORMContextPort {
 
     private DatabaseMeta dbConfig;
 
-    public SpringLoader(ApplicationContext applicationContext) {
+    public ORMMyBatisPlusLoader(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
         this.instance = this;
     }
@@ -70,7 +70,7 @@ public class SpringLoader implements InitializingBean, ORMContextPort {
         // 配置数据库来源
         ORMContext.setContextPort(this);
         // mybatis-plus字段支持
-        MyBatisPlusConfigure.init(this);
+        ORMMyBatisPlusConfigure.init(this);
         // 加载模型
         this.loadModels();
         // 更换classLoader

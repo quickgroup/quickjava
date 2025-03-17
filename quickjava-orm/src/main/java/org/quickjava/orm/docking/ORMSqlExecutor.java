@@ -15,11 +15,19 @@ package org.quickjava.orm.docking;
  * +-------------------------------------------------------------------
  */
 
+import org.quickjava.orm.query.QueryReservoir;
+import org.quickjava.orm.query.contain.SqlResult;
+
 import java.util.List;
-import java.util.Map;
 
-public interface SqlExecutor {
+public interface ORMSqlExecutor {
 
-    <T> List<T> query(String sql, Map<String, Object> params, Class<T> resultType);
+    SqlResult insert(QueryReservoir reservoir);
+
+    SqlResult delete(QueryReservoir reservoir);
+
+    SqlResult update(QueryReservoir reservoir);
+
+    <T> List<T> select(QueryReservoir reservoir, Class<T> resultType);
 
 }

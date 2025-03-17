@@ -7,6 +7,20 @@ QuickJava-ORM
 - [x] 模型一对一关联查询、与载入
 - [x] 一对一关联查询、与载入
 
+# 模块
+## ORMSqlExecutor
+> 语句编译
+> SQL执行
+
+# 流程
+## quickjava-web
+QuerySet -> ORMSqlExecutor -> Drive/Mysql/Oracle -> Connection
+## MyBatis SpringBoot
+QuerySet -> MyBatisORMSqlExecutor
+## MyBatis-Plus SpringBoot
+QuerySet -> MyBatisPlusORMSqlExecutor（后续执行逻辑由改负责了）
+
+
 # 关联查询
 ## 一对一
 ```java

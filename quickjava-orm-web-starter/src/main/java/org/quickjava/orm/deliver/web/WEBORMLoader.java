@@ -1,4 +1,4 @@
-package org.quickjava.orm.docking;
+package org.quickjava.orm.deliver.web;
 
 /*
  * Copyright (c) 2020~2025 http://www.quickjava.org All rights reserved.
@@ -7,13 +7,16 @@ package org.quickjava.orm.docking;
  * +-------------------------------------------------------------------
  * Author: Qlo1062
  * +-------------------------------------------------------------------
- * File: QuickConnection
+ * File: WEBORMLoader
  * +-------------------------------------------------------------------
- * Date: 2025/3/17 10:37
+ * Date: 2025/3/17 11:41
  * +-------------------------------------------------------------------
  * License: Apache Licence 2.0
  * +-------------------------------------------------------------------
  */
 
-public interface QuickConnection {
+/**
+ * WEB框架ORM对接
+ */
+public class WEBORMLoader {
 }

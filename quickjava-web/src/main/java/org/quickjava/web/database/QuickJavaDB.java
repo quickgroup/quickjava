@@ -13,10 +13,11 @@ package org.quickjava.web.database;/*
  * +-------------------------------------------------------------------
  */
 
+import org.quickjava.orm.docking.ORMSqlExecutor;
 import org.quickjava.web.common.QuickJavaVersion;
 import org.quickjava.orm.ORMContext;
 import org.quickjava.orm.domain.DatabaseMeta;
-import org.quickjava.orm.loader.ORMContextPort;
+import org.quickjava.orm.docking.ORMContextPort;
 import org.quickjava.orm.model.Model;
 import org.quickjava.orm.utils.QueryException;
 import org.quickjava.orm.utils.ReflectUtil;
@@ -44,42 +45,46 @@ public class QuickJavaDB implements ORMContextPort {
         ORMContext.setClassLoader(this.getClass().getClassLoader());
     }
 
-    @Override
-    public DatabaseMeta getDatabaseMeta() {
-        try {
-            Class<?> kernelClazz = ORMContext.class.getClassLoader().loadClass("org.quickjava.web.framework.Kernel");
-            Object configMap = ReflectUtil.getFieldValue(kernelClazz, "config");
-            Map<String, Object> databaseMap = ReflectUtil.invoke(configMap, "getDict", "database");
-            DatabaseMeta config1 = new DatabaseMeta();
-            for (Map.Entry<String, Object> entry : databaseMap.entrySet()) {
-                if (ReflectUtil.hasField(config1.getClass(), entry.getKey())) {
-                    ReflectUtil.setFieldValue(config1, entry.getKey(), entry.getValue());
-                }
-            }
-            config1.subject = subjectName;
-            return config1;
-        } catch (Throwable th) {
-            return defaultConfig;
-        }
-    }
+//    @Override
+//    public DatabaseMeta getDatabaseMeta() {
+//        try {
+//            Class<?> kernelClazz = ORMContext.class.getClassLoader().loadClass("org.quickjava.web.framework.Kernel");
+//            Object configMap = ReflectUtil.getFieldValue(kernelClazz, "config");
+//            Map<String, Object> databaseMap = ReflectUtil.invoke(configMap, "getDict", "database");
+//            DatabaseMeta config1 = new DatabaseMeta();
+//            for (Map.Entry<String, Object> entry : databaseMap.entrySet()) {
+//                if (ReflectUtil.hasField(config1.getClass(), entry.getKey())) {
+//                    ReflectUtil.setFieldValue(config1, entry.getKey(), entry.getValue());
+//                }
+//            }
+//            config1.subject = subjectName;
+//            return config1;
+//        } catch (Throwable th) {
+//            return defaultConfig;
+//        }
+//    }
+
+//    @Override
+//    public Connection getConnection() throws SQLException {
+//        try {
+//            DatabaseMeta config = getDatabaseMeta();
+//            // 加载驱动
+//            Class.forName(config.driver);
+//            // 用户名和密码
+//            Class<?> kernelClazz = ORMContext.class.getClassLoader().loadClass("org.quickjava.web.framework.Kernel");
+//            Object configMap = ReflectUtil.getFieldValue(kernelClazz, "config");
+//            Map<String, Object> databaseMap = ReflectUtil.invoke(configMap, "getDict", "database");
+//            String username = ReflectUtil.invoke(databaseMap, "getString", "username");
+//            String password = ReflectUtil.invoke(databaseMap, "getString", "password");
+//            // 去连接
+//            return DriverManager.getConnection(config.url, username, password);
+//        }  catch (ClassNotFoundException e) {
+//            throw new QueryException(e.toString());
+//        }
+//    }
 
     @Override
-    public Connection getConnection() throws SQLException {
-        try {
-            DatabaseMeta config = getDatabaseMeta();
-            // 加载驱动
-            Class.forName(config.driver);
-            // 用户名和密码
-            Class<?> kernelClazz = ORMContext.class.getClassLoader().loadClass("org.quickjava.web.framework.Kernel");
-            Object configMap = ReflectUtil.getFieldValue(kernelClazz, "config");
-            Map<String, Object> databaseMap = ReflectUtil.invoke(configMap, "getDict", "database");
-            String username = ReflectUtil.invoke(databaseMap, "getString", "username");
-            String password = ReflectUtil.invoke(databaseMap, "getString", "password");
-            // 去连接
-            return DriverManager.getConnection(config.url, username, password);
-        }  catch (ClassNotFoundException e) {
-            throw new QueryException(e.toString());
-        }
+    public ORMSqlExecutor getORMSqlExecutor() {
+        return null;
     }
-
 }

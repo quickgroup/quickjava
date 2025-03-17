@@ -22,20 +22,20 @@ import org.apache.ibatis.mapping.SqlSource;
 import org.apache.ibatis.scripting.defaults.RawSqlSource;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSession;
-import org.quickjava.orm.docking.SqlExecutor;
+import org.quickjava.orm.docking.ORMSqlExecutor;
 
 import java.util.*;
 
-public class MyBatisPlusSqlExecutor implements SqlExecutor {
+public class MyBatisPlusORMSqlExecutor implements ORMSqlExecutor {
 
     private final SqlSession sqlSession;
 
-    public MyBatisPlusSqlExecutor(SqlSession sqlSession) {
+    public MyBatisPlusORMSqlExecutor(SqlSession sqlSession) {
         this.sqlSession = sqlSession;
     }
 
     @Override
-    public <T> List<T> query(String sql, Map<String, Object> params, Class<T> resultType) {
+    public <T> List<T> select(String sql, Map<String, Object> params, Class<T> resultType) {
         Configuration config = sqlSession.getConfiguration();
         SqlSource sqlSource = new RawSqlSource(config, sql, Map.class);
 

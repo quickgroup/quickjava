@@ -16,7 +16,7 @@ package org.quickjava.orm;
  */
 
 import org.quickjava.orm.domain.ORMConfiguration;
-import org.quickjava.orm.loader.ORMContextPort;
+import org.quickjava.orm.docking.ORMContextPort;
 import org.quickjava.orm.model.callback.ModelStrut;
 import org.quickjava.orm.model.callback.ModelListener;
 import org.quickjava.orm.domain.DatabaseMeta;

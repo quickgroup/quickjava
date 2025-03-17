@@ -1,4 +1,4 @@
-package org.quickjava.orm.deliver.mybatisplus.loader;/*
+package org.quickjava.orm.deliver.mybatisplus.spring.loader;/*
  * Copyright (c) 2020~2024 http://www.quickjava.org All rights reserved.
  * +-------------------------------------------------------------------
  * Organization: QuickJava
@@ -26,7 +26,7 @@ import org.quickjava.orm.model.contain.ModelMeta;
 
 import java.io.Serializable;
 
-public class MyBatisPlusConfigure {
+public class ORMMyBatisPlusConfigure {
 
     protected static TableId getTableId(ModelFieldMeta fieldMeta) {
         return fieldMeta.getField().getAnnotation(TableId.class);
@@ -36,7 +36,7 @@ public class MyBatisPlusConfigure {
         return fieldMeta.getField().getAnnotation(TableField.class);
     }
 
-    protected static void loadConfig(SpringLoader loader) {
+    protected static void loadConfig(ORMMyBatisPlusLoader loader) {
         if (ObjectUtil.isEmpty(loader.getOrmProps().getTypeAliasesPackage())) {
             String typeAliasesPackage = loader.getEnvironment().getProperty("mybatis.type-aliases-package");
             if (ObjectUtil.isEmpty(typeAliasesPackage)) {
@@ -49,7 +49,7 @@ public class MyBatisPlusConfigure {
         }
     }
 
-    protected static void init(SpringLoader loader) {
+    protected static void init(ORMMyBatisPlusLoader loader) {
         // mp配置加载
         loadConfig(loader);
         // 插槽处理
@@ -152,7 +152,7 @@ public class MyBatisPlusConfigure {
                 TableField tableField = fieldMeta.getField().getAnnotation(TableField.class);
                 if (tableField != null) {
                     // 回调填充方法
-                    MetaObjectHandler metaObjectHandler = SpringLoader.getBean(MetaObjectHandler.class);
+                    MetaObjectHandler metaObjectHandler = ORMMyBatisPlusLoader.getBean(MetaObjectHandler.class);
                     if (metaObjectHandler != null) {    // 对象去接收值
 //                        metaObjectHandler.insertFill();
                     }
@@ -176,7 +176,7 @@ public class MyBatisPlusConfigure {
                 TableField tableField = fieldMeta.getField().getAnnotation(TableField.class);
                 if (tableField != null) {
                     // 回调填充方法
-                    MetaObjectHandler metaObjectHandler = SpringLoader.getBean(MetaObjectHandler.class);
+                    MetaObjectHandler metaObjectHandler = ORMMyBatisPlusLoader.getBean(MetaObjectHandler.class);
                     if (metaObjectHandler != null) {    // 对象去接收值
 //                        metaObjectHandler.updateFill();
                     }

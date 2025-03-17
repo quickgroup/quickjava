@@ -3,7 +3,7 @@ package org.quickjava.orm.deliver.mybatis.spring.loader;
 import cn.hutool.core.util.ReflectUtil;
 import org.quickjava.orm.ORMContext;
 import org.quickjava.orm.domain.DatabaseMeta;
-import org.quickjava.orm.loader.ORMContextPort;
+import org.quickjava.orm.docking.ORMContextPort;
 import org.quickjava.orm.model.IModel;
 import org.quickjava.orm.model.Model;
 import org.quickjava.orm.deliver.mybatis.domain.QuickJavaOrmProps;

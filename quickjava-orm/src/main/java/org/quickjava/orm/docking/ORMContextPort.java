@@ -1,31 +1,20 @@
-package org.quickjava.orm.deliver.mybatisplus.utils;/*
+package org.quickjava.orm.docking;/*
  * Copyright (c) 2020~2024 http://www.quickjava.org All rights reserved.
  * +-------------------------------------------------------------------
  * Organization: QuickJava
  * +-------------------------------------------------------------------
  * Author: Qlo1062
  * +-------------------------------------------------------------------
- * File: ORMMyBatisPlusUtils
+ * File: OrmContextConfigure
  * +-------------------------------------------------------------------
- * Date: 2024/5/22 9:53
+ * Date: 2024/5/21 15:40
  * +-------------------------------------------------------------------
  * License: Apache Licence 2.0
  * +-------------------------------------------------------------------
  */
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import org.quickjava.orm.contain.IPagination;
-import org.quickjava.orm.contain.Pagination;
+public interface ORMContextPort {
 
-/**
- * MyBatisPlus助手方法
- */
-public class ORMMyBatisPlusUtils {
+    ORMSqlExecutor getORMSqlExecutor();
 
-    /**
-     * IPage 转 Pagination
-     */
-    public static<T> IPagination<T> convPagination(IPage<T> page) {
-        return new Pagination<>(page.getCurrent(), page.getSize(), page.getTotal(), page.getRecords());
-    }
 }
