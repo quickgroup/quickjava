@@ -1,4 +1,4 @@
-package org.quickjava.orm.spring.loader;
+package org.quickjava.orm.spring.mybatisplus.loader;
 
 import cn.hutool.core.util.ReflectUtil;
 import org.quickjava.orm.ORMContext;
@@ -6,7 +6,7 @@ import org.quickjava.orm.domain.DatabaseMeta;
 import org.quickjava.orm.loader.ORMContextPort;
 import org.quickjava.orm.model.IModel;
 import org.quickjava.orm.model.Model;
-import org.quickjava.orm.spring.domain.QuickJavaOrmProps;
+import org.quickjava.orm.spring.mybatisplus.domain.QuickJavaOrmProps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;

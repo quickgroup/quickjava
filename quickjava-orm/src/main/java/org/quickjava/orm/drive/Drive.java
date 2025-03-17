@@ -301,13 +301,16 @@ public abstract class Drive {
             logger.warn("已处于事务中");
             return;
         }
-        QuickConnection connection = getQuickConnection();
+        // 新连接且线程缓存
+        QuickConnection connection = new QuickConnection(config);
         __transactionConnection.set(autoCommit ? null : connection);
         // 事务隔离
         if (!autoCommit) {
             logger.info("Transaction start");
             connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
         }
+        // 配置连接事务
+        connection.connect();
         connection.setAutoCommit(autoCommit);
     }
 

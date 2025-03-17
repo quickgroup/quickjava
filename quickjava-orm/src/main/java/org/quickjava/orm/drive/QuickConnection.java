@@ -142,7 +142,6 @@ public class QuickConnection implements AutoCloseable {
     public Map<String, Object> insert(String sql, List<Map<String, Object>> params, Map<Label, Object> labels)
             throws SQLException {
         Map<String, Object> ret = new LinkedHashMap<>();
-
         PreparedStatement ps;
         if (labels != null && labels.containsKey(Label.INSERT_GET_ID)) {
             ps = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);

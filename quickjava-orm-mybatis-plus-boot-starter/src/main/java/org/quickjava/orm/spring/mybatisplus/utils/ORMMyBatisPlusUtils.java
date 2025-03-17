@@ -1,35 +1,31 @@
-package org.quickjava.orm.spring.domain;/*
+package org.quickjava.orm.spring.mybatisplus.utils;/*
  * Copyright (c) 2020~2024 http://www.quickjava.org All rights reserved.
  * +-------------------------------------------------------------------
  * Organization: QuickJava
  * +-------------------------------------------------------------------
  * Author: Qlo1062
  * +-------------------------------------------------------------------
- * File: ORMProps
+ * File: ORMMyBatisPlusUtils
  * +-------------------------------------------------------------------
- * Date: 2024/9/14 15:05
+ * Date: 2024/5/22 9:53
  * +-------------------------------------------------------------------
  * License: Apache Licence 2.0
  * +-------------------------------------------------------------------
  */
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import org.quickjava.orm.contain.IPagination;
+import org.quickjava.orm.contain.Pagination;
 
-@Configuration
-@ConfigurationProperties(prefix = "quickjava.orm")
-public class QuickJavaOrmProps {
+/**
+ * MyBatisPlus助手方法
+ */
+public class ORMMyBatisPlusUtils {
 
     /**
-     * 实体扫描路径
+     * IPage 转 Pagination
      */
-    private String typeAliasesPackage;
-
-    public String getTypeAliasesPackage() {
-        return typeAliasesPackage;
-    }
-
-    public void setTypeAliasesPackage(String typeAliasesPackage) {
-        this.typeAliasesPackage = typeAliasesPackage;
+    public static<T> IPagination<T> convPagination(IPage<T> page) {
+        return new Pagination<>(page.getCurrent(), page.getSize(), page.getTotal(), page.getRecords());
     }
 }

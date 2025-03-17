@@ -1,4 +1,4 @@
-package org.quickjava.orm.spring.loader;/*
+package org.quickjava.orm.spring.mybatisplus.loader;/*
  * Copyright (c) 2020~2024 http://www.quickjava.org All rights reserved.
  * +-------------------------------------------------------------------
  * Organization: QuickJava
