@@ -1,4 +1,4 @@
 # Auto Configure
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  org.quickjava.orm.spring.mybatisplus.loader.SpringLoader, \
-  org.quickjava.orm.spring.mybatisplus.domain.QuickJavaOrmProps
+  org.quickjava.orm.deliver.mybatisplus.spring.loader.ORMMyBatisPlusLoader, \
+  org.quickjava.orm.deliver.mybatisplus.domain.QuickJavaOrmProps
