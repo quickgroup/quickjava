@@ -237,6 +237,23 @@ public class Model implements IModel {
         return insert();
     }
 
+    public int insertAllMap(List<Map<String, Object>> dataList) {
+        List<Map<String, Object>> ret = new LinkedList<>();
+        for (Map<String, Object> data : dataList) {
+            data(data);
+            ret.add(new LinkedHashMap<>(this.sqlData()));
+        }
+        return query().insertAll(ret);
+    }
+
+    public int insertAll(List<? extends Model> models) {
+        List<Map<String, Object>> ret = new LinkedList<>();
+        for (Model model : models) {
+            ret.add(model.sqlData());
+        }
+        return query().insertAll(ret);
+    }
+
     /**
      * 删除
      *
@@ -784,8 +801,12 @@ public class Model implements IModel {
         if (ModelHelper.isVegetarianModel(this) && reservoir.vegetarian) {
             // 收集字段数据
             reservoir.meta.fieldMap().forEach((name, field) -> {
-                Object val = ReflectUtil.getFieldValue(this, field.getField());
-                data(field.getName(), val);
+                try {
+                    Object val = BeanUtils.getPropertyValue(this, field.getName());
+                    data(field.getName(), val);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
             });
         }
     }
