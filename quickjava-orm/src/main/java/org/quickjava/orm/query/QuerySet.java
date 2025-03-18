@@ -454,7 +454,7 @@ public class QuerySet {
         return executeSql();
     }
 
-    public int insertAll(List<DataMap> dataList) {
+    public int insertAll(List<Map<String, Object>> dataList) {
         reservoir.action = Action.INSERT;
         reservoir.getDataList().addAll(dataList);
         return executeSql();

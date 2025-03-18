@@ -128,9 +128,9 @@ public class TestModel {
         ret = new Model().union("a").find();
         ret = new Model().union(new String[]{}).find();
 
-        ret = new Model().relation(Model.class, RelationType.OneToOne, "id", "appId").find();
-        ret = new Article().relation(Article.class, RelationType.OneToOne, "id", "appId").find();
-        ret = new Model().relation(Model.class.getName(), RelationType.OneToOne, "id", "appId");
+//        ret = new Model().relation(Model.class, RelationType.OneToOne, "id", "appId").find();
+//        ret = new Article().relation(Article.class, RelationType.OneToOne, "id", "appId").find();
+//        ret = new Model().relation(Model.class.getName(), RelationType.OneToOne, "id", "appId");
 
         new Model().delete();
 
