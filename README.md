@@ -62,33 +62,28 @@ Maven->QuickJava-www->Lifecycle->packing
 
 ## 用爱发电
 <p align="center">
-  <img src="res/img/001.jpg" width="49%" alt="001.jpg" />
-  <img src="res/img/002.jpg" width="49%" alt="002.jpg" />
+  <img src="data/res/img/001.jpg" width="49%" alt="001.jpg" />
+  <img src="data/res/img/002.jpg" width="49%" alt="002.jpg" />
 </p>
-
-## 版权申明
-
-QuickJava遵循Apache2开源协议发布，并提供免费使用。
-
-本项目包含的第三方源码和二进制文件之版权信息另行标注。
-
-版权所有Copyright © 2020-2021 by QuickJava (www.quickjava.org)
-
-All rights reserved。
 
 License
 --------
+Copyright (c) 2013, Aldo Cortesi. All rights reserved.
 
-    Copyright 2019-2021 QuickJava.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
 
-       http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
