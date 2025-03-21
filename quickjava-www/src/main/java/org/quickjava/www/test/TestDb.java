@@ -138,6 +138,23 @@ public class TestDb {
             QuerySet.table("qj_user").where("id", Operator.GTE, 0).select();
         });
 
+        // 手动控制事务（不建议）
+        QuerySet.startTrans();
+        try {
+            // NOTE::查询
+            QuerySet.table("qj_user").where("id", Operator.GTE, 0).select();
+            // NOTE::更新
+            Map<String, Object> updateData = new LinkedHashMap<>();
+            updateData.put("name", "xiaolong");
+            updateData.put("age", 15);
+            QuerySet.table("qj_user").where("id", 5).update(updateData);
+
+            QuerySet.commit();
+        } catch (Exception e) {
+            QuerySet.rollback();
+            throw new RuntimeException(e);
+        }
+
         // 事务提交
         QuerySet.transaction(() -> {
             // NOTE::查询
